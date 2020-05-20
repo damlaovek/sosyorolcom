@@ -1,0 +1,3 @@
+var j = jQuery.noConflict();j( window ).resize(function() {j('.category-card-left').each(function(i, obj) {var target = j('.category-card-right').eq(i).height();j('.category-card-left').eq(i).height(target);});});j(document).ready(function(){ j('.category-card-left').each(function(i, obj) {var target = j('.category-card-right').eq(i).height();j('.category-card-left').eq(i).height(target);j('.category-card-left').eq(i).css("visibility", "visible");});});
+function textAreaAdjust(o) {o.style.height = "1px";o.style.height = (o.scrollHeight)+"px";}
+function displayAlert(alertText){alert(alertText);}
