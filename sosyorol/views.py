@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from sosyorol.models import languages
+from sosyorol.models import *
 import mysql.connector
 from django.db.models import Q
 
@@ -69,10 +69,10 @@ def home(request):
     lang = mycursor.fetchone()[0]
     mycursor.execute("SELECT * FROM wpmu_usermeta WHERE user_id='{current_uid}' AND meta_key='mode'")
     dark = mycursor.fetchone()
-    word_list = languages.objects.filter(Q(lang_code = lang))
+    word_list = Languages.objects.filter(Q(lang_code = lang))
     header_dict = header(word_list)
     left_menu_dict = left_menu(word_list)
-    country_list = languages.objects.filter(Q(var_name = 'lang'))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
     for c in country_list:
         c.translation = ucfirst(c.translation)
     select_language = ucfirst(word_list.filter(Q(var_name = 'select-language'))[0].translation)
@@ -82,6 +82,16 @@ def home(request):
     seeall = ucfirst(word_list.filter(Q(var_name = 'see-all'))[0].translation)
     populercommunities = ucfirst(word_list.filter(Q(var_name = 'popular-communities'))[0].translation)
     subscribe = ucfirst(word_list.filter(Q(var_name = 'subscribe'))[0].translation)
+
+    followed_communities = FollowedCommunities.objects.filter(Q(user_id = current_uid)).order_by('-date')[:10]
+    followed_community_ids = list({x.term_id: x for x in followed_communities}.keys())
+    followed_communities = Community.objects.filter(term_id__in=followed_community_ids)
+    followed_communities_colors = CommunityMeta.objects.filter(term_id__in=followed_community_ids).filter(meta_key = 'color_up')
+    for color in followed_communities_colors:
+        if color.meta_value is None:
+            color.meta_value = "var(--main-color)"
+    followed_communities_url_ids = CommunityMeta.objects.filter(term_id__in=followed_community_ids).filter(meta_key = 'tag_img')
+    followed_communities_url_ids = list({x.meta_value: x for x in followed_communities_url_ids}.keys())
 
     '''
     $interaction = $wpdb->get_results("SELECT * FROM languages WHERE var_name='interaction' AND lang_code='$lang'")[0]->translation;
