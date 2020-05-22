@@ -1,15 +1,23 @@
 
-<!doctype html>
-<html>
-    <head>
-        {% include 'head.html' %}
+{% load static %}
+{% include 'head.html' %}
+        <title>Sosyorol - Sosyal İçerik Platformu</title>
+        <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
+        <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
+        <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
+        <script src="{% static 'js/new/autosize.min.js' %}"></script>
+        <script src="{% static 'js/new/user-list.min.js' %}"></script>
+        <script src="{% static 'js/index.js' %}"></script>
+    </head>
     <body>
-        <h1>{{lang.meta_value}}</h1>
-
-        <ul>
-            {% for word in all_items %}
-                <li>{{word.var_name}}</li>
-            {% endfor %}
-        </ul>
+        {% include 'header.html' %}
+        {% include 'includes/_lang_popup.html' %}
+        <div class="full-width inline-flex">
+            {% include 'includes/_left_menu.html' %}
+            {% include 'includes/_home_feed.html' %}
+            {% include 'includes/_right_menu.html' %}
+        </div>
     </body>
 </html>

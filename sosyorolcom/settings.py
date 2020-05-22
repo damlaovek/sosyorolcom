@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
+
 
 # Application definition
 
@@ -76,8 +78,11 @@ WSGI_APPLICATION = 'sosyorolcom.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'unhelvasi_wp864',
+        'USER': 'dmlssyrl',
+        'PASSWORD': '190734fB@vesselam',
+        'HOST': '185.87.252.147'
     }
 }
 
