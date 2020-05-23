@@ -9,11 +9,32 @@ class Languages(models.Model):
 
 # User related models.
 class User(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    user_login = models.TextField()
+    user_pass = models.TextField()
+    user_nicename = models.TextField()
+    user_email = models.EmailField()
+    user_url = models.TextField()
+    user_registered = models.DateTimeField()
+    display_name = models.TextField()
+    description = ""
+    avatar_url = ""
+    class Meta:
+        db_table = "wpmu_users"
+    
+    def set_description(self, user_desc):
+        self.description = user_desc
+    
+    def set_avatar(self, img_url):
+        self.avatar_url = img_url
+
+class UserMeta(models.Model):
+    umeta_id = models.BigIntegerField(primary_key = True)
     user_id = models.BigIntegerField()
-    first_name = models.TextField()
-    last_name = models.TextField()
-    email = models.EmailField()
-    user_name = models.TextField()
+    meta_key = models.TextField()
+    meta_value = models.TextField()
+    class Meta:
+        db_table = "wpmu_usermeta"
 
 # Post related models.
 class Post(models.Model):
