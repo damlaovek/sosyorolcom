@@ -1,0 +1,194 @@
+<style>
+    img{
+        width:calc(100% - 20px);
+        object-fit:contain;
+        overflow:hidden;
+    }
+    #iframe1{
+        resize:vertical;
+    }
+    #editor ol{margin-left:30px;}
+    #editor ul{margin-left:30px;list-style-type:square;}
+</style>
+<div class="full-width" id="rich-texteditor">
+    <div style="background-color:var(--grayish);border-top-left-radius:4px;border-top-right-radius:4px;padding:6px 5px 4px 5px;" class="bsbb full-width inline-flex">
+        <button style="background-color:var(--grayish);" data-edit="bold"><i id='boldbtn' class="fa fa-bold icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);" data-edit="italic"><i class="fa fa-italic icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);" data-edit="underline"><i class="fa fa-underline icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);" data-edit="strikeThrough"><i class="fa fa-strikethrough icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);" data-edit="insertUnorderedList"><i class="fa fa-list-ul icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);" data-edit="insertOrderedList"><i class="fa fa-list-ol icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);" data-edit="subscript"><i class="fa fa-subscript icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);" data-edit="superscript"><i class="fa fa-superscript icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);" data-edit="undo"><i class="fa fa-undo icon cg2" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);" data-edit="redo"><i class="fas fa-redo icon cg2" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <div style="background-color:var(--grayish);" onclick="toggleCodeView();this.getElementsByClassName('texteditorBtn')[0].classList.toggle('selected');"><i class="fas fa-code icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></div>
+        <div style="background-color:var(--grayish);" onclick="quote(this);"><i class="fas fa-quote-right icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></div>
+        <button style="background-color:var(--grayish);" onclick="execCmdWithArg('createLink', prompt('Enter a url', 'https://'));"><i class="fa fa-link icon cg2" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <div style="background-color:var(--grayish);position:relative;width:35px;height:35px;cursor:pointer;">
+            <i class="fas fa-image icon cg2" style="width:15px;height:15px;font-size:14px;"></i>
+            <div  id="imageUploadForm" class="hand absolute icon" style="width:15px;height:15px;bottom:0;left:0;overflow:hidden;cursor:pointer;">
+                <input type='file' onchange="uploadImg();" class="hand sqr15" style="overflow:hidden;opacity:0;" id="imageUpload" name="file" accept=".png, .jpg, .jpeg" />
+            </div>
+        </div>
+        <div style="background-color:var(--grayish);position:relative;width:35px;height:35px;cursor:pointer;">
+            <i class="fas fa-video icon cg2" style="width:15px;height:15px;font-size:14px;"></i>
+            <div  id="videoUploadForm" class="hand absolute icon" style="width:15px;height:15px;bottom:0;left:0;overflow:hidden;cursor:pointer;">
+                <input type='file' onchange="uploadVideo();" class="hand sqr15" style="overflow:hidden;opacity:0;" id="videoUpload" name="file" accept="video/mp4,video/x-m4v,video/*" />
+            </div>
+        </div>
+    </div>
+    <div contenteditable style="width:calc(100% - 40px);padding: 20px;min-height:150px;font-weight:normal;line-height:30px;" id="editor"></div>
+    <!-- <iframe src="about:blank"  name="richTextField" class="full-width" frameborder="0" scrolling="no" id="iframe1" allowfullscreen=""></iframe> -->
+    <script>
+    [].forEach.call(document.querySelectorAll("[data-edit]"), function(btn) {
+      btn.addEventListener("click", edit, false);
+    });
+    
+    function edit(event) {
+      event.preventDefault();
+      var cmd_val = this.dataset.edit.split(":");
+      document.execCommand(cmd_val[0], false, cmd_val[1]);
+      if(document.queryCommandState(cmd_val[0])){
+         this.getElementsByClassName('texteditorBtn')[0].classList.add('selected');
+      }else{
+        this.getElementsByClassName('texteditorBtn')[0].classList.remove('selected'); 
+      }
+    }
+    </script>
+    <script type="text/javascript">
+        /*function resizeIframe() {
+            var body = richTextField.document.body,
+                html = richTextField.document.documentElement;
+                // body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight,html.offsetHeight
+            var height = Math.max( (body.offsetHeight + 20), 150 );
+            document.getElementById('iframe1').style.height = height + "px";
+            validateForm();
+        }*/
+        var quoteClass = 'myQuote',
+            removeQuoteClass = 'remove-myQuote';
+        var isCodeView = false;
+        function enableEditMode(){
+            /*
+            richTextField.document.designMode = 'On';
+            richTextField.document.body.contentEditable = "true";
+            richTextField.document.body.style.fontSize = "15px";
+            richTextField.document.body.style.color = "var(--text-color)";
+            richTextField.document.body.style.lineHeight = "36px";
+            richTextField.document.body.style.fontFamily = "'Roboto', helvetica, sans-serif";
+            if(richTextField.addEventListener) {// if support addEventListener
+                richTextField.addEventListener("keyup", resizeIframe, true)
+            }
+            else { //For IE
+                richTextField.attachEvent("onkeyup", resizeIframe);
+            }*/
+            execCmdWithArg('hiliteColor', '#FFFCE3');
+            execCmdWithArg('fontName', "monospace");
+        }
+        function execCmd(cmd){
+            //richTextField.document.execCommand(cmd, false, null);
+            document.execCommand(cmd, false, null);
+            //resizeIframe()
+        }
+        function execCmdWithArg(cmd, arg){
+            document.execCommand(cmd, false, arg);
+        }
+        function toggleCodeView(){
+            if (isCodeView) {
+                execCmdWithArg('hiliteColor', '#FFFCE3');
+                execCmdWithArg('foreColor', '#333333');
+                execCmdWithArg('fontName', 'system-ui');
+                isCodeView = false;
+            }else{
+                isCodeView = true;
+            }
+        }
+        function quote(elem){
+            elem.getElementsByClassName('texteditorBtn')[0].classList.toggle('selected');
+            if(elem.getElementsByClassName('texteditorBtn')[0].classList.contains('selected')){
+                richTextField.document.execCommand('formatblock', false, '<div>')
+                var quoteList = richTextField.document.getElementsByTagName('div');
+                quoteList[quoteList.length - 1].classList.remove(removeQuoteClass);
+                quoteList[quoteList.length - 1].classList.add(quoteClass);
+            }else{
+                richTextField.document.execCommand('formatblock', false, 'p')
+                var quoteList = richTextField.document.getElementsByTagName('div');
+                quoteList[quoteList.length - 1].classList.remove(quoteClass);
+                quoteList[quoteList.length - 1].classList.add(removeQuoteClass);
+            }
+        }
+        function uploadImg() {
+            var input = document.getElementById('imageUpload');
+            var j = jQuery.noConflict();
+            if (input.files && input.files[0]) {
+                var fd = new FormData();
+                var files = input.files[0];
+                var htmlString = "<img id='preview' src='' style='margin:auto;max-width:100%;max-height:450px;height:inherit;object-fit:contain;'>";
+                document.getElementById('editor').innerHTML += htmlString;
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                  //resizeIframe();
+                  document.getElementById('preview').src = e.target.result;
+                  //resizeIframe();
+                }
+                reader.readAsDataURL(input.files[0]);
+                fd.append('file',files);
+                //resizeIframe();
+                j.ajax({
+                  type: "POST",
+                  url: "https://www.sosyorol.com/upload/",
+                  data: fd,
+                  contentType: false,
+                  processData:false,
+                  success: function(response) {
+                    if(response != "0"){
+                        var htmlString = "<img src='"+response+"' style='margin:auto;max-width:100%;max-height:450px;height:inherit;object-fit:contain;'>";
+                        execCmdWithArg('insertHTML', htmlString);
+                        //alert(htmlString);
+                        document.getElementById('preview').src = response; 
+                        document.getElementById('preview').id = 'loaded-img';
+                        //resizeIframe();
+                    }
+                  }
+                });
+            }
+        }
+        function uploadVideo(){
+            var input = document.getElementById('videoUpload');
+            var j = jQuery.noConflict();
+            if (input.files && input.files[0]) {
+                var fd = new FormData();
+                var files = input.files[0];
+                var htmlString = '<div contenteditable="false" class="w20 m010"><video controls class="afterglow" id="myvideo" data-skin="dark" style="width:100%;overflow:hidden;object-fit:contain;" data-autoresize="fit"><source type="video/mp4" id="videoPreview" src="" /></video></div><br/>';
+                document.getElementById('editor').innerHTML += htmlString;
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                  //resizeIframe();
+                  document.getElementById('videoPreview').src = e.target.result;
+                  //resizeIframe();
+                }
+                reader.readAsDataURL(input.files[0]);
+                fd.append('file',files);
+                j.ajax({
+                  type: "POST",
+                  url: "https://www.sosyorol.com/upload/",
+                  data: fd,
+                  contentType: false,
+                  processData:false,
+                  success: function(response) {
+                    if(response != "0"){
+                        //var htmlString = '<div contenteditable="false" class="w20 m010"><video controls class="afterglow" id="myvideo" data-skin="dark" style="width:100%;overflow:hidden;object-fit:contain;" data-autoresize="fit"><source type="video/mp4" src="'+response+'" /></video></div><br/>';
+                        //var htmlString = "<iframe controls style='max-width:calc(100% - 20px);max-height:450px;margin:auto;object-fit:contain;' src="+response+"></iframe>;
+                        //alert(htmlString);
+                        //document.getElementById('editor').innerHTML += htmlString;
+                        //execCmdWithArg('insertHTML', htmlString)
+                        document.getElementById('videoPreview').src = response;
+                        document.getElementById('videoPreview').id = 'loaded-video';
+                        //resizeIframe();
+                    }
+                  }
+                });
+            }
+        }
+    </script>
+</div>

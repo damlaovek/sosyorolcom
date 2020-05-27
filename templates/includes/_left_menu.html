@@ -14,8 +14,13 @@
             <a href="" title="{{c.name}}" class="full-width">
                 <div class="full-width hand left-list-item-link">
                     <li class="left-list-item">
-                    <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
-                        <p class="ellipsis followed-community-name" style="font-size:17px;padding:0 15px;font-weight:var(--bold);line-height:40px;">{{c.name}}</p>
+                        {% if c.tag_img == '' %}
+                            <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                            <p class="ellipsis followed-community-name" style="font-size:17px;padding:0 15px;font-weight:var(--bold);line-height:40px;">{{c.name}}</p>
+                        {% else %}
+                            <img src="{{c.tag_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                            <p class="ellipsis followed-community-name" style="font-size:17px;padding:0 15px;font-weight:var(--bold);line-height:40px;">{{c.name}}</p>
+                        {% endif %}
                     </li>
                 </div>
             </a>
@@ -37,7 +42,7 @@
                 <input id="switch-shadow" class="switch switch--shadow" type="checkbox" checked>
                 <label for="switch-shadow"></label>
             </div>
-            <p id="mode-text">{{left_menu_dict.darkmode}}></p>
+            <p id="mode-text">{{left_menu_dict.darkmode}}</p>
         {% else %}
             <div class="switch__container left">
                 <input id="switch-shadow" class="switch switch--shadow" type="checkbox">

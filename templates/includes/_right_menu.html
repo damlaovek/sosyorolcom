@@ -62,26 +62,22 @@
             <p id="see-all">{{right_menu_dict.seeall}}</p>
         </div>
         <ul class="full-width community-list">
-            <?php
-                $args = array('taxonomy' => 'post_tag','hide_empty' => true, 'orderby' => 'count', 'order' => 'DESC', 'number' => 5 );
-                $tags = get_terms($args);
-                if ( $tags ) :
-                    foreach ( $tags as $tag ) : 
-                        $args = array('numberposts' => -1,'tax_query' => array(array('taxonomy' => 'post_tag', 'field' => 'slug', 'terms' => $tag->slug)));
-                        $postslist = get_posts( $args ); ?>
-                        <a href="<?php echo esc_url( get_tag_link( $tag->term_id ) ); ?>" title="<?php echo esc_attr( $tag->name ); ?>" class="underline-link">
-                            <li class="full-width inline-block">
-                                <?php $trendTagImg = get_field( "tag_img",$tag )["url"];$trendTagColor = get_field( "color_up",$tag );if(!$trendTagImg){$trendTagImg = get_stylesheet_directory_uri()."/assets/img/defaults/default-community.png";}$trendTagColor = get_field( "color_up",$tag );if(!$trendTagColor){$trendTagColor = "var(--main-color)";}?>
-                                <img class="p5 left sqrt30 rounded img-sd non-draggable" src="<?php echo $trendTagImg; ?>" style="background-color:<?php echo $trendTagColor; ?>"/>
-                                <div class="left" id="community-info">
-                                    <p  class="ellipsis underline-onhover" id="community-name"><?php echo "c/".mb_strtolower(esc_html( $tag->name )); ?></p>
-                                    <p  class="ellipsis" id="community-pc"><?php echo count($postslist)." ".ucwords_tr($interaction); ?></p>
-                                </div>
-                                <p class="btn right" id="subscribe-btn"><span><?php echo ucwords_tr($subscribe); ?></span></p>
-                            </li>
-                        </a>
-                    <?php endforeach; ?>
-            <?php endif; ?>
+            {% for c in popular_communities %}
+                <a href="" title="{{c.name}}" class="underline-link">
+                    <li class="full-width inline-block">
+                        {% if c.tag_img == '' %}
+                            <img class="p5 left sqrt30 rounded img-sd non-draggable" src="{% static 'assets/img/defaults/default-community.png' %}" style="background-color:{{c.tag_color}}"/>
+                        {% else %}
+                            <img class="p5 left sqrt30 rounded img-sd non-draggable" src="{{c.tag_img}}" style="background-color:{{c.tag_color}}"/>
+                        {% endif %}
+                        <div class="left" id="community-info">
+                            <p  class="ellipsis underline-onhover" id="community-name">c/{{c.name}}</p>
+                            <p  class="ellipsis" id="community-pc">{{c.count}} {{right_menu_dict.interaction}}</p>
+                        </div>
+                        <p class="btn right" id="subscribe-btn"><span>{{right_menu_dict.subscribe}}</span></p>
+                    </li>
+                </a>
+            {% endfor %}
         </ul>
     </div>
     <p class="btn hand scroll-to-top">{{right_menu_dict.scrolltotop}}</p>

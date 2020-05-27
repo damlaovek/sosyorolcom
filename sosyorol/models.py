@@ -44,11 +44,61 @@ class Post(models.Model):
     post_content = models.TextField()
     post_title = models.TextField()
     post_excerpt = models.TextField()
+    post_parent = models.BigIntegerField()
     post_status = models.TextField()
     guid = models.TextField()
     post_type = models.TextField() 
+    rating = 0
+    likes = 0
+    dislikes = 0
+    short_content = ""
+    preview = ""
+    author = User()
+    comments = models.QuerySet()
+    post_images = []
+    photo_from_url = ""
+    time_diff = ""
+    parent_title = ""
     class Meta:
         db_table = "wpmu_posts"
+
+class PostRating(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    post_id = models.BigIntegerField()
+    user_id = models.BigIntegerField()
+    opinion = models.TextField()
+    date = models.DateTimeField()
+    class Meta:
+        db_table = "sosyorol_post_rating"
+
+class Repost(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    post_id = models.BigIntegerField()
+    user_id = models.BigIntegerField()
+    comment = models.TextField()
+    date = models.DateTimeField()
+    class Meta:
+        db_table = "repost"
+
+
+class PostMeta(models.Model):
+    meta_id = models.BigIntegerField(primary_key = True)
+    post_id = models.BigIntegerField()
+    meta_key = models.TextField()
+    meta_value = models.TextField()
+    class Meta:
+        db_table = "wpmu_postmeta"
+
+# Comment related models.
+class Comment(models.Model):
+    comment_ID = models.BigIntegerField(primary_key = True)
+    comment_post_ID = models.BigIntegerField()
+    comment_content = models.TextField()
+    comment_approved = models.SmallIntegerField()
+    comment_author = models.TextField()
+    comment_author_email = models.TextField()
+    class Meta:
+        db_table = "wpmu_comments"
 
 # Community related models.
 class TermTaxonomy(models.Model):
@@ -72,6 +122,11 @@ class Community(models.Model):
     term_id = models.BigIntegerField(primary_key = True)
     name = models.TextField()
     slug = models.TextField()
+    tag_img = ""
+    tag_color = ""
+    count = 0
+    metadesc = ""
+    lower_name = ""
     class Meta:
         db_table = "wpmu_terms"
 

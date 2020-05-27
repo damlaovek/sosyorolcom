@@ -15,8 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from sosyorol.views import home
+from sosyorol.views import home, newpost
 
 urlpatterns = [
     path('', home),
+    path('submit/', newpost),
 ]
