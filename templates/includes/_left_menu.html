@@ -1,3 +1,4 @@
+{% load static %}
 <div class="fixed section-left">
     <ul class="nav">
         <a href="/">
@@ -8,19 +9,23 @@
                 </li>
             </div>
         </a>
-        <?php $terms = followedCommunities($userID); foreach($terms as $term): $tag = get_term($term->term_id); ?>
+        {% for c in followed_communities %}
         <div class="full-width">
-            <a href="<?php echo esc_url( get_tag_link( $tag->term_id ) ); ?>" title="<?php echo esc_attr( $tag->name ); ?>" class="full-width">
+            <a href="" title="{{c.name}}" class="full-width">
                 <div class="full-width hand left-list-item-link">
                     <li class="left-list-item">
-                        <?php $trendTagImg = get_field( "tag_img",$tag )["url"]; if(!$trendTagImg){$trendTagImg = get_stylesheet_directory_uri()."/assets/img/defaults/default-community.png";}$trendTagColor = get_field( "color_up",$tag );if(!$trendTagColor){$trendTagColor = "var(--main-color)";}?>
-                        <img src="<?php echo $trendTagImg; ?>" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:<?php echo $trendTagColor; ?>" data-no-lazy="1"/>
-                        <p class="ellipsis followed-community-name" style="font-size:17px;padding:0 15px;font-weight:var(--bold);line-height:40px;"><?php echo esc_html(ucfirst(mb_convert_case(str_replace('I','ı',str_replace('İ','i',$tag->name)), MB_CASE_TITLE, "UTF-8"))); ?></p>
+                        {% if c.tag_img == '' %}
+                            <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                            <p class="ellipsis followed-community-name" style="font-size:17px;padding:0 15px;font-weight:var(--bold);line-height:40px;">{{c.name}}</p>
+                        {% else %}
+                            <img src="{{c.tag_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                            <p class="ellipsis followed-community-name" style="font-size:17px;padding:0 15px;font-weight:var(--bold);line-height:40px;">{{c.name}}</p>
+                        {% endif %}
                     </li>
                 </div>
             </a>
         </div>
-        <?php endforeach; ?>
+        {% endfor %}
     </ul>
     <div id="divider"></div>
     <div class="section-left-options inline-block">
@@ -37,7 +42,7 @@
                 <input id="switch-shadow" class="switch switch--shadow" type="checkbox" checked>
                 <label for="switch-shadow"></label>
             </div>
-            <p id="mode-text">{{left_menu_dict.darkmode}}></p>
+            <p id="mode-text">{{left_menu_dict.darkmode}}</p>
         {% else %}
             <div class="switch__container left">
                 <input id="switch-shadow" class="switch switch--shadow" type="checkbox">

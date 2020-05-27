@@ -1,7 +1,8 @@
+{% load static %}
 <div class="section-right fixed">
     <div class="full-shadow-border section-right-top">
         <div class="inline-block full-width">
-            <p class="profile-title"><?php echo ucwords_tr($myprofile); ?></p>
+            <p class="profile-title">{{right_menu_dict.myprofile}}</p>
             <svg viewBox="0 0 20 20" id="profile-more-actions" class="absolute icon hand right">
                 <g>
                     <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12 " transform="matrix(0.833333,0,0,0.833333,0,0)"/>
@@ -17,15 +18,15 @@
                             <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 15.003222 11.997149 C 15.003222 13.652864 13.652864 15.003222 11.997149 15.003222 C 10.34822 15.003222 8.997862 13.652864 8.997862 11.997149 C 8.997862 10.34822 10.34822 8.997862 11.997149 8.997862 C 13.652864 8.997862 15.003222 10.34822 15.003222 11.997149 Z M 15.003222 11.997149 " transform="matrix(0.575658,0,0,0.575658,0,0)"/>
                         </g>
                     </svg>
-                    <p id="viewPRofile"><?php echo ucwords_tr($viewProfile); ?></p>
+                    <p id="viewPRofile">{{right_menu_dict.viewprofile}}</p>
                 </a>
             </div>
         </div>
         <div class="inline-block full-width" id="user-profile-c">
-            <img class="non-draggable rounded left sqr40" src="<?php echo bp_core_fetch_avatar( array( 'item_id' => $userID, 'html' => false, 'type' => 'full' ) ); ?>"/>
+            <img class="non-draggable rounded left sqr40" src="{{current_user.avatar_url}}"/>
             <div class="left" id="user-profile-ic">
-                <p class="ellipsis"><?php echo $current_user->display_name; ?></p>
-                <a href=""><p class="ellipsis"><?php echo "u/".$current_user->user_login; ?></p></a>
+                <p class="ellipsis">{{current_user.display_name}}</p>
+                <a href=""><p class="ellipsis">u/{{current_user.user_login}}</p></a>
             </div>
         </div>
         <div class="inline-block full-width user-icons">
@@ -52,36 +53,32 @@
                 </g>
             </svg>
         </div>
-        <p id="user-bio"><?php echo htmlspecialchars_decode($current_user->description); ?></p>
-        <a href="https://www.sosyorol.com/submit" class="full-width"><p class="btn full-width" id="cp-btn"><?php echo ucwords_tr($createpost); ?></p></a>
+        <p id="user-bio">{{current_user.description}}</p>
+        <a href="https://www.sosyorol.com/submit" class="full-width"><p class="btn full-width" id="cp-btn">{{right_menu_dict.createpost}}</p></a>
     </div>
     <div  class="full-shadow-border p20 section-right-bottom">
         <div class="inline-block full-width">
-            <p class="ellipsis community-title"><?php echo ucwords_tr($populerCommunities); ?></p>
-            <p id="see-all"><?php echo mb_strtoupper($seeall); ?></p>
+            <p class="ellipsis community-title">{{right_menu_dict.popularcommunities}}</p>
+            <p id="see-all">{{right_menu_dict.seeall}}</p>
         </div>
         <ul class="full-width community-list">
-            <?php
-                $args = array('taxonomy' => 'post_tag','hide_empty' => true, 'orderby' => 'count', 'order' => 'DESC', 'number' => 5 );
-                $tags = get_terms($args);
-                if ( $tags ) :
-                    foreach ( $tags as $tag ) : 
-                        $args = array('numberposts' => -1,'tax_query' => array(array('taxonomy' => 'post_tag', 'field' => 'slug', 'terms' => $tag->slug)));
-                        $postslist = get_posts( $args ); ?>
-                        <a href="<?php echo esc_url( get_tag_link( $tag->term_id ) ); ?>" title="<?php echo esc_attr( $tag->name ); ?>" class="underline-link">
-                            <li class="full-width inline-block">
-                                <?php $trendTagImg = get_field( "tag_img",$tag )["url"];$trendTagColor = get_field( "color_up",$tag );if(!$trendTagImg){$trendTagImg = get_stylesheet_directory_uri()."/assets/img/defaults/default-community.png";}$trendTagColor = get_field( "color_up",$tag );if(!$trendTagColor){$trendTagColor = "var(--main-color)";}?>
-                                <img class="p5 left sqrt30 rounded img-sd non-draggable" src="<?php echo $trendTagImg; ?>" style="background-color:<?php echo $trendTagColor; ?>"/>
-                                <div class="left" id="community-info">
-                                    <p  class="ellipsis underline-onhover" id="community-name"><?php echo "c/".mb_strtolower(esc_html( $tag->name )); ?></p>
-                                    <p  class="ellipsis" id="community-pc"><?php echo count($postslist)." ".ucwords_tr($interaction); ?></p>
-                                </div>
-                                <p class="btn right" id="subscribe-btn"><span><?php echo ucwords_tr($subscribe); ?></span></p>
-                            </li>
-                        </a>
-                    <?php endforeach; ?>
-            <?php endif; ?>
+            {% for c in popular_communities %}
+                <a href="" title="{{c.name}}" class="underline-link">
+                    <li class="full-width inline-block">
+                        {% if c.tag_img == '' %}
+                            <img class="p5 left sqrt30 rounded img-sd non-draggable" src="{% static 'assets/img/defaults/default-community.png' %}" style="background-color:{{c.tag_color}}"/>
+                        {% else %}
+                            <img class="p5 left sqrt30 rounded img-sd non-draggable" src="{{c.tag_img}}" style="background-color:{{c.tag_color}}"/>
+                        {% endif %}
+                        <div class="left" id="community-info">
+                            <p  class="ellipsis underline-onhover" id="community-name">c/{{c.name}}</p>
+                            <p  class="ellipsis" id="community-pc">{{c.count}} {{right_menu_dict.interaction}}</p>
+                        </div>
+                        <p class="btn right" id="subscribe-btn"><span>{{right_menu_dict.subscribe}}</span></p>
+                    </li>
+                </a>
+            {% endfor %}
         </ul>
     </div>
-    <p class="btn hand scroll-to-top"><?php echo mb_strtoupper($scrollToTop); ?></p>
+    <p class="btn hand scroll-to-top">{{right_menu_dict.scrolltotop}}</p>
 </div>
