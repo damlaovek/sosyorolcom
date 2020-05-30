@@ -59,6 +59,13 @@ class Post(models.Model):
     photo_from_url = ""
     time_diff = ""
     parent_title = ""
+    poll_duration = ""
+    number_options = 0
+    poll_options = models.QuerySet()
+    votes = models.QuerySet()
+    poll_duration_left = ""
+    voted = 0
+    vote_percentages = []
     class Meta:
         db_table = "wpmu_posts"
 
@@ -88,6 +95,18 @@ class PostMeta(models.Model):
     meta_value = models.TextField()
     class Meta:
         db_table = "wpmu_postmeta"
+
+class SossyComments(models.Model):
+    id = models.BigIntegerField(primary_key = True)
+    post_id = models.BigIntegerField()
+    user_id = models.BigIntegerField()
+    comment = models.TextField()
+    choice = models.IntegerField()
+    percentage = 0
+    max_voted = False
+    num_votes = 0
+    class Meta:
+        db_table = "sossy_comments"
 
 # Comment related models.
 class Comment(models.Model):
