@@ -1,3 +1,7 @@
+<style>
+    .box{box-shadow:0px 3px 4px rgba(173,173,173, 0.53);}
+    .box .box{box-shadow:none;}
+</style>
 <div class="section-middle" style="margin-top:58px;">
     <div id="section-middle-top" class="box inline-block p10">
         <a href="https://www.sosyorol.com/submit" id="create-post" class="left">
@@ -117,6 +121,11 @@
                 </div>
             </div>
         </div>
+        <div class="full-width link-wrapper">
+            {% for poll in polls %}
+                 {% include 'includes/poll_template.html' %}
+            {% endfor %}
+         </div>
         <div class="full-width link-wrapper">
            {% for post in posts %}
                 {% include 'includes/post_template.html' %}

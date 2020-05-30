@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from sosyorol.models import *
 import mysql.connector
 from django.db.models import Q
@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup as BSHTML
 import datetime as dt
 import re
 from urllib.request import urlopen
+import json
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -192,6 +193,7 @@ def post_template(word_list):
     post_template_dict['article'] = ucwords(word_list.filter(Q(var_name = 'article'))[0].translation)
     post_template_dict['link'] = ucwords(word_list.filter(Q(var_name = 'link'))[0].translation)
     post_template_dict['answer'] = ucwords(word_list.filter(Q(var_name = 'answer'))[0].translation)
+    post_template_dict['poll'] = ucwords(word_list.filter(Q(var_name = 'poll'))[0].translation)
     post_template_dict['answernoun'] = ucwords(word_list.filter(Q(var_name = 'answer-noun'))[0].translation)
     post_template_dict['recommendedfy'] = ucwords(word_list.filter(Q(var_name = 'recommended-for-you'))[0].translation)
     post_template_dict['more'] = ucwords(word_list.filter(Q(var_name = 'more'))[0].translation)
@@ -202,6 +204,9 @@ def post_template(word_list):
     post_template_dict['downvote'] = ucwords(word_list.filter(Q(var_name = 'downvote'))[0].translation)
     post_template_dict['send'] = ucwords(word_list.filter(Q(var_name = 'send'))[0].translation)
     post_template_dict['subscribe'] = ucwords(word_list.filter(Q(var_name = 'subscribe'))[0].translation)
+    post_template_dict['vote'] = ucwords(word_list.filter(Q(var_name = 'vote'))[0].translation)
+    post_template_dict['votenoun'] = localized_lower(word_list.filter(Q(var_name = 'vote-noun'))[0].translation)
+    post_template_dict['votesnoun'] = localized_lower(word_list.filter(Q(var_name = 'votes-noun'))[0].translation)
     return post_template_dict
 
 def comment_editor_dict(word_list):
@@ -220,6 +225,45 @@ def get_photo_from_url(photo_url):
     elif link.find("img") is not None:
         image = link.find("img").get('href')
     return image
+
+def setup_pollmeta(post, word_list):
+    current_uid = 8
+    post.poll_duration = PostMeta.objects.filter(Q(post_id=post.ID)).filter(Q(meta_key="poll_duration"))[0].meta_value
+    post.number_options = int(PostMeta.objects.filter(Q(post_id=post.ID)).filter(Q(meta_key="number_options"))[0].meta_value)
+    options_keys = []
+    for i in range(0, post.number_options):
+        options_keys.append(f'secenek_{i+1}')
+    post.poll_options = PostMeta.objects.filter(Q(post_id=post.ID)).filter(Q(meta_key__in=options_keys))
+    post.votes = SossyComments.objects.filter(Q(post_id=post.ID))
+    total_votes = len(post.votes)
+    index = 1
+    max_vote = 0
+    for vote in post.poll_options:
+        vote.num_votes = len(SossyComments.objects.filter(Q(post_id=post.ID)).filter(Q(choice=index)))
+        if vote.num_votes > max_vote:
+            max_vote = vote.num_votes
+        vote.percentage = vote.num_votes / total_votes * 100
+        index += 1
+    for vote in post.poll_options:
+        if vote.num_votes == max_vote:
+            vote.max_voted = True
+            break
+    isvoted = SossyComments.objects.filter(Q(post_id=post.ID)).filter(Q(user_id=current_uid))
+    if(len(isvoted)>0):
+        post.voted = isvoted[0].choice
+    duration = PostMeta.objects.filter(Q(post_id=post.ID)).filter(Q(meta_key="poll_duration"))[0].meta_value
+    if duration == "Unlimited":
+        post.poll_duration_left = ucwords(word_list.filter(Q(var_name = 'unlimited-time'))[0].translation)
+    else:
+        days = int(duration.split()[0])
+        ago = localized_lower(word_list.filter(Q(var_name = 'ago'))[0].translation)
+        left = localized_lower(word_list.filter(Q(var_name = 'left'))[0].translation)
+        to = post.post_date.replace(tzinfo=None) + dt.timedelta(days=days)
+        now = dt.datetime.now()
+        if now < to:
+            post.poll_duration_left = humanizedate(now, word_list, to=to).replace(ago, left)
+        else:
+            post.poll_duration_left = "bitti"       
 
 def setup_postmeta(post, word_list):
     post.like = len(PostRating.objects.filter(Q(post_id=post.ID)).filter(Q(opinion='like')))
@@ -255,6 +299,9 @@ def setup_postmeta(post, word_list):
         post.parent_title = post.post_title
     else:
         post.parent_title = Post.objects.filter(Q(ID=post.post_parent))[0].post_title
+
+    if post.post_type == "poll":
+        setup_pollmeta(post, word_list)
 
 # Create your views here.
 def home(request):
@@ -344,6 +391,10 @@ def home(request):
     questions = Post.objects.filter(Q(post_type="questions")).filter(Q(post_status="publish")).order_by('-post_date')[:8]
     for post in questions:
         setup_postmeta(post, word_list)
+    
+    polls = Post.objects.filter(Q(post_type="poll")).filter(Q(post_status="publish")).order_by('-post_date')
+    for poll in polls:
+        setup_postmeta(poll, word_list)
 
     communities = Community.objects.all()[:10]
     for i in communities:
@@ -384,7 +435,7 @@ def home(request):
                                             'popular_communities':popular_communities, 'posts':posts,
                                             'post_template_dict':post_template_dict, 'comment_editor':comment_editor,
                                             'links':links, 'answers':answers, 'questions':questions,
-                                            'communities':communities, 'users':users
+                                            'communities':communities, 'users':users, 'polls':polls
                                             })
 
 def post_types(word_list):
@@ -432,6 +483,9 @@ def newpost_actions(word_list):
     newpost_actions_dict['searchcommunity'] = ucwords(word_list.filter(Q(var_name = 'search-community'))[0].translation)
     newpost_actions_dict['spoiler'] = ucfirst(word_list.filter(Q(var_name = 'spoiler-flair'))[0].translation)
     newpost_actions_dict['nsfw'] = ucfirst(word_list.filter(Q(var_name = 'nsfw-flair'))[0].translation)
+    newpost_actions_dict['close'] = ucfirst(word_list.filter(Q(var_name = 'close'))[0].translation)
+    newpost_actions_dict['delete'] = ucfirst(word_list.filter(Q(var_name = 'delete'))[0].translation)
+    newpost_actions_dict['lastupdated'] = ucfirst(word_list.filter(Q(var_name = 'last-updated'))[0].translation)
     return newpost_actions_dict
 
 def newpost(request):
@@ -460,7 +514,18 @@ def newpost(request):
         create_post_dict = create_poll(word_list)
     newpost_actions_dict = newpost_actions(word_list)
     drafts = Post.objects.filter(Q(post_author=current_uid)).filter(post_status="draft").filter(post_type__in=["post", "questions","poll"]).order_by('post_date')
+    for post in drafts:
+        setup_postmeta(post, word_list)
     return render(request, 'newpost.html', {'post_type':post_type,'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict, 'post_types_dict':post_types_dict,
                                             'create_post_rules_dict': create_post_rules_dict, 'tips':tips, 'create_post_dict':create_post_dict,
                                             'newpost_actions_dict':newpost_actions_dict, 'drafts':drafts})
+
+def votepoll(request):
+    post_id = request.POST["post_id"]
+    user_id = 8
+    choice = request.POST["option"]
+    comment = ""
+    new_vote = SossyComments(post_id=post_id, user_id=user_id, choice=choice, comment=comment)
+    new_vote.save()
+    return HttpResponse(json.dumps({}),content_type="application/json")

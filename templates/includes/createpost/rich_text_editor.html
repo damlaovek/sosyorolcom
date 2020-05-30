@@ -4,11 +4,60 @@
         object-fit:contain;
         overflow:hidden;
     }
-    #iframe1{
-        resize:vertical;
-    }
+
+    #editor{width:calc(100% - 40px);padding: 20px;min-height:150px;font-weight:normal;line-height:30px; counter-reset: custom-counter;text-align: left;}
     #editor ol{margin-left:30px;}
     #editor ul{margin-left:30px;list-style-type:square;}
+    #editor > p{
+        background-color:#F6F6F6;
+        display: table;
+        padding:0;
+        width:100%;
+        text-align:left;
+        line-height:20px;
+        overflow:hidden;
+        font-family: monospace;
+        font-size:14px; 
+        color:#666666;
+        text-indent: 10px;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+    #editor > p:before{
+        counter-increment: custom-counter+1;
+        content: counter(custom-counter)". ";
+        background-color:#E6E6E6;
+        color:#949494;
+        width:30px;
+        padding-right:5px;
+        align-content: flex-end;
+        display: table-cell;
+    }
+    #editor > p::after{
+        word-wrap: break-word;
+    }
+    /*
+    #editor div:not(:first-child):before {
+        counter-increment: custom-counter+1;
+        content: counter(custom-counter)". ";
+        color: var(--black);
+        padding-right: 5px;
+        text-align:left;
+        line-break: strict;
+        height: 100%;
+        padding-left: 10px;
+        background-color: darkkhaki;
+    }
+    #editor div:first-child:before {
+        color: var(--black);
+        content: '1. ';
+        counter-increment: custom-counter+1;
+        padding-right: 5px;
+        padding-left: 10px;
+        text-align:left;
+        line-break: strict;
+        background-color: darkkhaki;
+    }*/
 </style>
 <div class="full-width" id="rich-texteditor">
     <div style="background-color:var(--grayish);border-top-left-radius:4px;border-top-right-radius:4px;padding:6px 5px 4px 5px;" class="bsbb full-width inline-flex">
@@ -20,9 +69,9 @@
         <button style="background-color:var(--grayish);" data-edit="insertOrderedList"><i class="fa fa-list-ol icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
         <button style="background-color:var(--grayish);" data-edit="subscript"><i class="fa fa-subscript icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
         <button style="background-color:var(--grayish);" data-edit="superscript"><i class="fa fa-superscript icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
-        <button style="background-color:var(--grayish);" data-edit="undo"><i class="fa fa-undo icon cg2" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);" data-edit="undo"><i class="fa fa-undo icon cg2 " style="width:15px;height:15px;font-size:14px;"></i></button>
         <button style="background-color:var(--grayish);" data-edit="redo"><i class="fas fa-redo icon cg2" style="width:15px;height:15px;font-size:14px;"></i></button>
-        <div style="background-color:var(--grayish);" onclick="toggleCodeView();this.getElementsByClassName('texteditorBtn')[0].classList.toggle('selected');"><i class="fas fa-code icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></div>
+        <button style="background-color:var(--grayish);" data-edit="formatBlock:p" id="code"><i class="fas fa-code icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
         <div style="background-color:var(--grayish);" onclick="quote(this);"><i class="fas fa-quote-right icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></div>
         <button style="background-color:var(--grayish);" onclick="execCmdWithArg('createLink', prompt('Enter a url', 'https://'));"><i class="fa fa-link icon cg2" style="width:15px;height:15px;font-size:14px;"></i></button>
         <div style="background-color:var(--grayish);position:relative;width:35px;height:35px;cursor:pointer;">
@@ -38,23 +87,43 @@
             </div>
         </div>
     </div>
-    <div contenteditable style="width:calc(100% - 40px);padding: 20px;min-height:150px;font-weight:normal;line-height:30px;" id="editor"></div>
-    <!-- <iframe src="about:blank"  name="richTextField" class="full-width" frameborder="0" scrolling="no" id="iframe1" allowfullscreen=""></iframe> -->
-    <script>
-    [].forEach.call(document.querySelectorAll("[data-edit]"), function(btn) {
-      btn.addEventListener("click", edit, false);
-    });
-    
-    function edit(event) {
-      event.preventDefault();
-      var cmd_val = this.dataset.edit.split(":");
-      document.execCommand(cmd_val[0], false, cmd_val[1]);
-      if(document.queryCommandState(cmd_val[0])){
-         this.getElementsByClassName('texteditorBtn')[0].classList.add('selected');
-      }else{
-        this.getElementsByClassName('texteditorBtn')[0].classList.remove('selected'); 
-      }
-    }
+    <div contenteditable id="editor"></div>
+    <script type="text/javascript">
+        var j = jQuery.noConflict();
+        j("#editor").keydown(function(e){
+            if ( e.which === 9 ) {
+                e.preventDefault();
+                var editor = document.getElementById("editor");
+                var doc = editor.ownerDocument.defaultView;
+                var sel = doc.getSelection();
+                var range = sel.getRangeAt(0);
+
+                var tabNode = document.createTextNode("\u00a0\u00a0\u00a0\u00a0");
+                range.insertNode(tabNode);
+
+                range.setStartAfter(tabNode);
+                range.setEndAfter(tabNode); 
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        });
+        [].forEach.call(document.querySelectorAll("[data-edit]"), function(btn) {
+            btn.addEventListener("click", edit, false);
+        });
+        function edit(event) {
+            event.preventDefault();
+            var cmd_val = this.dataset.edit.split(":");
+            document.execCommand(cmd_val[0], false, cmd_val[1]);
+            if(this.id == "code"){
+                this.getElementsByClassName('texteditorBtn')[0].classList.toggle("selected");
+            }else{
+                if(document.queryCommandState(cmd_val[0])){
+                    this.getElementsByClassName('texteditorBtn')[0].classList.add('selected');
+                }else{
+                    this.getElementsByClassName('texteditorBtn')[0].classList.remove('selected'); 
+                }
+            }
+        }
     </script>
     <script type="text/javascript">
         /*function resizeIframe() {
@@ -69,19 +138,6 @@
             removeQuoteClass = 'remove-myQuote';
         var isCodeView = false;
         function enableEditMode(){
-            /*
-            richTextField.document.designMode = 'On';
-            richTextField.document.body.contentEditable = "true";
-            richTextField.document.body.style.fontSize = "15px";
-            richTextField.document.body.style.color = "var(--text-color)";
-            richTextField.document.body.style.lineHeight = "36px";
-            richTextField.document.body.style.fontFamily = "'Roboto', helvetica, sans-serif";
-            if(richTextField.addEventListener) {// if support addEventListener
-                richTextField.addEventListener("keyup", resizeIframe, true)
-            }
-            else { //For IE
-                richTextField.attachEvent("onkeyup", resizeIframe);
-            }*/
             execCmdWithArg('hiliteColor', '#FFFCE3');
             execCmdWithArg('fontName', "monospace");
         }

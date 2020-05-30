@@ -1,6 +1,3 @@
-<script type="text/javascript"> 
-    var a = "{{post.ID|escapejs}}";
- </script>
 <div class='full-width'>
     <div class='full-width box answer-template-oc'>
         <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
@@ -12,39 +9,88 @@
                         <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
                     </g>
                 </svg>
-                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{post_template_dict.article}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{post_template_dict.recommendedfy}}</p>
+                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{post_template_dict.poll}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{post_template_dict.recommendedfy}}</p>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
-                    <img src='{{post.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
+                    <img src='{{poll.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
-                        <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{post.author.display_name}}</a><br>
-                        <a href='{{post.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{post.time_diff}} {{post_template_dict.ago}}</a>
+                        <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{poll.author.display_name}}</a><br>
+                        <a href='{{poll.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{poll.time_diff}} {{post_template_dict.ago}}</a>
                     </div>
                 </div>
-                <a href='{{post.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{post.post_title}}</a>
-                {% if post.preview == 'not-found' %}
-                    <div class="full-width answer-more-container hand" id="post-more-container" onclick="document.getElementById('post-template{{post.ID|escapejs}}').style.display='block';this.remove();">
-                        <p class='answer-shorttext hand' id='post-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick='document.getElementById("photo-frame-{{post.ID}}").style.display="none";document.getElementById("post-shorttext{{post.ID}}").style.display="none";document.getElementById("post-template{{post.ID|escapejs}}").style.display="block";this.remove();'>({{post_template_dict.more}})</span></p>
-                    </div>
-                    <div class='answer-template' id='post-template{{post.ID}}'>{% autoescape off %}{{post.post_content}}{% endautoescape %}</div>
-                {% else %}
-                    <div class='full-width answer-more-container hand' id='post-more-container' onclick='document.getElementById("post-template{{post.ID|escapejs}}").style.display="block";this.remove();'>
-                        {% include 'includes/photo_college.html' %}
-                        <p class='answer-shorttext hand' id='post-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick="document.getElementById('photo-frame-{{post.ID}}').style.display='none';document.getElementById('post-shorttext{{post.ID}}').style.display='none';document.getElementById('post-template{{post.ID|escapejs}}').style.display='block';this.remove();">({{post_template_dict.more}})</span></p>
-                    </div>
-                    <div class='answer-template' id='post-template{{post.ID}}'>{% autoescape off %}{{post.post_content}}{% endautoescape %}</div>
-                {% endif %}
+                <a href='{{poll.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{poll.post_title}}</a>
+                <div class='bsbb full-width box m100'>
+                    {% if poll.voted > 0 %}
+                        <div class='bsbb full-width'>
+                            {% for option in poll.poll_options %}
+                                <div class="bsbb full-width p10 m10">
+                                    {% if poll.voted == forloop.counter %}
+                                        <p style="z-index:9;margin-left:40px;padding-right:30px;">{{option.meta_value}}
+                                            <span style="margin-left:20px;width:20px;height:20px;top:1.5px;">
+                                                <i class="fas fa-check" style="font-size:10px;color:var(--main-color); border:1px solid var(--main-color);border-radius:50%;padding:3px;"></i>
+                                            </span>
+                                        </p>
+                                    {% else %}
+                                        <p style="z-index:9;margin-left:40px;top:2px;">{{option.meta_value}}</p>
+                                    {% endif %}
+                                    {% if option.max_voted %}
+                                        <p class="absolute" style="top:0;left:0;height:100%;background-color:rgba(0,164,236,0.25);width:{{option.percentage}}%;border-radius:4px;">
+                                            <span style="margin-left:20px;line-height:38px;font-size:14px;font-weight:bold;color:var(--dark-gray);top:2px;">{{option.num_votes}}</span>
+                                        </p>
+                                    {% else %}
+                                        <p class="absolute" style="top:0;left:0;height:100%;background-color:rgba(0,164,236,0.10);width:{{option.percentage}}%;border-radius:4px;">
+                                            <span style="margin-left:20px;line-height:38px;font-size:14px;font-weight:bold;color:var(--dark-gray);">{{option.num_votes}}</span>
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                            <div class="full-width bt mt10"></div>
+                            <div class='bsbb full-width p10 inline-flex'>
+                                {% if poll.votes|length == 1 %}
+                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;'>{{poll.votes|length}} {{post_template_dict.votenoun}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
+                                {% else %}
+                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;'>{{poll.votes|length}} {{post_template_dict.votesnoun}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <form method="POST" id="votepoll-form{{poll.ID}}" onsubmit="return false">
+                            {% csrf_token %}
+                            <div class='bsbb full-width p100'>
+                                {% for option in poll.poll_options %}
+                                    <input type="hidden" name="post_id" id="post_id{{poll.ID}}" value="{{poll.ID}}">
+                                    <p class="full-width inline-flex poll-option p010 m50">
+                                        <input type="radio" id="option{{forloop.counter}}" name="option" value="{{forloop.counter}}" class="choice" onclick="document.getElementById('votebtn').classList.remove('blocked');">
+                                        <label for="option{{forloop.counter}}">{{option.meta_value}}</label>
+                                    </p>
+                                {% endfor %}
+                            </div>
+                            <div class="full-width bt"></div>
+                            <div class='bsbb full-width p10 inline-flex'>
+                                <div style="position:relative;width:120px; height:38px;">
+                                    <input onclick="votepoll('{{poll.ID}}')" type="submit" class="btn p10 hand blocked" id="votebtn" style="border-radius:4px;" value="{{post_template_dict.vote}}">
+                                    <div class="loader hidden"></div>
+                                </div>
+                                {% if poll.votes|length == 1 %}
+                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;margin-left:20px;'>{{poll.votes|length}} {{post_template_dict.votenoun}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
+                                {% else %}
+                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;margin-left:20px;'>{{poll.votes|length}} {{post_template_dict.votesnoun}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
+                                {% endif %}
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
             <div class='full-width' style='display:inline-block;margin-top:5px;'>
                 <div class='icon left answer-hint' onclick="upvote(a);" data-title='{{post_template_dict.upvote}}'>
-                    <svg width='20px' height='20px' id='upvote{{post.ID}}' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+                    <svg width='20px' height='20px' id='upvote{{poll.ID}}' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
                         <g id='surface1'>
                             <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
                         </g>
                     </svg>
                 </div>
-                <p class='vote noselect' id='vote{{post.ID}}'>{{post.rating}}</p>
+                <p class='vote noselect' id='vote{{poll.ID}}'>{{poll.rating}}</p>
                 <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote(a);' data-title='{{post_template_dict.downvote}}'>
-                    <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{post.ID}}' class='downvote'>
+                    <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{poll.ID}}' class='downvote'>
                         <g id='surface1'>
                             <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
                         </g>
@@ -58,11 +104,11 @@
                         </g>
                     </svg>
                 </div>
-                <p class='vote noselect'>{{post.repost}}</p>
+                <p class='vote noselect'>{{poll.repost}}</p>
                 {% if comments.count > 0 %}
-                    <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comments-wrapperanswer{{post.ID}}").style.display = "block";' data-title='{{post_template_dict.comments}}'>
+                    <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comments-wrapperanswer{{poll.ID}}").style.display = "block";' data-title='{{post_template_dict.comments}}'>
                 {% else %}
-                    <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comment-editor{{post.ID}}").focus();' data-title='{{post_template_dict.comments}}'>
+                    <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comment-editor{{poll.ID}}").focus();' data-title='{{post_template_dict.comments}}'>
                 {% endif %}
                         <svg width='20px' height='20px' viewBox='0 0 20 20'>
                             <g>
@@ -86,3 +132,38 @@
         {% include 'includes/comment_editor.html' %}
     </div>
 </div>
+<script type="text/javascript"> 
+    var a = "{{poll.ID|escapejs}}";
+    var j = jQuery.noConflict();
+    j("#votepoll-form").submit(function(e) {
+        //e.preventDefault();
+        votepoll(this);
+    });
+    function votepoll(postId){
+        console.log("vote poll is working!") // sanity check
+        var form = document.getElementById('votepoll-form'+postId)
+        var options = form.getElementsByClassName('choice')
+        var selected = 0;
+        for(var i=0;i<options.length;i++) {
+            if(options[i].checked){
+                selected = options[i].value ;
+                break;
+            }
+        }
+        j.ajax({
+            url:"{% url 'votepoll' %}",
+            type : "POST", // http method
+            data : { csrfmiddlewaretoken: '{{csrf_token}}',
+                    post_id : postId,
+                    option : selected,
+            }, // data sent with the post request
+
+            // handle a successful response
+            success : function(json) {
+                 // log the returned json to the console
+                console.log("success"); // another sanity check
+            }
+        });
+        return false;
+    }
+ </script>
