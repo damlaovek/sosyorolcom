@@ -18,7 +18,7 @@
                     </div>
                 </div>
                 <a href='{{poll.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{poll.post_title}}</a>
-                <div class='bsbb full-width box m100'>
+                <div class='bsbb full-width box m100' id='poll-content-{{poll.ID}}'>
                     {% if poll.voted > 0 %}
                         <div class='bsbb full-width'>
                             {% for option in poll.poll_options %}
@@ -30,7 +30,7 @@
                                             </span>
                                         </p>
                                     {% else %}
-                                        <p style="z-index:9;margin-left:40px;top:2px;">{{option.meta_value}}</p>
+                                        <p style="z-index:9;margin-left:40px;">{{option.meta_value}}</p>
                                     {% endif %}
                                     {% if option.max_voted %}
                                         <p class="absolute" style="top:0;left:0;height:100%;background-color:rgba(0,164,236,0.25);width:{{option.percentage}}%;border-radius:4px;">
@@ -81,21 +81,49 @@
                 </div>
             </div>
             <div class='full-width' style='display:inline-block;margin-top:5px;'>
-                <div class='icon left answer-hint' onclick="upvote(a);" data-title='{{post_template_dict.upvote}}'>
-                    <svg width='20px' height='20px' id='upvote{{poll.ID}}' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
-                        <g id='surface1'>
-                            <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
-                        </g>
-                    </svg>
-                </div>
-                <p class='vote noselect' id='vote{{poll.ID}}'>{{poll.rating}}</p>
-                <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote(a);' data-title='{{post_template_dict.downvote}}'>
-                    <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{poll.ID}}' class='downvote'>
-                        <g id='surface1'>
-                            <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
-                        </g>
-                    </svg>
-                </div>
+                {% if poll.user_rate == "like" %}
+                    <div class='icon left answer-hint' onclick='upvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.upvote}}'>
+                        <svg width='20px' height='20px' id='upvote{{poll.ID}}' class='upvote active' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+                            <g id='surface1'>
+                                <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                            </g>
+                        </svg>
+                    </div>
+                {% else %}
+                    <div class='icon left answer-hint' onclick='upvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.upvote}}'>
+                        <svg width='20px' height='20px' id='upvote{{poll.ID}}' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+                            <g id='surface1'>
+                                <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                            </g>
+                        </svg>
+                    </div>
+                {% endif %}
+
+                {% if poll.user_rate == "like" %}
+                    <p class='main-color vote noselect' id='vote{{poll.ID}}'>{{poll.rating}}</p>
+                {% elif poll.user_rate == "dislike" %}
+                    <p class='vote noselect red' id='vote{{poll.ID}}'>{{poll.rating}}</p>
+                {% else %}
+                    <p class='vote noselect' id='vote{{poll.ID}}'>{{poll.rating}}</p>
+                {% endif %}
+                
+                {% if poll.user_rate == "dislike" %}
+                    <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.downvote}}'>
+                        <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{poll.ID}}' class='downvote active'>
+                            <g id='surface1'>
+                                <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                            </g>
+                        </svg>
+                    </div>
+                {% else %}
+                    <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.downvote}}'>
+                        <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{poll.ID}}' class='downvote'>
+                            <g id='surface1'>
+                                <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                            </g>
+                        </svg>
+                    </div>
+                {% endif %}
                 <div class='icon left answer-hint' data-title='{{post_template_dict.repost}}'>
                     <svg width='20px' height='20px' viewBox='0 0 20 20'>
                         <g id='surface1'>
@@ -142,6 +170,9 @@
     function votepoll(postId){
         console.log("vote poll is working!") // sanity check
         var form = document.getElementById('votepoll-form'+postId)
+        var votetext = document.getElementById('votebtn').value;
+        document.getElementById('votebtn').value = "";
+        form.getElementsByClassName('loader')[0].classList.remove('hidden');
         var options = form.getElementsByClassName('choice')
         var selected = 0;
         for(var i=0;i<options.length;i++) {
@@ -153,15 +184,13 @@
         j.ajax({
             url:"{% url 'votepoll' %}",
             type : "POST", // http method
-            data : { csrfmiddlewaretoken: '{{csrf_token}}',
-                    post_id : postId,
-                    option : selected,
-            }, // data sent with the post request
-
+            data : { csrfmiddlewaretoken: '{{csrf_token}}', post_id : postId, option : selected}, // data sent with the post request
             // handle a successful response
             success : function(json) {
                  // log the returned json to the console
                 console.log("success"); // another sanity check
+                form.getElementsByClassName('loader')[0].classList.add('hidden');
+                document.getElementById('poll-content-'+postId).innerHTML = json.content;
             }
         });
         return false;

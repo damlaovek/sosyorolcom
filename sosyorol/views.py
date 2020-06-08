@@ -11,6 +11,7 @@ import datetime as dt
 import re
 from urllib.request import urlopen
 import json
+from django.views.decorators.csrf import csrf_protect
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -40,7 +41,6 @@ def humanizedate(date, word_list, to=None):
         to = dt.datetime.now()
     diff = to - date
     seconds = diff.total_seconds()
-    print(diff)
     if seconds < 3600:
         if seconds < 60:
             if seconds == 1:
@@ -191,6 +191,7 @@ def feed(word_list):
 def post_template(word_list):
     post_template_dict = {}
     post_template_dict['article'] = ucwords(word_list.filter(Q(var_name = 'article'))[0].translation)
+    post_template_dict['media'] = ucwords(word_list.filter(Q(var_name = 'media'))[0].translation)
     post_template_dict['link'] = ucwords(word_list.filter(Q(var_name = 'link'))[0].translation)
     post_template_dict['answer'] = ucwords(word_list.filter(Q(var_name = 'answer'))[0].translation)
     post_template_dict['poll'] = ucwords(word_list.filter(Q(var_name = 'poll'))[0].translation)
@@ -266,6 +267,7 @@ def setup_pollmeta(post, word_list):
             post.poll_duration_left = "bitti"       
 
 def setup_postmeta(post, word_list):
+    current_uid = 8
     post.like = len(PostRating.objects.filter(Q(post_id=post.ID)).filter(Q(opinion='like')))
     post.dislike = len(PostRating.objects.filter(Q(post_id=post.ID)).filter(Q(opinion='dislike')))
     post.rating = post.like - post.dislike
@@ -300,6 +302,9 @@ def setup_postmeta(post, word_list):
     else:
         post.parent_title = Post.objects.filter(Q(ID=post.post_parent))[0].post_title
 
+    israted = PostRating.objects.filter(Q(post_id=post.ID)).filter(Q(user_id=current_uid))
+    if len(israted) > 0:
+        post.user_rate = israted[0].opinion
     if post.post_type == "poll":
         setup_pollmeta(post, word_list)
 
@@ -340,7 +345,6 @@ def home(request):
             i.tag_img = ""
         else:
             url_id = img_url[0].meta_value
-            print(url_id)
             i.tag_img = Post.objects.filter(Q(ID=url_id))[0].guid
 
     popular_communities = TermTaxonomy.objects.filter(Q(taxonomy="post_tag")).order_by('-count')[:5]
@@ -360,7 +364,6 @@ def home(request):
             i.tag_img = ""
         else:
             url_id = img_url[0].meta_value
-            print(url_id)
             i.tag_img = Post.objects.filter(Q(ID=url_id))[0].guid
 
     current_user = User.objects.filter(Q(ID = current_uid))[0]
@@ -524,8 +527,76 @@ def newpost(request):
 def votepoll(request):
     post_id = request.POST["post_id"]
     user_id = 8
+    lang = UserMeta.objects.filter(Q(user_id = user_id)).filter(Q(meta_key = 'language'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
     choice = request.POST["option"]
     comment = ""
     new_vote = SossyComments(post_id=post_id, user_id=user_id, choice=choice, comment=comment)
     new_vote.save()
-    return HttpResponse(json.dumps({}),content_type="application/json")
+    html_string = " <div class='bsbb full-width'>"
+    poll = Post.objects.filter(Q(ID=post_id))[0]
+    setup_postmeta(poll,word_list)
+    post_template_dict = post_template(word_list)
+    index = 1
+    for poll_option in poll.poll_options:
+        html_string += "<div class='bsbb full-width p10 m10'>"
+        if poll.voted == index:
+            html_string += "<p style='z-index:9;margin-left:40px;padding-right:30px;'>"
+            html_string += poll_option.meta_value
+            html_string += "<span style='margin-left:20px;width:20px;height:20px;top:1.5px;'><i class='fas fa-check' style='font-size:10px;color:var(--main-color); border:1px solid var(--main-color);border-radius:50%;padding:3px;'></i></span></p>"
+        else:
+            html_string += "<p style='z-index:9;margin-left:40px;'>"
+            html_string += poll_option.meta_value
+            html_string += '</p>'
+        if poll_option.max_voted:
+            html_string += "<p class='absolute' style='top:0;left:0;height:100%;background-color:rgba(0,164,236,0.25);width:"
+            html_string += str(poll_option.percentage)
+            html_string += "%;border-radius:4px;'>"
+            html_string += "<span style='margin-left:20px;line-height:38px;font-size:14px;font-weight:bold;color:var(--dark-gray);top:2px;'>"
+            html_string += str(poll_option.num_votes)
+            html_string += "</span></p>"
+        else:
+            html_string += "<p class='absolute' style='top:0;left:0;height:100%;background-color:rgba(0,164,236,0.10);width:"
+            html_string += str(poll_option.percentage)
+            html_string += "%;border-radius:4px;'><span style='margin-left:20px;line-height:38px;font-size:14px;font-weight:bold;color:var(--dark-gray);'>"
+            html_string += str(poll_option.num_votes)
+            html_string += "</span></p>"
+        html_string += "</div>"
+        index += 1
+    html_string += "<div class='full-width bt mt10'></div><div class='bsbb full-width p10 inline-flex'>"
+    if len(poll.votes) == 1:
+        html_string += "<p class='noselect' style='color:var(--gray2);line-height:40px;font-size:13px;'>"
+        html_string += str(len(poll.votes))
+        html_string += post_template_dict["votenoun"] + "<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>"
+        html_string += poll.poll_duration_left
+        html_string += "</p>"
+    else:
+        html_string += "<p class='noselect' style='color:var(--gray2);line-height:40px;font-size:13px;'>"
+        html_string += str(len(poll.votes))
+        html_string += post_template_dict["votesnoun"] + "<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>"
+        html_string += poll.poll_duration_left
+        html_string += "</p>"
+    html_string += "</div></div>"
+    response_data = {}
+    response_data['content'] = html_string                          
+    return HttpResponse(json.dumps(response_data),content_type="application/json")
+
+@csrf_protect
+def postrating(request):
+    redirect = request.POST["redirect"]
+    operation = request.POST["operation"]
+    post_id = request.POST["post_id"]
+    user_id = 8
+    opinion = request.POST["opinion"]
+    date = dt.datetime.now()
+    if operation == "add":
+        olds = PostRating.objects.filter(Q(post_id=post_id)).filter(Q(user_id=user_id))
+        for old in olds:
+            old.delete()
+        new_vote = PostRating(post_id=post_id, user_id=user_id, opinion=opinion, date=date)
+        new_vote.save()
+    else:
+        olds = PostRating.objects.filter(Q(post_id=post_id)).filter(Q(user_id=user_id))
+        for old in olds:
+            old.delete()
+    return HttpResponseRedirect(redirect)

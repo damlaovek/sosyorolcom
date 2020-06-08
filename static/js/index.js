@@ -64,4 +64,70 @@ var scrollDuration = 600,
     }
     
     // upvote & downvote & comment-editor
-    function upvote(e){document.getElementById("upvote"+e).classList.contains("active")?(document.getElementById("upvote"+e).classList.remove("active"),document.getElementById("vote"+e).classList.add("animatedown"),document.getElementById("vote"+e).style.color="var(--gray2)",document.getElementById("vote"+e).innerHTML=(parseInt(document.getElementById("vote"+e).innerHTML)-1).toString(),setTimeout(function(){document.getElementById("vote"+e).classList.remove("animatedown")},300)):(document.getElementById("vote"+e).classList.add("animateup"),document.getElementById("upvote"+e).classList.add("active"),document.getElementById("vote"+e).style.color="var(--main-color)",document.getElementById("downvote"+e).classList.contains("active")?(document.getElementById("downvote"+e).classList.remove("active"),document.getElementById("vote"+e).innerHTML=(parseInt(document.getElementById("vote"+e).innerHTML)+2).toString()):document.getElementById("vote"+e).innerHTML=(parseInt(document.getElementById("vote"+e).innerHTML)+1).toString(),setTimeout(function(){document.getElementById("vote"+e).classList.remove("animateup")},300))}function downvote(e){document.getElementById("downvote"+e).classList.contains("active")?(document.getElementById("downvote"+e).classList.remove("active"),document.getElementById("vote"+e).classList.add("animateup"),document.getElementById("vote"+e).style.color="var(--gray2)",document.getElementById("vote"+e).innerHTML=(parseInt(document.getElementById("vote"+e).innerHTML)+1).toString(),setTimeout(function(){document.getElementById("vote"+e).classList.remove("animateup")},300)):(document.getElementById("vote"+e).classList.add("animatedown"),document.getElementById("downvote"+e).classList.add("active"),document.getElementById("vote"+e).style.color="red",document.getElementById("upvote"+e).classList.contains("active")?(document.getElementById("upvote"+e).classList.remove("active"),document.getElementById("vote"+e).innerHTML=(parseInt(document.getElementById("vote"+e).innerHTML)-2).toString()):document.getElementById("vote"+e).innerHTML=(parseInt(document.getElementById("vote"+e).innerHTML)-1).toString(),setTimeout(function(){document.getElementById("vote"+e).classList.remove("animatedown")},300))}function commentEditorChange(e){var t=document.getElementById("comment-editor"+e).value,n=document.getElementById("comment-send-btn"+e);""==t?n.classList.contains("active")&&n.classList.remove("active"):n.classList.contains("active")||n.classList.add("active")}
+    function upvote(e, csrf) {
+        document.getElementById("upvote" + e).classList.contains("active") ? (document.getElementById("upvote" + e).classList.remove("active"), document.getElementById("vote" + e).classList.add("animatedown"), document.getElementById("vote" + e).classList.remove("red"), document.getElementById("vote" + e).classList.remove("main-color"), document.getElementById("vote" + e).innerHTML = (parseInt(document.getElementById("vote" + e).innerHTML) - 1).toString(), setTimeout(function() {
+            document.getElementById("vote" + e).classList.remove("animatedown")
+        }, 300)) : (document.getElementById("vote" + e).classList.add("animateup"), document.getElementById("upvote" + e).classList.add("active"), document.getElementById("vote" + e).classList.remove("red"), document.getElementById("vote" + e).classList.add("main-color"), document.getElementById("downvote" + e).classList.contains("active") ? (document.getElementById("downvote" + e).classList.remove("active"), document.getElementById("vote" + e).innerHTML = (parseInt(document.getElementById("vote" + e).innerHTML) + 2).toString()) : document.getElementById("vote" + e).innerHTML = (parseInt(document.getElementById("vote" + e).innerHTML) + 1).toString(), setTimeout(function() {
+            document.getElementById("vote" + e).classList.remove("animateup")
+        }, 300))
+        if (document.getElementById("upvote" + e).classList.contains("active")) {
+            j.ajax({
+                url:"postrating/",
+                type : "POST", // http method
+                data : {csrfmiddlewaretoken: csrf, redirect: window.location.href, post_id : e, opinion : "like", operation: "add"}, // data sent with the post request
+                // handle a successful response
+                success : function(json) {
+                     // log the returned json to the console
+                    console.log("success"); // another sanity check
+                }
+            });
+        }else{
+            j.ajax({
+                url:"postrating/",
+                type : "POST", // http method
+                data : {csrfmiddlewaretoken: csrf, redirect: window.location.href, post_id : e, opinion : "like", operation: "remove"}, // data sent with the post request
+                // handle a successful response
+                success : function(json) {
+                     // log the returned json to the console
+                    console.log("success"); // another sanity check
+                }
+            });
+        }
+    }
+    
+    function downvote(e,csrf) {
+        document.getElementById("downvote" + e).classList.contains("active") ? (document.getElementById("downvote" + e).classList.remove("active"), document.getElementById("vote" + e).classList.add("animateup"),  document.getElementById("vote" + e).classList.remove("red"), document.getElementById("vote" + e).classList.remove("main-color"), document.getElementById("vote" + e).innerHTML = (parseInt(document.getElementById("vote" + e).innerHTML) + 1).toString(), setTimeout(function() {
+            document.getElementById("vote" + e).classList.remove("animateup")
+        }, 300)) : (document.getElementById("vote" + e).classList.add("animatedown"), document.getElementById("downvote" + e).classList.add("active"), document.getElementById("vote" + e).classList.add("red"), document.getElementById("vote" + e).classList.remove("main-color"), document.getElementById("upvote" + e).classList.contains("active") ? (document.getElementById("upvote" + e).classList.remove("active"), document.getElementById("vote" + e).innerHTML = (parseInt(document.getElementById("vote" + e).innerHTML) - 2).toString()) : document.getElementById("vote" + e).innerHTML = (parseInt(document.getElementById("vote" + e).innerHTML) - 1).toString(), setTimeout(function() {
+            document.getElementById("vote" + e).classList.remove("animatedown")
+        }, 300))
+        if (document.getElementById("downvote" + e).classList.contains("active")) {
+            j.ajax({
+                url:"postrating/",
+                type : "POST", // http method
+                data : {csrfmiddlewaretoken: csrf, redirect: window.location.href, post_id : e, opinion : "dislike", operation: "add"}, // data sent with the post request
+                // handle a successful response
+                success : function(json) {
+                     // log the returned json to the console
+                    console.log("success"); // another sanity check
+                }
+            });
+        }else{
+            j.ajax({
+                url:"postrating/",
+                type : "POST", // http method
+                data : {csrfmiddlewaretoken: csrf, redirect: window.location.href, post_id : e, opinion : "dislike", operation: "remove"}, // data sent with the post request
+                // handle a successful response
+                success : function(json) {
+                     // log the returned json to the console
+                    console.log("success"); // another sanity check
+                }
+            });
+        }
+    }
+    
+    function commentEditorChange(e) {
+        var t = document.getElementById("comment-editor" + e).value,
+            n = document.getElementById("comment-send-btn" + e);
+        "" == t ? n.classList.contains("active") && n.classList.remove("active") : n.classList.contains("active") || n.classList.add("active")
+    }

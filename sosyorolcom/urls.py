@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from sosyorol.views import home, newpost, votepoll
+from sosyorol.views import *
 
 urlpatterns = [
     path('', home),
     path('submit/', newpost),
     path('votepoll/', votepoll, name='votepoll'),
+    path('postrating/', postrating, name='postrating'),
 ]

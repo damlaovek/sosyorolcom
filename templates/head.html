@@ -3,6 +3,7 @@
 <!doctype html>
 <html>
     <head>
+        <link rel='stylesheet' href='https://unpkg.com/plyr@3/dist/plyr.css'>
         <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'css/sosyorol-style.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'css/sossytrap.css' %}">
@@ -34,7 +35,9 @@
         <link rel="stylesheet" type="text/css" href="{% static '/assets/fonts/fontawesome/css/all.css' %}">
         <script defer src="{% static '/assets/fonts/fontawesome/js/all.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/new/jquery.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/index.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/new/index-v81.js' %}"></script>
+        <script src="https://cdn.plyr.io/3.6.2/plyr.polyfilled.js"></script>
         <script>
             var j = jQuery.noConflict()
             j({property: 0}).animate({property: 105}, {
