@@ -66,6 +66,7 @@ class Post(models.Model):
     poll_duration_left = ""
     voted = 0
     vote_percentages = []
+    user_rate = ""
     class Meta:
         db_table = "wpmu_posts"
 
@@ -93,6 +94,9 @@ class PostMeta(models.Model):
     post_id = models.BigIntegerField()
     meta_key = models.TextField()
     meta_value = models.TextField()
+    percentage = 0
+    max_voted = False
+    num_votes = 0
     class Meta:
         db_table = "wpmu_postmeta"
 
@@ -102,9 +106,6 @@ class SossyComments(models.Model):
     user_id = models.BigIntegerField()
     comment = models.TextField()
     choice = models.IntegerField()
-    percentage = 0
-    max_voted = False
-    num_votes = 0
     class Meta:
         db_table = "sossy_comments"
 
