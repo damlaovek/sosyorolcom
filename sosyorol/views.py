@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from sosyorol.models import *
+from sosyorol.forms import *
 import mysql.connector
 from django.db.models import Q
 import os
@@ -11,7 +12,12 @@ import datetime as dt
 import re
 from urllib.request import urlopen
 import json
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
+import time
+from colorthief import ColorThief
+from PIL import Image
+import requests
+from io import BytesIO
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -119,6 +125,7 @@ def header(word_list):
     messages = ucfirst(word_list.filter(Q(var_name = 'messages'))[0].translation)
     search = ucfirst(word_list.filter(Q(var_name = 'search'))[0].translation)
     notifications = ucfirst(word_list.filter(Q(var_name = 'notifications'))[0].translation)
+    header_dict['createpost'] = ucwords(word_list.filter(Q(var_name = 'create-post'))[0].translation)
     header_dict['home'] = home
     header_dict['quizzes'] = quizzes
     header_dict['questions'] = questions
@@ -144,6 +151,25 @@ def left_menu(word_list):
     left_menu_dict['helpvar'] = ucfirst(word_list.filter(Q(var_name = 'help'))[0].translation)
     left_menu_dict['termsvar'] = ucfirst(word_list.filter(Q(var_name = 'terms'))[0].translation)
     return left_menu_dict
+
+def lists_achive(word_list):
+    lists_dict = {}
+    lists_dict['lists'] = ucfirst(word_list.filter(Q(var_name = 'lists'))[0].translation)
+    lists_dict['listsPageDesc'] = ucfirst(word_list.filter(Q(var_name = 'lists_page_desc'))[0].translation)
+    lists_dict['createList'] = ucwords(word_list.filter(Q(var_name = 'create-list'))[0].translation)
+    lists_dict['followLists'] = ucwords(word_list.filter(Q(var_name = 'follow-lists'))[0].translation)
+    lists_dict['yourlists'] = ucwords(word_list.filter(Q(var_name = 'your-lists'))[0].translation)
+    lists_dict['all'] = ucfirst(word_list.filter(Q(var_name = 'see-all'))[0].translation)
+    lists_dict['createdbyyou'] = ucfirst(word_list.filter(Q(var_name = 'created-by-you'))[0].translation)
+    lists_dict['addlist'] = ucwords(word_list.filter(Q(var_name = 'add-list'))[0].translation)
+    lists_dict['listsyoumaylike'] = ucwords(word_list.filter(Q(var_name = 'lists-you-may-like'))[0].translation)
+    lists_dict['listsyoumaylikeinfo'] = ucfirst(word_list.filter(Q(var_name = 'lists-you-may-like-info'))[0].translation)
+    lists_dict['featured'] = ucwords(word_list.filter(Q(var_name = 'featured'))[0].translation)
+    lists_dict['post'] = ucfirst(word_list.filter(Q(var_name = 'post'))[0].translation)
+    lists_dict['members'] = ucfirst(word_list.filter(Q(var_name = 'members'))[0].translation)
+    lists_dict['followers'] = ucfirst(word_list.filter(Q(var_name = 'followers'))[0].translation)
+    lists_dict['follow'] = ucfirst(word_list.filter(Q(var_name = 'follow'))[0].translation)
+    return lists_dict
 
 def right_menu(word_list):
     right_menu_dict = {}
@@ -310,6 +336,7 @@ def setup_postmeta(post, word_list):
 
 # Create your views here.
 def home(request):
+    start = time.perf_counter()
     current_uid = 8
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
@@ -365,7 +392,7 @@ def home(request):
         else:
             url_id = img_url[0].meta_value
             i.tag_img = Post.objects.filter(Q(ID=url_id))[0].guid
-
+    
     current_user = User.objects.filter(Q(ID = current_uid))[0]
     user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
     current_user.set_description(user_desc.meta_value)
@@ -439,6 +466,57 @@ def home(request):
                                             'post_template_dict':post_template_dict, 'comment_editor':comment_editor,
                                             'links':links, 'answers':answers, 'questions':questions,
                                             'communities':communities, 'users':users, 'polls':polls
+                                            })
+
+def lists(request):
+    current_uid = 8
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
+    current_user = User.objects.filter(Q(ID = current_uid))[0]
+    user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
+    current_user.set_description(user_desc.meta_value)
+    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
+    if (os.path.exists(mypath)):
+        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
+    else:
+        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+    current_user.set_avatar(avatar_url)
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    header_dict = header(word_list)
+    left_menu_dict = left_menu(word_list)
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    for c in country_list:
+        c.translation = ucfirst(c.translation)
+    select_language = ucfirst(word_list.filter(Q(var_name = 'select-language'))[0].translation)
+    followed_communities = FollowedCommunities.objects.filter(Q(user_id = current_uid)).order_by('-date')[:10]
+    followed_community_ids = list({x.term_id: x for x in followed_communities}.keys())
+    followed_communities = Community.objects.filter(term_id__in=followed_community_ids)
+    for i in followed_communities:
+        i.name = ucwords(i.name)
+        color = CommunityMeta.objects.filter(term_id=i.term_id).filter(meta_key = 'color_up')
+        if len(color) == 0 or color[0].meta_value == '':
+            i.tag_color = "var(--main-color)"
+        else:
+            i.tag_color = color[0].meta_value
+        
+        img_url = CommunityMeta.objects.filter(term_id=i.term_id).filter(meta_key = 'tag_img')
+        if len(img_url) == 0 or img_url[0].meta_value == '':
+            i.tag_img = ""
+        else:
+            url_id = img_url[0].meta_value
+            i.tag_img = Post.objects.filter(Q(ID=url_id))[0].guid
+    lists_dict = lists_achive(word_list)
+    listsyoumaylike = List.objects.all()
+    for lst in listsyoumaylike:
+        lst.posts = ListPost.objects.filter(Q(list_id=lst.ID))
+        lst.members = ListUser.objects.filter(Q(list_id=lst.ID) & Q(role='member'))
+        lst.followers = ListUser.objects.filter(Q(list_id=lst.ID) & Q(role='follower'))
+    return render(request, 'lists.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'followed_communities':followed_communities, 'lists_dict':lists_dict,
+                                            'listsyoumaylike':listsyoumaylike
                                             })
 
 def post_types(word_list):
@@ -600,3 +678,15 @@ def postrating(request):
         for old in olds:
             old.delete()
     return HttpResponseRedirect(redirect)
+
+@csrf_exempt
+def uploadmedia(request):
+    print("test")
+    form = MediaFileUploadForm(data=request.POST, files=request.FILES)
+    if form.is_valid():
+        photo = form.save()
+        form = MediaFileUploadForm()
+        data = {'is_valid': True, 'name': photo.file.name, 'url': photo.file.url}
+    else:
+        data = {'is_valid': False}
+    return JsonResponse(data)

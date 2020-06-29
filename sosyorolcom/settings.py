@@ -32,7 +32,15 @@ ALLOWED_HOSTS = ['*']
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
 
 
+MEDIA_ROOT =  os.path.join(STATICFILES_DIRS[0], 'assets') 
+MEDIA_URL = '/media/'
+
+
 # Application definition
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 250000000
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1024000
 
 INSTALLED_APPS = [
     'django.contrib.admin',

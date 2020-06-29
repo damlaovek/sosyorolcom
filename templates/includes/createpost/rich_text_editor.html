@@ -1,11 +1,36 @@
 <style>
+    #dialogbox{position:absolute;display:none;z-index:999;width:300px;padding:10px;box-shadow: none; background-color:var(--white);}
+    #dialogbox>.triangle, #dialogbox>.triangle:after {
+        position: absolute;
+        display: block;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 10px;
+        border-top-width: 0;
+        border-color: transparent;
+    }
+    #dialogbox>.triangle {
+        top: -10px;
+        border-bottom-color: var(--border-color);
+    }
+    #dialogbox>.triangle:after{
+        top: 11px;
+        margin: -10px;
+        content: " ";
+        border-bottom-color: #fff;
+    }
+    #dialogbox>.triangle {
+        left: 20px;
+    }
+
     img{
         width:calc(100% - 20px);
         object-fit:contain;
         overflow:hidden;
     }
 
-    #editor{width:calc(100% - 40px);padding: 20px;min-height:150px;font-weight:normal;line-height:30px; counter-reset: custom-counter;text-align: left;}
+    #editor{position:relative;width:calc(100% - 30px);padding: 15px;min-height:150px;font-weight:normal;line-height:24px; font-size:15px; counter-reset: custom-counter;text-align: left;}
     #editor ol{margin-left:30px;}
     #editor ul{margin-left:30px;list-style-type:square;}
     #editor > p{
@@ -36,6 +61,7 @@
     #editor > p::after{
         word-wrap: break-word;
     }
+    #editor a{text-decoration:underline; color:var(--main-color);cursor:pointer;}
     /*
     #editor div:not(:first-child):before {
         counter-increment: custom-counter+1;
@@ -69,11 +95,12 @@
         <button style="background-color:var(--grayish);" data-edit="insertOrderedList"><i class="fa fa-list-ol icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
         <button style="background-color:var(--grayish);" data-edit="subscript"><i class="fa fa-subscript icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
         <button style="background-color:var(--grayish);" data-edit="superscript"><i class="fa fa-superscript icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
-        <button style="background-color:var(--grayish);" data-edit="undo"><i class="fa fa-undo icon cg2 " style="width:15px;height:15px;font-size:14px;"></i></button>
-        <button style="background-color:var(--grayish);" data-edit="redo"><i class="fas fa-redo icon cg2" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);" data-edit="undo"><i class="fa fa-undo icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);" data-edit="redo"><i class="fas fa-redo icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);display:none;" data-edit="createlink" id="crtlnk"><i class="fas fa-redo icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
         <button style="background-color:var(--grayish);" data-edit="formatBlock:p" id="code"><i class="fas fa-code icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
         <div style="background-color:var(--grayish);" onclick="quote(this);"><i class="fas fa-quote-right icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></div>
-        <button style="background-color:var(--grayish);" onclick="execCmdWithArg('createLink', prompt('Enter a url', 'https://'));"><i class="fa fa-link icon cg2" style="width:15px;height:15px;font-size:14px;"></i></button>
+        <button style="background-color:var(--grayish);" data-edit="link"><i class="fa fa-link icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
         <div style="background-color:var(--grayish);position:relative;width:35px;height:35px;cursor:pointer;">
             <i class="fas fa-image icon cg2" style="width:15px;height:15px;font-size:14px;"></i>
             <div  id="imageUploadForm" class="hand absolute icon" style="width:15px;height:15px;bottom:0;left:0;overflow:hidden;cursor:pointer;">
@@ -87,9 +114,16 @@
             </div>
         </div>
     </div>
-    <div contenteditable id="editor"></div>
+    <div contenteditable id="editor">
+    </div>
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=es6,Array.prototype.includes,CustomEvent,Object.entries,Object.values,URL"></script>
+    <script src="https://unpkg.com/plyr@3"></script>
     <script type="text/javascript">
         var j = jQuery.noConflict();
+        var promot = new CustomPrompt();
+        j(document).on('click', '.promptBtn',function(e) { 
+            e.preventDefault();
+        });
         j("#editor").keydown(function(e){
             if ( e.which === 9 ) {
                 e.preventDefault();
@@ -113,7 +147,11 @@
         function edit(event) {
             event.preventDefault();
             var cmd_val = this.dataset.edit.split(":");
-            document.execCommand(cmd_val[0], false, cmd_val[1]);
+            if(cmd_val[0] == "link"){
+                promot.render('Insert Link:','createLinkFunction')
+            }else{
+                document.execCommand(cmd_val[0], false, cmd_val[1]);
+            }
             if(this.id == "code"){
                 this.getElementsByClassName('texteditorBtn')[0].classList.toggle("selected");
             }else{
@@ -122,6 +160,118 @@
                 }else{
                     this.getElementsByClassName('texteditorBtn')[0].classList.remove('selected'); 
                 }
+            }
+        }
+        function createLinkFunction(title, url){
+            var editor = document.getElementById("editor");
+            //document.execCommand('createlink', false, url);
+            //editor.innerHTML += '<a href="' + url + '" target="_blank">' + title + '</a>';
+            document.execCommand('insertHTML', false, '<a href="' + url + '" target="_blank">' + title + '</a>');
+        }
+        function CustomPrompt(){
+            this.render = function(dialog,fctn){	
+            var dialogbox = document.createElement('div');
+            dialogbox.setAttribute("id", "dialogbox");
+            dialogbox.setAttribute("class", "full-shadow-border");
+            dialogbox.setAttribute("contenteditable", "false");
+            var triangle = document.createElement('div');
+            triangle.setAttribute("class", "triangle");
+            var dialogboxbody = document.createElement('div');
+            dialogboxbody.setAttribute("id", "dialogboxbody");
+            var dialogboxfoot = document.createElement('div');
+            dialogboxfoot.setAttribute("id", "dialogboxfoot");
+            dialogbox.appendChild(triangle);
+            dialogbox.appendChild(dialogboxbody);
+            dialogbox.appendChild(dialogboxfoot);
+            var editor = document.getElementById("editor");
+            editor.appendChild(dialogbox)
+            var startPos = getCaretTopPoint();
+            var left = startPos.left - 500;
+            var top = startPos.top - 255;
+            if (left <= 0){
+                dialogbox.style.left = (left - 5)+"px";
+            }else{
+                dialogbox.style.left = (left - 20)+"px";
+            }
+            dialogbox.style.top = top + "px";
+            dialogbox.style.display = "block";
+            document.getElementById('dialogboxbody').innerHTML = dialog;
+            document.getElementById('dialogboxbody').innerHTML +='<br><input class="bsbb box full-width p5 mt10 lh20 fs13 text textarea" id="prompt_value2" placeholder="Title of link (optional)"/><br><input class="bsbb box full-width p5 mt10 lh20 fs13 text textarea" id="prompt_value1" placeholder="Paste or type a link"/>';
+            document.getElementById('dialogboxfoot').innerHTML = '<button class="promptBtn btn mt10 hand" onclick="promot.cancel()">Cancel</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class="promptBtn btn mt10 hand" onclick="promot.ok(\''+fctn+'\')">OK</button>';	
+            }
+            this.cancel = function(){
+                document.getElementById('dialogbox').remove();
+            }
+            this.ok = function(fctn){
+                var prompt_value1 = document.getElementById('prompt_value1').value;
+                var prompt_value2 = document.getElementById('prompt_value2').value;
+                if(prompt_value2 == ""){
+                    prompt_value2 = prompt_value1;
+                }
+                j("#crtlnk").data('edit', "createlink:"+prompt_value1);
+                j("#crtlnk").click();
+                window[fctn](prompt_value2, prompt_value1);
+                document.getElementById('dialogbox').remove();
+            }
+        }
+        function getCaretPosition(editableDiv) {
+            var caretPos = 0,
+                sel, range;
+            if (window.getSelection) {
+                sel = window.getSelection();
+                if (sel.rangeCount) {
+                    range = sel.getRangeAt(0);
+                    if (range.commonAncestorContainer.parentNode == editableDiv) {
+                        caretPos = range.endOffset;
+                    }
+                }
+            } else if (document.selection && document.selection.createRange) {
+                range = document.selection.createRange();
+                if (range.parentElement() == editableDiv) {
+                    var tempEl = document.createElement("span");
+                    editableDiv.insertBefore(tempEl, editableDiv.firstChild);
+                    var tempRange = range.duplicate();
+                    tempRange.moveToElementText(tempEl);
+                    tempRange.setEndPoint("EndToEnd", range);
+                    caretPos = tempRange.text.length;
+                }
+            }
+            return caretPos;
+        }
+        function getCaretTopPoint () {
+            const sel = window.getSelection();
+            const r = sel.getRangeAt(0);
+            let rect;
+            let r2;
+            // supposed to be textNode in most cases
+            // but div[contenteditable] when empty
+            const node = r.startContainer;
+            const offset = r.startOffset;
+            if (offset > 0) {
+                // new range, don't influence DOM state
+                r2 = document.createRange();
+                r2.setStart(node, (offset - 1));
+                r2.setEnd(node, offset);
+                // https://developer.mozilla.org/en-US/docs/Web/API/range.getBoundingClientRect
+                // IE9, Safari?(but look good in Safari 8)
+                rect = r2.getBoundingClientRect();
+                return { left: rect.right, top: rect.top }
+            } else if (offset < node.length) {
+                r2 = document.createRange();
+                // similar but select next on letter
+                r2.setStart(node, offset);
+                r2.setEnd(node, (offset + 1));
+                rect = r2.getBoundingClientRect();
+                return { left: rect.left, top: rect.top }
+            } else { // textNode has length
+                // https://developer.mozilla.org/en-US/docs/Web/API/Element.getBoundingClientRect
+                rect = node.getBoundingClientRect();
+                const styles = getComputedStyle(node);
+                const lineHeight = parseInt(styles.lineHeight);
+                const fontSize = parseInt(styles.fontSize);
+                // roughly half the whitespace... but not exactly
+                const delta = (lineHeight - fontSize) / 2;
+                return { left: rect.left, top: (rect.top + delta) }
             }
         }
     </script>
@@ -134,6 +284,8 @@
             document.getElementById('iframe1').style.height = height + "px";
             validateForm();
         }*/
+        var videoCounter = 0;
+        var imageCounter = 0;
         var quoteClass = 'myQuote',
             removeQuoteClass = 'remove-myQuote';
         var isCodeView = false;
@@ -176,75 +328,113 @@
         function uploadImg() {
             var input = document.getElementById('imageUpload');
             var j = jQuery.noConflict();
+            ic = imageCounter;
             if (input.files && input.files[0]) {
                 var fd = new FormData();
                 var files = input.files[0];
-                var htmlString = "<img id='preview' src='' style='margin:auto;max-width:100%;max-height:450px;height:inherit;object-fit:contain;'>";
+                var fullPath = input.value;
+                var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+                var filename = fullPath.substring(startIndex);
+                if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+                    filename = filename.substring(1);
+                }
+                newName = filename.hashCode();
+                var htmlString = "<img id='imagePreview"+ic+"' src='' style='margin:auto;max-width:100%;max-height:450px;height:inherit;object-fit:contain;'>";
                 document.getElementById('editor').innerHTML += htmlString;
                 var reader = new FileReader();
                 reader.onload = function(e) {
                   //resizeIframe();
-                  document.getElementById('preview').src = e.target.result;
+                  document.getElementById('imagePreview'+ic).src = e.target.result;
                   //resizeIframe();
                 }
                 reader.readAsDataURL(input.files[0]);
-                fd.append('file',files);
+                fd.append('file',files,newName);
                 //resizeIframe();
                 j.ajax({
                   type: "POST",
-                  url: "https://www.sosyorol.com/upload/",
+                  url:"{% url 'uploadmedia' %}",
                   data: fd,
+                  processData: false, 
                   contentType: false,
-                  processData:false,
+                  cache: false,
+                  async: false,
                   success: function(response) {
-                    if(response != "0"){
-                        var htmlString = "<img src='"+response+"' style='margin:auto;max-width:100%;max-height:450px;height:inherit;object-fit:contain;'>";
-                        execCmdWithArg('insertHTML', htmlString);
-                        //alert(htmlString);
-                        document.getElementById('preview').src = response; 
-                        document.getElementById('preview').id = 'loaded-img';
+                    if(response != ""){
+                        document.getElementById('imagePreview'+ic).src = response.url;
                         //resizeIframe();
                     }
                   }
                 });
             }
+            imageCounter += 1;
         }
         function uploadVideo(){
             var input = document.getElementById('videoUpload');
             var j = jQuery.noConflict();
+            vc = videoCounter;
             if (input.files && input.files[0]) {
                 var fd = new FormData();
                 var files = input.files[0];
-                var htmlString = '<div contenteditable="false" class="w20 m010"><video controls class="afterglow" id="myvideo" data-skin="dark" style="width:100%;overflow:hidden;object-fit:contain;" data-autoresize="fit"><source type="video/mp4" id="videoPreview" src="" /></video></div><br/>';
+                var htmlString = '<div contenteditable="false" class="w20 m010"><video id="player'+vc+'" playsinline controls class="js-player" autoplay="true" style="min-height: 400px;" muted="muted"><source type="video/mp4" id="videoPreview'+vc+'" src="" /></video></div><br/>';
                 document.getElementById('editor').innerHTML += htmlString;
                 var reader = new FileReader();
                 reader.onload = function(e) {
                   //resizeIframe();
-                  document.getElementById('videoPreview').src = e.target.result;
+                  id = 'videoPreview'+vc;
+                  document.getElementById(id).src = e.target.result;
                   //resizeIframe();
                 }
+                var fullPath = input.value;
+                var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+                var filename = fullPath.substring(startIndex);
+                if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+                    filename = filename.substring(1);
+                }
+                newName = filename.hashCode();
+                document.getElementById('editor').innerHTML += '<script>const player = new Plyr("#player'+vc+'", {captions: {active: true}});window.player = player;window.player.play();\<\/script>';
                 reader.readAsDataURL(input.files[0]);
-                fd.append('file',files);
+                fd.append('file',files, newName);
+                //fd.append('redirect', window.location.href)
+                //fd.append('csrfmiddlewaretoken', '{{csrf_token}}');
                 j.ajax({
                   type: "POST",
-                  url: "https://www.sosyorol.com/upload/",
+                  url:"{% url 'uploadmedia' %}",
                   data: fd,
+                  processData: false, 
                   contentType: false,
-                  processData:false,
                   success: function(response) {
-                    if(response != "0"){
-                        //var htmlString = '<div contenteditable="false" class="w20 m010"><video controls class="afterglow" id="myvideo" data-skin="dark" style="width:100%;overflow:hidden;object-fit:contain;" data-autoresize="fit"><source type="video/mp4" src="'+response+'" /></video></div><br/>';
+                    if(response != ""){
                         //var htmlString = "<iframe controls style='max-width:calc(100% - 20px);max-height:450px;margin:auto;object-fit:contain;' src="+response+"></iframe>;
                         //alert(htmlString);
                         //document.getElementById('editor').innerHTML += htmlString;
                         //execCmdWithArg('insertHTML', htmlString)
-                        document.getElementById('videoPreview').src = response;
-                        document.getElementById('videoPreview').id = 'loaded-video';
+                        document.getElementById('videoPreview'+vc).src = response.url;
                         //resizeIframe();
                     }
                   }
                 });
             }
+            videoCounter += 1;
+        }
+
+        String.prototype.hashCode = function(){
+            var hash = 0;
+            if (this.length == 0) return hash;
+            for (i = 0; i < this.length; i++) {
+                char = this.charCodeAt(i);
+                hash = ((hash<<5)-hash)+char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return hash+makeid(5);
+        }
+        function makeid(length) {
+            var result = '';
+            var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var charactersLength = characters.length;
+            for ( var i = 0; i < length; i++ ) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
         }
     </script>
 </div>
