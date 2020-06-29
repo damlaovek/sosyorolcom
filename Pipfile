@@ -9,6 +9,8 @@ beautifulsoup4 = "*"
 re2 = "*"
 urllib = "*"
 lxml = "*"
+colorthief = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"

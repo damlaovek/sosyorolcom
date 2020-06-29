@@ -158,5 +158,47 @@ class CommunityMeta(models.Model):
     class Meta:
         db_table = "wpmu_termmeta"
 
+# Media model
+class Media(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    title = models.CharField(max_length=255, blank=True)
+    file = models.FileField(upload_to='media/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        db_table = "media"
+
+# List related models
+class List(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    photo_small = models.TextField()
+    photo_medium = models.TextField()
+    photo_large = models.TextField()
+    name = models.TextField()
+    description = models.TextField()
+    creator = models.BigIntegerField()
+    created_at = models.DateTimeField()
+    is_public = models.SmallIntegerField()
+    color = models.TextField()
+    posts = models.QuerySet()
+    members = models.QuerySet()
+    followers = models.QuerySet()
+    class Meta:
+        db_table = "lists"
+
+class ListPost(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    list_id = models.BigIntegerField()
+    post_id = models.BigIntegerField()
+    class Meta:
+        db_table = "list_post"
+
+class ListUser(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    list_id = models.BigIntegerField()
+    user_id = models.BigIntegerField()
+    role = models.TextField()
+    notifications = models.SmallIntegerField()
+    class Meta:
+        db_table = "list_user"
 
 

@@ -15,11 +15,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from sosyorol.views import *
+import sosyorol.views as sv
+from django.conf import settings 
+from django.conf.urls.static import static 
 
 urlpatterns = [
-    path('', home),
-    path('submit/', newpost),
-    path('votepoll/', votepoll, name='votepoll'),
-    path('postrating/', postrating, name='postrating'),
+    path('', sv.home),
+    path('submit/', sv.newpost),
+    path('votepoll/', sv.votepoll, name='votepoll'),
+    path('postrating/', sv.postrating, name='postrating'),
+    path('uploadmedia/', sv.uploadmedia, name='uploadmedia'),
+    path('c/lists/', sv.lists, name='lists'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
