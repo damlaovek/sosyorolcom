@@ -25,7 +25,11 @@ urlpatterns = [
     path('votepoll/', sv.votepoll, name='votepoll'),
     path('postrating/', sv.postrating, name='postrating'),
     path('uploadmedia/', sv.uploadmedia, name='uploadmedia'),
+    path('uploadmediagetcolor/', sv.uploadmediagetcolor, name='uploadmediagetcolor'),
     path('c/lists/', sv.lists, name='lists'),
+    path('c/lists/create', sv.createlist, name='createlist'),
+    path('c/lists/create/savenewlist/', sv.savenewlist, name='savenewlist'),
+    path('c/lists/<slug:slug>/', sv.listdetail, name='listdetail'),
 ]
 
 if settings.DEBUG:

@@ -1,5 +1,4 @@
 {
-    "python.pythonPath": "/Users/damla/.local/share/virtualenvs/sosyorolcom-n4ObFjTh/bin/python",
     "python.linting.pylintEnabled": false,
     "python.linting.pycodestyleEnabled": true,
     "python.linting.enabled": false

@@ -179,6 +179,7 @@ class List(models.Model):
     created_at = models.DateTimeField()
     is_public = models.SmallIntegerField()
     color = models.TextField()
+    url = models.TextField()
     posts = models.QuerySet()
     members = models.QuerySet()
     followers = models.QuerySet()
