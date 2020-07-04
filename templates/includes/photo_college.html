@@ -12,6 +12,10 @@
             <div class='left photo-frame-item hand' >
                 <img src='{{i}}' class='full'/>
             </div>
+        {% elif forloop.counter == 3 and post.post_images|length == 3 %}
+            <div class='absolute hand' style='right:10px;bottom:10px; width:calc(50% - 15px);background-color: rgba(0,26,51, 0.3); height:195px;line-height:200px;border-radius:4px;'>
+                <p class='full-width' style='font-weight:bold;font-size:28px;color:white;text-align:center;'>+{{post.post_images|length|add:"-2"}}</p>
+            </div>
         {% else %}
             <div class='absolute hand' style='right:10px;bottom:10px; width:calc(50% - 15px);background-color: rgba(0,26,51, 0.3); height:195px;line-height:200px;border-radius:4px;'>
                 <p class='full-width' style='font-weight:bold;font-size:28px;color:white;text-align:center;'>+{{post.post_images|length|add:"-3"}}</p>
