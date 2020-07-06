@@ -76,7 +76,7 @@ function uploadImg(input, url){
         j.ajax({
             type: "POST",
             url:url,
-            data: fd,
+            data: {fd},
             processData: false, 
             contentType: false,
             cache: false,

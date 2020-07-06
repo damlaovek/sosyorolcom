@@ -199,6 +199,7 @@ class ListUser(models.Model):
     user_id = models.BigIntegerField()
     role = models.TextField()
     notifications = models.SmallIntegerField()
+    date = models.DateTimeField()
     class Meta:
         db_table = "list_user"
 

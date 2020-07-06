@@ -5,7 +5,7 @@
             <div class="full-width hand">
                 <li class="inline-flex" id="home">
                     <p class="non-draggable rounded background-image" id="home-icon"></p>
-                    <p id="home-text">{{left_menu_dict.feed}}</p>
+                    <p class="fs19" id="home-text">{{left_menu_dict.feed}}</p>
                 </li>
             </div>
         </a>
@@ -16,10 +16,10 @@
                     <li class="left-list-item">
                         {% if c.tag_img == '' %}
                             <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
-                            <p class="ellipsis followed-community-name" style="font-size:17px;padding:0 15px;font-weight:var(--bold);line-height:40px;">{{c.name}}</p>
+                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{c.name}}</p>
                         {% else %}
                             <img src="{{c.tag_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
-                            <p class="ellipsis followed-community-name" style="font-size:17px;padding:0 15px;font-weight:var(--bold);line-height:40px;">{{c.name}}</p>
+                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{c.name}}</p>
                         {% endif %}
                     </li>
                 </div>
@@ -46,7 +46,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <p class="ellipsis followed-community-name" style="font-size:17px;padding:0 15px;font-weight:var(--bold);line-height:40px;">{{left_menu_dict.lists}}</p>
+                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{left_menu_dict.lists}}</p>
                     </li>
                 </div>
             </a>
@@ -78,7 +78,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <p class="ellipsis followed-community-name" style="font-size:17px;padding:0 15px;font-weight:var(--bold);line-height:40px;">{{left_menu_dict.visithistory}}</p>
+                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{left_menu_dict.visithistory}}</p>
                     </li>
                 </div>
             </a>
@@ -94,7 +94,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <p class="ellipsis followed-community-name" style="font-size:17px;padding:0 15px;font-weight:var(--bold);line-height:40px;">{{left_menu_dict.savedposts}}</p>
+                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{left_menu_dict.savedposts}}</p>
                     </li>
                 </div>
             </a>

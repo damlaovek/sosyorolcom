@@ -19,7 +19,7 @@ from PIL import Image
 import requests
 from io import BytesIO
 import sosyorol.functions as fun
-
+import locale
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATICFILES_DIR = os.path.join(BASE_DIR, 'static')
@@ -176,7 +176,14 @@ def lists_achive(word_list):
     lists_dict['members'] = ucfirst(word_list.filter(Q(var_name = 'members'))[0].translation)
     lists_dict['followers'] = ucfirst(word_list.filter(Q(var_name = 'followers'))[0].translation)
     lists_dict['follow'] = ucfirst(word_list.filter(Q(var_name = 'follow'))[0].translation)
+    lists_dict['following'] = ucwords(word_list.filter(Q(var_name = 'following'))[0].translation)
     return lists_dict
+
+def list_info(word_list):
+    list_info_dict = {}
+    list_info_dict["aboutlist"] = ucwords(word_list.filter(Q(var_name = 'about-list'))[0].translation)
+    list_info_dict["datecreated"] = ucwords(word_list.filter(Q(var_name = 'date-created'))[0].translation)
+    return list_info_dict
 
 def right_menu(word_list):
     right_menu_dict = {}
@@ -517,6 +524,9 @@ def lists(request):
             url_id = img_url[0].meta_value
             i.tag_img = Post.objects.filter(Q(ID=url_id))[0].guid
     lists_dict = lists_achive(word_list)
+    list_ids = ListUser.objects.filter(Q(user_id=current_uid)).order_by('-date')
+    list_ids = list({x.list_id: x for x in list_ids}.keys())
+    followedlists = List.objects.filter(Q(ID__in=list_ids)).order_by('-created_at')
     listsyoumaylike = List.objects.order_by('-created_at')[:3]
     for lst in listsyoumaylike:
         lst.posts = ListPost.objects.filter(Q(list_id=lst.ID))
@@ -526,7 +536,7 @@ def lists(request):
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
                                             'country_list':country_list, 'select_language':select_language,
                                             'followed_communities':followed_communities, 'lists_dict':lists_dict,
-                                            'listsyoumaylike':listsyoumaylike
+                                            'listsyoumaylike':listsyoumaylike, 'followedlists':followedlists
                                             })
 
 def post_types(word_list):
@@ -706,6 +716,7 @@ def uploadmedia(request):
 
 @csrf_exempt
 def uploadmediagetcolor(request):
+    print("uploadmediagetcolor")
     form = MediaFileUploadForm(data=request.POST, files=request.FILES)
     if form.is_valid():
         photo = form.save()
@@ -719,6 +730,7 @@ def uploadmediagetcolor(request):
     return JsonResponse(data)
 
 def createlist(request):
+    print("createlist")
     current_uid = 8
     current_user = User.objects.filter(Q(ID = current_uid))[0]
     user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
@@ -753,6 +765,7 @@ def createlist(request):
                                             'tips':tips, 'create_list_dict':create_list_dict})
 
 def savenewlist(request):
+    print("savenewlist")
     photo_url = request.POST["photo_url"]
     filename, file_extension = os.path.splitext(photo_url)
     title = request.POST["title"]
@@ -773,8 +786,32 @@ def savenewlist(request):
     response_data['content'] = "success"                        
     return HttpResponse(json.dumps(response_data),content_type="application/json")
 
-@csrf_exempt
-def listdetail(request, slug):
+def listdetail(request, slug, **kwargs):
+    print("listdetail")
+    if 'filter' in kwargs:
+        fltr = kwargs.get("filter")
+    else:
+        fltr = "all"
+    print(fltr)
+    if fltr == "post":
+        lst.posts = lst.posts.filter(Q(post_type="post"))
+    elif fltr == "link":
+        lst.posts = lst.posts.filter(Q(post_type="link"))
+    elif fltr == "poll":
+        lst.posts = lst.posts.filter(Q(post_type="poll"))
+    elif fltr == "quiz":
+        lst.posts = lst.posts.filter(Q(post_type="quiz"))
+    elif fltr == "answer":
+        lst.posts = lst.posts.filter(Q(post_type="answer"))
+    elif fltr == "question":
+        lst.posts = lst.posts.filter(Q(post_type="question"))
+    elif fltr == "media":
+        lst.posts = lst.posts.filter(Q(post_type="media"))
+    elif fltr == "about":
+        return aboutlist(request, slug)
+    elif fltr == "create":
+        return createlist(request)
+    
     lst = List.objects.get(url=slug)
     post_ids = ListPost.objects.filter(Q(list_id=lst.ID))
     lst.members = ListUser.objects.filter(Q(list_id=lst.ID, role="member"))
@@ -795,25 +832,6 @@ def listdetail(request, slug):
     word_list = Languages.objects.filter(Q(lang_code = lang))
     post_ids = list({x.post_id: x for x in post_ids}.keys())
     lst.posts = Post.objects.filter(Q(ID__in=post_ids)).order_by('-post_date')
-    try:
-        fltr = request.POST["filter"]
-    except:
-        fltr = "all"
-    print(fltr)
-    if fltr == "post":
-        lst.posts = lst.posts.filter(Q(post_type="post"))
-    elif fltr == "link":
-        lst.posts = lst.posts.filter(Q(post_type="link"))
-    elif fltr == "poll":
-        lst.posts = lst.posts.filter(Q(post_type="poll"))
-    elif fltr == "quiz":
-        lst.posts = lst.posts.filter(Q(post_type="quiz"))
-    elif fltr == "answer":
-        lst.posts = lst.posts.filter(Q(post_type="answer"))
-    elif fltr == "question":
-        lst.posts = lst.posts.filter(Q(post_type="question"))
-    elif fltr == "media":
-        lst.posts = lst.posts.filter(Q(post_type="media"))
 
     for post in lst.posts:
         setup_postmeta(post, word_list)
@@ -832,3 +850,104 @@ def listdetail(request, slug):
                                             'list_dict':list_dict, 'post_types_dict':post_types_dict,
                                             'comment_editor':comment_editor, 'post_template_dict':post_template_dict,
                                             'filter':fltr}))
+
+def listdetailfilter(request, slug, post_type):
+    print("listdetailfilter")
+    lst = List.objects.get(url=slug)
+    post_ids = ListPost.objects.filter(Q(list_id=lst.ID))
+    lst.members = ListUser.objects.filter(Q(list_id=lst.ID, role="member"))
+    lst.followers = ListUser.objects.filter(Q(list_id=lst.ID, role="follower"))
+    current_uid = 8
+    current_user = User.objects.filter(Q(ID = current_uid))[0]
+    user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
+    current_user.set_description(user_desc.meta_value)
+    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
+    if (os.path.exists(mypath)):
+        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
+    else:
+        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+    current_user.set_avatar(avatar_url)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    post_ids = list({x.post_id: x for x in post_ids}.keys())
+    lst.posts = Post.objects.filter(Q(ID__in=post_ids)).order_by('-post_date')
+    fltr = post_type
+    if fltr == "post":
+        lst.posts = lst.posts.filter(Q(post_type="post"))
+    elif fltr == "link":
+        lst.posts = lst.posts.filter(Q(post_type="link"))
+    elif fltr == "poll":
+        lst.posts = lst.posts.filter(Q(post_type="poll"))
+    elif fltr == "quiz":
+        lst.posts = lst.posts.filter(Q(post_type="quiz"))
+    elif fltr == "answer":
+        lst.posts = lst.posts.filter(Q(post_type="answer"))
+    elif fltr == "question":
+        lst.posts = lst.posts.filter(Q(post_type="question"))
+    elif fltr == "media":
+        lst.posts = lst.posts.filter(Q(post_type="media"))
+    elif fltr == "about":
+        return aboutlist(request, slug)
+    elif fltr == "create":
+        return createlist(request)
+
+    for post in lst.posts:
+        setup_postmeta(post, word_list)
+        if post.post_type == "link":
+            post.photo_from_url = get_photo_from_url(post.post_content)
+
+    header_dict = header(word_list)
+    left_menu_dict = left_menu(word_list)
+    right_menu_dict = right_menu(word_list)
+    list_dict = lists_achive(word_list)
+    post_types_dict = post_types(word_list)
+    comment_editor = comment_editor_dict(word_list)
+    post_template_dict = post_template(word_list)
+    return HttpResponse(render(request, 'list_detail.html', {'list':lst, 'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
+                                            'list_dict':list_dict, 'post_types_dict':post_types_dict,
+                                            'comment_editor':comment_editor, 'post_template_dict':post_template_dict,
+                                            'filter':fltr}))
+
+def aboutlist(request, slug):
+    lst = List.objects.get(url=slug)
+    post_ids = ListPost.objects.filter(Q(list_id=lst.ID))
+    lst.members = ListUser.objects.filter(Q(list_id=lst.ID, role="member"))
+    lst.followers = ListUser.objects.filter(Q(list_id=lst.ID, role="follower"))
+    post_ids = list({x.post_id: x for x in post_ids}.keys())
+    lst.posts = Post.objects.filter(Q(ID__in=post_ids)).order_by('-post_date')
+    current_uid = 8
+    current_user = User.objects.filter(Q(ID = current_uid))[0]
+    user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
+    current_user.set_description(user_desc.meta_value)
+    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
+    if (os.path.exists(mypath)):
+        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
+    else:
+        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+    current_user.set_avatar(avatar_url)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    header_dict = header(word_list)
+    left_menu_dict = left_menu(word_list)
+    right_menu_dict = right_menu(word_list)
+    list_dict = lists_achive(word_list)
+    post_types_dict = post_types(word_list)
+    list_info_dict = list_info(word_list)
+    return render(request, 'aboutlist.html', {'list':lst, 'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
+                                            'list_dict':list_dict, 'post_types_dict':post_types_dict,
+                                            'list_info_dict':list_info_dict})
+
+def follow_unfollow_list(request):
+    redirect = request.POST["redirect"]
+    print(request.POST["redirect"])
+    list_id = request.POST["list_id"]
+    user_id = 8
+    new_follower = ListUser(list_id=list_id, user_id=user_id, role="follower", notifications=1, date=dt.datetime.now())
+    new_follower.save()
+    return HttpResponseRedirect(redirect)

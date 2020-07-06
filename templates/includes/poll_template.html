@@ -24,21 +24,21 @@
                             {% for option in poll.poll_options %}
                                 <div class="bsbb full-width p10 m10">
                                     {% if poll.voted == forloop.counter %}
-                                        <p style="z-index:9;margin-left:40px;padding-right:30px;">{{option.meta_value}}
+                                        <p class="fs15" style="z-index:9;margin-left:40px;padding-right:30px;">{{option.meta_value}}
                                             <span style="margin-left:20px;width:20px;height:20px;top:1.5px;">
                                                 <i class="fas fa-check" style="font-size:10px;color:var(--main-color); border:1px solid var(--main-color);border-radius:50%;padding:3px;"></i>
                                             </span>
                                         </p>
                                     {% else %}
-                                        <p style="z-index:9;margin-left:40px;">{{option.meta_value}}</p>
+                                        <p class="fs15" style="z-index:9;margin-left:40px;">{{option.meta_value}}</p>
                                     {% endif %}
                                     {% if option.max_voted %}
                                         <p class="absolute" style="top:0;left:0;height:100%;background-color:rgba(0,164,236,0.25);width:calc({{option.percentage}}% - 20px);border-radius:4px;">
-                                            <span style="margin-left:20px;line-height:38px;font-size:14px;font-weight:bold;color:var(--dark-gray);top:2px;">{{option.num_votes}}</span>
+                                            <span style="margin-left:20px;line-height:38px;font-size:15px;font-weight:bold;color:var(--dark-gray);top:2px;">{{option.num_votes}}</span>
                                         </p>
                                     {% else %}
                                         <p class="absolute" style="top:0;left:0;height:100%;background-color:rgba(0,164,236,0.10);width:{{option.percentage}}%;border-radius:4px;">
-                                            <span style="margin-left:20px;line-height:38px;font-size:14px;font-weight:bold;color:var(--dark-gray);">{{option.num_votes}}</span>
+                                            <span style="margin-left:20px;line-height:38px;font-size:15px;font-weight:bold;color:var(--dark-gray);">{{option.num_votes}}</span>
                                         </p>
                                     {% endif %}
                                 </div>

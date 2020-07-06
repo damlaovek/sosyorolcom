@@ -23,7 +23,7 @@
                     <img class="non-draggable rounded left sqr40" style="object-fit:cover" src="{{current_user.avatar_url}}"/>
                     <div class="left ml10 bsbb">
                         <p class="ellipsis lh20 title">{{current_user.display_name}}</p>
-                        <a href=""><p class="ellipsis fs14 cg2 lh20">u/{{current_user.user_login}}</p></a>
+                        <a href=""><p class="ellipsis fs15 cg2 lh20">u/{{current_user.user_login}}</p></a>
                     </div>
                 </div>
                 <div class='full-width bt'></div>
@@ -47,7 +47,7 @@
                                         </g>
                                     </svg>
                                 </div>
-                                <p class="ellipsis followed-community-name" style="font-size:17px;padding:0 15px;font-weight:var(--bold);line-height:40px;">{{left_menu_dict.lists}}</p>
+                                <p class="ellipsis followed-community-name" style="font-size:19px;padding:0 15px;font-weight:var(--bold);line-height:40px;">{{left_menu_dict.lists}}</p>
                             </li>
                         </a>
                     </div>
@@ -94,11 +94,11 @@
                         <input type="hidden" id="imgUrl" value="">
                         <input type="hidden" id="imgColor" value="">
                         <input type="hidden" id="isPrivate" value="1">
-                        <div class="bsbb box p20 title fs18 cp-container" id="cp-container">
+                        <div class="bsbb box p20 title fs19 cp-container" id="cp-container">
                             {{left_menu_dict.createlist}}
                             <div class="absolute inline-flex" style="right:20px;top:1px;">
                                 <div class="btn inline-block p10 m100 hand" style="border-radius:4px;min-width:150px;" id='poll-duration-btn' onclick="showHide('privacy-menu')">
-                                    <p  class="fs14 left noselect" id='privacy'>{{create_list_dict.public}}</p>
+                                    <p  class="fs15 left noselect" id='privacy'>{{create_list_dict.public}}</p>
                                     <svg class="right" width="10px" height="10px" viewBox="0 0 10 10" style="margin:3.5px 0;">
                                         <g>
                                             <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 9.628906 2.285156 L 0.488281 2.285156 C 0.0546875 2.285156 -0.164062 2.808594 0.144531 3.117188 L 4.714844 7.6875 C 4.902344 7.875 5.214844 7.875 5.402344 7.6875 L 9.96875 3.117188 C 10.28125 2.808594 10.0625 2.285156 9.628906 2.285156 Z M 9.628906 2.285156 "/>
@@ -107,7 +107,7 @@
                                 </div>
                             </div>
                             <ul  id="privacy-menu" class="full-shadow-border box dropdown hidden" style='right:20px; top: 55px;'>
-                                <li class="fs14 lh20 text hand p20 noselect poll-duration-menu-item" style="width:calc(100% - 40px);padding:20px;" onclick="selectListPrivacy(this, '{{create_list_dict.public}}', 1);">
+                                <li class="fs15 lh20 text hand p20 noselect poll-duration-menu-item" style="width:calc(100% - 40px);padding:20px;font-size:15px;" onclick="selectListPrivacy(this, '{{create_list_dict.public}}', 1);">
                                     <div class="full-width inline-flex">
                                         <svg width="25px" height="25px" viewBox="0 0 25 25" style="margin-top: 4px;">
                                             <g>
@@ -121,7 +121,7 @@
                                         </svg>
                                         <div style="width:calc(100% - 55px);padding:0 15px;">
                                             <p class="fs15 ctitle fwnormal" style="font-weight: normal;">{{create_list_dict.public}}</p>
-                                            <p class="fs14 cg2 fwnormal" style="font-weight: normal;">{{create_list_dict.public_info}}</p>
+                                            <p class="fs15 cg2 fwnormal" style="font-weight: normal;">{{create_list_dict.public_info}}</p>
                                         </div>
                                     </div>
                                 </li>
@@ -134,13 +134,13 @@
                                         </svg>
                                         <div style="width:calc(100% - 55px);padding:0 15px;">
                                             <p class="fs15 ctitle fwnormal" style="font-weight: normal;">{{create_list_dict.private}}</p>
-                                            <p class="fs14 cg2 fwnormal" style="font-weight: normal;">{{create_list_dict.private_info}}</p>
+                                            <p class="fs15 cg2 fwnormal" style="font-weight: normal;">{{create_list_dict.private_info}}</p>
                                         </div>
                                     </div>
                                 </li>
                             </ul>
                         </div>
-                        <div class="bsbb box title fs18 cp-container" style="margin:10px auto;">
+                        <div class="bsbb box title fs19 cp-container" style="margin:10px auto;">
                             <div class="full-width">
                                 <div class="full-width" style="height: 150px;" id="listColor">
 
@@ -156,7 +156,7 @@
                                 <input type='file' onchange="uploadImg(this, {% url 'uploadmediagetcolor' %});" class="hand sqr15" style="width:135px; height:135px;overflow:hidden;margin-left:calc(50% - 67.5px); top:-140px;opacity:0;z-index:99;" id="imageUpload" name="file" accept=".png, .jpg, .jpeg" /><br>
                                 <img src="" class="rounded sqr130" id="listImg">
                                 <div class="full-width" style="margin-top: -270px;">
-                                    <p class="tac full-width fs20 mt20 fwblack ctitle" id="title-placeholder">{{create_list_dict.title_placeholder}}</p>
+                                    <p class="tac full-width fs19 mt20 fwblack ctitle" id="title-placeholder">{{create_list_dict.title_placeholder}}</p>
                                     <p class="tac full-width fwlight m100 fs15 cg2" id="desc-placeholder">{{create_list_dict.desc_placeholder}}</p>
                                 </div>
                             </div>
@@ -209,7 +209,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <p class='fwblack' style="color:var(--title-color);line-height:40px;margin-left:15px; font-size:21px;">{{tips}}</p>
+                        <p class='fwblack' style="color:var(--title-color);line-height:40px;margin-left:15px; font-size:19px;">{{tips}}</p>
                     </div>
                     <div class='full-width mt10'>
                         {% for number, rule in create_post_rules_dict.items %}
