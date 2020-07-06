@@ -1,6 +1,8 @@
 from PIL import Image
 from resizeimage import resizeimage
 import os
+import time
+import locale
 
 # Resize list image
 def resize_list_image(filepath):
@@ -15,4 +17,8 @@ def resize_list_image(filepath):
             cover = resizeimage.resize_cover(image, [130, 130])
             cover.save(filename+"_130x130"+file_extension, image.format)
     return
-    
+
+def format_date(lang_code, date, format_string):
+    locale.setlocale(locale.LC_TIME, lang_code)
+    return time.strftime("%a, %d %b %Y %H:%M:%S")
+

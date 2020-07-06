@@ -27,9 +27,11 @@ urlpatterns = [
     path('uploadmedia/', sv.uploadmedia, name='uploadmedia'),
     path('uploadmediagetcolor/', sv.uploadmediagetcolor, name='uploadmediagetcolor'),
     path('c/lists/', sv.lists, name='lists'),
+    path('followlist', sv.follow_unfollow_list, name='followlist'),
     path('c/lists/create', sv.createlist, name='createlist'),
     path('c/lists/create/savenewlist/', sv.savenewlist, name='savenewlist'),
     path('c/lists/<slug:slug>/', sv.listdetail, name='listdetail'),
+    path('c/lists/<slug:slug>/<path:post_type>', sv.listdetailfilter, name='listdetailfilter'),
 ]
 
 if settings.DEBUG:

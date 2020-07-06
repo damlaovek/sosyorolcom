@@ -1,13 +1,13 @@
 <div class="full-width align-center mt10">
     <form>
-    <div class="bsbb box p20 title fs18 cp-container" id="cp-container">
+    <div class="bsbb box p20 title fs19 cp-container" id="cp-container">
         {{create_post_dict.createpoll}}
         <div class="absolute inline-flex" style="right:20px;top:1px;">
             <div class="btn p10 hand m10" style="border-radius:4px;" onclick="document.getElementById('drafts-popup').classList.toggle('hidden');">
-                <p  class="fs14 noselect" id='drafts'>{{newpost_actions_dict.drafts}}&nbsp;({{drafts|length}})</p>
+                <p  class="fs15 noselect" id='drafts'>{{newpost_actions_dict.drafts}}&nbsp;({{drafts|length}})</p>
             </div>
             <div class="btn inline-block p10 m100 hand" style="border-radius:4px;min-width:150px;" id='poll-duration-btn' onclick="showHide('poll-duration-menu')">
-                <p  class="fs14 left noselect" id='poll-duration'>{{create_post_dict.pollduration}}</p>
+                <p  class="fs15 left noselect" id='poll-duration'>{{create_post_dict.pollduration}}</p>
                 <svg class="right" width="10px" height="10px" viewBox="0 0 10 10" style="margin:3.5px 0;">
                     <g>
                         <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 9.628906 2.285156 L 0.488281 2.285156 C 0.0546875 2.285156 -0.164062 2.808594 0.144531 3.117188 L 4.714844 7.6875 C 4.902344 7.875 5.214844 7.875 5.402344 7.6875 L 9.96875 3.117188 C 10.28125 2.808594 10.0625 2.285156 9.628906 2.285156 Z M 9.628906 2.285156 "/>
@@ -15,8 +15,8 @@
                 </svg>
             </div>
         </div>
-        <ul  id="poll-duration-menu" class="full-shadow-border box dropdown hidden" style='right:20px; top: 55px;'>
-            <li class="fs14 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '{{create_post_dict.unlimitedtime}}');validateForm();">{{create_post_dict.unlimitedtime}}
+        <ul  id="poll-duration-menu" class="full-shadow-border box dropdown hidden fs15" style='right:20px; top: 55px;'>
+            <li style="font-size: 15px;" class="fs15 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '{{create_post_dict.unlimitedtime}}');validateForm();">{{create_post_dict.unlimitedtime}}
                 <div class="tick">
                     <svg width="14px" height="14px" viewBox="0 0 14 14">
                         <g>
@@ -25,7 +25,7 @@
                     </svg>
                 </div>
             </li>
-            <li class="fs14 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '1 {{create_post_dict.day}}');validateForm();">1 {{create_post_dict.day}}
+            <li style="font-size: 15px;" class="fs15 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '1 {{create_post_dict.day}}');validateForm();">1 {{create_post_dict.day}}
                 <div class="tick">
                     <svg width="14px" height="14px" viewBox="0 0 14 14">
                         <g>
@@ -34,7 +34,7 @@
                     </svg>
                 </div>
             </li>
-            <li class="fs14 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '2 {{create_post_dict.days}}');validateForm();">2 {{create_post_dict.days}}
+            <li style="font-size: 15px;" class="fs15 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '2 {{create_post_dict.days}}');validateForm();">2 {{create_post_dict.days}}
                 <div class="tick">
                     <svg width="14px" height="14px" viewBox="0 0 14 14">
                         <g>
@@ -43,7 +43,7 @@
                     </svg>
                 </div>
             </li>
-            <li class="fs14 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '3 {{create_post_dict.days}}');validateForm();">3 {{create_post_dict.days}}
+            <li style="font-size: 15px;" class="fs15 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '3 {{create_post_dict.days}}');validateForm();">3 {{create_post_dict.days}}
                 <div class="tick">
                     <svg width="14px" height="14px" viewBox="0 0 14 14">
                         <g>
@@ -52,7 +52,7 @@
                     </svg>
                 </div>
             </li>
-            <li class="fs14 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '4 {{create_post_dict.days}}');validateForm();">4 {{create_post_dict.days}}
+            <li style="font-size: 15px;" class="fs15 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '4 {{create_post_dict.days}}');validateForm();">4 {{create_post_dict.days}}
                 <div class="tick">
                     <svg width="14px" height="14px" viewBox="0 0 14 14">
                         <g>
@@ -61,7 +61,7 @@
                     </svg>
                 </div>
             </li>
-            <li class="fs14 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '5 {{create_post_dict.days}}');validateForm();">5 {{create_post_dict.days}}
+            <li style="font-size: 15px;" class="fs15 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '5 {{create_post_dict.days}}');validateForm();">5 {{create_post_dict.days}}
                 <div class="tick">
                     <svg width="14px" height="14px" viewBox="0 0 14 14">
                         <g>
@@ -70,7 +70,7 @@
                     </svg>
                 </div>
             </li>
-            <li class="fs14 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '6 {{create_post_dict.days}}');validateForm();">6 {{create_post_dict.days}}
+            <li style="font-size: 15px;" class="lh20 text fs15 hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '6 {{create_post_dict.days}}');validateForm();">6 {{create_post_dict.days}}
                 <div class="tick">
                     <svg width="14px" height="14px" viewBox="0 0 14 14">
                         <g>
@@ -79,7 +79,7 @@
                     </svg>
                 </div>
             </li>
-            <li class="fs14 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '7 {{create_post_dict.days}}');validateForm();">7 {{create_post_dict.days}}
+            <li style="font-size: 15px;" class="lh20 text fs15 hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '7 {{create_post_dict.days}}');validateForm();">7 {{create_post_dict.days}}
                 <div class="tick">
                     <svg width="14px" height="14px" viewBox="0 0 14 14">
                         <g>
@@ -121,8 +121,8 @@
     </div>
     <div class="bsbb box p020 title fs18 cp-container">
         <div class="p100 full-width inline-flex">
-            <div class="textarea p10 fs14 cg2 hand box flair" data-title="{{newpost_actions_dict.spoiler}}" id="flair" onclick="this.classList.toggle('active');" style="border-radius:18px;">&nbsp;&nbsp;Spoiler&nbsp;&nbsp;</div>
-            <div class="textarea p10 fs14 cg2 m010 hand box flair" data-title="{{newpost_actions_dict.nsfw}}" id="flair"  onclick="this.classList.toggle('active');" style="border-radius:18px;">&nbsp;&nbsp;NSFW&nbsp;&nbsp;</div>
+            <div class="textarea p10 fs15 cg2 hand box flair" data-title="{{newpost_actions_dict.spoiler}}" id="flair" onclick="this.classList.toggle('active');" style="border-radius:18px;">&nbsp;&nbsp;Spoiler&nbsp;&nbsp;</div>
+            <div class="textarea p10 fs15 cg2 m010 hand box flair" data-title="{{newpost_actions_dict.nsfw}}" id="flair"  onclick="this.classList.toggle('active');" style="border-radius:18px;">&nbsp;&nbsp;NSFW&nbsp;&nbsp;</div>
         </div>
     </div>
     <div class="bsbb box p20 title fs18 cp-container" style="margin:10px auto;">

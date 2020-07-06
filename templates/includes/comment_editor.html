@@ -4,6 +4,6 @@
     <div style='position:relative;width:calc(100% - 55px); margin-left:15px;align-items:stretch;align-self:flex-start;display:flex;flex-direction:row;'>
         <textarea class='comment-editor' id='comment-editor{{post.ID}}' onblur='this.classList.remove("active");' onfocus='this.classList.add("active");' oninput='commentEditorChange({{post.ID}});' id='comment-editor{{post.ID}}' rows='1' placeholder='{{comment_editor.addcomment}}...'></textarea>
         <div class='comment-send-btn' style='position:relative;opacity:0;'>{{comment_editor.send}}</div>
-        <input class='comment-send-btn' id='comment-send-btn".$index."' type='submit' value='{{comment_editor.send}}'>
+        <input class='comment-send-btn' style="font-size:15px;" id='comment-send-btn".$index."' type='submit' value='{{comment_editor.send}}'>
     </div>
 </div>
