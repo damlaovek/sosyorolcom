@@ -1,0 +1,143 @@
+{% load static %}
+{% include 'head.html' %}
+        <title>Sosyorol - Sosyal İçerik Platformu</title>
+        <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
+        <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
+        <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
+        <script src="{% static 'js/new/autosize.min.js' %}"></script>
+        <script src="{% static 'js/new/user-list.min.js' %}"></script>
+        <script src="{% static 'js/index.js' %}"></script>
+    </head>
+    <body class="{{darkmode}}">
+        {% include 'header.html' %}
+        {% include 'includes/_lang_popup.html' %}
+        <div class="full-width inline-flex">
+            {% include 'includes/_left_menu.html' %}
+            <style>
+                .box2{position:relative;box-sizing:border-box;box-shadow:0px 3px 4px rgba(173,173,173, 0.53); background-color:var(--white);max-width:812px;margin:auto}
+                .box .box2{box-shadow:none;}
+                .hide{display:none;}
+            </style>
+            <div class="section-middle">
+                <div class="bsbb full-shadow-border box2" style="margin-top:8px;">
+                    <div class="bsbb full-width p2040">
+                        <h1 class="fs19 fwblack ctitle">{{savedposts_dict.saveditems}}</h1>
+                        <p class="lh24 mt20 fs15 cg2 mxw500">{{savedposts_dict.saveditemsDesc}}</p>
+                    </div>
+                    <div class="bsbb full-width inline-flex mt8 bt p2040">
+                        <a href="" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{savedposts_dict.all}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.post}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.question}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.poll}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.quiz}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.media}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <p class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.link}}</p>
+                    </div>
+                </div>
+                <div class="bsbb full-width mt20" id="posts" style="width:812px;margin:auto;margin-top:20px;">
+                    {% for post in savedposts %}
+                        {% if post.post_type == "post" %}
+                            {% if filter == "post" %}
+                                {% include 'includes/post_template.html' %}
+                            {% elif filter == "all" %}
+                                {% include 'includes/post_template.html' %}
+                            {% endif %}
+                        {% elif post.post_type == "media" %}
+                            {% if filter == "media" %}
+                                {% include 'includes/media_template.html' %}
+                            {% elif filter == "all" %}
+                                {% include 'includes/media_template.html' %}
+                            {% endif %}
+                        {% elif post.post_type == "link" %}
+                            {% if filter == "link" %}
+                                {% include 'includes/link_template.html' with link=post %}
+                            {% elif filter == "all" %}
+                                {% include 'includes/link_template.html' with link=post %}
+                            {% endif %}
+                        {% elif post.post_type == "question" %}
+                        {% elif post.post_type == "answer" %}
+                        {% elif post.post_type == "poll" %}
+                            {% if filter == "poll" %}
+                                {% include 'includes/poll_template.html' with poll=post %}
+                            {% elif filter == "all" %}
+                                {% include 'includes/poll_template.html' with poll=post %}
+                            {% endif %}
+                        {% elif post.post_type == "quiz" %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="section-right fixed">
+                <div class="bsbb full-shadow-border section-right-top full-width" style="padding:10px 0;width:calc(100% - 60px);">
+                    <div class="bsbb full-width inline-block p020 mt5">
+                        <p class="fs19 fwblack ctitle left">{{right_menu_dict.trendsofcountrytitle}}</p>
+                        <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                            </g>
+                        </svg>
+                    </div>
+                    <ul class="full-width mt7 bt">
+                        <li class="bsbb full-width bb right-list-item">
+                            <a href="" class="bsbb full-width p1020 inline-flex">
+                                <div class="sqrt30 rounded p5 bcb lh30">
+                                    <svg  width="25px" height="16px" viewBox="0 0 25 16" version="1.1" class="hcentered" style="margin-top:7px; margin-left:2.5px;">
+                                        <g>
+                                            <path style="fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(90.980392%,94.901961%,97.647059%);stroke-opacity:1;stroke-miterlimit:4;" d="M 24.483781 8.99985 L 14.561281 18.923434 L 9.33425 13.698092 L 1.500031 21.53818 " transform="matrix(0.925926,0,0,0.941176,0.575926,-6.474353)"/>
+                                            <path style="fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(90.980392%,94.901961%,97.647059%);stroke-opacity:1;stroke-miterlimit:4;" d="M 25.498719 8.99985 L 31.767781 8.99985 L 31.767781 15.266939 " transform="matrix(0.925926,0,0,0.941176,-6.168519,-6.474353)"/>
+                                        </g>
+                                    </svg>
+                                </div>
+                                <div class="ml10">
+                                    <p class="lh20 fwblack">Akparti</p>
+                                    <div class="inline-flex lh20">
+                                        <img src="https://www.imf.org/external/pubs/ft/fandd/2020/06/images/frieden-1600.jpg" class="rounded sqr17" style="top:1.5px;">
+                                        <p class="cg2 lh20 ml5">c/politika ve daha fazlası</p>       
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="bsbb p020 mt10">
+                        <a href="" class="cb">{{right_menu_dict.showmore}}</a>
+                    </div>
+                </div>
+                <div  class="full-shadow-border section-right-bottom" style="padding:10px 0;width:calc(100% - 60px);">
+                    <div class="bsbb full-width inline-block p020 mt5">
+                        <p class="fs19 fwblack ctitle left">{{right_menu_dict.usersyoumayfollow}}</p>
+                        <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                            </g>
+                        </svg>
+                    </div>
+                    <ul class="full-width mt7 bt">
+                        {% for user in users %}
+                            <li class="bsbb full-width bb right-list-item">
+                                <a href="" class="bsbb full-width p1020 inline-block">
+                                    <img class="sqr40 rounded lh30 left" src="{{user.avatar_url}}"/>
+                                    <div class="ml10 left">
+                                        <p class="lh20 fwblack ctitle">{{user.display_name}}</p>
+                                        <p class="cg2 lh20">u/{{user.user_login}}</p>
+                                    </div>
+                                    <div class="right" style="top:5.5px;">
+                                        <p class="btn"><span class="p115">{{right_menu_dict.follow}}</span></p>
+                                    </div>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="bsbb p020 mt10">
+                        <a href="" class="cb">{{right_menu_dict.showmore}}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

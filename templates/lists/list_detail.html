@@ -1,0 +1,146 @@
+{% load static %}
+{% include 'head.html' %}
+        <title>{{list.name}} - Sosyorol</title>
+        <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
+        <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
+        <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
+        <script src="{% static 'js/new/user-list.min.js' %}"></script>
+        <script src="{% static 'js/index.js' %}"></script>
+        <style>
+            .box{box-shadow:0px 3px 4px rgba(173,173,173, 0.53);}
+            .box .box{box-shadow:none;}
+            .lst-item{padding:10px 0 15px 0;}
+            .lst-item:hover{border-bottom:5px solid var(--main-color);padding-bottom:10px; color:var(--main-color);}
+            .lst-item.active{border-bottom:5px solid var(--main-color);padding-bottom:10px; color:var(--main-color);}
+            .hide{display:none;}
+        </style>
+    </head>
+    <body class="{{darkmode}}">
+        {% include 'header.html' %}
+        {% include 'includes/_lang_popup.html' %}
+        <div class="full-width inline-flex">
+            {% include 'includes/_left_menu.html' %}
+            <div class="section-middle" style="margin-top:45px; padding-bottom:32px;">
+                <div class="bsbb p2040">
+                    <div class="full-width full-shadow-border box" style="z-index:2;">
+                        <div class="full-width" style="height: 150px;background-color: {{list.color}};border-top-left-radius:3px;border-top-right-radius:3px;" id="listColor"></div>
+                        <img src="{{list.photo_large}}" class="rounded sqr130  full-shadow2 twb" style="margin-left:calc(50% - 70px);margin-top: -70px;">
+                        <div class="tac full-width">
+                            <div class="tac inline-flex"  style="margin:auto;">
+                                <p class="fs19 mt10 fwblack ctitle" style="margin-left:27px;">{{list.name}}</p>
+                                <a href="/c/lists/{{list.url}}/about">
+                                    <svg width="16px" height="16px" viewBox="0 0 20 20" style="margin-top:13px;margin-left:10px;">
+                                        <g>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                                        </g>
+                                    </svg>
+                                </a>
+                            </div>
+                            <p class="fwlight fs13 cg2 lh22">{{list.posts|length}}&nbsp;{{list_dict.post}}</p>
+                            <p class="tac full-width m100 fs15 cg2" id="desc-placeholder">{{list.description}}</p>
+                            <div class="bsbb mt10 inline-flex">
+                                <p class="cb fs15"><span class="fwblack">{{list.members|length}}</span>&nbsp;{{list_dict.members}}</p>&nbsp;&nbsp;&nbsp;&nbsp;
+                                <p class="cb fs15"><span class="fwblack">{{list.followers|length}}</span>&nbsp;{{list_dict.followers}}</p>
+                            </div><br>
+                            <div class="bsbb m200 inline-flex">
+                                {% if list.is_mine %}
+                                <a href="" class="btn fs15 p710 hand noselect" style="border-radius:16px;margin-left:48px;">{{list_dict.editlist}}</a>
+                                {% else %}
+                                <p class="btn fs15 p710 hand noselect" style="border-radius:16px;margin-left:48px;">{{list_dict.follow}}</p>
+                                {% endif %}
+                                <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand' style='margin-top:-3.5px;margin-left:10px;transform: rotate(90deg);'>
+                                    <g>
+                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                    </g>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bsbb full-width p020 full-shadow-border box" style="width:calc(100% + 2px);margin-top: -4px;">
+                        <ul class="full-width mt10 inline-flex" style="top:1px;">
+                            {% if filter == "all" %}
+                            <a href="/c/lists/{{list.url}}"><li class="hand fs15 cg2 fwmedium lst-item active" onclick="filter(this, 'all', '{{list.url}}')">{{list_dict.all}}</li></a>
+                            {% else %}
+                            <a href="/c/lists/{{list.url}}"><li class="hand fs15 cg2 fwmedium lst-item" onclick="filter(this, 'all', '{{list.url}}')">{{list_dict.all}}</li></a>
+                            {% endif %}
+                            {% if filter == "post" %}
+                            <a href="/c/lists/{{list.url}}/post"><li class="hand fs15 cg2 fwmedium lst-item m020 active" onclick="filter(this, 'post', '{{list.url}}')">{{post_types_dict.post}}</li></a>
+                            {% else %}
+                            <a href="/c/lists/{{list.url}}/post"><li class="hand fs15 cg2 fwmedium lst-item m020" onclick="filter(this, 'post', '{{list.url}}')">{{post_types_dict.post}}</li></a>
+                            {% endif %}
+                            {% if filter == "media" %}
+                            <a href="/c/lists/{{list.url}}/media"><li class="hand fs15 cg2 fwmedium lst-item active" onclick="filter(this, 'media', '{{list.url}}')">{{post_types_dict.media}}</li></a>
+                            {% else %}
+                            <a href="/c/lists/{{list.url}}/media"><li class="hand fs15 cg2 fwmedium lst-item" onclick="filter(this, 'media', '{{list.url}}')">{{post_types_dict.media}}</li></a>
+                            {% endif %}
+                            {% if filter == "link" %}
+                            <a href="/c/lists/{{list.url}}/link"><li class="hand fs15 cg2 fwmedium lst-item m020 active" onclick="filter(this, 'link', '{{list.url}}')">{{post_types_dict.link}}</li></a>
+                            {% else %}
+                            <a href="/c/lists/{{list.url}}/link"><li class="hand fs15 cg2 fwmedium lst-item m020" onclick="filter(this, 'link', '{{list.url}}')">{{post_types_dict.link}}</li></a>
+                            {% endif %}
+                            {% if filter == "question" %}
+                            <a href="/c/lists/{{list.url}}/question"><li class="hand fs15 cg2 fwmedium lst-item active" onclick="filter(this, 'question', '{{list.url}}')">{{post_types_dict.question}}</li></a>
+                            {% else %}
+                            <a href="/c/lists/{{list.url}}/question"><li class="hand fs15 cg2 fwmedium lst-item" onclick="filter(this, 'question', '{{list.url}}')">{{post_types_dict.question}}</li></a>
+                            {% endif %}
+                            {% if filter == "answer" %}
+                            <a href="/c/lists/{{list.url}}/answer"><li class="hand fs15 cg2 fwmedium lst-item m020 active" onclick="filter(this, 'answer', '{{list.url}}')">{{post_types_dict.answer}}</li></a>
+                            {% else %}
+                            <a href="/c/lists/{{list.url}}/answer"><li class="hand fs15 cg2 fwmedium lst-item m020" onclick="filter(this, 'answer', '{{list.url}}')">{{post_types_dict.answer}}</li></a>
+                            {% endif %}
+                            {% if filter == "poll" %}
+                            <a href="/c/lists/{{list.url}}/poll"><li class="hand fs15 cg2 fwmedium lst-item active" onclick="filter(this, 'poll', '{{list.url}}')">{{post_types_dict.poll}}</li></a>
+                            {% else %}
+                            <a href="/c/lists/{{list.url}}/poll"><li class="hand fs15 cg2 fwmedium lst-item" onclick="filter(this, 'poll', '{{list.url}}')">{{post_types_dict.poll}}</li></a>
+                            {% endif %}
+                            {% if filter == "quiz" %}
+                            <a href="/c/lists/{{list.url}}/quiz"><li class="hand fs15 cg2 fwmedium lst-item m020 active" onclick="filter(this, 'quiz', '{{list.url}}')">{{post_types_dict.quiz}}</li></a>
+                            {% else %}
+                            <a href="/c/lists/{{list.url}}/quiz"><li class="hand fs15 cg2 fwmedium lst-item m020" onclick="filter(this, 'quiz', '{{list.url}}')">{{post_types_dict.quiz}}</li></a>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="full-width mt20" id="posts">
+                        {% for post in list.posts %}
+                            {% if post.post_type == "post" %}
+                                {% if filter == "post" %}
+                                    {% include 'includes/post_template.html' %}
+                                {% elif filter == "all" %}
+                                    {% include 'includes/post_template.html' %}
+                                {% endif %}
+                            {% elif post.post_type == "media" %}
+                                {% if filter == "media" %}
+                                    {% include 'includes/media_template.html' %}
+                                {% elif filter == "all" %}
+                                    {% include 'includes/media_template.html' %}
+                                {% endif %}
+                            {% elif post.post_type == "link" %}
+                                {% if filter == "link" %}
+                                    {% include 'includes/link_template.html' with link=post %}
+                                {% elif filter == "all" %}
+                                    {% include 'includes/link_template.html' with link=post %}
+                                {% endif %}
+                            {% elif post.post_type == "question" %}
+                            {% elif post.post_type == "answer" %}
+                            {% elif post.post_type == "poll" %}
+                                {% if filter == "poll" %}
+                                    {% include 'includes/poll_template.html' with poll=post %}
+                                {% elif filter == "all" %}
+                                    {% include 'includes/poll_template.html' with poll=post %}
+                                {% endif %}
+                            {% elif post.post_type == "quiz" %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% include 'includes/_right_menu.html' %}
+        </div>
+    </body>
+</html>

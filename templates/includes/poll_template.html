@@ -1,15 +1,20 @@
-<div class='full-width'>
-    <div class='full-width box answer-template-oc'>
+<div class='bsbb full-width'>
+    <div class='bsbb full-width box answer-template-oc'>
         <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
             <div style='width:calc(100% - 20px);' class='p010'>
-                <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon absolute hand' style='top:0;right:0;transform: rotate(90deg);'>
-                    <g>
-                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                    </g>
-                </svg>
-                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{post_template_dict.poll}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide">{{post_template_dict.recommendedfy}}</span></p>
+                <div class='sqr20 icon absolute hand aligntr bringfront' onclick="showMoreOptions(this, {{poll.ID}})">
+                    <svg width='20px' height='20px' viewBox='0 0 20 20' class="rotate90">
+                        <g>
+                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                        </g>
+                    </svg>
+                </div>
+                <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{poll.ID}}">
+                    <li class="hand" onclick="savePost(this, {{poll.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
+                </ul>
+                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{post_template_dict.poll}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{post_template_dict.recommendedfy}}</span></p>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
                     <img src='{{poll.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
@@ -80,7 +85,7 @@
                     {% endif %}
                 </div>
             </div>
-            <div class='full-width' style='display:inline-block;margin-top:5px;'>
+            <div class='bsbb full-width' style='display:inline-block;margin-top:5px;'>
                 {% if poll.user_rate == "like" %}
                     <div class='icon left answer-hint' onclick='upvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.upvote}}'>
                         <svg width='20px' height='20px' id='upvote{{poll.ID}}' class='upvote active' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
@@ -195,4 +200,27 @@
         });
         return false;
     }
+    function showMoreOptions(elem, postID){
+        if (elem.classList.contains("active")){
+            elem.classList.remove("active");
+            document.getElementById("moreoptions"+postID).classList.add("dnone");
+        }else{
+            elem.classList.add("active");
+            document.getElementById("moreoptions"+postID).classList.remove("dnone");
+        }
+    }
+
+    function savePost(elem, postID, userID, csrf){
+        j.ajax({
+            url:"{% url 'save-the-post' %}",
+            type : "POST", // http method
+            data : { redirect: window.location.href, csrfmiddlewaretoken: csrf, post_id : postID, operation : "save", user_id : userID}, // data sent with the post request
+            // handle a successful response
+            success : function(json) {
+                 // log the returned json to the console
+                console.log("success"); // another sanity check
+            }
+        });
+    }
+    
  </script>

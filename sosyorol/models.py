@@ -88,7 +88,6 @@ class Repost(models.Model):
     class Meta:
         db_table = "repost"
 
-
 class PostMeta(models.Model):
     meta_id = models.BigIntegerField(primary_key = True)
     post_id = models.BigIntegerField()
@@ -108,6 +107,14 @@ class SossyComments(models.Model):
     choice = models.IntegerField()
     class Meta:
         db_table = "sossy_comments"
+
+class SavedPosts(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    saved_at = models.DateTimeField()
+    class Meta:
+        db_table = "saved_posts"
 
 # Comment related models.
 class Comment(models.Model):
@@ -148,7 +155,7 @@ class Community(models.Model):
     metadesc = ""
     lower_name = ""
     class Meta:
-        db_table = "wpmu_terms"
+        db_table = "communities"
 
 class CommunityMeta(models.Model):
     meta_id = models.BigIntegerField(primary_key = True)
@@ -176,6 +183,7 @@ class List(models.Model):
     name = models.TextField()
     description = models.TextField()
     creator = models.BigIntegerField()
+    creator_uname = ""
     created_at = models.DateTimeField()
     is_public = models.SmallIntegerField()
     color = models.TextField()
@@ -183,6 +191,8 @@ class List(models.Model):
     posts = models.QuerySet()
     members = models.QuerySet()
     followers = models.QuerySet()
+    is_mine = False
+    is_followed = False
     class Meta:
         db_table = "lists"
 

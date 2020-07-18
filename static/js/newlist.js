@@ -65,23 +65,34 @@ function uploadImg(input, url){
         var fd = new FormData();
         var files = input.files[0];
         var fullPath = input.value;
-        var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+        if (fullPath) {
+            var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+            var filename = fullPath.substring(startIndex);
+            if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+                filename = filename.substring(1);
+                var tokens = filename.split(".");
+                if (tokens[0].length > 96) {
+                    tokens[0] = tokens[0].substring(0,95);
+                    filename = tokens[0].concat(tokens[1]);
+                }
+            }
+        }
         var reader = new FileReader();
         reader.onload = function(e) {
             placeholder.style.opacity = "1";
             placeholder.src = e.target.result;
         }
         reader.readAsDataURL(input.files[0]);
-        fd.append('file',files);
+        fd.append('file',files,filename);
         j.ajax({
             type: "POST",
-            url:url,
-            data: {fd},
+            url: url,
+            data: fd,
             processData: false, 
             contentType: false,
-            cache: false,
             success: function(response) {
-                if(response != ""){
+                alert(response.color);
+                if(response.is_valid){
                     placeholder.src = response.url;
                     bg.style.backgroundColor = response.color;
                     document.getElementById('imgColor').value = response.color;
