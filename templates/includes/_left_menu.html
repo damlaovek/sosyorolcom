@@ -10,22 +10,81 @@
             </div>
         </a>
         {% for c in followed_communities %}
-        <div class="full-width">
-            <a href="" title="{{c.name}}" class="full-width">
-                <div class="full-width hand left-list-item-link">
+            {% if forloop.counter <= 4 %}
+                <div class="full-width">
+                    <a href="" title="{{c.name}}" class="full-width">
+                        <div class="full-width hand left-list-item-link">
+                            <li class="left-list-item">
+                                {% if c.tag_img == '' %}
+                                    <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.name}}</p>
+                                {% else %}
+                                    <img src="{{c.tag_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.name}}</p>
+                                {% endif %}
+                            </li>
+                        </div>
+                    </a>
+                </div>
+            {% elif forloop.counter == 5 %}
+                {% if followed_communities|length|add:-4 < 10 %}
+                <div class="full-width hand left-list-item-link" id="loadmore" onclick="loadMoreCommunities(this)">
                     <li class="left-list-item">
-                        {% if c.tag_img == '' %}
-                            <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
-                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{c.name}}</p>
-                        {% else %}
-                            <img src="{{c.tag_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
-                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{c.name}}</p>
-                        {% endif %}
+                        <p class="non-draggable rounded fwblack fs19" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">+{{followed_communities|length|add:-4}}</p>
+                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{left_menu_dict.more}}</p>
                     </li>
                 </div>
-            </a>
-        </div>
+                {% else %}
+                <div class="full-width hand left-list-item-link" id="loadmore" onclick="loadMoreCommunities(this)">
+                    <li class="left-list-item">
+                        <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
+                            <i class="fa fa-chevron-down cb fs19" style="top:4px" aria-hidden="true"></i>
+                        </div>
+                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{left_menu_dict.more}}</p>
+                    </li>
+                </div>
+                {% endif %}
+                <div class="full-width com dnone">
+                    <a href="" title="{{c.name}}" class="full-width">
+                        <div class="full-width hand left-list-item-link">
+                            <li class="left-list-item">
+                                {% if c.tag_img == '' %}
+                                    <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.name}}</p>
+                                {% else %}
+                                    <img src="{{c.tag_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.name}}</p>
+                                {% endif %}
+                            </li>
+                        </div>
+                    </a>
+                </div>
+            {% else %}
+                <div class="full-width com dnone">
+                    <a href="" title="{{c.name}}" class="full-width">
+                        <div class="full-width hand left-list-item-link">
+                            <li class="left-list-item">
+                                {% if c.tag_img == '' %}
+                                    <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.name}}</p>
+                                {% else %}
+                                    <img src="{{c.tag_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.name}}</p>
+                                {% endif %}
+                            </li>
+                        </div>
+                    </a>
+                </div>
+            {% endif %}
         {% endfor %}
+        <div class="full-width hand left-list-item-link com dnone"  id="showless" onclick="showLessCommunities(this)">
+            <li class="left-list-item">
+                <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
+                    <i class="fa fa-chevron-up cb fs19" style="top:2px;" aria-hidden="true"></i>
+                </div>
+                <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{left_menu_dict.less}}</p>
+            </li>
+        </div>
     </ul>
     <div id="divider" style="margin:0;width:100%;z-index:999;margin-bottom:20px;"></div>
     <ul class="nav" style="margin-top:0; top:0;padding-top:0;">
@@ -84,7 +143,7 @@
             </a>
         </div>
         <div class="full-width">
-            <a href="" title="{{c.name}}" class="full-width">
+            <a href="/saved" title="{{c.name}}" class="full-width">
                 <div class="full-width hand left-list-item-link">
                     <li class="left-list-item">
                         <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
@@ -135,3 +194,19 @@
         <p class="copyright">&copy; 2020 Sosyorol, Inc.</p>
     </div>
 </div>
+<script>
+    function loadMoreCommunities(elem){
+        elem.classList.add("dnone");
+        hiddencoms = document.getElementsByClassName("com");
+        for (var i = 0; i < hiddencoms.length; i++) {
+            hiddencoms[i].classList.remove("dnone");
+        }
+    }
+    function showLessCommunities(elem){
+        hiddencoms = document.getElementsByClassName("com");
+        for (var i = 0; i < hiddencoms.length; i++) {
+            hiddencoms[i].classList.add("dnone");
+        }
+        document.getElementById("loadmore").classList.remove("dnone");
+    }
+</script>

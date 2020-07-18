@@ -6,7 +6,7 @@ def getlist(indexable, i):
     j = 0
     for obj in indexable:
         if j==i:
-            return {'name': obj.name, 'image':obj.photo_small, 'url':obj.url}
+            return {'name': obj.name, 'image':obj.photo_medium, 'url':obj.url}
         j += 1
 
 @register.filter

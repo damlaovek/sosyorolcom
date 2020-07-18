@@ -1,0 +1,28 @@
+{% load index %}
+{% for list in followedlists %}
+    {% if forloop.counter0|divisibleby:2 %}
+    <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 left m100 inline-block hand bcgrayish" style="width:288px;">
+        <img src="{{ followedlists|getlist:forloop.counter0|getdata:'image' }}" class="sqr60 rounded left full-shadow"/>
+        <p class="fs15 lh60 fwbold ml28 left">{{ followedlists|getlist:forloop.counter0|getdata:'name'}}</p>
+        <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand right' style='margin-top:9.5px;transform: rotate(90deg);'>
+            <g>
+                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+            </g>
+        </svg>
+    </a>
+    {% else %}
+    <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 right m100 inline-block hand bcgrayish" style="width:288px;">
+        <img src="{{ followedlists|getlist:forloop.counter0|getdata:'image' }}" class="sqr60 rounded full-shadow left"/>
+        <p class="fs15 lh60 fwbold ml28 left">{{ followedlists|getlist:forloop.counter0|getdata:'name' }}</p>
+        <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand right' style='margin-top:9.5px;transform: rotate(90deg);'>
+            <g>
+                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+            </g>
+        </svg>
+    </a>
+    {% endif %}
+{% endfor %}

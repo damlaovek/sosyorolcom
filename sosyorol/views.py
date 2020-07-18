@@ -157,6 +157,8 @@ def left_menu(word_list):
     left_menu_dict['lists'] = ucfirst(word_list.filter(Q(var_name = 'lists'))[0].translation)
     left_menu_dict['visithistory'] = ucfirst(word_list.filter(Q(var_name = 'visithistory'))[0].translation)
     left_menu_dict['savedposts'] = ucfirst(word_list.filter(Q(var_name = 'savedposts'))[0].translation)
+    left_menu_dict['more'] = ucfirst(word_list.filter(Q(var_name = 'more'))[0].translation)
+    left_menu_dict['less'] = ucfirst(word_list.filter(Q(var_name = 'less'))[0].translation)
     return left_menu_dict
 
 def lists_achive(word_list):
@@ -177,12 +179,14 @@ def lists_achive(word_list):
     lists_dict['followers'] = ucfirst(word_list.filter(Q(var_name = 'followers'))[0].translation)
     lists_dict['follow'] = ucfirst(word_list.filter(Q(var_name = 'follow'))[0].translation)
     lists_dict['following'] = ucwords(word_list.filter(Q(var_name = 'following'))[0].translation)
+    lists_dict['editlist'] = ucwords(word_list.filter(Q(var_name = 'edit-list'))[0].translation)
     return lists_dict
 
 def list_info(word_list):
     list_info_dict = {}
     list_info_dict["aboutlist"] = ucwords(word_list.filter(Q(var_name = 'about-list'))[0].translation)
     list_info_dict["datecreated"] = ucwords(word_list.filter(Q(var_name = 'date-created'))[0].translation)
+    list_info_dict["createdby"] = ucwords(word_list.filter(Q(var_name = 'created_by'))[0].translation)
     return list_info_dict
 
 def right_menu(word_list):
@@ -195,6 +199,10 @@ def right_menu(word_list):
     right_menu_dict['seeall'] = ucwords(word_list.filter(Q(var_name = 'see-all'))[0].translation)
     right_menu_dict['popularcommunities'] = ucwords(word_list.filter(Q(var_name = 'popular-communities'))[0].translation)
     right_menu_dict['subscribe'] = ucwords(word_list.filter(Q(var_name = 'subscribe'))[0].translation)
+    right_menu_dict['trendsofcountrytitle'] = ucfirst(word_list.filter(Q(var_name = 'trends-of-country-title'))[0].translation)
+    right_menu_dict['showmore'] = ucfirst(word_list.filter(Q(var_name = 'show-more'))[0].translation)
+    right_menu_dict['usersyoumayfollow'] = ucfirst(word_list.filter(Q(var_name = 'users-you-may-follow'))[0].translation)
+    right_menu_dict['follow'] = ucfirst(word_list.filter(Q(var_name = 'follow'))[0].translation)
     return right_menu_dict
 
 def feed(word_list):
@@ -373,11 +381,10 @@ def home(request):
     populercommunities = ucfirst(word_list.filter(Q(var_name = 'popular-communities'))[0].translation)
     subscribe = ucfirst(word_list.filter(Q(var_name = 'subscribe'))[0].translation)
 
-    followed_communities = FollowedCommunities.objects.filter(Q(user_id = current_uid)).order_by('-date')[:5]
+    followed_communities = FollowedCommunities.objects.filter(Q(user_id = current_uid)).order_by('-date')
     followed_community_ids = list({x.term_id: x for x in followed_communities}.keys())
     followed_communities = Community.objects.filter(term_id__in=followed_community_ids)
     for i in followed_communities:
-        i.name = ucwords(i.name)
         color = CommunityMeta.objects.filter(term_id=i.term_id).filter(meta_key = 'color_up')
         if len(color) == 0 or color[0].meta_value == '':
             i.tag_color = "var(--main-color)"
@@ -485,7 +492,9 @@ def home(request):
                                             'communities':communities, 'users':users, 'polls':polls
                                             })
 
+@csrf_exempt
 def lists(request):
+    limit = 3
     current_uid = 8
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
@@ -532,12 +541,33 @@ def lists(request):
         lst.posts = ListPost.objects.filter(Q(list_id=lst.ID))
         lst.members = ListUser.objects.filter(Q(list_id=lst.ID) & Q(role='member'))
         lst.followers = ListUser.objects.filter(Q(list_id=lst.ID) & Q(role='follower'))
-    return render(request, 'lists.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+    return render(request, 'lists/lists.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
                                             'country_list':country_list, 'select_language':select_language,
                                             'followed_communities':followed_communities, 'lists_dict':lists_dict,
-                                            'listsyoumaylike':listsyoumaylike, 'followedlists':followedlists
+                                            'listsyoumaylike':listsyoumaylike, 'followedlists':followedlists, 'limit':limit
                                             })
+
+def morefollowedlists(request):
+    try:
+        offset = int(request.GET["offset"])
+        limit = int(request.GET["limit"])
+    except:
+        offset = 0
+        limit = 3
+    limit += 1
+    current_uid = 8
+    list_ids = ListUser.objects.filter(Q(user_id=current_uid)).order_by('-date')
+    list_ids = list({x.list_id: x for x in list_ids}.keys())
+    followedlists = List.objects.filter(Q(ID__in=list_ids)).order_by('-created_at')
+    if (len(followedlists) < offset):
+        return render(request, 'morefollowedlists.html')
+    else:
+        if (len(followedlists) > limit):
+            followedlists = followedlists[offset:limit]
+        elif (len(followedlists) >= offset):
+            followedlists = followedlists[offset:]
+        return render(request, 'lists/morefollowedlists.html', {'limit':limit, 'followedlists':followedlists})
 
 def post_types(word_list):
     post_types_dict = {}
@@ -718,6 +748,7 @@ def uploadmedia(request):
 def uploadmediagetcolor(request):
     print("uploadmediagetcolor")
     form = MediaFileUploadForm(data=request.POST, files=request.FILES)
+    print(form.errors)
     if form.is_valid():
         photo = form.save()
         form = MediaFileUploadForm()
@@ -727,7 +758,8 @@ def uploadmediagetcolor(request):
         data = {'is_valid': True, 'name': photo.file.name, 'url': photo.file.url, 'color': 'rgb('+str(r)+','+str(g)+','+str(b)+')'}
     else:
         data = {'is_valid': False}
-    return JsonResponse(data)
+    print(data)
+    return HttpResponse(json.dumps(data),content_type="application/json")
 
 def createlist(request):
     print("createlist")
@@ -760,7 +792,7 @@ def createlist(request):
     create_list_dict['cancel'] = ucwords(word_list.filter(Q(var_name = 'cancel'))[0].translation)
     create_list_dict['save'] = ucwords(word_list.filter(Q(var_name = 'save'))[0].translation)
     create_list_dict['clear'] = ucwords(word_list.filter(Q(var_name = 'clear'))[0].translation)
-    return render(request, 'newlist.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+    return render(request, 'lists/newlist.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict, 
                                             'tips':tips, 'create_list_dict':create_list_dict})
 
@@ -787,7 +819,8 @@ def savenewlist(request):
     return HttpResponse(json.dumps(response_data),content_type="application/json")
 
 def listdetail(request, slug, **kwargs):
-    print("listdetail")
+    if slug == "undefined":
+        return createlist(request)
     if 'filter' in kwargs:
         fltr = kwargs.get("filter")
     else:
@@ -832,6 +865,8 @@ def listdetail(request, slug, **kwargs):
     word_list = Languages.objects.filter(Q(lang_code = lang))
     post_ids = list({x.post_id: x for x in post_ids}.keys())
     lst.posts = Post.objects.filter(Q(ID__in=post_ids)).order_by('-post_date')
+    if lst.creator == current_uid:
+        lst.is_mine = True
 
     for post in lst.posts:
         setup_postmeta(post, word_list)
@@ -845,7 +880,7 @@ def listdetail(request, slug, **kwargs):
     post_types_dict = post_types(word_list)
     comment_editor = comment_editor_dict(word_list)
     post_template_dict = post_template(word_list)
-    return HttpResponse(render(request, 'list_detail.html', {'list':lst, 'lang':lang, 'dark':dark, 'current_user': current_user,
+    return HttpResponse(render(request, 'lists/list_detail.html', {'list':lst, 'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
                                             'list_dict':list_dict, 'post_types_dict':post_types_dict,
                                             'comment_editor':comment_editor, 'post_template_dict':post_template_dict,
@@ -905,7 +940,7 @@ def listdetailfilter(request, slug, post_type):
     post_types_dict = post_types(word_list)
     comment_editor = comment_editor_dict(word_list)
     post_template_dict = post_template(word_list)
-    return HttpResponse(render(request, 'list_detail.html', {'list':lst, 'lang':lang, 'dark':dark, 'current_user': current_user,
+    return HttpResponse(render(request, 'lists/list_detail.html', {'list':lst, 'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
                                             'list_dict':list_dict, 'post_types_dict':post_types_dict,
                                             'comment_editor':comment_editor, 'post_template_dict':post_template_dict,
@@ -918,6 +953,7 @@ def aboutlist(request, slug):
     lst.followers = ListUser.objects.filter(Q(list_id=lst.ID, role="follower"))
     post_ids = list({x.post_id: x for x in post_ids}.keys())
     lst.posts = Post.objects.filter(Q(ID__in=post_ids)).order_by('-post_date')
+    lst.creator_uname = User.objects.filter(Q(ID = lst.creator))[0].user_login
     current_uid = 8
     current_user = User.objects.filter(Q(ID = current_uid))[0]
     user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
@@ -929,6 +965,9 @@ def aboutlist(request, slug):
     else:
         avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
     current_user.set_avatar(avatar_url)
+    followed = ListUser.objects.filter(Q(user_id=current_uid)).filter(Q(list_id=lst.ID))
+    if len(followed) > 0:
+        lst.is_followed = True
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
     word_list = Languages.objects.filter(Q(lang_code = lang))
@@ -938,7 +977,7 @@ def aboutlist(request, slug):
     list_dict = lists_achive(word_list)
     post_types_dict = post_types(word_list)
     list_info_dict = list_info(word_list)
-    return render(request, 'aboutlist.html', {'list':lst, 'lang':lang, 'dark':dark, 'current_user': current_user,
+    return render(request, 'lists/aboutlist.html', {'list':lst, 'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
                                             'list_dict':list_dict, 'post_types_dict':post_types_dict,
                                             'list_info_dict':list_info_dict})
@@ -947,7 +986,103 @@ def follow_unfollow_list(request):
     redirect = request.POST["redirect"]
     print(request.POST["redirect"])
     list_id = request.POST["list_id"]
+    operation = request.POST["operation"]
     user_id = 8
-    new_follower = ListUser(list_id=list_id, user_id=user_id, role="follower", notifications=1, date=dt.datetime.now())
-    new_follower.save()
+    if operation == "follow":
+        new_follower = ListUser(list_id=list_id, user_id=user_id, role="follower", notifications=1, date=dt.datetime.now())
+        new_follower.save()
+    elif operation == "unfollow":
+        instance = ListUser.objects.get(list_id=list_id, user_id=user_id)
+        instance.delete()
     return HttpResponseRedirect(redirect)
+
+def savethepost(request):
+    try:
+        redirect = request.POST["redirect"]
+        post_id = request.POST["post_id"]
+        user_id = request.POST["user_id"]
+        operation = request.POST["operation"]
+        if operation == "save":
+            instance = SavedPosts(post_id=post_id, user_id=user_id, saved_at=dt.datetime.now())
+            instance.save()
+        elif operation == "remove":
+            instance = SavedPosts.objects.get(post_id=post_id, user_id=user_id)
+            instance.delete()
+        return HttpResponseRedirect(redirect)
+    except:
+        return HttpResponseRedirect("")
+
+def savedposts(request):
+    current_uid = 8
+    fltr = "all"
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    header_dict = header(word_list)
+    left_menu_dict = left_menu(word_list)
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    for c in country_list:
+        c.translation = ucfirst(c.translation)
+    select_language = ucfirst(word_list.filter(Q(var_name = 'select-language'))[0].translation)
+    current_user = User.objects.filter(Q(ID = current_uid))[0]
+    user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
+    current_user.set_description(user_desc.meta_value)
+    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
+    if (os.path.exists(mypath)):
+        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
+    else:
+        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+    current_user.set_avatar(avatar_url)
+
+    followed_communities = FollowedCommunities.objects.filter(Q(user_id = current_uid)).order_by('-date')
+    followed_community_ids = list({x.term_id: x for x in followed_communities}.keys())
+    followed_communities = Community.objects.filter(term_id__in=followed_community_ids)
+    for i in followed_communities:
+        color = CommunityMeta.objects.filter(term_id=i.term_id).filter(meta_key = 'color_up')
+        if len(color) == 0 or color[0].meta_value == '':
+            i.tag_color = "var(--main-color)"
+        else:
+            i.tag_color = color[0].meta_value
+        
+        img_url = CommunityMeta.objects.filter(term_id=i.term_id).filter(meta_key = 'tag_img')
+        if len(img_url) == 0 or img_url[0].meta_value == '':
+            i.tag_img = ""
+        else:
+            url_id = img_url[0].meta_value
+            i.tag_img = Post.objects.filter(Q(ID=url_id))[0].guid
+    savedpostsobjs = SavedPosts.objects.filter(Q(user_id=current_uid)).prefetch_related()
+    savedposts = []
+    for item in savedpostsobjs:
+        setup_postmeta(item.post, word_list)
+        if item.post.post_type == "link":
+            item.post.photo_from_url = get_photo_from_url(item.post.post_content)
+        savedposts.append(item.post)
+    print(savedposts)
+    savedposts_dict = {}
+    savedposts_dict["saveditems"] = ucfirst(word_list.filter(Q(var_name = 'saveditems'))[0].translation)
+    savedposts_dict["saveditemsDesc"] = ucfirst(word_list.filter(Q(var_name = 'saveditemsDesc'))[0].translation)
+    savedposts_dict["all"] = ucfirst(word_list.filter(Q(var_name = 'all'))[0].translation)
+    post_types_dict = post_types(word_list)
+    comment_editor = comment_editor_dict(word_list)
+    post_template_dict = post_template(word_list)
+    right_menu_dict = right_menu(word_list)
+    users = User.objects.all()[:2]
+    for user in users:
+        user_desc = UserMeta.objects.filter(Q(user_id = user.ID)).filter(Q(meta_key = 'description'))[0]
+        user.set_description(user_desc.meta_value)
+        mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{user.ID}')
+        if (os.path.exists(mypath)):
+            onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+            avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(user.ID) + "/" + onlyfiles[0]
+        else:
+            avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        user.set_avatar(avatar_url)
+    return render(request, "savedposts.html", {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'followed_communities':followed_communities, 'savedposts_dict':savedposts_dict,
+                                            'post_types_dict':post_types_dict, 'savedposts':savedposts, 'filter': fltr,
+                                            'comment_editor':comment_editor, 'post_template_dict':post_template_dict,
+                                            'right_menu_dict':right_menu_dict, 'users':users
+                                            })
