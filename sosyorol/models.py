@@ -39,7 +39,7 @@ class UserMeta(models.Model):
 # Post related models.
 class Post(models.Model):
     ID = models.BigIntegerField(primary_key = True)
-    post_author = models.BigIntegerField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     post_date = models.DateTimeField()
     post_content = models.TextField()
     post_title = models.TextField()
@@ -53,7 +53,6 @@ class Post(models.Model):
     dislikes = 0
     short_content = ""
     preview = ""
-    author = User()
     comments = models.QuerySet()
     post_images = []
     photo_from_url = ""
@@ -128,23 +127,6 @@ class Comment(models.Model):
         db_table = "wpmu_comments"
 
 # Community related models.
-class TermTaxonomy(models.Model):
-    term_taxonomy_id = models.BigIntegerField(primary_key = True)
-    term_id = models.BigIntegerField()
-    taxonomy = models.TextField()
-    count = models.BigIntegerField()
-    parent = models.BigIntegerField()
-    class Meta:
-        db_table = "wpmu_term_taxonomy"
-
-class FollowedCommunities(models.Model):
-    user_id = models.BigIntegerField()
-    term_id = models.BigIntegerField()
-    date = models.DateTimeField()
-    role = models.TextField()
-    class Meta:
-        db_table = "term_members"
-
 class Community(models.Model):
     term_id = models.BigIntegerField(primary_key = True)
     name = models.TextField()
@@ -157,9 +139,47 @@ class Community(models.Model):
     class Meta:
         db_table = "communities"
 
+class CommunityCategories(models.Model):
+    term_id = models.BigIntegerField(primary_key = True)
+    name = models.TextField()
+    class Meta:
+        db_table = "community_categories"
+
+class CommunityCategoryRelation(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    community = models.ForeignKey(Community, on_delete=models.CASCADE)
+    category = models.ForeignKey(CommunityCategories, on_delete=models.CASCADE)
+    class Meta:
+        db_table = "community_category_relation"
+
+class TermTaxonomy(models.Model):
+    term_taxonomy_id = models.BigIntegerField(primary_key = True)
+    term = models.ForeignKey(Community, on_delete=models.CASCADE)
+    taxonomy = models.TextField()
+    count = models.BigIntegerField()
+    parent = models.BigIntegerField()
+    class Meta:
+        db_table = "wpmu_term_taxonomy"
+
+class TermRelationship(models.Model):
+    object_id = models.BigIntegerField()
+    term_taxonomy_id = models.BigIntegerField()
+    term_order = models.BigIntegerField()
+    class Meta:
+        db_table = "wpmu_term_relationships"
+
+class FollowedCommunities(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    term = models.ForeignKey(Community, on_delete=models.CASCADE)
+    date = models.DateTimeField()
+    role = models.TextField()
+    class Meta:
+        db_table = "term_members"
+
+
 class CommunityMeta(models.Model):
     meta_id = models.BigIntegerField(primary_key = True)
-    term_id = models.BigIntegerField()
+    term = models.ForeignKey(Community, on_delete=models.CASCADE)
     meta_key = models.TextField()
     meta_value = models.TextField()
     class Meta:

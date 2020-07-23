@@ -1,6 +1,6 @@
 
 {% load static %}
-{% include 'head.html' %}
+{% include 'includes/general/head.html' %}
         <title>Sosyorol - Sosyal İçerik Platformu</title>
         <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
         <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
@@ -12,12 +12,12 @@
         <script src="{% static 'js/index.js' %}"></script>
     </head>
     <body class="{{darkmode}}">
-        {% include 'header.html' %}
-        {% include 'includes/_lang_popup.html' %}
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
         <div class="full-width inline-flex">
-            {% include 'includes/_left_menu.html' %}
-            {% include 'includes/_home_feed.html' %}
-            {% include 'includes/_right_menu.html' %}
+            {% include 'includes/general/left_menu.html' %}
+            {% include 'includes/general/home_feed.html' %}
+            {% include 'includes/general/right_menu.html' %}
         </div>
     </body>
 </html>

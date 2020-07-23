@@ -1,5 +1,5 @@
 {% load static %}
-{% include 'head.html' %}
+{% include 'includes/general/head.html' %}
         <title>Sosyorol - Sosyal İçerik Platformu</title>
         <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
         <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
@@ -11,10 +11,10 @@
         <script src="{% static 'js/index.js' %}"></script>
     </head>
     <body class="{{darkmode}}">
-        {% include 'header.html' %}
-        {% include 'includes/_lang_popup.html' %}
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
         <div class="full-width inline-flex">
-            {% include 'includes/_left_menu.html' %}
+            {% include 'includes/general/left_menu.html' %}
             <style>
                 .box2{position:relative;box-sizing:border-box;box-shadow:0px 3px 4px rgba(173,173,173, 0.53); background-color:var(--white);max-width:812px;margin:auto}
                 .box .box2{box-shadow:none;}
@@ -22,47 +22,85 @@
             </style>
             <div class="section-middle">
                 <div class="bsbb full-shadow-border box2" style="margin-top:8px;">
-                    <div class="bsbb full-width p2040">
+                    <div class="bsbb full-width p20">
                         <h1 class="fs19 fwblack ctitle">{{savedposts_dict.saveditems}}</h1>
                         <p class="lh24 mt20 fs15 cg2 mxw500">{{savedposts_dict.saveditemsDesc}}</p>
                     </div>
-                    <div class="bsbb full-width inline-flex mt8 bt p2040">
-                        <a href="" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{savedposts_dict.all}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
-                        <a href="" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.post}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
-                        <a href="" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.question}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
-                        <a href="" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.poll}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
-                        <a href="" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.quiz}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
-                        <a href="" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.media}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
-                        <p class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.link}}</p>
+                    <div class="bsbb full-width inline-flex mt8 bt p20">
+                        {% if filter == "all" %}
+                            <a href="/saved" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{savedposts_dict.all}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% else %}
+                            <a href="/saved" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{savedposts_dict.all}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% endif %}
+                        {% if filter == "post" %}
+                            <a href="/saved/post" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.post}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% else %}
+                            <a href="/saved/post" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.post}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% endif %}
+                        {% if filter == "question" %}
+                            <a href="/saved/question" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.question}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% else %}
+                            <a href="/saved/question" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.question}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% endif %}
+                        {% if filter == "answer" %}
+                            <a href="/saved/answer" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.answer}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% else %}
+                            <a href="/saved/answer" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.answer}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% endif %}
+                        {% if filter == "poll" %}
+                            <a href="/saved/poll" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.poll}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% else %}
+                            <a href="/saved/poll" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.poll}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% endif %}
+                        {% if filter == "quiz" %}
+                            <a href="/saved/quiz" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.quiz}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% else %}
+                            <a href="/saved/quiz" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.quiz}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% endif %}
+                        {% if filter == "media" %}
+                            <a href="/saved/media" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.media}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% else %}
+                            <a href="/saved/media" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.media}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% endif %}
+                        {% if filter == "link" %}
+                            <a href="/saved/link" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.link}}</a>
+                        {% else %}
+                            <a href="/saved/link" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.link}}</a>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="bsbb full-width mt20" id="posts" style="width:812px;margin:auto;margin-top:20px;">
                     {% for post in savedposts %}
                         {% if post.post_type == "post" %}
                             {% if filter == "post" %}
-                                {% include 'includes/post_template.html' %}
+                                {% include 'posts/posttemplates/post_template.html' %}
                             {% elif filter == "all" %}
-                                {% include 'includes/post_template.html' %}
+                                {% include 'posts/posttemplates/post_template.html' %}
                             {% endif %}
                         {% elif post.post_type == "media" %}
                             {% if filter == "media" %}
-                                {% include 'includes/media_template.html' %}
+                                {% include 'posts/posttemplates/media_template.html' %}
                             {% elif filter == "all" %}
-                                {% include 'includes/media_template.html' %}
+                                {% include 'posts/posttemplates/media_template.html' %}
                             {% endif %}
                         {% elif post.post_type == "link" %}
                             {% if filter == "link" %}
-                                {% include 'includes/link_template.html' with link=post %}
+                                {% include 'posts/posttemplates/link_template.html' with link=post %}
                             {% elif filter == "all" %}
-                                {% include 'includes/link_template.html' with link=post %}
+                                {% include 'posts/posttemplates/link_template.html' with link=post %}
                             {% endif %}
                         {% elif post.post_type == "question" %}
                         {% elif post.post_type == "answer" %}
+                            {% if filter == "answer" %}
+                                {% include 'posts/posttemplates/answer_template.html' with answer=post %}
+                            {% elif filter == "all" %}
+                                {% include 'posts/posttemplates/answer_template.html' with answer=post %}
+                            {% endif %}
                         {% elif post.post_type == "poll" %}
                             {% if filter == "poll" %}
-                                {% include 'includes/poll_template.html' with poll=post %}
+                                {% include 'posts/posttemplates/poll_template.html' with poll=post %}
                             {% elif filter == "all" %}
-                                {% include 'includes/poll_template.html' with poll=post %}
+                                {% include 'posts/posttemplates/poll_template.html' with poll=post %}
                             {% endif %}
                         {% elif post.post_type == "quiz" %}
                         {% endif %}

@@ -1,5 +1,5 @@
 {% load static %}
-{% include 'head.html' %}
+{% include 'includes/general/head.html' %}
         <title>{{list.name}} - Sosyorol</title>
         <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
         <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
@@ -18,10 +18,10 @@
         </style>
     </head>
     <body class="{{darkmode}}">
-        {% include 'header.html' %}
-        {% include 'includes/_lang_popup.html' %}
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
         <div class="full-width inline-flex">
-            {% include 'includes/_left_menu.html' %}
+            {% include 'includes/general/left_menu.html' %}
             <div class="section-middle" style="margin-top:45px; padding-bottom:32px;">
                 <div class="bsbb p2040">
                     <div class="full-width full-shadow-border box" style="z-index:2;">
@@ -110,29 +110,29 @@
                         {% for post in list.posts %}
                             {% if post.post_type == "post" %}
                                 {% if filter == "post" %}
-                                    {% include 'includes/post_template.html' %}
+                                    {% include 'posts/posttemplates/post_template.html' %}
                                 {% elif filter == "all" %}
-                                    {% include 'includes/post_template.html' %}
+                                    {% include 'posts/posttemplates/post_template.html' %}
                                 {% endif %}
                             {% elif post.post_type == "media" %}
                                 {% if filter == "media" %}
-                                    {% include 'includes/media_template.html' %}
+                                    {% include 'posts/posttemplates/media_template.html' %}
                                 {% elif filter == "all" %}
-                                    {% include 'includes/media_template.html' %}
+                                    {% include 'posts/posttemplates/media_template.html' %}
                                 {% endif %}
                             {% elif post.post_type == "link" %}
                                 {% if filter == "link" %}
-                                    {% include 'includes/link_template.html' with link=post %}
+                                    {% include 'posts/posttemplates/link_template.html' with link=post %}
                                 {% elif filter == "all" %}
-                                    {% include 'includes/link_template.html' with link=post %}
+                                    {% include 'posts/posttemplates/link_template.html' with link=post %}
                                 {% endif %}
                             {% elif post.post_type == "question" %}
                             {% elif post.post_type == "answer" %}
                             {% elif post.post_type == "poll" %}
                                 {% if filter == "poll" %}
-                                    {% include 'includes/poll_template.html' with poll=post %}
+                                    {% include 'posts/posttemplates/poll_template.html' with poll=post %}
                                 {% elif filter == "all" %}
-                                    {% include 'includes/poll_template.html' with poll=post %}
+                                    {% include 'posts/posttemplates/poll_template.html' with poll=post %}
                                 {% endif %}
                             {% elif post.post_type == "quiz" %}
                             {% endif %}
@@ -140,7 +140,7 @@
                     </div>
                 </div>
             </div>
-            {% include 'includes/_right_menu.html' %}
+            {% include 'includes/general/right_menu.html' %}
         </div>
     </body>
 </html>

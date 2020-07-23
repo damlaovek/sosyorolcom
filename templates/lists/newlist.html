@@ -1,5 +1,5 @@
 {% load static %}
-{% include 'head.html' %}
+{% include 'includes/general/head.html' %}
         <title>Create List - Sosyorol</title>
         <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
         <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
@@ -14,9 +14,9 @@
         </style>
     </head>
     <body class="{{darkmode}}">
-        {% include 'includes/_lang_popup.html' %}
-        {% include 'header.html' %}
-        <div class="popup-container hidden" id="drafts-popup"> {% include 'includes/createpost/drafts_popup.html' %}</div>
+        {% include 'includes/general/lang_popup.html' %}
+        {% include 'includes/general/header.html' %}
+        <div class="popup-container hidden" id="drafts-popup"> {% include 'posts/createpost/drafts_popup.html' %}</div>
         <div class="full-width inline-flex">
             <div class="fixed section-left oh pt10">
                 <div class="inline-block p200 m034 w68 oh">
@@ -166,7 +166,7 @@
                                     <p class='noselect fs13 absolute cg2' style="bottom:4.5px;right:10px;line-height:40px;" id='title-counter'></p>
                                 </div>
                                 <div class="full-width">
-                                    <textarea  name="cp-desc" class="bsbb box full-width p10 lh20 fs15 mt10 text textarea" rows="3"onblur='this.classList.remove("active");document.getElementById("desc-counter").innerHTML = "";' onfocus='this.classList.add("active");var len = this.value.length;document.getElementById("desc-counter").innerHTML = len+"/"+100;' onkeyup="descChanged(this, '{{create_list_dict.desc_placeholder}}');"  maxlength="100" placeholder="{{create_list_dict.description}}"></textarea>
+                                    <textarea  name="cp-desc" class="bsbb box full-width p10 lh20 fs15 mt10 text textarea" rows="3"onblur='this.classList.remove("active");document.getElementById("desc-counter").innerHTML = "";' onfocus='this.classList.add("active");var len = this.value.length;document.getElementById("desc-counter").innerHTML = len+"/"+100;' onkeyup="descChanged(this, '{{create_list_dict.desc_placeholder}}', 100);"  maxlength="100" placeholder="{{create_list_dict.description}}"></textarea>
                                     <p class='noselect fs13 absolute cg2' style="bottom:4.5px;right:10px;line-height:40px;" id='desc-counter'></p>
                                 </div>
                             </div>

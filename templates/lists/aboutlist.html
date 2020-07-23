@@ -1,5 +1,5 @@
 {% load static %}
-{% include 'head.html' %}
+{% include 'includes/general/head.html' %}
         <title> About {{list.name}}</title>
         <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
         <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
@@ -16,10 +16,10 @@
         </style>
     </head>
     <body class="{{darkmode}}">
-        {% include 'header.html' %}
-        {% include 'includes/_lang_popup.html' %}
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
         <div class="full-width inline-flex">
-            {% include 'includes/_left_menu.html' %}
+            {% include 'includes/general/left_menu.html' %}
             <div class="section-middle" style="margin-top:45px; padding-bottom:32px;">
                 <div class="bsbb p2040">
                     <div class="full-width full-shadow-border box" style="z-index:2;">
@@ -96,7 +96,7 @@
                     </div>
                 </div>
             </div>
-            {% include 'includes/_right_menu.html' %}
+            {% include 'includes/general/right_menu.html' %}
         </div>
         <script>
             var j = jQuery.noConflict();
