@@ -1,0 +1,151 @@
+<div class="full-width align-center mt10">
+    <form>
+    <div class="bsbb box p20 title fs19 cp-container" id="cp-container">
+        {{create_post_dict.createpoll}}
+        <div class="absolute inline-flex" style="right:20px;top:1px;">
+            <div class="btn p10 hand m10" style="border-radius:4px;" onclick="document.getElementById('drafts-popup').classList.toggle('hidden');">
+                <p  class="fs15 noselect" id='drafts'>{{newpost_actions_dict.drafts}}&nbsp;({{drafts|length}})</p>
+            </div>
+            <div class="btn inline-block p10 m100 hand" style="border-radius:4px;min-width:150px;" id='poll-duration-btn' onclick="showHide('poll-duration-menu')">
+                <p  class="fs15 left noselect" id='poll-duration'>{{create_post_dict.pollduration}}</p>
+                <svg class="right" width="10px" height="10px" viewBox="0 0 10 10" style="margin:3.5px 0;">
+                    <g>
+                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 9.628906 2.285156 L 0.488281 2.285156 C 0.0546875 2.285156 -0.164062 2.808594 0.144531 3.117188 L 4.714844 7.6875 C 4.902344 7.875 5.214844 7.875 5.402344 7.6875 L 9.96875 3.117188 C 10.28125 2.808594 10.0625 2.285156 9.628906 2.285156 Z M 9.628906 2.285156 "/>
+                    </g>
+                </svg>
+            </div>
+        </div>
+        <ul  id="poll-duration-menu" class="full-shadow-border box dropdown hidden fs15" style='right:20px; top: 55px;'>
+            <li style="font-size: 15px;" class="fs15 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '{{create_post_dict.unlimitedtime}}');validateForm();">{{create_post_dict.unlimitedtime}}
+                <div class="tick">
+                    <svg width="14px" height="14px" viewBox="0 0 14 14">
+                        <g>
+                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 13.796875 2.0625 C 13.523438 1.789062 13.078125 1.789062 12.804688 2.0625 L 4.417969 10.449219 L 1.195312 7.226562 C 0.921875 6.953125 0.476562 6.953125 0.203125 7.226562 C -0.0664062 7.5 -0.0664062 7.945312 0.203125 8.21875 L 3.921875 11.9375 C 4.195312 12.210938 4.640625 12.207031 4.914062 11.9375 L 13.796875 3.054688 C 14.070312 2.78125 14.066406 2.335938 13.796875 2.0625 Z M 13.796875 2.0625 "/>
+                        </g>
+                    </svg>
+                </div>
+            </li>
+            <li style="font-size: 15px;" class="fs15 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '1 {{create_post_dict.day}}');validateForm();">1 {{create_post_dict.day}}
+                <div class="tick">
+                    <svg width="14px" height="14px" viewBox="0 0 14 14">
+                        <g>
+                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 13.796875 2.0625 C 13.523438 1.789062 13.078125 1.789062 12.804688 2.0625 L 4.417969 10.449219 L 1.195312 7.226562 C 0.921875 6.953125 0.476562 6.953125 0.203125 7.226562 C -0.0664062 7.5 -0.0664062 7.945312 0.203125 8.21875 L 3.921875 11.9375 C 4.195312 12.210938 4.640625 12.207031 4.914062 11.9375 L 13.796875 3.054688 C 14.070312 2.78125 14.066406 2.335938 13.796875 2.0625 Z M 13.796875 2.0625 "/>
+                        </g>
+                    </svg>
+                </div>
+            </li>
+            <li style="font-size: 15px;" class="fs15 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '2 {{create_post_dict.days}}');validateForm();">2 {{create_post_dict.days}}
+                <div class="tick">
+                    <svg width="14px" height="14px" viewBox="0 0 14 14">
+                        <g>
+                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 13.796875 2.0625 C 13.523438 1.789062 13.078125 1.789062 12.804688 2.0625 L 4.417969 10.449219 L 1.195312 7.226562 C 0.921875 6.953125 0.476562 6.953125 0.203125 7.226562 C -0.0664062 7.5 -0.0664062 7.945312 0.203125 8.21875 L 3.921875 11.9375 C 4.195312 12.210938 4.640625 12.207031 4.914062 11.9375 L 13.796875 3.054688 C 14.070312 2.78125 14.066406 2.335938 13.796875 2.0625 Z M 13.796875 2.0625 "/>
+                        </g>
+                    </svg>
+                </div>
+            </li>
+            <li style="font-size: 15px;" class="fs15 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '3 {{create_post_dict.days}}');validateForm();">3 {{create_post_dict.days}}
+                <div class="tick">
+                    <svg width="14px" height="14px" viewBox="0 0 14 14">
+                        <g>
+                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 13.796875 2.0625 C 13.523438 1.789062 13.078125 1.789062 12.804688 2.0625 L 4.417969 10.449219 L 1.195312 7.226562 C 0.921875 6.953125 0.476562 6.953125 0.203125 7.226562 C -0.0664062 7.5 -0.0664062 7.945312 0.203125 8.21875 L 3.921875 11.9375 C 4.195312 12.210938 4.640625 12.207031 4.914062 11.9375 L 13.796875 3.054688 C 14.070312 2.78125 14.066406 2.335938 13.796875 2.0625 Z M 13.796875 2.0625 "/>
+                        </g>
+                    </svg>
+                </div>
+            </li>
+            <li style="font-size: 15px;" class="fs15 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '4 {{create_post_dict.days}}');validateForm();">4 {{create_post_dict.days}}
+                <div class="tick">
+                    <svg width="14px" height="14px" viewBox="0 0 14 14">
+                        <g>
+                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 13.796875 2.0625 C 13.523438 1.789062 13.078125 1.789062 12.804688 2.0625 L 4.417969 10.449219 L 1.195312 7.226562 C 0.921875 6.953125 0.476562 6.953125 0.203125 7.226562 C -0.0664062 7.5 -0.0664062 7.945312 0.203125 8.21875 L 3.921875 11.9375 C 4.195312 12.210938 4.640625 12.207031 4.914062 11.9375 L 13.796875 3.054688 C 14.070312 2.78125 14.066406 2.335938 13.796875 2.0625 Z M 13.796875 2.0625 "/>
+                        </g>
+                    </svg>
+                </div>
+            </li>
+            <li style="font-size: 15px;" class="fs15 lh20 text hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '5 {{create_post_dict.days}}');validateForm();">5 {{create_post_dict.days}}
+                <div class="tick">
+                    <svg width="14px" height="14px" viewBox="0 0 14 14">
+                        <g>
+                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 13.796875 2.0625 C 13.523438 1.789062 13.078125 1.789062 12.804688 2.0625 L 4.417969 10.449219 L 1.195312 7.226562 C 0.921875 6.953125 0.476562 6.953125 0.203125 7.226562 C -0.0664062 7.5 -0.0664062 7.945312 0.203125 8.21875 L 3.921875 11.9375 C 4.195312 12.210938 4.640625 12.207031 4.914062 11.9375 L 13.796875 3.054688 C 14.070312 2.78125 14.066406 2.335938 13.796875 2.0625 Z M 13.796875 2.0625 "/>
+                        </g>
+                    </svg>
+                </div>
+            </li>
+            <li style="font-size: 15px;" class="lh20 text fs15 hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '6 {{create_post_dict.days}}');validateForm();">6 {{create_post_dict.days}}
+                <div class="tick">
+                    <svg width="14px" height="14px" viewBox="0 0 14 14">
+                        <g>
+                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 13.796875 2.0625 C 13.523438 1.789062 13.078125 1.789062 12.804688 2.0625 L 4.417969 10.449219 L 1.195312 7.226562 C 0.921875 6.953125 0.476562 6.953125 0.203125 7.226562 C -0.0664062 7.5 -0.0664062 7.945312 0.203125 8.21875 L 3.921875 11.9375 C 4.195312 12.210938 4.640625 12.207031 4.914062 11.9375 L 13.796875 3.054688 C 14.070312 2.78125 14.066406 2.335938 13.796875 2.0625 Z M 13.796875 2.0625 "/>
+                        </g>
+                    </svg>
+                </div>
+            </li>
+            <li style="font-size: 15px;" class="lh20 text fs15 hand p10 noselect poll-duration-menu-item" onclick="selectPollDuration(this, '7 {{create_post_dict.days}}');validateForm();">7 {{create_post_dict.days}}
+                <div class="tick">
+                    <svg width="14px" height="14px" viewBox="0 0 14 14">
+                        <g>
+                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 13.796875 2.0625 C 13.523438 1.789062 13.078125 1.789062 12.804688 2.0625 L 4.417969 10.449219 L 1.195312 7.226562 C 0.921875 6.953125 0.476562 6.953125 0.203125 7.226562 C -0.0664062 7.5 -0.0664062 7.945312 0.203125 8.21875 L 3.921875 11.9375 C 4.195312 12.210938 4.640625 12.207031 4.914062 11.9375 L 13.796875 3.054688 C 14.070312 2.78125 14.066406 2.335938 13.796875 2.0625 Z M 13.796875 2.0625 "/>
+                        </g>
+                    </svg>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="bsbb box p20 title fs18 cp-container" style="margin:10px auto;">
+        <div class="full-width">
+            <textarea name="cp-title" style='padding-right:70px;' rows="1" onblur='this.classList.remove("active");document.getElementById("title-counter").innerHTML = "";' onfocus='this.classList.add("active");var len = this.value.length;document.getElementById("title-counter").innerHTML = len+"/"+250;' onkeyup="updateTextareaCounter(this, 'title-counter', 250)" class="bsbb box full-width p10 lh20 fs15 text textarea" maxlength="250" placeholder="{{newpost_actions_dict.title}}"></textarea>
+            <p class='noselect fs13 absolute cg2' style="bottom:0;right:10px;line-height:40px;" id='title-counter'></p>
+        </div>
+        <div class="bsbb full-width box mt10">
+            {% include 'includes/createpost/rich_text_editor.html' %}
+        </div>
+        <ul class="connected-sortable droppable-area full-width mt10" id='poll-options-list'>
+            <li class="full-width inline-flex hand mt10" id='poll-option-1'>
+                <p style="line-height:12px;margin:14px 0;" class="cg2 hand">=</p>
+                <div class='m010' style='width:calc(100% - 80px)'>
+                    <textarea style='padding-right:70px;' placeholder="{{create_post_dict.option}}" rows="1" onblur='this.classList.remove("active");document.getElementById("poll-option-1-counter").innerHTML = "";' onfocus='this.classList.add("active");var len = this.value.length;document.getElementById("poll-option-1-counter").innerHTML = len+"/"+120;' onkeyup="updateTextareaCounter(this, 'poll-option-1-counter', 120)" class="bsbb full-width box p10 lh20 fs15 text textarea" maxlength="120"></textarea>
+                    <p class='noselect fs13 absolute cg2' style="bottom:0;right:10px;line-height:40px;" id='poll-option-1-counter'></p>
+                </div>
+                <p class="sqrt30 box border rounded hand cg2 poll-option-btn" style='line-height:30px; text-align:center;font-size:18px;margin:5px 0;margin-right:10px;' onclick="addPollOption('poll-option-1','{{create_post_dict.option}}', '{{create_post_dict.addrule}}', '{{create_post_dict.removerule}}');">+</p>
+                <p class="sqrt30 box border rounded hand cg2 poll-option-btn" style='line-height:30px; text-align:center;font-size:20px;margin:5px 0;' onclick="removePollOption('poll-option-1', '{{create_post_dict.removerule}}');">-</p>
+            </li>
+            <li class="full-width inline-flex hand mt10" id='poll-option-2'>
+                <p style="line-height:12px;margin:14px 0;" class="cg2 hand">=</p>
+                <div class='m010' style='width:calc(100% - 80px)'>
+                    <textarea style='padding-right:70px;' placeholder="{{create_post_dict.option}}" rows="1" onblur='this.classList.remove("active");document.getElementById("poll-option-2-counter").innerHTML = "";' onfocus='this.classList.add("active");var len = this.value.length;document.getElementById("poll-option-2-counter").innerHTML = len+"/"+120;' onkeyup="updateTextareaCounter(this, 'poll-option-2-counter', 120)" class="bsbb full-width box p10 lh20 fs15 text textarea" maxlength="120"></textarea>
+                    <p class='noselect fs13 absolute cg2' style="bottom:0;right:10px;line-height:40px;" id='poll-option-2-counter'></p>
+                </div>
+                <p class="sqrt30 box border rounded hand cg2 poll-option-btn" style='line-height:30px; text-align:center;font-size:18px;margin:5px 0;margin-right:10px;' onclick="addPollOption('poll-option-2','{{create_post_dict.option}}', '{{create_post_dict.addrule}}', '{{create_post_dict.removerule}}');">+</p>
+                <p class="sqrt30 box border rounded hand cg2 poll-option-btn" style='line-height:30px; text-align:center;font-size:20px;margin:5px 0;' onclick="removePollOption('poll-option-2', '{{create_post_dict.removerule}}');">-</p>
+            </li>
+        </ul>
+    </div>
+    <div class="bsbb box p020 title fs18 cp-container">
+        <div class="p100 full-width inline-flex">
+            <div class="textarea p10 fs15 cg2 hand box flair" data-title="{{newpost_actions_dict.spoiler}}" id="flair" onclick="this.classList.toggle('active');" style="border-radius:18px;">&nbsp;&nbsp;Spoiler&nbsp;&nbsp;</div>
+            <div class="textarea p10 fs15 cg2 m010 hand box flair" data-title="{{newpost_actions_dict.nsfw}}" id="flair"  onclick="this.classList.toggle('active');" style="border-radius:18px;">&nbsp;&nbsp;NSFW&nbsp;&nbsp;</div>
+        </div>
+    </div>
+    <div class="bsbb box p20 title fs18 cp-container" style="margin:10px auto;">
+        <ul class="inline-block full-width" id="selected-communities">
+        </ul>
+        <textarea rows="1" onblur='this.classList.remove("active");' onfocus='this.classList.add("active");' class="bsbb box full-width p10 lh20 fs15 text textarea" placeholder="{{newpost_actions_dict.searchcommunity}}"></textarea>
+        <ul class="bsbb box full-shadow-border dropdown hidden" style="width:calc(100% - 40px);" id="communities">
+            <?php $terms = followedCommunities(get_current_user_id()); $index = 1; foreach($terms as $term): $tag = get_term($term->term_id); if($index < 3) { ?>
+                <li class="bsbb fs14 lh20 text hand p10 noselect inline-flex full-width" onclick="addSelectedCommunity(this);validateForm();">
+                    <?php $trendTagImg = get_field( "tag_img",$tag )["url"]; if(!$trendTagImg){$trendTagImg = get_stylesheet_directory_uri()."/assets/img/defaults/default-community.png";}$trendTagColor = get_field( "color_up",$tag );if(!$trendTagColor){$trendTagColor = "var(--main-color)";}?>
+                        <img src="<?php echo $trendTagImg; ?>" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:<?php echo $trendTagColor; ?>" data-no-lazy="1"/>
+                        <p class="ellipsis followed-community-name" style="font-size:17px;padding:0 15px;font-weight:var(--bold);line-height:40px;"><?php echo "c/".esc_html(strtolower(mb_convert_case(str_replace('I','ı',str_replace('İ','i',$tag->name)), MB_CASE_TITLE, "UTF-8"))); ?></p>
+                </li>
+            <?php } $index += 1; endforeach; ?>
+        </ul>
+    </div>
+    <div class="bsbb box p20 title fs18 cp-container">
+        <div class="full-width inline-block">
+            <div class="bsbb p10 hand left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;' style="width:calc(25% - 15px); text-align:center;border-radius:4px;">{{newpost_actions_dict.cancel}}</div>
+            <div class="bsbb p10 m020 hand left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;'  style="width:calc(25% - 15px); text-align:center;border-radius:4px;">{{newpost_actions_dict.clear}}</div>
+            <div class="bsbb p10 hand left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;'  style="width:calc(25% - 15px);margin-right:20px; text-align:center;border-radius:4px;">{{newpost_actions_dict.save}}</div>
+            <input disabled type="submit" id="cp-sendBtn" class="btn p10 left fs15 lh20 noselect" style="border-radius:4px;height:20px;width:calc(25% - 35px); border:none; text-align:center; color:var(--main-color); font-weight:700;" value="{{newpost_actions_dict.send}}"/>
+        </div>
+    </div>
+    </form>
+</div>

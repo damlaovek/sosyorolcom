@@ -1,6 +1,6 @@
 {% load static %}
 {% load index %}
-{% include 'head.html' %}
+{% include 'includes/general/head.html' %}
         <title>Lists - Sosyorol</title>
         <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
         <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
@@ -12,10 +12,10 @@
         <script src="{% static 'js/index.js' %}"></script>
     </head>
     <body>
-        {% include 'header.html' %}
-        {% include 'includes/_lang_popup.html' %}
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
         <div class="full-width inline-flex">
-            {% include 'includes/_left_menu.html' %}
+            {% include 'includes/general/left_menu.html' %}
             <style>
                 .box{box-shadow:0px 3px 4px rgba(173,173,173, 0.53); background-color:var(--white);width:812px;margin:auto}
                 .box .box{box-shadow:none;}
@@ -23,7 +23,7 @@
                 #loadmorefollowedlists:hover{border:1px solid var(--border3); padding:9px 0;}
             </style>
             <div class="section-middle">
-                <div class="bsbb full-shadow-border box p2040" style="margin-top:8px;">
+                <div class="bsbb full-shadow-border box p20" style="margin-top:8px;">
                     <h1 class="fs19 fwblack ctitle">{{lists_dict.lists}}</h1>
                     <p class="lh24 m200 fs15 cg2 mxw500">{{lists_dict.listsPageDesc}}</p>
                     <div class="full-width inline-flex mt8">
@@ -31,7 +31,7 @@
                         <p onclick="goToLists()" class="fs15 cg2 p1030 bcg hand border2 br19 hoverb">{{lists_dict.followLists}}</p>
                     </div>
                 </div>
-                <div class="bsbb full-shadow-border box p2040" style="margin-top: 28px;">
+                <div class="bsbb full-shadow-border box p20" style="margin-top: 28px;">
                     <div class="inline-flex full-width">
                         <h1 class="fs19 fwbold lh40 ctitle">{{lists_dict.yourlists}}</h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <div>
@@ -49,7 +49,7 @@
                                 {% if forloop.counter0 < limit|add:1 %}
                                     {% if forloop.counter0 >= followedlists|length %}
                                         {% if forloop.counter0|divisibleby:2 %}
-                                            <a href="create" class="p20 border3h4 br20 right m100 inline-flex hand" style="width:288px;">
+                                            <a href="create" class="p20 border3h4 br20 right m100 inline-flex hand" style="width:308px;">
                                                 <div class="icon-bg full-shadow2">
                                                     <svg class="svg20" viewBox="0 0 20 20">
                                                         <g>
@@ -60,7 +60,7 @@
                                                 <p class="fs15 lh60 fwbold ml28">{{lists_dict.addlist}}</p>
                                             </a>
                                         {% else %}
-                                            <a href="create" class="p20 border3h4 br20 left m100 inline-flex hand" style="width:288px;">
+                                            <a href="create" class="p20 border3h4 br20 left m100 inline-flex hand" style="width:308px;">
                                                 <div class="icon-bg full-shadow2">
                                                     <svg class="svg20" viewBox="0 0 20 20">
                                                         <g>
@@ -73,7 +73,7 @@
                                         {% endif %}
                                     {% else %}
                                         {% if forloop.counter0|divisibleby:2 %}
-                                            <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 left m100 inline-block hand bcgrayish" style="width:288px;">
+                                            <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 left m100 inline-block hand bcgrayish" style="width:308px;">
                                                 <img src="{{ followedlists|getlist:forloop.counter0|getdata:'image' }}" class="sqr60 rounded left full-shadow"/>
                                                 <p class="fs15 lh60 fwbold ml28 left">{{ followedlists|getlist:forloop.counter0|getdata:'name'}}</p>
                                                 <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand right' style='margin-top:9.5px;transform: rotate(90deg);'>
@@ -85,7 +85,7 @@
                                                 </svg>
                                             </a>
                                         {% else %}
-                                            <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 right m100 inline-block hand bcgrayish" style="width:288px;">
+                                            <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 right m100 inline-block hand bcgrayish" style="width:308px;">
                                                 <img src="{{ followedlists|getlist:forloop.counter0|getdata:'image' }}" class="sqr60 rounded full-shadow left"/>
                                                 <p class="fs15 lh60 fwbold ml28 left">{{ followedlists|getlist:forloop.counter0|getdata:'name' }}</p>
                                                 <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand right' style='margin-top:9.5px;transform: rotate(90deg);'>
@@ -104,7 +104,7 @@
                             {% for i in '0123'|make_list %}
                                 {% if forloop.counter0 >= followedlists|length %}
                                     {% if forloop.counter0|divisibleby:2 %}
-                                        <a href="create" class="p20 border3h4 br20 left m100 inline-flex hand" style="width:288px;">
+                                        <a href="create" class="p20 border3h4 br20 left m100 inline-flex hand" style="width:308px;">
                                             <div class="icon-bg full-shadow2">
                                                 <svg class="svg20" viewBox="0 0 20 20">
                                                     <g>
@@ -115,7 +115,7 @@
                                             <p class="fs15 lh60 fwbold ml28">{{lists_dict.addlist}}</p>
                                         </a>
                                     {% else %}
-                                        <a href="create" class="p20 border3h4 br20 right m100 inline-flex hand" style="width:288px;">
+                                        <a href="create" class="p20 border3h4 br20 right m100 inline-flex hand" style="width:308px;">
                                             <div class="icon-bg full-shadow2">
                                                 <svg class="svg20" viewBox="0 0 20 20">
                                                     <g>
@@ -128,7 +128,7 @@
                                     {% endif %}
                                 {% else %}
                                     {% if forloop.counter0|divisibleby:2 %}
-                                        <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 left m100 inline-block hand bcgrayish" style="width:288px;">
+                                        <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 left m100 inline-block hand bcgrayish" style="width:308px;">
                                             <img src="{{ followedlists|getlist:forloop.counter0|getdata:'image' }}" class="sqr60 rounded full-shadow left"/>
                                             <p class="fs15 lh60 fwbold ml28 left">{{ followedlists|getlist:forloop.counter0|getdata:'name'}}</p>
                                             <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand right' style='margin-top:9.5px;transform: rotate(90deg);'>
@@ -140,7 +140,7 @@
                                             </svg>
                                         </a>
                                     {% else %}
-                                        <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 right m100 inline-block hand bcgrayish" style="width:288px;">
+                                        <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 right m100 inline-block hand bcgrayish" style="width:308px;">
                                             <img src="{{ followedlists|getlist:forloop.counter0|getdata:'image' }}" class="sqr60 rounded full-shadow left"/>
                                             <p class="fs15 lh60 fwbold ml28 left">{{ followedlists|getlist:forloop.counter0|getdata:'name' }}</p>
                                             <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand right' style='margin-top:9.5px;transform: rotate(90deg);'>
@@ -163,7 +163,7 @@
                     {% endif %}
                 </div>
                 <div class="thick-line"></div>
-                <div class="full-width" id="lists">
+                <div id="lists" style="width:calc(100% - 10px);margin: 0 5px;">
                     <div class="inline-flex p2040">
                         <h1 class="fs19 fwbold lh40 ctitle">{{lists_dict.listsyoumaylike}}</h1>
                         <p class="bgb" style="top:9px;margin-left:7px;">{{lists_dict.featured}}</p>

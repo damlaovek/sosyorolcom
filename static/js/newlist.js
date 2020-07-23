@@ -50,12 +50,12 @@ function titleChanged(elem, txt){
     }
     updateTextareaCounter(elem, 'title-counter', 25)
 }
-function descChanged(elem, txt){
+function descChanged(elem, txt, max){
     document.getElementById('desc-placeholder').innerHTML=safe_tags_replace(elem.value);
     if(elem.value == ''){
         document.getElementById('desc-placeholder').innerHTML=txt;
     }
-    updateTextareaCounter(elem, 'desc-counter', 100)
+    updateTextareaCounter(elem, 'desc-counter', max)
 }
 
 function uploadImg(input, url){

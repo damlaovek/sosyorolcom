@@ -22,12 +22,14 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('', sv.home),
     path('saved/', sv.savedposts, name="savedposts"),
+    path('saved/<path:post_type>', sv.savedpostsfilter, name="savedpostsfilter"),
     path('save-the-post/', sv.savethepost, name="save-the-post"),
     path('submit/', sv.newpost),
     path('votepoll/', sv.votepoll, name='votepoll'),
     path('postrating/', sv.postrating, name='postrating'),
     path('uploadmedia/', sv.uploadmedia, name='uploadmedia'),
     path('uploadmediagetcolor/', sv.uploadmediagetcolor, name='uploadmediagetcolor'),
+    path('c/<slug:slug>/', sv.communitydetail, name='communitydetail'),
     path('c/lists/', sv.lists, name='lists'),
     path('c/lists/morefollowedlists', sv.morefollowedlists, name='morefollowedlists'),
     path('followlist', sv.follow_unfollow_list, name='followlist'),
@@ -35,6 +37,7 @@ urlpatterns = [
     path('c/lists/create/savenewlist/', sv.savenewlist, name='savenewlist'),
     path('c/lists/<slug:slug>/', sv.listdetail, name='listdetail'),
     path('c/lists/<slug:slug>/<path:post_type>', sv.listdetailfilter, name='listdetailfilter'),
+    path('c/communities/create', sv.newcommunity, name='newcommunity'),
 ]
 
 if settings.DEBUG:

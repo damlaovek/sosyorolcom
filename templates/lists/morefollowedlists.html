@@ -1,7 +1,7 @@
 {% load index %}
 {% for list in followedlists %}
     {% if forloop.counter0|divisibleby:2 %}
-    <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 left m100 inline-block hand bcgrayish" style="width:288px;">
+    <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 left m100 inline-block hand bcgrayish" style="width:308px;">
         <img src="{{ followedlists|getlist:forloop.counter0|getdata:'image' }}" class="sqr60 rounded left full-shadow"/>
         <p class="fs15 lh60 fwbold ml28 left">{{ followedlists|getlist:forloop.counter0|getdata:'name'}}</p>
         <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand right' style='margin-top:9.5px;transform: rotate(90deg);'>
@@ -13,7 +13,7 @@
         </svg>
     </a>
     {% else %}
-    <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 right m100 inline-block hand bcgrayish" style="width:288px;">
+    <a href="{{ followedlists|getlist:forloop.counter0|getdata:'url' }}" class="p20 border3h4 br20 right m100 inline-block hand bcgrayish" style="width:308px;">
         <img src="{{ followedlists|getlist:forloop.counter0|getdata:'image' }}" class="sqr60 rounded full-shadow left"/>
         <p class="fs15 lh60 fwbold ml28 left">{{ followedlists|getlist:forloop.counter0|getdata:'name' }}</p>
         <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand right' style='margin-top:9.5px;transform: rotate(90deg);'>
