@@ -709,7 +709,7 @@ def newpost(request):
     if(post_type == "poll"):
         create_post_dict = create_poll(word_list)
     newpost_actions_dict = newpost_actions(word_list)
-    drafts = Post.objects.filter(Q(post_author=current_uid)).filter(post_status="draft").filter(post_type__in=["post", "questions","poll"]).order_by('post_date')
+    drafts = Post.objects.filter(Q(author_id=current_uid)).filter(post_status="draft").filter(post_type__in=["post", "questions","poll"]).order_by('post_date')
     for post in drafts:
         setup_postmeta(post, word_list)
     return render(request, 'newpost.html', {'post_type':post_type,'lang':lang, 'dark':dark, 'current_user': current_user,
@@ -1017,6 +1017,7 @@ def newcommunity(request):
     header_dict = header(word_list)
     left_menu_dict = left_menu(word_list)
     tips = fun.ucwords(word_list.filter(Q(var_name = 'tips'))[0].translation)
+    communitycats = CommunityCategories.objects.all().order_by("name")
     create_list_dict = {}
     create_list_dict["public"] = fun.ucwords(word_list.filter(Q(var_name = 'public'))[0].translation)
     create_list_dict["restricted"] = fun.ucwords(word_list.filter(Q(var_name = 'restricted'))[0].translation)
@@ -1033,7 +1034,14 @@ def newcommunity(request):
     create_list_dict['clear'] = fun.ucwords(word_list.filter(Q(var_name = 'clear'))[0].translation)
     create_list_dict['nsfw'] = fun.ucfirst(word_list.filter(Q(var_name = 'nsfw-flair'))[0].translation)
     create_list_dict['edit'] = fun.ucfirst(word_list.filter(Q(var_name = 'edit'))[0].translation)
+    create_list_dict['selectaprimarycategory'] = fun.ucfirst(word_list.filter(Q(var_name = 'select-a-primary-category'))[0].translation)
+    create_list_dict['primarycategory'] = fun.ucfirst(word_list.filter(Q(var_name = 'primary-category'))[0].translation)
+    create_list_dict['subcategoryinfo'] = word_list.filter(Q(var_name = 'subcategory-info'))[0].translation
+    create_list_dict['cannotaddmorecategoryalert'] = word_list.filter(Q(var_name = 'cannot-add-more-category-alert'))[0].translation
+    create_list_dict['remove'] = fun.ucfirst(word_list.filter(Q(var_name = 'remove'))[0].translation)
+    create_list_dict['picturehaschanged'] = fun.ucfirst(word_list.filter(Q(var_name = 'picture-has-changed'))[0].translation)
+    create_list_dict['coverpicturehaschanged'] = fun.ucfirst(word_list.filter(Q(var_name = 'cover-picture-has-changed'))[0].translation)
     return render(request, 'communities/newcommunity.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict, 
-                                            'tips':tips, 'create_list_dict':create_list_dict})
+                                            'tips':tips, 'create_list_dict':create_list_dict, 'communitycats':communitycats})
 

@@ -91,7 +91,6 @@ function uploadImg(input, url){
             processData: false, 
             contentType: false,
             success: function(response) {
-                alert(response.color);
                 if(response.is_valid){
                     placeholder.src = response.url;
                     bg.style.backgroundColor = response.color;
