@@ -92,7 +92,7 @@ DATABASES = {
         'NAME': 'unhelvasi_wp864',
         'USER': 'dmlssyrl',
         'PASSWORD': '190734fB@vesselam',
-        'HOST': '185.87.252.147'
+        'HOST': '77.245.158.227'
     }
 }
 

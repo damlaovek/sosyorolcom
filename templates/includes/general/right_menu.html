@@ -73,13 +73,13 @@
         </div>
         <ul class="full-width">
             {% for c in popular_communities %}
-                <a href="c/lists/{{c.term.slug}}" title="{{c.name}}" class="full-width">
+                <a href="c/{{c.term.slug}}" title="{{c.name}}" class="full-width">
                     <li class="bsbb full-width p1020 bt inline-block right-list-item">
                         <p class="left fwbold lh40">{{forloop.counter}}</p>
-                        {% if c.tag_img == '' %}
-                            <img class="p5 left sqrt30 rounded img-sd non-draggable ml10" src="{% static 'assets/img/defaults/default-community.png' %}" style="background-color:{{c.tag_color}}"/>
+                        {% if c.term.profile_img == '' %}
+                            <img class="p5 left sqrt30 rounded img-sd non-draggable ml10" src="{% static 'assets/img/defaults/default-community.png' %}" style="background-color:var(--main-color)"/>
                         {% else %}
-                            <img class="p5 left sqrt30 rounded img-sd non-draggable ml10" src="{{c.tag_img}}" style="background-color:{{c.tag_color}}"/>
+                            <img class="p5 left sqrt30 rounded img-sd non-draggable ml10" src="{{c.term.profile_img}}" style="background-color:{{c.term.cover_color}}"/>
                         {% endif %}
                         <div class="left" id="community-info">
                             <p  class="ellipsis underline-onhover lh30 fwbold">c/{{c.term.name}}</p>

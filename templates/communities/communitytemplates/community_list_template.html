@@ -1,16 +1,17 @@
 {% load static %}
+{% load index %}
 <div class='community-template'>
     <a href='' title='{{community.name}}' class='community-template-link'>
         <div class='full-shadow-border box' id='community-template-link-box'>
-            <div style='width:178px;height:60px; background-color:{{community.tag_color}};border-top-left-radius:4px;border-top-right-radius:4px;'>
-                {% if community.tag_img == '' %}
+            <div style='width:178px;height:60px; background-color:var(--main-color);border-top-left-radius:4px;border-top-right-radius:4px;'>
+                {% if community.profile_img == '' %}
                     <img class='community-template-img' src="{% static 'assets/img/defaults/default-community.png' %}"/>
                 {% else %}
                     <img class='community-template-img' src="{{community.tag_img}}"/>
                 {% endif %}
             </div>
             <p class='community-template-name'>{{community.name}}</p>
-            <p class='community-template-slug'>c/{{community.lower_name}}</p>
+            <p class='community-template-slug'>c/{{community.name|tolower}}</p>
             <p class='limited-lines seven community-template-info'>{{community.metadesc}}</p>
             <div class='absolute full-width' style='bottom:25px; left:0;  text-align:center;'>
                 <p class='btn' style='margin-left: calc(50% - 50px);'>{{post_template_dict.subscribe}}</p>

@@ -1,4 +1,5 @@
 from django import template
+import re
 register = template.Library()
 
 @register.filter
@@ -19,6 +20,10 @@ def tolower(txt):
     for search, replace in rep:
         txt = txt.replace(search, replace)
     return txt.lower()
+
+def striphtml(data):
+    p = re.compile(r'<.*?>')
+    return p.sub('', data)
 
 @register.filter
 def toupper(txt):
@@ -43,3 +48,22 @@ def ucwords(txt):
             subwords[j] = ucfirst(subwords[j])
         words[i] = "/".join(subwords)
     return " ".join(words)
+
+@register.filter
+def get_unit(number):
+    number = int(number)
+    if number < 1000:
+        return f"{number}"
+    elif number >= 1000 & number < 1000000:
+        return f"{number} K"
+    elif number >= 1000000 & number < 1000000000:
+        return f"{number} M"
+    elif number >= 1000000000 & number < 1000000000000:
+        return f"{number} B"
+    else:
+        return f"{number} T"
+
+@register.filter
+def edit_comm_desc(txt):
+    txt = striphtml(txt)
+    return txt[:156]

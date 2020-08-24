@@ -36,6 +36,15 @@ class UserMeta(models.Model):
     class Meta:
         db_table = "wpmu_usermeta"
 
+class UserRelation(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower')
+    date = models.DateTimeField()
+    class Meta:
+        db_table = "user_relations"
+
+
 # Post related models.
 class Post(models.Model):
     ID = models.BigIntegerField(primary_key = True)
@@ -136,8 +145,29 @@ class Community(models.Model):
     count = 0
     metadesc = ""
     lower_name = ""
+    description = models.TextField()
+    cover_img = models.TextField()
+    profile_img = models.TextField()
+    profile_img_small = models.TextField()
+    nsfw = models.IntegerField()
+    cover_color = models.TextField()
+    is_public = models.TextField()
+    date_created = models.DateTimeField()
+    views = models.BigIntegerField()
+    posts = models.QuerySet()
+    flairs = models.QuerySet()
     class Meta:
         db_table = "communities"
+
+class Flairs(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    term = models.ForeignKey(Community, on_delete=models.CASCADE)
+    flair = models.TextField()
+    flair_type = models.TextField()
+    background_color = models.TextField()
+    text_color = models.TextField()
+    class Meta:
+        db_table = "community_flairs"
 
 class CommunityCategories(models.Model):
     term_id = models.BigIntegerField(primary_key = True)
@@ -149,6 +179,7 @@ class CommunityCategoryRelation(models.Model):
     ID = models.BigIntegerField(primary_key = True)
     community = models.ForeignKey(Community, on_delete=models.CASCADE)
     category = models.ForeignKey(CommunityCategories, on_delete=models.CASCADE)
+    relation = models.IntegerField()
     class Meta:
         db_table = "community_category_relation"
 
@@ -156,6 +187,7 @@ class TermTaxonomy(models.Model):
     term_taxonomy_id = models.BigIntegerField(primary_key = True)
     term = models.ForeignKey(Community, on_delete=models.CASCADE)
     taxonomy = models.TextField()
+    description = models.TextField()
     count = models.BigIntegerField()
     parent = models.BigIntegerField()
     class Meta:
@@ -184,6 +216,13 @@ class CommunityMeta(models.Model):
     meta_value = models.TextField()
     class Meta:
         db_table = "wpmu_termmeta"
+
+class YoastMetaFields(models.Model):
+    object_id = models.BigIntegerField()
+    title = models.TextField()
+    description = models.TextField()
+    class Meta:
+        db_table = "wpmu_yoast_indexable"
 
 # Media model
 class Media(models.Model):
