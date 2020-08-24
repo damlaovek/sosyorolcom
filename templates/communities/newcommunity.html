@@ -110,8 +110,8 @@
                                     </svg>
                                 </div>
                             </div>
-                            <ul  id="privacy-menu" class="full-shadow-border box dropdown hidden" style='right:20px; top: 55px; z-index:5;'>
-                                <li class="fs15 lh20 text hand p20 noselect poll-duration-menu-item" style="width:calc(100% - 40px);padding:20px;font-size:15px;" onclick="selectListPrivacy(this, '{{create_list_dict.public}}', 1);">
+                            <ul  id="privacy-menu" class="full-shadow-border box dropdown hidden" style='right:20px; top: 55px; z-index:10;'>
+                                <li class="fs15 lh20 text hand p20 noselect poll-duration-menu-item" style="width:calc(100% - 40px);padding:20px;font-size:15px;" id="public" onclick="selectListPrivacy(this, '{{create_list_dict.public}}', 2);">
                                     <div class="full-width inline-flex">
                                         <svg width="25px" height="25px" viewBox="0 0 25 25" style="margin-top: 4px;">
                                             <g>
@@ -129,7 +129,7 @@
                                         </div>
                                     </div>
                                 </li>
-                                <li class="fs14 lh20 text hand p20 noselect poll-duration-menu-item" style="width:calc(100% - 40px);padding:20px;" onclick="selectListPrivacy(this, '{{create_list_dict.restricted}}', 0);">
+                                <li class="fs14 lh20 text hand p20 noselect poll-duration-menu-item" style="width:calc(100% - 40px);padding:20px;" onclick="selectListPrivacy(this, '{{create_list_dict.restricted}}', 1);">
                                     <div class="full-width inline-flex">
                                         <svg width="25px" height="25px" viewBox="0 0 25 25" style="margin-top: 4px;">
                                             <g>
@@ -178,8 +178,11 @@
                                             </svg>
                                         </div>
                                     </div>
+                                    <div class="absolute aligntr tac full-width dnone" id="coverLoader" style="height:150px;background-color: var(--main-color-alpha);">
+                                        <img class="center sqr60 mt40" src="{% static 'assets/img/loader.gif' %}">
+                                    </div>
                                 </div>
-                                <img src="{% static 'assets/img/community_default/blackBG.png' %}" class="absolute full-width align tr" id="coverImg"/>
+                                <img src="{% static 'assets/img/community_default/blackBG.png' %}" class="absolute full-width align tr non-draggable" id="coverImg"/>
                                 <input type="hidden" id="coverImgUrl">
                                 <!--
                                 <input type='file' onchange="uploadCoverImg(this, {% url 'uploadmediagetcolor' %});" class="absolute aligntl full-width hand" style="height:150px;overflow:hidden;opacity:0;z-index:3;" id="coverUpload" name="file" accept=".png, .jpg, .jpeg" /><br>
@@ -207,7 +210,10 @@
                                         </div>
                                         <input type="hidden" id="profileImgUrl">
                                         <br>
-                                        <img src="#" class="rounded sqr130" id="profileImg" style="z-index:4;">
+                                        <img src="" class="rounded sqr130" id="profileImg" style="z-index:4;">
+                                        <div class="absolute aligntr tac full-width rounded dnone" id="profileLoader" style="height:140px;background-color: var(--main-color-alpha);">
+                                            <img class="center sqr60 mt40" src="{% static 'assets/img/loader.gif' %}">
+                                        </div>
                                     </div>
                                     <div class="ml30 mt10" style="width:350px;">
                                         <p class="fs19 mt20 fwbold ctitle" id="title-placeholder">{{create_list_dict.title_placeholder}}</p>
@@ -244,16 +250,17 @@
                                     </g>
                                 </svg>
                             </div>
+                            <input type="hidden" id="primaryCategoryId" value="">
                             <ul class="bsbb box full-shadow-border dropdown hidden coco" style="width:calc(100% - 40px); height:200px; top:62px; overflow:scroll;" id="primaryCategories">
                                 {% for category in communitycats %}
-                                <li class="bcma" onclick="selectPrimaryCategory(this)">{{category.name|ucwords}}</li>
+                                <li class="bcma" id="category{{category.term_id}}" onclick="selectPrimaryCategory(this)">{{category.name|ucwords}}</li>
                                 {% endfor %}
                             </ul>
                             <ul id="selected-communities" class="full-width dnone"></ul>
                             <textarea id="categoryfilter" rows="1" onkeyup="filtercategories(this);" onblur='this.classList.remove("active");document.getElementById("categoryTable").classList.add("hidden")' onfocus='openAllCategories();this.classList.add("active");' class="bsbb box full-width p10 lh20 fs15 text textarea cocotarget" placeholder="{{create_list_dict.searchcommunity}}"></textarea>
                             <ul class="bsbb box full-shadow-border dropdown coco hidden" style="width:calc(100% - 40px); height:150px; overflow:scroll;" id="categoryTable">
                                 {% for category in communitycats %}
-                                <li onclick="addSelectedCategory(this)">{{category.name|ucwords}}</li>
+                                <li id="secondary{{category.term_id}}" onclick="addSelectedCategory(this)">{{category.name|ucwords}}</li>
                                 {% endfor %}
                             </ul>
                             <p class="fs13 cg2 mt10 lh20">{{create_list_dict.subcategoryinfo}}</p>
@@ -265,9 +272,9 @@
                         </div>
                         <div class="bsbb box p20 ctitle fwbold fs15 cp-container" style="margin-top:10px;">
                             <div class="full-width inline-block">
-                                <div class="bsbb p10 hand left fwbold fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;' style="width:calc(100%/3 - 20px); text-align:center;border-radius:4px;" onclick="cancelClicked()">{{create_list_dict.cancel}}</div>
+                                <a href="/" class="bsbb p10 hand left fwbold fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;' style="width:calc(100%/3 - 20px); text-align:center;border-radius:4px;" onclick="cancelClicked()">{{create_list_dict.cancel}}</a>
                                 <div class="bsbb p10 m020 hand fwbold left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;'  style="width:calc(100%/3 - 20px); text-align:center;border-radius:4px;" onclick="clearClicked()">{{create_list_dict.clear}}</div>
-                                <input onclick="saveList('{{csrf_token}}');" disabled type="submit" id="cp-sendBtn" class="btn p10 right fwboldfs15 lh20 noselect" style="border-radius:4px;height:30px;width:calc(100%/3 - 20px); border:none; text-align:center; color:var(--main-color); font-weight:700;" value="{{create_list_dict.save}}"/>
+                                <input onclick="saveCommunity('{{csrf_token}}');" type="submit" id="cp-sendBtn" class="btn p10 right fwboldfs15 lh20 noselect hand" style="border-radius:4px;height:30px;width:calc(100%/3 - 20px); border:none; text-align:center; color:var(--main-color); font-weight:700;" value="{{create_list_dict.save}}"/>
                             </div>
                         </div>
                     </form>
@@ -297,7 +304,7 @@
                         <p class='fwblack' style="color:var(--title-color);line-height:40px;margin-left:15px; font-size:19px;">{{tips}}</p>
                     </div>
                     <div class='full-width mt10'>
-                        {% for number, rule in create_post_rules_dict.items %}
+                        {% for number, rule in new_community_tips_dict.items %}
                             <p class='p100 fs15 bt' style='color:var(--title-color);'>{{number}}. {{rule}}</p>
                         {% endfor %}
                     </div>
@@ -319,6 +326,7 @@
             }); 
             function openCloseProfileImgMenu(){
                 event.preventDefault();
+                document.getElementById("editCoverImgMenu").classList.add("hidden");
                 var elem = document.getElementById("editProfileImgMenu");
                 if(elem.classList.contains("hidden")){
                     elem.classList.remove("hidden");
@@ -328,6 +336,7 @@
             }
             function openCloseCoverImgMenu(){
                 event.preventDefault();
+                document.getElementById("editProfileImgMenu").classList.add("hidden");
                 var elem = document.getElementById("editCoverImgMenu");
                 if(elem.classList.contains("hidden")){
                     elem.classList.remove("hidden");
@@ -400,6 +409,7 @@
                     li.style.opacity = "1";
                     var p = document.createElement('p');
                     p.innerHTML = commName;
+                    p.id = "related"+ elem.id.replace("secondary","")
                     p.setAttribute("class","fs15 lh20");
                     p.style.margin = "0 10px";
                     var x = document.createElement('p');
@@ -456,6 +466,7 @@
                 document.getElementById("primaryCategories").classList.toggle("hidden");
             }
             function selectPrimaryCategory(elem){
+                document.getElementById("primaryCategoryId").value = elem.id.replace("category","");
                 var oldname = document.getElementById("pricat").innerText;
                 var oldcat = oldname.replace("{{create_list_dict.primarycategory}}:", "").trim();
                 document.getElementById("pricat").innerHTML = "<span class='fwbold'>{{create_list_dict.primarycategory}}:</span>&nbsp;"+elem.innerHTML;
@@ -508,6 +519,7 @@
                 openCloseCategories();
             }
             function uploadCoverImg(input, url){
+                document.getElementById("coverLoader").classList.remove("dnone");
                 j(".coco").addClass("hidden");
                 var placeholder = document.getElementById("coverImg");
                 if (input.files && input.files[0]) {
@@ -545,8 +557,8 @@
                                 displayAlert("{{create_list_dict.coverpicturehaschanged}}");
                                 placeholder.src = response.url;
                                 document.getElementById('coverImgUrl').value = response.name;
+                                document.getElementById("coverLoader").classList.add("dnone");
                                 document.getElementById("removeCoverImg").classList.remove("dnone");
-                                validateCommunityForm();
                             }
                         }
                     });
@@ -554,6 +566,10 @@
             }
             function uploadProfileImg(input, url){
                 j(".coco").addClass("hidden");
+                if(document.getElementById('coverImgUrl').value == "" || document.getElementById('coverImgUrl').value.length == 0 || document.getElementById('coverImgUrl').value == null){
+                    document.getElementById("coverLoader").classList.remove("dnone");
+                }
+                document.getElementById("profileLoader").classList.remove("dnone");
                 var placeholder = document.getElementById("profileImg");
                 var bg = document.getElementById("coverColor");
                 var coverimg = document.getElementById("coverImg");
@@ -596,10 +612,11 @@
                                     coverimg.src = "{% static 'assets/img/community_default/blackBG.png' %}";
                                     document.getElementById("removeCoverImg").classList.add("dnone");
                                     document.getElementById("colorswitch").style.opacity = "1";
-                                    document.getElementById("removeProfileImg").classList.remove("dnone")
+                                    document.getElementById("removeProfileImg").classList.remove("dnone");
+                                    document.getElementById("coverLoader").classList.add("dnone");
                                 }
-                                document.getElementById('profileImgUrl').value = response.name
-                                validateCommunityForm();
+                                document.getElementById("profileLoader").classList.add("dnone");
+                                document.getElementById('profileImgUrl').value = response.name;
                             }
                         }
                     });
@@ -690,6 +707,75 @@
                         }
                     }
                 }
+                var public = document.getElementById("public");
+                selectListPrivacy(public, '{{create_list_dict.public}}', 1);
+            }
+
+            function validateCommunityForm(){
+                if(!j("#isPrivate").val()) {
+                    displayAlert("{{create_list_dict.formerrormsg}}");
+                    return false;
+                }
+                if(j("#cp-title").val() === "") {
+                    displayAlert("{{create_list_dict.formerrormsg}}");
+                    return false;
+                }
+                if(j("#cp-desc").val() === "") {
+                    displayAlert("{{create_list_dict.formerrormsg}}");
+                    return false;
+                }
+                if(j("#profileImg").attr('src') === "") {
+                    displayAlert("{{create_list_dict.formerrormsg}}");
+                    return false;
+                }
+                if(j("#pricat").text() == "{{create_list_dict.selectaprimarycategory}}"){
+                    displayAlert("{{create_list_dict.formerrormsg}}");
+                    return false;
+                }
+                document.getElementById('cp-sendBtn').classList.add('active');
+                return true;
+            }
+
+            function saveCommunity(){
+                if (validateCommunityForm()){
+                    var profileImgUrl = document.getElementById('profileImgUrl').value;
+                    var coverImgUrl = document.getElementById('coverImgUrl').value;
+                    var imgColor = document.getElementById('imgColor').value;
+                    var isPrivate = document.getElementById('isPrivate').value;
+                    var title = document.getElementsByName('cp-title')[0].value;
+                    var desc = document.getElementsByName('cp-desc')[0].value;
+                    var pricat = document.getElementById("primaryCategoryId").value;
+                    var nsfw = 0;
+                    if (document.getElementById("flair").classList.contains("active")){
+                        nsfw = 1;
+                    }
+                    var relatedTopics = "";
+                    var selecteds = document.getElementById("selected-communities").getElementsByTagName("li");
+                    for(var i = 0; i < selecteds.length; i++){
+                        if(i > 0){
+                            relatedTopics = relatedTopics.concat(", ");
+                        }
+                        relatedTopics = relatedTopics.concat(selecteds[i].getElementsByTagName("p")[0].id.replace("related", ""));
+                    }
+                    j.ajax({
+                        url:"{% url 'savenewcommunity' %}",
+                        type : "POST", // http method
+                        data : { csrfmiddlewaretoken: '{{csrf_token}}', profileImgUrl: profileImgUrl, coverImgUrl: coverImgUrl, imgColor:imgColor, isPrivate:isPrivate, title:title, desc:desc, pricat:pricat, nsfw:nsfw, relatedTopics:relatedTopics}, // data sent with the post request
+                        // handle a successful response
+                        success : function(json) {
+                            if(json.content != "success"){
+                                document.getElementsByName('cp-title')[0].style.color = "var(--red)";
+                                document.getElementsByName('cp-title')[0].style.border = "1px solid var(--red)";
+                                displayAlert(json.content);
+                            }
+                            // log the returned json to the console
+                            console.log("success"); // another sanity check
+                            return true;
+                        }
+                    });
+                    return false;
+                }
+                return false;
             }
         </script>
     </body>

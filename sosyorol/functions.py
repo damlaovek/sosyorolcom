@@ -58,6 +58,22 @@ def correct_community_name(name):
 
 
 '''---------------------------------------
+  UNIT OPERATIONS            
+-----------------------------------------'''
+def get_unit(number):
+    if number < 1000:
+        return f"{number}"
+    elif number >= 1000 & number < 1000000:
+        return f"{number} K"
+    elif number >= 1000000 & number < 1000000000:
+        return f"{number} M"
+    elif number >= 1000000000 & number < 1000000000000:
+        return f"{number} B"
+    else:
+        return f"{number} T"
+
+
+'''---------------------------------------
   DATE OPERATIONS        
 -----------------------------------------'''
 def humanizedate(date, word_list, to=None):
@@ -145,6 +161,11 @@ def resize_image(filepath, typeOfImg):
                 cover.save(filename+"_60x60"+file_extension, image.format)
                 cover = resizeimage.resize_cover(image, [130, 130])
                 cover.save(filename+"_130x130"+file_extension, image.format)
+            elif typeOfImg == "community":
+                cover = resizeimage.resize_cover(image, [40, 40])
+                cover.save(filename+"_40x40"+file_extension, image.format)
+                cover = resizeimage.resize_cover(image, [130, 130])
+                cover.save(filename+"_130x130"+file_extension, image.format)
     return
 
 def get_photo_from_url(photo_url):
@@ -159,6 +180,9 @@ def get_photo_from_url(photo_url):
     return image
 
 
+'''---------------------------------------
+  COMMUNITIES        
+-----------------------------------------'''
 def extract_categories():
     terms = sm.TermTaxonomy.objects.all()
     for term in terms:
@@ -210,7 +234,6 @@ def find_category(community, category_ids=None):
         print(cat_dct)
         return max(cat_dct,  key=cat_dct.get)
 
-
 def find_category_of_community():
     category_ids = sm.CommunityCategories.objects.all()
     category_ids = list({x.term_id: x for x in category_ids}.keys())
@@ -224,4 +247,27 @@ def find_category_of_community():
                 new_instance.save()
             except:
                 pass
+    return
+
+def generate_descriptions():
+    communities = sm.Community.objects.all()
+    for c in communities:
+        try:
+            meta_desc = sm.YoastMetaFields.objects.get(object_id=c.term_id).description
+            c.description = meta_desc
+            c.save()
+            print(meta_desc)
+        except:
+            pass
+    return
+
+def get_date_created():
+    communities = sm.Community.objects.all()
+    for c in communities:
+        try:
+            date_created = sm.CommunityMeta.objects.filter(Q(term_id=c.term_id))
+            #c.update(date_created=date_created.meta_value)
+            print(len(date_created))
+        except:
+            pass
     return

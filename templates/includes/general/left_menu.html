@@ -15,11 +15,11 @@
                     <a href="c/{{c.term.slug}}" title="{{c.name}}" class="full-width">
                         <div class="full-width hand left-list-item-link">
                             <li class="left-list-item">
-                                {% if c.tag_img == '' %}
-                                    <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                                {% if c.term.profile_img == '' %}
+                                    <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
                                     <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                 {% else %}
-                                    <img src="{{c.tag_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                                    <img src="{{c.term.profile_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.term.cover_color}}" data-no-lazy="1"/>
                                     <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                 {% endif %}
                             </li>
@@ -48,11 +48,11 @@
                     <a href="c/{{c.term.slug}}" title="{{c.name}}" class="full-width">
                         <div class="full-width hand left-list-item-link">
                             <li class="left-list-item">
-                                {% if c.tag_img == '' %}
-                                    <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                                {% if c.term.profile_img == '' %}
+                                    <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
                                     <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                 {% else %}
-                                    <img src="{{c.tag_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                                    <img src="{{c.term.profile_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.term.cover_color}}" data-no-lazy="1"/>
                                     <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                 {% endif %}
                             </li>
@@ -64,11 +64,11 @@
                     <a href="c/{{c.term.slug}}" title="{{c.name}}" class="full-width">
                         <div class="full-width hand left-list-item-link">
                             <li class="left-list-item">
-                                {% if c.tag_img == '' %}
-                                    <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                                {% if c.term.profile_img == '' %}
+                                    <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
                                     <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                 {% else %}
-                                    <img src="{{c.tag_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.tag_color}}" data-no-lazy="1"/>
+                                    <img src="{{c.term.profile_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.term.cover_color}}" data-no-lazy="1"/>
                                     <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                 {% endif %}
                             </li>

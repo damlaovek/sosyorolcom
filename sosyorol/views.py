@@ -146,6 +146,17 @@ def feed(word_list):
     feed_dict['follow'] = fun.ucwords(word_list.filter(Q(var_name = 'follow'))[0].translation)
     return feed_dict
 
+def new_community_tips(word_list):
+    tips_dict = {}
+    tips_dict["1"] = word_list.filter(Q(var_name = 'create-community-tip1'))[0].translation
+    tips_dict["2"] = word_list.filter(Q(var_name = 'create-community-tip2'))[0].translation
+    tips_dict["3"] = word_list.filter(Q(var_name = 'create-community-tip3'))[0].translation
+    tips_dict["4"] = word_list.filter(Q(var_name = 'create-community-tip4'))[0].translation
+    tips_dict["5"] = word_list.filter(Q(var_name = 'create-community-tip5'))[0].translation
+    tips_dict["6"] = word_list.filter(Q(var_name = 'create-community-tip6'))[0].translation
+    tips_dict["7"] = word_list.filter(Q(var_name = 'create-community-tip7'))[0].translation
+    return tips_dict
+
 def post_template(word_list):
     post_template_dict = {}
     post_template_dict['article'] = fun.ucwords(word_list.filter(Q(var_name = 'article'))[0].translation)
@@ -225,6 +236,60 @@ def newpost_actions(word_list):
     newpost_actions_dict['lastupdated'] = fun.ucfirst(word_list.filter(Q(var_name = 'last-updated'))[0].translation)
     return newpost_actions_dict
 
+def create_community(word_list):
+    create_community_dict = {}
+    create_community_dict["public"] = fun.ucwords(word_list.filter(Q(var_name = 'public'))[0].translation)
+    create_community_dict["restricted"] = fun.ucwords(word_list.filter(Q(var_name = 'restricted'))[0].translation)
+    create_community_dict["private"] = fun.ucwords(word_list.filter(Q(var_name = 'private'))[0].translation)
+    create_community_dict["public_info_community"] = fun.ucfirst(word_list.filter(Q(var_name = 'public-info-community'))[0].translation)
+    create_community_dict["restricted_info_community"] = fun.ucfirst(word_list.filter(Q(var_name = 'restricted-info-community'))[0].translation)
+    create_community_dict["private_info_community"] = fun.ucfirst(word_list.filter(Q(var_name = 'private-info-community'))[0].translation)
+    create_community_dict["title"] = fun.ucfirst(word_list.filter(Q(var_name = 'community-name'))[0].translation)
+    create_community_dict["title_placeholder"] = fun.ucwords(word_list.filter(Q(var_name = 'community_title_placeholder'))[0].translation)
+    create_community_dict["desc_placeholder"] = fun.ucfirst(word_list.filter(Q(var_name = 'community_desc_placeholder'))[0].translation)
+    create_community_dict["description"] = fun.ucwords(word_list.filter(Q(var_name = 'description'))[0].translation)
+    create_community_dict['cancel'] = fun.ucwords(word_list.filter(Q(var_name = 'cancel'))[0].translation)
+    create_community_dict['save'] = fun.ucwords(word_list.filter(Q(var_name = 'save'))[0].translation)
+    create_community_dict['clear'] = fun.ucwords(word_list.filter(Q(var_name = 'clear'))[0].translation)
+    create_community_dict['nsfw'] = fun.ucfirst(word_list.filter(Q(var_name = 'nsfw-flair'))[0].translation)
+    create_community_dict['edit'] = fun.ucfirst(word_list.filter(Q(var_name = 'edit'))[0].translation)
+    create_community_dict['selectaprimarycategory'] = fun.ucfirst(word_list.filter(Q(var_name = 'select-a-primary-category'))[0].translation)
+    create_community_dict['primarycategory'] = fun.ucfirst(word_list.filter(Q(var_name = 'primary-category'))[0].translation)
+    create_community_dict['subcategoryinfo'] = word_list.filter(Q(var_name = 'subcategory-info'))[0].translation
+    create_community_dict['cannotaddmorecategoryalert'] = word_list.filter(Q(var_name = 'cannot-add-more-category-alert'))[0].translation
+    create_community_dict['remove'] = fun.ucfirst(word_list.filter(Q(var_name = 'remove'))[0].translation)
+    create_community_dict['picturehaschanged'] = fun.ucfirst(word_list.filter(Q(var_name = 'picture-has-changed'))[0].translation)
+    create_community_dict['coverpicturehaschanged'] = fun.ucfirst(word_list.filter(Q(var_name = 'cover-picture-has-changed'))[0].translation)
+    create_community_dict['formerrormsg'] = fun.ucfirst(word_list.filter(Q(var_name = 'form-error-msg'))[0].translation)
+    return create_community_dict
+
+def communitydetail_dict(word_list, community_rank, followings):
+    page_dict = {}
+    page_dict['views'] = fun.ucfirst(word_list.filter(Q(var_name = 'views'))[0].translation)
+    page_dict['usersfollowing'] = fun.ucfirst(word_list.filter(Q(var_name = 'users-are-following-this'))[0].translation)
+    rank = word_list.filter(Q(var_name = 'community-rank-info'))[0].translation
+    rank = rank.replace("[number]",f"<span class='fwbold'>{community_rank}</span>")
+    page_dict['rank'] = rank
+    page_dict['join'] = fun.ucfirst(word_list.filter(Q(var_name = 'join'))[0].translation)
+    page_dict['moderators'] = fun.ucfirst(word_list.filter(Q(var_name = 'moderators'))[0].translation)
+    page_dict['showmore'] = fun.ucfirst(word_list.filter(Q(var_name = 'show-more'))[0].translation)
+    page_dict['filterbylabel'] = fun.ucfirst(word_list.filter(Q(var_name = 'filter-by-label'))[0].translation)
+    page_dict['communityrules'] = fun.ucfirst(word_list.filter(Q(var_name = 'community-rules'))[0].translation)
+    if (len(followings) == 0):
+        followingsinfo = ""
+    elif (len(followings) >= 3):
+        followingsinfo = word_list.filter(Q(var_name = 'community-followers-info'))[0].translation
+        followingsinfo = followingsinfo.replace("[number]", f"{len(followings)}")
+    else:
+        followingsinfo = word_list.filter(Q(var_name = 'community-followers-info2'))[0].translation
+        str1 = f"<a href='/u/{followings[0].following.user_nicename}' target='_blank' class='fs13 cg2 lh30 underline-on-hover'>u/{followings[0].following.user_nicename}</a>"
+        if (len(followings) == 1):
+            followingsinfo = followingsinfo.replace("[user] & [user]", str1)
+        else:
+            str2 = f"<a href='/u/{followings[0].following.user_nicename}' target='_blank' class='fs13 cg2 lh30 underline-on-hover'>u/{followings[1].following.user_nicename}</a>"
+            followingsinfo = followingsinfo.replace("[user] & [user]", f"{str1} & {str2}")
+    page_dict['followingsinfo'] = followingsinfo
+    return page_dict
 
 '''---------------------------------------
   HELPERS              
@@ -333,6 +398,18 @@ def morefollowedlists(request):
             followedlists = followedlists[offset:]
         return render(request, 'lists/morefollowedlists.html', {'limit':limit, 'followedlists':followedlists})
 
+def setup_current_user(current_uid):
+    current_user = User.objects.filter(Q(ID = current_uid))[0]
+    user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
+    current_user.set_description(user_desc.meta_value)
+    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
+    if (os.path.exists(mypath)):
+        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
+    else:
+        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+    current_user.set_avatar(avatar_url)
+    return current_user
 
 '''---------------------------------------
   OPERATIONS              
@@ -494,14 +571,60 @@ def savethepost(request):
     except:
         return HttpResponseRedirect("")
 
+def savenewcommunity(request):
+    print("savenewcommunity")
+    title = request.POST["title"]
+    # Check if community name is in use:
+    creator = 8
+    result = Community.objects.filter(name__iexact=title)
+    response_data = {}
+    lang = UserMeta.objects.filter(Q(user_id = creator)).filter(Q(meta_key = 'language'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    if(len(result) > 0):
+        response_data['content'] = fun.ucfirst(word_list.filter(Q(var_name = 'community-name-inuse-error'))[0].translation) 
+    else:
+        profile_img = request.POST["profileImgUrl"]
+        cover_img = request.POST["coverImgUrl"]
+        filename, file_extension = os.path.splitext(profile_img)
+        desc = request.POST["desc"]
+        color = request.POST["imgColor"]
+        is_public = request.POST["isPrivate"]
+        nsfw = request.POST["nsfw"]
+        primary_cat = request.POST["pricat"]
+        related_topics = request.POST["relatedTopics"].split(", ")
+        if(is_public == 0):
+            is_public = "private"
+        elif(is_public == 1):
+            is_public = "restricted"
+        else:
+            is_public = "public"
+        fun.resize_image(profile_img, "community")
+        photo_small = filename + '_40x40' + file_extension
+        photo_large = filename + '_130x130' + file_extension
+        try:
+            new_community = Community(name=title, slug=title, description=desc, cover_color=color, is_public=is_public, nsfw=nsfw, cover_img=cover_img, profile_img=photo_large, profile_img_small=photo_small)
+            new_community.save()
+            new_community = Community.objects.get(name=title)
+            print(new_community.term_id)
+            new_moderator = FollowedCommunities(term_id=new_community.term_id, user_id=creator, role="Moderator", date=dt.datetime.now())
+            new_moderator.save()
+            new_category = CommunityCategoryRelation(community_id=new_community.term_id, category_id=primary_cat, relation=0)
+            new_category.save()
+            for i in related_topics:
+                new_category = CommunityCategoryRelation(community_id=new_community.term_id, category_id=int(i), relation=1)
+                new_category.save()
+            response_data['content'] = "success"
+        except:
+            response_data['content'] = word_list.filter(Q(var_name = 'general-error-msg'))[0].translation                
+    return HttpResponse(json.dumps(response_data),content_type="application/json")
 
 '''---------------------------------------
   VIEWS              
 -----------------------------------------'''
 def home(request):
-    #community = Community.objects.get(term_id=5427)
-    #fun.find_category_of_community()
+    #fun.generate_descriptions()
     current_uid = 8
+    current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
     word_list = Languages.objects.filter(Q(lang_code = lang))
@@ -510,8 +633,6 @@ def home(request):
     right_menu_dict = right_menu(word_list)
     feed_dict = feed(word_list)
     country_list = Languages.objects.filter(Q(var_name = 'lang'))
-    for c in country_list:
-        c.translation = fun.ucfirst(c.translation)
     select_language = fun.ucfirst(word_list.filter(Q(var_name = 'select-language'))[0].translation)
     
     myprofile = fun.ucfirst(word_list.filter(Q(var_name = 'my-profile'))[0].translation)
@@ -521,49 +642,9 @@ def home(request):
     subscribe = fun.ucfirst(word_list.filter(Q(var_name = 'subscribe'))[0].translation)
 
     followed_communities = FollowedCommunities.objects.filter(Q(user_id = current_uid)).order_by('-date').prefetch_related()
-    for i in followed_communities:
-        color = CommunityMeta.objects.filter(term_id=i.term_id).filter(meta_key = 'color_up')
-        if len(color) == 0 or color[0].meta_value == '':
-            i.tag_color = "var(--main-color)"
-        else:
-            i.tag_color = color[0].meta_value
-        
-        img_url = CommunityMeta.objects.filter(term_id=i.term_id).filter(meta_key = 'tag_img')
-        if len(img_url) == 0 or img_url[0].meta_value == '':
-            i.tag_img = ""
-        else:
-            url_id = img_url[0].meta_value
-            i.tag_img = Post.objects.filter(Q(ID=url_id))[0].guid
     
     popular_communities = TermTaxonomy.objects.filter(Q(taxonomy="post_tag")).order_by('-count')[:5].prefetch_related()
-    for i in popular_communities:
-        i.count = TermTaxonomy.objects.filter(Q(term_id=i.term_id))[0].count
-        i.term.name = fun.localized_lower(i.term.name)
-        color = CommunityMeta.objects.filter(term_id=i.term_id).filter(meta_key = 'color_up')
-        if len(color) == 0 or color[0].meta_value == '':
-            i.tag_color = "var(--main-color)"
-        else:
-            i.tag_color = color[0].meta_value
-        
-        img_url = CommunityMeta.objects.filter(term_id=i.term_id).filter(meta_key = 'tag_img')
-        if len(img_url) == 0 or img_url[0].meta_value == '':
-            i.tag_img = ""
-        else:
-            url_id = img_url[0].meta_value
-            i.tag_img = Post.objects.filter(Q(ID=url_id))[0].guid
-    
-    current_user = User.objects.filter(Q(ID = current_uid))[0]
-    user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
-    current_user.set_description(user_desc.meta_value)
-    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
-    if (os.path.exists(mypath)):
-        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
-    else:
-        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
-    current_user.set_avatar(avatar_url)
 
-    
     post_template_dict = post_template(word_list)
     posts = Post.objects.filter(Q(post_type="post")).filter(Q(post_status="publish")).order_by('-post_date')[1055:1056].prefetch_related()
     for post in posts:
@@ -587,34 +668,12 @@ def home(request):
         setup_postmeta(poll, word_list)
 
     communities = Community.objects.all()[:10]
-    for i in communities:
-        i.name = fun.ucwords(i.name)
-        i.lower_name = fun.localized_lower(i.name)
-        color = CommunityMeta.objects.filter(term_id=i.term_id).filter(meta_key = 'color_up')
-        if len(color) == 0 or color[0].meta_value == '':
-            i.tag_color = "var(--main-color)"
-        else:
-            i.tag_color = color[0].meta_value
-        
-        img_url = CommunityMeta.objects.filter(term_id=i.term_id).filter(meta_key = 'tag_img')
-        if len(img_url) == 0 or img_url[0].meta_value == '':
-            i.tag_img = ""
-        else:
-            url_id = img_url[0].meta_value
-            i.tag_img = Post.objects.filter(Q(ID=url_id))[0].guid
 
-
-    users = User.objects.all()[:10]
-    for user in users:
-        user_desc = UserMeta.objects.filter(Q(user_id = user.ID)).filter(Q(meta_key = 'description'))[0]
-        user.set_description(user_desc.meta_value)
-        mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{user.ID}')
-        if (os.path.exists(mypath)):
-            onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-            avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(user.ID) + "/" + onlyfiles[0]
-        else:
-            avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
-        user.set_avatar(avatar_url)
+    user_queryset = User.objects.all()[:10]
+    users = []
+    for user in user_queryset:
+        user = setup_current_user(user.ID)
+        users.append(user)
 
     comment_editor = comment_editor_dict(word_list)
     return render(request, 'index.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
@@ -634,16 +693,7 @@ def lists(request):
     current_uid = 8
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
-    current_user = User.objects.filter(Q(ID = current_uid))[0]
-    user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
-    current_user.set_description(user_desc.meta_value)
-    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
-    if (os.path.exists(mypath)):
-        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
-    else:
-        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
-    current_user.set_avatar(avatar_url)
+    current_user = setup_current_user(current_uid)
     word_list = Languages.objects.filter(Q(lang_code = lang))
     header_dict = header(word_list)
     left_menu_dict = left_menu(word_list)
@@ -687,16 +737,7 @@ def newpost(request):
     except:
         post_type = "post"
     current_uid = 8
-    current_user = User.objects.filter(Q(ID = current_uid))[0]
-    user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
-    current_user.set_description(user_desc.meta_value)
-    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
-    if (os.path.exists(mypath)):
-        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
-    else:
-        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
-    current_user.set_avatar(avatar_url)
+    current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
     word_list = Languages.objects.filter(Q(lang_code = lang))
@@ -994,23 +1035,79 @@ def savedposts(request, **kwargs):
 def savedpostsfilter(request, post_type):
     return savedposts(request, filter=post_type)
 
-def communitydetail(request, slug):
+def communitydetail(request, slug,  **kwargs):
     if slug == "lists":
         return lists(request)
-    return render(request, 'communities/communitydetail.html')
+    elif slug == "communities/create":
+        return newcommunity(request)
+
+    community = Community.objects.filter(slug=slug)[0]
+    taxonomy = TermTaxonomy.objects.filter(term_id=community.term_id)[0].term_taxonomy_id
+    post_ids = TermRelationship.objects.filter(Q(term_taxonomy_id=taxonomy))
+    post_ids = list({x.object_id: x for x in post_ids}.keys())
+    community.posts = Post.objects.filter(Q(ID__in=post_ids)).order_by('-post_date')
+    if 'filter' in kwargs:
+        fltr = kwargs.get("filter")
+    else:
+        fltr = "all"
+    if fltr == "post":
+        community.posts = community.posts.filter(Q(post_type="post"))
+    elif fltr == "link":
+        community.posts = community.posts.filter(Q(post_type="link"))
+    elif fltr == "poll":
+        community.posts = community.posts.filter(Q(post_type="poll"))
+    elif fltr == "quiz":
+        community.posts = community.posts.filter(Q(post_type="quiz"))
+    elif fltr == "answer":
+        community.posts = community.posts.filter(Q(post_type="answer"))
+    elif fltr == "question":
+        community.posts = community.posts.filter(Q(post_type="question"))
+    elif fltr == "media":
+        community.posts = community.posts.filter(Q(post_type="media"))
+
+
+    community.posts = community.posts[:20]
+
+    community.flairs = Flairs.objects.filter(term_id=community.term_id).filter(flair_type="post")
+
+    current_uid = 8
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    for post in community.posts:
+        setup_postmeta(post, word_list)
+        if post.post_type == "link":
+            post.photo_from_url = fun.get_photo_from_url(post.post_content)
+    header_dict = header(word_list)
+    post_types_dict = post_types(word_list)
+    comment_editor = comment_editor_dict(word_list)
+    post_template_dict = post_template(word_list)
+    feed_dict = feed(word_list)
+    followers = FollowedCommunities.objects.filter(Q(term_id=community.term_id))
+    comment_editor = comment_editor_dict(word_list)
+    post_template_dict = post_template(word_list)
+    followings = []
+    for f in followers:
+        user = UserRelation.objects.filter(Q(following_id=f.user_id)).filter(Q(follower_id=current_uid))
+        if (len(user) > 0):
+            user[0].following = setup_current_user(user[0].following.ID)
+            followings.append(user[0])
+    page_dict = communitydetail_dict(word_list, 83, followings)
+    moderators = followers.filter(role="moderator")
+    for m in moderators:
+        m.user = setup_current_user(m.user_id)
+    return render(request, 'communities/communitydetail.html', {'header_dict':header_dict, 'community':community,
+                                                                'post_types_dict':post_types_dict, 'filter':fltr,
+                                                                'feed_dict':feed_dict, 'page_dict':page_dict,
+                                                                'followers':followers, 'comment_editor':comment_editor,
+                                                                'post_template_dict': post_template_dict, 'followings':followings,
+                                                                'moderators':moderators
+                                                                })
 
 def newcommunity(request):
     current_uid = 8
-    current_user = User.objects.filter(Q(ID = current_uid))[0]
-    user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
-    current_user.set_description(user_desc.meta_value)
-    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
-    if (os.path.exists(mypath)):
-        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
-    else:
-        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
-    current_user.set_avatar(avatar_url)
+    current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
     word_list = Languages.objects.filter(Q(lang_code = lang))
@@ -1018,30 +1115,11 @@ def newcommunity(request):
     left_menu_dict = left_menu(word_list)
     tips = fun.ucwords(word_list.filter(Q(var_name = 'tips'))[0].translation)
     communitycats = CommunityCategories.objects.all().order_by("name")
-    create_list_dict = {}
-    create_list_dict["public"] = fun.ucwords(word_list.filter(Q(var_name = 'public'))[0].translation)
-    create_list_dict["restricted"] = fun.ucwords(word_list.filter(Q(var_name = 'restricted'))[0].translation)
-    create_list_dict["private"] = fun.ucwords(word_list.filter(Q(var_name = 'private'))[0].translation)
-    create_list_dict["public_info_community"] = fun.ucfirst(word_list.filter(Q(var_name = 'public-info-community'))[0].translation)
-    create_list_dict["restricted_info_community"] = fun.ucfirst(word_list.filter(Q(var_name = 'restricted-info-community'))[0].translation)
-    create_list_dict["private_info_community"] = fun.ucfirst(word_list.filter(Q(var_name = 'private-info-community'))[0].translation)
-    create_list_dict["title"] = fun.ucfirst(word_list.filter(Q(var_name = 'community-name'))[0].translation)
-    create_list_dict["title_placeholder"] = fun.ucwords(word_list.filter(Q(var_name = 'community_title_placeholder'))[0].translation)
-    create_list_dict["desc_placeholder"] = fun.ucfirst(word_list.filter(Q(var_name = 'community_desc_placeholder'))[0].translation)
-    create_list_dict["description"] = fun.ucwords(word_list.filter(Q(var_name = 'description'))[0].translation)
-    create_list_dict['cancel'] = fun.ucwords(word_list.filter(Q(var_name = 'cancel'))[0].translation)
-    create_list_dict['save'] = fun.ucwords(word_list.filter(Q(var_name = 'save'))[0].translation)
-    create_list_dict['clear'] = fun.ucwords(word_list.filter(Q(var_name = 'clear'))[0].translation)
-    create_list_dict['nsfw'] = fun.ucfirst(word_list.filter(Q(var_name = 'nsfw-flair'))[0].translation)
-    create_list_dict['edit'] = fun.ucfirst(word_list.filter(Q(var_name = 'edit'))[0].translation)
-    create_list_dict['selectaprimarycategory'] = fun.ucfirst(word_list.filter(Q(var_name = 'select-a-primary-category'))[0].translation)
-    create_list_dict['primarycategory'] = fun.ucfirst(word_list.filter(Q(var_name = 'primary-category'))[0].translation)
-    create_list_dict['subcategoryinfo'] = word_list.filter(Q(var_name = 'subcategory-info'))[0].translation
-    create_list_dict['cannotaddmorecategoryalert'] = word_list.filter(Q(var_name = 'cannot-add-more-category-alert'))[0].translation
-    create_list_dict['remove'] = fun.ucfirst(word_list.filter(Q(var_name = 'remove'))[0].translation)
-    create_list_dict['picturehaschanged'] = fun.ucfirst(word_list.filter(Q(var_name = 'picture-has-changed'))[0].translation)
-    create_list_dict['coverpicturehaschanged'] = fun.ucfirst(word_list.filter(Q(var_name = 'cover-picture-has-changed'))[0].translation)
+    create_list_dict = create_community(word_list)
+    new_community_tips_dict = new_community_tips(word_list)
     return render(request, 'communities/newcommunity.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict, 
-                                            'tips':tips, 'create_list_dict':create_list_dict, 'communitycats':communitycats})
+                                            'tips':tips, 'create_list_dict':create_list_dict, 'communitycats':communitycats,
+                                            'new_community_tips_dict':new_community_tips_dict})
+
 

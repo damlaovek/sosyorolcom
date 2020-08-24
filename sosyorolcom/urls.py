@@ -29,7 +29,10 @@ urlpatterns = [
     path('postrating/', sv.postrating, name='postrating'),
     path('uploadmedia/', sv.uploadmedia, name='uploadmedia'),
     path('uploadmediagetcolor/', sv.uploadmediagetcolor, name='uploadmediagetcolor'),
+    path('c/communities/create', sv.newcommunity, name='newcommunity'),
+    path('c/communities/create/savenewcommunity', sv.savenewcommunity, name='savenewcommunity'),
     path('c/<slug:slug>/', sv.communitydetail, name='communitydetail'),
+    path('c/<slug:slug>/<path:filter>', sv.communitydetail, name='communitydetail'),
     path('c/lists/', sv.lists, name='lists'),
     path('c/lists/morefollowedlists', sv.morefollowedlists, name='morefollowedlists'),
     path('followlist', sv.follow_unfollow_list, name='followlist'),
@@ -37,7 +40,6 @@ urlpatterns = [
     path('c/lists/create/savenewlist/', sv.savenewlist, name='savenewlist'),
     path('c/lists/<slug:slug>/', sv.listdetail, name='listdetail'),
     path('c/lists/<slug:slug>/<path:post_type>', sv.listdetailfilter, name='listdetailfilter'),
-    path('c/communities/create', sv.newcommunity, name='newcommunity'),
 ]
 
 if settings.DEBUG:

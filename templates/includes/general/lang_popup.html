@@ -1,3 +1,4 @@
+{% load index %}
 <div id="lang-popup" class="popup-container hidden">
     <div class="popup box full-shadow-border">
         <svg style="position:absolute;top:20px;right:20px;cursor:pointer;padding:5px;width:15px;height:15px;z-index:9999;" class="icon hand" onclick="document.getElementById('lang-popup').classList.toggle('hidden');" viewBox="0 0 15 15" version="1.1">
@@ -9,7 +10,7 @@
             <p style="margin-bottom:20px;font-weight:var(--bold);font-size:20px;color:var(--title-color);">{{select_language}}</p>
             {% for c in country_list %}
                 <li style="width:20%;padding:10px 0;float:left;cursor:default;">
-                    <a href="." onclick="updateLanguage('{{c.lang_code}}', '{{current_uid}}');" style="cursor:pointer;color:var(--gray2);font-size:15px;">{{c.translation}}</a>
+                    <a href="." onclick="updateLanguage('{{c.lang_code}}', '{{current_uid}}');" style="cursor:pointer;color:var(--gray2);font-size:15px;">{{c.translation|ucwords}}</a>
                 </li>
             {% endfor %}
         </ul>
