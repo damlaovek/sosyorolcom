@@ -207,9 +207,9 @@
                         {% for post in community.posts %}
                             {% if post.post_type == "post" %}
                                 {% if filter == "post" %}
-                                    {% include 'posts/posttemplates/post_template.html' %}
+                                    {% include 'posts/posttemplates/post_template.html' with post=post %}
                                 {% elif filter == "all" %}
-                                    {% include 'posts/posttemplates/post_template.html' %}
+                                    {% include 'posts/posttemplates/post_template.html' with post=post %}
                                 {% endif %}
                             {% elif post.post_type == "media" %}
                                 {% if filter == "media" %}

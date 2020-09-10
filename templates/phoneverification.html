@@ -1,0 +1,149 @@
+{% load static %}
+{% include 'includes/general/basic_head.html' %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/sign.css' %}">
+    </head>
+    <body class="{{darkmode}}">
+        <div class="full-width bcg sign-body">
+            <div class="horizontally-centered-auto-width">
+                <div class="p040 ml30 mt60">
+                    <a href="/" title="Sosyorol">
+                        <picture class="logo-picture">
+                            {% if dark == 'dark' %}
+                                <source id="logo3" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo3-dark.webp' %}" type="image/webp">
+                                <source id="logo2" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo1-dark.jpg' %}" type="image/jpeg"> 
+                                <img id="logo1" class="full non-draggable" src="{% static 'assets/img/header/sosyorol-logo1-dark.jpg' %}" alt="Sosyorol">
+                            {% else %}
+                                <source id="logo3" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo3.webp' %}" type="image/webp">
+                                <source id="logo2" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo1.jpg' %}" type="image/jpeg"> 
+                                <img id="logo1" class="full non-draggable" src="{% static 'assets/img/header/sosyorol-logo1.jpg' %}" alt="Sosyorol">
+                            {% endif %}
+                        </picture>
+                    </a><br>
+                    <p class="mt20 p100 cg fwmedium">{{page_dict.slogan}}.</p>
+                </div>
+                <div class="bsbb p40 m20 bcw br30 full-shadow2 w428">
+                    <form method="POST" name="signin_form" id="signin_form">
+                        {% csrf_token %}
+                        <input type="hidden" name="uid">
+                    </form>
+                    <p class="cg">{% autoescape off %}{{page_dict.checkcodemsg}}{% endautoescape %}</p>
+                    <form method="POST" name="verification-form">
+                        {% csrf_token %}
+                        <input class="bsbb cg full-width p20 mt20 bcw br30 border" type="text" name="phone_code" placeholder="{{page_dict.enterauthcode}}">
+                        <input type="submit" class="bsbb full-width p20 m200 bcb cw br20 full-shadow2 fwbold hand" value="{{page_dict.verify}}" id="submit_btn" name="submit_btn" onclick="verifyPhoneCode('{{username}}', '{{firstname}}', '{{lastname}}');">
+                    </form>
+                    <div class="full-width inline-block">
+                        <div class="left">
+                            <p class="hand cb">Numarayı değiştir</p>
+                            <p class="cg mt10">{{page_dict.alreadyhaveaccount}}? <a href="/" class="cb">{{page_dict.signin}}</a></p>
+                        </div>
+                        <div class="right">
+                            <p class="hand cb">{{page_dict.resendcode}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include 'includes/sign_footer.html' %}
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script>
+        <script defer src="https://www.gstatic.com/firebasejs/7.19.1/firebase-auth.js"></script>
+        <script>
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+                apiKey: "AIzaSyA9jeHII9FVkhOQfCM_NyoifnN8eIN6EFM",
+                authDomain: "sosyorol-b6ab6.firebaseapp.com",
+                databaseURL: "https://sosyorol-b6ab6.firebaseio.com",
+                projectId: "sosyorol-b6ab6",
+                storageBucket: "sosyorol-b6ab6.appspot.com",
+                messagingSenderId: "565098272319",
+                appId: "1:565098272319:web:5105dd611ce14cf98c8a8a",
+                measurementId: "G-18ZNPD8JH4"
+            };
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            firebase.analytics();
+            window.onload = function(e){ 
+                var phone = "{{phone}}";
+                document.getElementById("phone-end").innerHTML = phone.slice(-2);
+                //sendPhoneCode(phone);
+
+                // [START appVerifier]
+                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('submit_btn', {
+                    'size': 'invisible',
+                    'callback': function(response) {
+                        // reCAPTCHA solved, allow signInWithPhoneNumber.
+                        window.signingIn = true;
+                        var phone = "{{phone}}";
+                        firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+                        .then(function (confirmationResult) {
+                            // SMS sent. Prompt user to type the code from the message, then sign the
+                            // user in with confirmationResult.confirm(code).
+                            window.confirmationResult = confirmationResult;
+                            window.signingIn = false;
+                        }).catch(function (error) {
+                            // Error; SMS not sent
+                            console.error('Error during signInWithPhoneNumber', error);
+                            window.alert('Error during signInWithPhoneNumber:\n\n'
+                                + error.code + '\n\n' + error.message);
+                            window.signingIn = false;
+                        });
+                    }
+                });
+                // [END appVerifier]
+
+                recaptchaVerifier.render().then(function(widgetId) {
+                    window.recaptchaWidgetId = widgetId;
+                });    
+                
+                
+            }
+           function sendPhoneCode(){
+                window.signingIn = true;
+                var phone = "{{phone}}";
+                firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+                .then(function (confirmationResult) {
+                    // SMS sent. Prompt user to type the code from the message, then sign the
+                    // user in with confirmationResult.confirm(code).
+                    window.confirmationResult = confirmationResult;
+                    window.signingIn = false;
+                }).catch(function (error) {
+                    // Error; SMS not sent
+                    console.error('Error during signInWithPhoneNumber', error);
+                    window.alert('Error during signInWithPhoneNumber:\n\n'
+                        + error.code + '\n\n' + error.message);
+                    window.signingIn = false;
+                });
+            }
+            function verifyPhoneCode(username, firstname, lastname){
+                window.verifyingCode = true;
+                var code = document.getElementsByName("phone_code")[0].value;
+                confirmationResult.confirm(code).then(function (result) {
+                    // User signed in successfully.
+                    var user = result.user;
+                    window.verifyingCode = false;
+                    window.confirmationResult = null;
+                    var credential = firebase.auth.PhoneAuthProvider.credential(confirmationResult.verificationId, code);
+                    firebase.auth().signInWithCredential(credential);
+                    console.log(user.uid);
+                    firebase.database().ref('users/' + user.uid).set({
+                        username: username,
+                        phone: phone,
+                        firstname : firstname,
+                        lastname : lastname
+                    });
+                    var signin_form = document.getElementById("signin_form");
+                    document.getElementsByName("uid")[0].value = user.uid;
+                    signin_form.action = "/";
+                    signin_form.submit();
+                }).catch(function (error) {
+                    // User couldn't sign in (bad verification code?)
+                    console.error('Error while checking the verification code', error);
+                    window.alert('Error while checking the verification code:\n\n'
+                        + error.code + '\n\n' + error.message);
+                    window.verifyingCode = false;
+                });
+            }
+        </script>
+    </body>
+</html>

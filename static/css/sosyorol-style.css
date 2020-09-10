@@ -79,6 +79,7 @@ svg{pointer-events:all;}
 /*---------------------------------------
   ALIGNMENTS              
 -----------------------------------------*/
+.relative{position:relative;}
 .fixed {position: fixed;}
 .absolute {position: absolute;}
 .left {float: left;}
@@ -95,6 +96,7 @@ svg{pointer-events:all;}
 -----------------------------------------*/
 .full{width:100%;height:100%}
 .full-width{width:100%}
+.half-width{width:50%;}
 .w48{width:calc(100% - 48px)}
 .w68{width:calc(100% - 68px)}
 .w200{width:calc(100% - 200px)}
@@ -106,6 +108,7 @@ svg{pointer-events:all;}
 .mw430{max-width:430px}
 .mxw500 {max-width: 500px;}
 .mxw600 {max-width: 600px;}
+.w428{width:428px;}
 
 /*---------------------------------------
   MARGINS & PADDINGS              
@@ -117,13 +120,14 @@ svg{pointer-events:all;}
 .m10{margin:10px}.m010{margin:0 10px}.m100{margin:10px 0}.ml10{margin-left:10px}.mt10{margin-top:10px}.mb10{margin-bottom:10px}
 .mt12{margin-top:12px;}
 .ml5{margin-left:5px}
-.m20{margin:20px}.m020{margin:0 20px}.m200{margin:20px 0}.mb20{margin-bottom:20px}.mt20 {margin-top: 20px;}.mr20{margin-right:20px}.ml20{margin-left:20px}
-.m024{margin:0 24px}.m240{margin:24px 0}
+.m20{margin:20px}.m020{margin:0 20px}.m200{margin:20px 0}.mb20{margin-bottom:20px;}.mt20 {margin-top: 20px;}.mr20{margin-right:20px}.ml20{margin-left:20px}
+.m024{margin:0 24px}.m240{margin:24px 0}.mb{margin-bottom: 40px;}
 .ml28{margin-left:28px}
 .ml30{margin-left:30px;}
 .m034{margin:0 34px}.m34{margin:34px;}
 .mt40{margin-top:40px;}.ml40{margin-left:40px;}
-.mt60{margin-top:60px;}
+.mt60{margin-top:60px;}.ml-20{margin-left:-20px;}
+.mr-40{margin-right:-40px;}
 
 /* Paddings */
 .p5{padding:5px}.p05{padding:0 5px}.p50{padding:5px 0}
@@ -134,6 +138,7 @@ svg{pointer-events:all;}
 .p20{padding:20px}.p020{padding:0 20px}.p200{padding:20px 0}.pt20{padding-top:20px;}
 .p710{padding:7px 10px}
 .p15500{padding:15px 0 5px 0}
+.p40{padding:40px;}
 .p040{padding:0 40px}
 .p1020{padding:10px 20px}
 .p1030{padding:10px 30px}
@@ -155,9 +160,11 @@ svg{pointer-events:all;}
 .rounded{border-radius:50%}
 .br19{border-radius:19px}
 .br20 {border-radius: 20px;}
+.br30{border-radius: 30px;}
 
 /* Borders */
 .imgbw{border:2px solid var(--white);}
+.border{border:1px solid #e8e8e8;}
 .borderblue{border:1px solid var(--main-color);}
 .activebtb3b{border-bottom:3px solid var(--main-color)}
 .border2{border:1px solid var(--border2)}
@@ -165,6 +172,7 @@ svg{pointer-events:all;}
 .border4{border:1px solid var(--border4)}
 .twb {border: 5px solid var(--white);}
 .bt{border-top:1px solid var(--border)}
+.btg2{border-top:1px solid var(--gray2)}
 .bb{border-bottom:1px solid var(--border)}
 .bl{border-left:1px solid var(--border);}
 .bl3{border-left:3px solid var(--border)}
@@ -220,6 +228,7 @@ svg{pointer-events:all;}
 .title {color: var(--title-color);font-weight: var(--black-font);}
 .main-color {color: var(--main-color) !important;}
 .red {color: red !important;}
+.cw{color:var(--white);}
 
 /*---------------------------------------
   BACKGROUND            
@@ -234,6 +243,13 @@ svg{pointer-events:all;}
 .bcb{background-color: var(--main-color);}
 .bcma{background-color:#f0f8fd;}
 .bcw{background-color: var(--white);}
+.bcra{background-color: rgba(224,36,94, 0.5);}
+
+/*---------------------------------------
+  CONTAINERS              
+-----------------------------------------*/
+.sign-body{min-height:calc(100vh - 235px);}
+.sign-container{max-width:calc(100% - 528px); min-width:990px;margin:auto; padding:20px 0;}
 
 /*---------------------------------------
   IMAGES           

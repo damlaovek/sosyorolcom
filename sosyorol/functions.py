@@ -10,6 +10,9 @@ import re
 from urllib.request import urlopen
 from bs4 import BeautifulSoup as BSHTML
 import operator
+import firebase_admin
+from firebase_admin import auth, credentials, exceptions
+import base64
 
 
 '''---------------------------------------
@@ -56,6 +59,12 @@ def correct_community_name(name):
     name = change_special_chars(name)
     return name
 
+def is_email(email):
+    regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+    if(re.search(regex,email)):  
+        return True     
+    else:  
+        return False
 
 '''---------------------------------------
   UNIT OPERATIONS            
@@ -271,3 +280,41 @@ def get_date_created():
         except:
             pass
     return
+
+
+'''---------------------------------------
+  TRANSFER USERS TO FIREBASE        
+-----------------------------------------'''
+def transferUsers():
+    if not firebase_admin._apps:
+        cred = credentials.Certificate('static/sosyorol-b6ab6-firebase-adminsdk-q80t3-54150f4057.json') 
+        default_app = firebase_admin.initialize_app(cred)
+    userObjects = sm.User.objects.all()
+    users = []
+    '''
+    for u in userObjects:
+        users.append('sosyoroluseruid'+str(u.ID))
+    result = auth.delete_users(users)
+    '''
+    for u in userObjects:
+        pass_hash = str.encode(u.user_pass)
+        user = auth.ImportUserRecord(uid='sosyoroluseruid'+str(u.ID), email=u.user_email, password_hash=pass_hash)
+        users.append(user)
+    hash_alg = auth.UserImportHash.md5(rounds=0)
+    try:
+        result = auth.import_users(users, hash_alg=hash_alg)
+        for err in result.errors:
+            print('Failed to import user:', err.reason)
+    except exceptions.FirebaseError as error:
+        print('Error importing users:', error)
+
+
+'''---------------------------------------
+  USERS        
+-----------------------------------------'''
+def arrange_usernames():
+    users = sm.User.objects.all()
+    for user in users:
+        username = user.user_login.replace(".","_")
+        user.user_login = username
+        user.save()

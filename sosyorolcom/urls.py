@@ -20,7 +20,14 @@ from django.conf import settings
 from django.conf.urls.static import static 
 
 urlpatterns = [
-    path('', sv.home),
+    path('', sv.opensosyorol),
+    path('signup', sv.signup),
+    path('signin', sv.signin),
+    path('phonecodeverification', sv.phonecodeverification),
+    path('accounts/password/reset/', sv.resetpassword, name="resetpassword"),
+    path('accounts/password/reset/verify', sv.verifyresetpassword, name="verifyresetpassword"),
+    path('logout', sv.signout),
+    path('checkusernamevalidity', sv.checkusername, name="checkusernamevalidity"),
     path('saved/', sv.savedposts, name="savedposts"),
     path('saved/<path:post_type>', sv.savedpostsfilter, name="savedpostsfilter"),
     path('save-the-post/', sv.savethepost, name="save-the-post"),

@@ -1,0 +1,295 @@
+{% load static %}
+{% include 'includes/general/basic_head.html' %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/sign.css' %}">
+    </head>
+    <body class="{{darkmode}}">
+        <div class="full-width bcg">
+            <div class="sign-container sign-body">
+                <div class="full-width inline-flex mb20">
+                    <div class="bsbb half-width p200 mt60 mb20 ml-20">
+                        <div class="p040 ml30">
+                            <a href="/" title="Sosyorol">
+                                <picture class="logo-picture">
+                                    {% if dark == 'dark' %}
+                                        <source id="logo3" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo3-dark.webp' %}" type="image/webp">
+                                        <source id="logo2" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo1-dark.jpg' %}" type="image/jpeg"> 
+                                        <img id="logo1" class="full non-draggable" src="{% static 'assets/img/header/sosyorol-logo1-dark.jpg' %}" alt="Sosyorol">
+                                    {% else %}
+                                        <source id="logo3" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo3.webp' %}" type="image/webp">
+                                        <source id="logo2" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo1.jpg' %}" type="image/jpeg"> 
+                                        <img id="logo1" class="full non-draggable" src="{% static 'assets/img/header/sosyorol-logo1.jpg' %}" alt="Sosyorol">
+                                    {% endif %}
+                                </picture>
+                            </a><br>
+                            <p class="mt20 p100 cg fwmedium">{{page_dict.slogan}}.</p>
+                        </div>
+                        <div class="full-width">
+                            <div class="bsbb p40 m20 bcw br30 full-shadow2 w428">
+                                <form method="POST" name="signin_form" id="signin_form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="uid">
+                                </form>
+                                <form method="POST" name="signup-form" onsubmit="return submitSignupForm();">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="is_email" id="is_email" value="">
+                                    <input type="hidden" name="country_code" id="country_code" value="">
+                                    <div class="relative">
+                                        <input class="bsbb cg full-width p20 mt20 bcw br30 border" type="text" name="signup_email" placeholder="{{page_dict.emailorphone}}" onfocusout="validateEmailOrPhone();">
+                                        <svg width="20pt" height="20pt" viewBox="0 0 20 20" class="usernamecheck" id="invalidemailorphone">
+                                            <g>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--red);fill-opacity:1;" d="M 10 0 C 4.476562 0 0 4.476562 0 10 C 0 15.523438 4.476562 20 10 20 C 15.523438 20 20 15.523438 20 10 C 20 4.476562 15.523438 0 10 0 Z M 10 18.75 C 5.167969 18.75 1.25 14.832031 1.25 10 C 1.25 5.167969 5.167969 1.25 10 1.25 C 14.832031 1.25 18.75 5.167969 18.75 10 C 18.75 14.832031 14.832031 18.75 10 18.75 Z M 10 18.75 "/>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--red);fill-opacity:1;" d="M 14.207031 13.292969 L 10.914062 10 L 14.1875 6.753906 C 14.433594 6.511719 14.433594 6.113281 14.1875 5.871094 C 13.941406 5.625 13.539062 5.625 13.292969 5.871094 L 10.023438 9.113281 L 6.707031 5.792969 C 6.460938 5.546875 6.0625 5.546875 5.8125 5.792969 C 5.566406 6.042969 5.566406 6.441406 5.8125 6.6875 L 9.128906 10.003906 L 5.796875 13.308594 C 5.550781 13.550781 5.550781 13.949219 5.796875 14.191406 C 6.042969 14.4375 6.441406 14.4375 6.6875 14.191406 L 10.015625 10.890625 L 13.3125 14.1875 C 13.558594 14.4375 13.960938 14.4375 14.207031 14.1875 C 14.453125 13.941406 14.453125 13.542969 14.207031 13.292969 Z M 14.207031 13.292969 "/>
+                                            </g>
+                                        </svg>
+                                        <svg width="20pt" height="20pt" viewBox="0 0 20 20" class="usernamecheck" id="validemailorphone">
+                                            <g>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:green;fill-opacity:1;" d="M 10 0 C 4.476562 0 0 4.476562 0 10 C 0 15.523438 4.476562 20 10 20 C 15.523438 20 20 15.523438 20 10 C 20 4.476562 15.523438 0 10 0 Z M 10 18.75 C 5.167969 18.75 1.25 14.832031 1.25 10 C 1.25 5.167969 5.167969 1.25 10 1.25 C 14.832031 1.25 18.75 5.167969 18.75 10 C 18.75 14.832031 14.832031 18.75 10 18.75 Z M 10 18.75 "/>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:green;fill-opacity:1;" d="M 14.5625 6.496094 L 8.132812 12.867188 L 5.457031 10.246094 C 5.210938 10 4.8125 10 4.5625 10.246094 C 4.316406 10.488281 4.316406 10.886719 4.5625 11.128906 L 7.6875 14.191406 C 7.945312 14.417969 8.328125 14.441406 8.582031 14.191406 L 15.457031 7.378906 C 15.703125 7.136719 15.703125 6.738281 15.457031 6.496094 C 15.207031 6.25 14.808594 6.25 14.5625 6.496094 Z M 14.5625 6.496094 "/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    <div class="full-width inline-flex">
+                                        <input class="bsbb cg half-width p20 bcw br30 border mt20" type="text" name="firstname" placeholder="{{page_dict.name}}">
+                                        <input class="bsbb cg half-width p20 mt20 bcw br30 border ml20" type="text" name="lastname" placeholder="{{page_dict.surname}}">
+                                    </div>
+                                    <div class="relative">
+                                        <input class="bsbb cg full-width p20 mt20 bcw br30 border" type="text" name="username" placeholder="{{page_dict.username}}" onfocusout="validateUsername('{{page_dict.usernamelengtherror}}','{{page_dict.usernamespecialcharerror}}','{{page_dict.usernameexistserror}}', '{{page_dict.usernameonlynumberserror}}');">
+                                        <svg width="20pt" height="20pt" viewBox="0 0 20 20" class="usernamecheck" id="invalidusername">
+                                            <g>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--red);fill-opacity:1;" d="M 10 0 C 4.476562 0 0 4.476562 0 10 C 0 15.523438 4.476562 20 10 20 C 15.523438 20 20 15.523438 20 10 C 20 4.476562 15.523438 0 10 0 Z M 10 18.75 C 5.167969 18.75 1.25 14.832031 1.25 10 C 1.25 5.167969 5.167969 1.25 10 1.25 C 14.832031 1.25 18.75 5.167969 18.75 10 C 18.75 14.832031 14.832031 18.75 10 18.75 Z M 10 18.75 "/>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--red);fill-opacity:1;" d="M 14.207031 13.292969 L 10.914062 10 L 14.1875 6.753906 C 14.433594 6.511719 14.433594 6.113281 14.1875 5.871094 C 13.941406 5.625 13.539062 5.625 13.292969 5.871094 L 10.023438 9.113281 L 6.707031 5.792969 C 6.460938 5.546875 6.0625 5.546875 5.8125 5.792969 C 5.566406 6.042969 5.566406 6.441406 5.8125 6.6875 L 9.128906 10.003906 L 5.796875 13.308594 C 5.550781 13.550781 5.550781 13.949219 5.796875 14.191406 C 6.042969 14.4375 6.441406 14.4375 6.6875 14.191406 L 10.015625 10.890625 L 13.3125 14.1875 C 13.558594 14.4375 13.960938 14.4375 14.207031 14.1875 C 14.453125 13.941406 14.453125 13.542969 14.207031 13.292969 Z M 14.207031 13.292969 "/>
+                                            </g>
+                                        </svg>
+                                        <svg width="20pt" height="20pt" viewBox="0 0 20 20" class="usernamecheck" id="validusername">
+                                            <g>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:green;fill-opacity:1;" d="M 10 0 C 4.476562 0 0 4.476562 0 10 C 0 15.523438 4.476562 20 10 20 C 15.523438 20 20 15.523438 20 10 C 20 4.476562 15.523438 0 10 0 Z M 10 18.75 C 5.167969 18.75 1.25 14.832031 1.25 10 C 1.25 5.167969 5.167969 1.25 10 1.25 C 14.832031 1.25 18.75 5.167969 18.75 10 C 18.75 14.832031 14.832031 18.75 10 18.75 Z M 10 18.75 "/>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:green;fill-opacity:1;" d="M 14.5625 6.496094 L 8.132812 12.867188 L 5.457031 10.246094 C 5.210938 10 4.8125 10 4.5625 10.246094 C 4.316406 10.488281 4.316406 10.886719 4.5625 11.128906 L 7.6875 14.191406 C 7.945312 14.417969 8.328125 14.441406 8.582031 14.191406 L 15.457031 7.378906 C 15.703125 7.136719 15.703125 6.738281 15.457031 6.496094 C 15.207031 6.25 14.808594 6.25 14.5625 6.496094 Z M 14.5625 6.496094 "/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    <div class="relative">
+                                        <input class="bsbb cg full-width p20 mt20 bcw br30 border" name="signup_password" id="signup_password" type="password" placeholder="{{page_dict.password}}" onfocusout="validatePassword();">
+                                        <svg width="20pt" height="20pt" viewBox="0 0 20 20" class="usernamecheck" id="invalidpassword">
+                                            <g>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--red);fill-opacity:1;" d="M 10 0 C 4.476562 0 0 4.476562 0 10 C 0 15.523438 4.476562 20 10 20 C 15.523438 20 20 15.523438 20 10 C 20 4.476562 15.523438 0 10 0 Z M 10 18.75 C 5.167969 18.75 1.25 14.832031 1.25 10 C 1.25 5.167969 5.167969 1.25 10 1.25 C 14.832031 1.25 18.75 5.167969 18.75 10 C 18.75 14.832031 14.832031 18.75 10 18.75 Z M 10 18.75 "/>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--red);fill-opacity:1;" d="M 14.207031 13.292969 L 10.914062 10 L 14.1875 6.753906 C 14.433594 6.511719 14.433594 6.113281 14.1875 5.871094 C 13.941406 5.625 13.539062 5.625 13.292969 5.871094 L 10.023438 9.113281 L 6.707031 5.792969 C 6.460938 5.546875 6.0625 5.546875 5.8125 5.792969 C 5.566406 6.042969 5.566406 6.441406 5.8125 6.6875 L 9.128906 10.003906 L 5.796875 13.308594 C 5.550781 13.550781 5.550781 13.949219 5.796875 14.191406 C 6.042969 14.4375 6.441406 14.4375 6.6875 14.191406 L 10.015625 10.890625 L 13.3125 14.1875 C 13.558594 14.4375 13.960938 14.4375 14.207031 14.1875 C 14.453125 13.941406 14.453125 13.542969 14.207031 13.292969 Z M 14.207031 13.292969 "/>
+                                            </g>
+                                        </svg>
+                                        <svg width="20pt" height="20pt" viewBox="0 0 20 20" class="usernamecheck" id="validpassword">
+                                            <g>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:green;fill-opacity:1;" d="M 10 0 C 4.476562 0 0 4.476562 0 10 C 0 15.523438 4.476562 20 10 20 C 15.523438 20 20 15.523438 20 10 C 20 4.476562 15.523438 0 10 0 Z M 10 18.75 C 5.167969 18.75 1.25 14.832031 1.25 10 C 1.25 5.167969 5.167969 1.25 10 1.25 C 14.832031 1.25 18.75 5.167969 18.75 10 C 18.75 14.832031 14.832031 18.75 10 18.75 Z M 10 18.75 "/>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:green;fill-opacity:1;" d="M 14.5625 6.496094 L 8.132812 12.867188 L 5.457031 10.246094 C 5.210938 10 4.8125 10 4.5625 10.246094 C 4.316406 10.488281 4.316406 10.886719 4.5625 11.128906 L 7.6875 14.191406 C 7.945312 14.417969 8.328125 14.441406 8.582031 14.191406 L 15.457031 7.378906 C 15.703125 7.136719 15.703125 6.738281 15.457031 6.496094 C 15.207031 6.25 14.808594 6.25 14.5625 6.496094 Z M 14.5625 6.496094 "/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    <input type="submit" class="bsbb full-width p20 m200 bcb cw br20 full-shadow2 fwbold hand" value="{{page_dict.signup}}" id="signup-btn" name="signup-btn">
+                                </form>
+                                <div class="full-width bt m200"></div>
+                                <p class="cg">{{page_dict.alreadyhaveaccount}}? <a href="/" class="cb">{{page_dict.signin}}</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bsbb half-width p20">
+                        <div class="full-width inline-block mt60">
+                            <div class="bsbb p40 m20 bcw br30 full-shadow2 right w428 mr-40">
+                                <p class="full-width tac cg mb20">{{page_dict.sosyorolinfo}}.</p>
+                                <div class="bsbb full-width p20 bcw br30 full-shadow2 fwmedium inline-flex mt20 hand" id="facebookLogin">
+                                    <img src="{% static 'assets/img/icons/facebook-btn-icon.png' %}" class="sqr20">
+                                    <p class="lh20 fwmedium ml20">{{page_dict.signupwithfacebook}}</p>
+                                </div>
+                                <div class="bsbb full-width p20 bcw br30 full-shadow2 fwmedium inline-flex mt20 hand" id="googleLogin">
+                                    <img src="{% static 'assets/img/icons/google-btn-icon.png' %}" class="sqr20">
+                                    <p class="lh20 fwmedium ml20" >{{page_dict.signupwithgoogle}}</p>
+                                </div>
+                                <div class="bsbb full-width p20 bcw br30 full-shadow2 fwmedium inline-flex mt20 hand" id="twitterLogin">
+                                    <img src="{% static 'assets/img/icons/twitter-btn-icon.png' %}" class="sqr20">
+                                    <p class="lh20 fwmedium ml20">{{page_dict.signupwithtwitter}}</p>
+                                </div>
+                                <div class="full-width bt m200"></div>
+                                <p class="bsbb p020 cg full-width tac">{% autoescape off %}{{page_dict.acceptedtermscondsonsignup}}{% endautoescape %}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if error_msg %}
+            <script>
+                displayAlert('{{error_msg}}');
+            </script>
+        {% endif %}
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script>
+        <script defer src="https://www.gstatic.com/firebasejs/7.19.1/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-database.js"></script>
+        <script type="text/javascript" src="{% static 'js/signup.js' %}"></script>
+        <script>
+            //=================Login With Google===========================
+            var googleLogin=document.getElementById("googleLogin");
+            googleLogin.onclick=function(){
+                var provider=new firebase.auth.GoogleAuthProvider();
+                firebase.auth().signInWithPopup(provider).then(function(response){
+                    var userobj=response.user;
+                    var token=userobj.xa;
+                    var provider="google";
+                    var email=userobj.email;
+                    if(token!=null && token!=undefined && token!=""){
+                        // Register user if not exists,
+                        // Login otherwise
+                        console.log(email);
+                        console.log(userobj.displayName);
+                    }
+
+                    console.log(response);
+                })
+                .catch(function(error){
+                    console.log(error);
+                })
+            }
+            //=======================End Login With Google==================
+
+            //======================Login With Facebook==========================
+            var facebooklogin=document.getElementById("facebookLogin");
+            facebooklogin.onclick=function(){
+                var provider=new firebase.auth.FacebookAuthProvider();
+
+            firebase.auth().signInWithPopup(provider).then(function(response){
+                var userobj=response.user;
+                var token=userobj.xa;
+                var provider="facebook";
+                var email=userobj.email;
+                if(token!=null && token!=undefined && token!=""){
+                 //sendDatatoServerPhp(email,provider,token,userobj.displayName);
+                    console.log(email);
+                    console.log(userobj.displayName);
+                }
+
+                console.log(response);
+            })
+            .catch(function(error){
+                console.log(error);
+            })
+
+
+            }
+            //======================End Login With Facebook==========================
+
+            //======================Login With Twitter==========================
+            var twitterlogin = document.getElementById("twitterLogin");
+            twitterlogin.onclick = function () {
+                var o = new firebase.auth.TwitterAuthProvider();
+                firebase
+                    .auth()
+                    .signInWithPopup(o)
+                    .then(function (o) {
+                        var e = o.user,
+                            n = e.xa,
+                            a = e.email;
+                        null != n && null != n && "" != n && (console.log(a), console.log(e.displayName)), console.log(o);
+                    })
+                    .catch(function (o) {
+                        console.log(o);
+                    });
+            };
+            //======================End Login With Twitter==========================
+
+            function submitSignupForm() {
+                if(isEmailOrPhoneValid && isUsernameValid && isPasswordValid){
+                    if(isPhone){
+                        var phoneNumber = document.getElementsByName("signup_email")[0].value;
+                        if ("geolocation" in navigator) {
+                            // check if geolocation is supported/enabled on current browser
+                            navigator.geolocation.getCurrentPosition(function(position) {
+                                var longitude = position.coords.longitude;
+                                var latitude = position.coords.latitude;
+                                console.log(longitude);
+                                console.log(latitude);
+                                initCountry().then(result => verifyPhone(result.countryCode)).catch(e => console.log(e));
+                            });
+                        } else {
+                            // geolocation is not supported
+                            // get your location some other way
+                            console.log('geolocation is not enabled on this browser')
+                        }
+                    }else{
+                        var email = document.getElementsByName("signup_email")[0].value;
+                        var password = document.getElementsByName("signup_password")[0].value;
+                        firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+                            alert("error");
+                        });
+                        firebase.auth().onAuthStateChanged(function(user) {
+                            if (user) {
+                                firebase.database().ref('users/' + user.uid).set({
+                                    username: document.getElementsByName("username")[0].value,
+                                    email: email,
+                                    firstname : document.getElementsByName("firstname")[0].value,
+                                    lastname : document.getElementsByName("lastname")[0].value
+                                });
+                                var signin_form = document.getElementById("signin_form");
+                                document.getElementsByName("uid")[0].value = user.uid;
+                                signin_form.action = "/";
+                                signin_form.submit();
+                            }
+                        });
+                    }
+                }else{
+                    if(!isEmailOrPhoneValid){
+                        document.getElementById("validemailorphone").style.display = "none";
+                        document.getElementById("invalidemailorphone").style.display = "block";
+                    }
+                    if(!isUsernameValid){
+                        document.getElementById("validusername").style.display = "none";
+                        document.getElementById("invalidusername").style.display = "block";
+                    }
+                    if(!isPasswordValid){
+                        document.getElementById("validpassword").style.display = "none";
+                        document.getElementById("invalidpassword").style.display = "block";
+                    }
+                }
+                return false;
+            }
+            //regular expressions to extract IP and country values
+            const countryCodeExpression = /loc=([\w]{2})/;
+            const userIPExpression = /ip=([\w\.]+)/;
+
+            //automatic country determination.
+            function initCountry() {
+                return new Promise((resolve, reject) => {
+                    var xhr = new XMLHttpRequest();
+                    xhr.timeout = 3000;
+                    xhr.onreadystatechange = function () {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                countryCode = countryCodeExpression.exec(this.responseText)
+                                ip = userIPExpression.exec(this.responseText)
+                                if (countryCode === null || countryCode[1] === '' ||
+                                    ip === null || ip[1] === '') {
+                                    reject('IP/Country code detection failed');
+                                }
+                                let result = {
+                                    "countryCode": countryCode[1],
+                                    "IP": ip[1]
+                                };
+                                resolve(result)
+                            } else {
+                                reject(xhr.status)
+                            }
+                        }
+                    }
+                    xhr.ontimeout = function () {
+                        reject('timeout')
+                    }
+                    xhr.open('GET', 'https://www.cloudflare.com/cdn-cgi/trace', true);
+                    xhr.send();
+                });
+            }
+            function verifyPhone(countryCode){
+                document.getElementById("country_code").value = countryCode;
+                var form = document.getElementsByName("signup-form")[0];
+                form.action = "/phonecodeverification";
+                form.submit();
+            }
+        </script>
+        {% include 'includes/sign_footer.html' %}
+    </body>
+</html>
