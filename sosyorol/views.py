@@ -17,9 +17,21 @@ from colorthief import ColorThief
 from PIL import Image
 import requests
 import sosyorol.functions as fun
+#import pyrebase
+import firebase_admin
+from firebase_admin import auth, credentials, exceptions
+import hashlib
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATICFILES_DIR = os.path.join(BASE_DIR, 'static')
+
+'''---------------------------------------
+  FIREBASE              
+-----------------------------------------'''
+if not firebase_admin._apps:
+    cred = credentials.Certificate('static/sosyorol-b6ab6-firebase-adminsdk-q80t3-54150f4057.json') 
+    default_app = firebase_admin.initialize_app(cred)
+    auth = default_app.auth()
 
 '''---------------------------------------
   DICTIONARIES              
@@ -290,6 +302,46 @@ def communitydetail_dict(word_list, community_rank, followings):
             followingsinfo = followingsinfo.replace("[user] & [user]", f"{str1} & {str2}")
     page_dict['followingsinfo'] = followingsinfo
     return page_dict
+
+def sign_dictionary(word_list):
+    page_dict = {}
+    page_dict["slogan"] = word_list.filter(Q(var_name = 'sosyorol-slogan'))[0].translation
+    page_dict["createcommunity"] = fun.ucwords(word_list.filter(Q(var_name = 'create-community'))[0].translation)
+    page_dict["createad"] = fun.ucwords(word_list.filter(Q(var_name = 'create-ad'))[0].translation)
+    page_dict["signin"] = fun.ucfirst(word_list.filter(Q(var_name = 'signin'))[0].translation)
+    page_dict["signup"] = fun.ucfirst(word_list.filter(Q(var_name = 'signup'))[0].translation)
+    page_dict["forgottenpass"] = fun.ucfirst(word_list.filter(Q(var_name = 'forgotten-pass'))[0].translation)
+    page_dict["sosyorolinfo"] = fun.ucfirst(word_list.filter(Q(var_name = 'sosyorol-info'))[0].translation)
+    page_dict["dontyouhaveanaccount"] = fun.ucfirst(word_list.filter(Q(var_name = 'dont-you-have-an-account'))[0].translation)
+    page_dict["alreadyhaveaccount"] = fun.ucfirst(word_list.filter(Q(var_name = 'already-have-account'))[0].translation)
+    page_dict["name"] = fun.ucfirst(word_list.filter(Q(var_name = 'name'))[0].translation)
+    page_dict["surname"] = fun.ucfirst(word_list.filter(Q(var_name = 'surname'))[0].translation)
+    page_dict["username"] = fun.ucfirst(word_list.filter(Q(var_name = 'username'))[0].translation)
+    page_dict["password"] = fun.ucfirst(word_list.filter(Q(var_name = 'password'))[0].translation)
+    page_dict["emailorphone"] = fun.ucfirst(word_list.filter(Q(var_name = 'email-or-phone'))[0].translation)
+    page_dict["signinwithgoogle"] = word_list.filter(Q(var_name = 'signin-with-google'))[0].translation
+    page_dict["signinwithfacebook"] = word_list.filter(Q(var_name = 'signin-with-facebook'))[0].translation
+    page_dict["signinwithtwitter"] = word_list.filter(Q(var_name = 'signin-with-twitter'))[0].translation
+    page_dict["signupwithgoogle"] = word_list.filter(Q(var_name = 'signup-with-google'))[0].translation
+    page_dict["signupwithfacebook"] = word_list.filter(Q(var_name = 'signup-with-facebook'))[0].translation
+    page_dict["signupwithtwitter"] = word_list.filter(Q(var_name = 'signup-with-twitter'))[0].translation
+    page_dict["optional"] = fun.ucfirst(word_list.filter(Q(var_name = 'optional'))[0].translation)
+    page_dict["usernamelengtherror"] = word_list.filter(Q(var_name = 'username-length-error'))[0].translation
+    page_dict["usernamespecialcharerror"] = word_list.filter(Q(var_name = 'username-specialchar-error'))[0].translation
+    page_dict["usernameexistserror"] = word_list.filter(Q(var_name = 'username-exists-error'))[0].translation
+    page_dict["usernameonlynumberserror"] = word_list.filter(Q(var_name = 'username-onlynumbers-error'))[0].translation
+    page_dict["checkcodemsg"] = word_list.filter(Q(var_name = 'check-code-msg'))[0].translation
+    page_dict["enterauthcode"] = word_list.filter(Q(var_name = 'enter-auth-code'))[0].translation
+    page_dict["verify"] = fun.ucfirst(word_list.filter(Q(var_name = 'verify'))[0].translation)
+    page_dict["resendcode"] = word_list.filter(Q(var_name = 'resend-code'))[0].translation
+    page_dict["acceptedtermscondsonsignup"] = word_list.filter(Q(var_name = 'accepted-terms-conds-onsignup'))[0].translation
+    page_dict["emailplaceholder"] = word_list.filter(Q(var_name = 'email-placeholder'))[0].translation
+    page_dict["resetpassword"] = word_list.filter(Q(var_name = 'reset-password'))[0].translation
+    page_dict["havingtroubleloggingin"] = word_list.filter(Q(var_name = 'having-trouble-logging-in'))[0].translation
+    page_dict["resetpassinfo"] = word_list.filter(Q(var_name = 'reset-pass-info'))[0].translation
+    page_dict["passresetemailsentmsg"] = word_list.filter(Q(var_name = 'pass-reset-email-sent-msg'))[0].translation
+    return page_dict
+
 
 '''---------------------------------------
   HELPERS              
@@ -618,11 +670,124 @@ def savenewcommunity(request):
             response_data['content'] = word_list.filter(Q(var_name = 'general-error-msg'))[0].translation                
     return HttpResponse(json.dumps(response_data),content_type="application/json")
 
+@csrf_exempt
+def checkusername(request):
+    try:
+        username = request.POST.get("username")
+        user = User.objects.filter(Q(user_login=username))
+        if(len(user) > 0):
+            data = {'is_valid': False}
+        else:
+            data = {'is_valid': True}
+    except:
+        data = {'is_valid': False}
+    return JsonResponse(data)
+
 '''---------------------------------------
   VIEWS              
 -----------------------------------------'''
+def opensosyorol(request):
+    try:
+        uid = request.session["uid"]
+        user = auth.get_user(uid)
+        print('Successfully fetched user data: {0}'.format(user.uid))
+        return home(request)
+    except:
+        pass
+    try:
+        uid = request.POST.get("uid")
+        request.session["uid"] = uid
+        user = auth.get_user(uid)
+        print('Successfully fetched user data: {0}'.format(user.uid))
+        return home(request)
+    except:
+        pass
+    lang = "en-EN"
+    dark = ""
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    page_dict = sign_dictionary(word_list)
+    return render(request, 'signin.html', {'lang':lang, 'dark':dark, 'country_list':country_list, 'page_dict':page_dict})
+
+def signin(request):
+    return opensosyorol(request)
+
+def signup(request):
+    try:
+        uid = request.session["uid"]
+        user = auth.get_user(uid)
+        return HttpResponseRedirect("/")
+    except:
+        pass
+    lang = "en-EN"
+    dark = ""
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    page_dict = sign_dictionary(word_list)
+    return render(request, 'signup.html', {'lang':lang, 'dark':dark, 'country_list':country_list, 'page_dict':page_dict})
+
+def signout(request):
+    try:
+        redirect = request.POST.get("uid")
+        request.session["uid"] = None
+        return HttpResponseRedirect(redirect)
+    except:
+        return HttpResponseRedirect("/")
+
+def resetpassword(request):
+    try:
+        uid = request.session["uid"]
+        user = auth.get_user(uid)
+        return HttpResponseRedirect("/")
+    except:
+        pass   
+    lang = "en-EN"
+    dark = ""
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    page_dict = sign_dictionary(word_list)
+    return render(request, "resetpassword.html", {'lang':lang, 'dark':dark, 'country_list':country_list, 'page_dict':page_dict }) 
+
+def verifyresetpassword(request):
+    try:
+        uid = request.session["uid"]
+        user = auth.get_user(uid)
+        return HttpResponseRedirect("/")
+    except:
+        pass   
+    lang = "en-EN"
+    dark = ""
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    page_dict = sign_dictionary(word_list)
+    return render(request, "verifyresetpassword.html", {'lang':lang, 'dark':dark, 'country_list':country_list, 'page_dict':page_dict }) 
+
+def phonecodeverification(request):
+    try:
+        uid = request.session["uid"]
+        user = auth.get_user(uid)
+        return HttpResponseRedirect("/")
+    except:
+        pass
+    lang = "en-EN"
+    dark = ""
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    page_dict = sign_dictionary(word_list)
+    phone = request.POST.get("signup_email")
+    username = request.POST.get("username")
+    firstname = request.POST.get("firstname")
+    lastname = request.POST.get("lastname")
+    country_code = request.POST.get("country_code")
+    phone_code = str(Country.objects.filter(Q(iso=country_code))[0].phonecode)
+    if phone_code[0] != "+":
+        for i in range(0, len(phone_code)):
+            if phone.find(phone_code[i:]) == 0:
+                phone = "+" + phone_code[0:i] + phone
+                break
+    return render(request, "phoneverification.html", {'lang':lang, 'dark':dark, 'country_list':country_list, 'page_dict':page_dict, 'phone':phone, 'username':username, 'firstname':firstname, 'lastname': lastname })
+
 def home(request):
-    #fun.generate_descriptions()
     current_uid = 8
     current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
@@ -1085,8 +1250,6 @@ def communitydetail(request, slug,  **kwargs):
     post_template_dict = post_template(word_list)
     feed_dict = feed(word_list)
     followers = FollowedCommunities.objects.filter(Q(term_id=community.term_id))
-    comment_editor = comment_editor_dict(word_list)
-    post_template_dict = post_template(word_list)
     followings = []
     for f in followers:
         user = UserRelation.objects.filter(Q(following_id=f.user_id)).filter(Q(follower_id=current_uid))
@@ -1102,7 +1265,7 @@ def communitydetail(request, slug,  **kwargs):
                                                                 'feed_dict':feed_dict, 'page_dict':page_dict,
                                                                 'followers':followers, 'comment_editor':comment_editor,
                                                                 'post_template_dict': post_template_dict, 'followings':followings,
-                                                                'moderators':moderators
+                                                                'moderators':moderators, 'current_user': current_user
                                                                 })
 
 def newcommunity(request):

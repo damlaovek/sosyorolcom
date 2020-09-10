@@ -13,6 +13,9 @@ colorthief = "*"
 requests = "*"
 resizeimage = "*"
 python-resize-image = "*"
+firebase-admin = "*"
+pyrebase = "*"
+hashlib = "*"
 
 [requires]
 python_version = "3.8"

@@ -1,0 +1,29 @@
+{% load index %}
+<footer>
+    <div class="full-width bcw">
+        <div class="sign-container">
+            <ul class="full-width inline-block">
+                {% for c in country_list %}
+                    <a href="" target="_blank" class="left">
+                        <li class="p100 mr20 cg2">{{c.translation|ucfirst}}</li>
+                    </a>
+                {% endfor %}
+            </ul>
+            <ul class="full-width inline-block btg2">
+                <a href="" target="_blank" class="left">
+                    <li class="p100 mr20 cg2">{{page_dict.signup}}</li>
+                </a>
+                <a href="" target="_blank" class="left">
+                    <li class="p100 mr20 cg2">{{page_dict.signin}}</li>
+                </a>
+                <a href="" target="_blank" class="left">
+                    <li class="p100 mr20 cg2">{{page_dict.createad}}</li>
+                </a>
+                <a href="" target="_blank" class="left">
+                    <li class="p100 mr20 cg2">{{page_dict.createcommunity}}</li>
+                </a>
+            </ul>
+            <p class="copyright p100 cg2 m200">Sosyorol &copy; 2020</p>
+        </div>
+    </div>
+</footer>

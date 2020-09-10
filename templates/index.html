@@ -10,6 +10,29 @@
         <script src="{% static 'js/new/autosize.min.js' %}"></script>
         <script src="{% static 'js/new/user-list.min.js' %}"></script>
         <script src="{% static 'js/index.js' %}"></script>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script>
+
+        <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyA9jeHII9FVkhOQfCM_NyoifnN8eIN6EFM",
+            authDomain: "sosyorol-b6ab6.firebaseapp.com",
+            databaseURL: "https://sosyorol-b6ab6.firebaseio.com",
+            projectId: "sosyorol-b6ab6",
+            storageBucket: "sosyorol-b6ab6.appspot.com",
+            messagingSenderId: "565098272319",
+            appId: "1:565098272319:web:5105dd611ce14cf98c8a8a",
+            measurementId: "G-18ZNPD8JH4"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+        </script>
     </head>
     <body class="{{darkmode}}">
         {% include 'includes/general/header.html' %}

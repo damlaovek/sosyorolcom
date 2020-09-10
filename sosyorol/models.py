@@ -272,4 +272,11 @@ class ListUser(models.Model):
     class Meta:
         db_table = "list_user"
 
-
+# Country Code
+class Country(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    iso = models.TextField()
+    nicename = models.TextField()
+    phonecode = models.TextField()
+    class Meta:
+        db_table = "country_phone_code"
