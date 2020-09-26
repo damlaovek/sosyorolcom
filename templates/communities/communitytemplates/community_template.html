@@ -1,0 +1,26 @@
+{% load static %}
+{% load index %}
+<div class='full-width'>
+    <div class='full-width box answer-template-oc'>
+        <a href="/c/{{community.slug}}" class='bsbb full-width inline-flex p020'>
+            {% if community.profile_img == '' %}
+                <img src="{% static 'assets/img/defaults/default-community.png' %}" class="sqrt30 img-sd p5 bcb non-draggable rounded border" data-no-lazy="1"/>
+            {% else %}
+                <img src="{{community.profile_img}}" class="sqr40 img-sd non-draggable rounded border" data-no-lazy="1"/>
+            {% endif %}
+            <div class="bsbb ml20 mr20 mb10">
+                <p class="title fs19">{{community.name}}</p>
+                <p class="fs15 cg2 underline-on-hover lh20">c/{{community.slug}}</p>
+                {% if community.description != '' %}
+                    <p class="fs15 cg2 lh20 mt10">{% autoescape off %}{{community.description|edit_comm_desc}}{% endautoescape %}</p>
+                {% endif %}
+                <div class="full-width inline-flex mt20">
+                    <p class="cb"><span class="fwbold">{{community.views}}</span>&nbsp;{{page_dict.views}}</p>
+                    <p class="cb ml20"><span class="fwbold">{{community.followers|length}}</span>&nbsp;{{page_dict.usersfollowing}}</p>
+                    <p class="cb ml20">Topluluklar arasında <span class="fwbold">83.</span> sırada</p>
+                </div>
+                <p class="btn mt20 width100"><span class="p115">{{right_menu_dict.follow}}</span></p>
+            </div>
+        </a>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-.section-right{top:58px;right:0;padding-bottom:78px;float:right;height:calc(100vh - 78px);box-shadow:-6px 0 6px -4px rgba(0, 0, 0, 0.161);z-index: 2;overflow:scroll;}
+.section-right{top:58px;right:0;padding-bottom:78px;float:right;height:calc(100vh - 78px);box-shadow:-6px 0 6px -4px rgba(0, 0, 0, 0.161);z-index: 2;overflow:scroll;max-width:371px;}
 .section-right-top{width:calc(100% - 102px); padding:10px 20px; margin:30px; border-radius:4px;background-color:var(--grayish);}
 .section-right-top .profile-title{font-size:19px;font-weight:700;float:left;color:var(--title-color);}
 .section-right #profile-more-submenu{display:none;top:40px;right:-10px;border-radius:4px;z-index:3;background-color:var(--grayish);}

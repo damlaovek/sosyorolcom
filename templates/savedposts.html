@@ -28,44 +28,44 @@
                     </div>
                     <div class="bsbb full-width inline-flex mt8 bt p20">
                         {% if filter == "all" %}
-                            <a href="/saved" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{savedposts_dict.all}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{savedposts_dict.all}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% else %}
-                            <a href="/saved" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{savedposts_dict.all}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{savedposts_dict.all}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% endif %}
                         {% if filter == "post" %}
-                            <a href="/saved/post" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.post}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved/post" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.post}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% else %}
-                            <a href="/saved/post" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.post}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved/post" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.post}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% endif %}
                         {% if filter == "question" %}
-                            <a href="/saved/question" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.question}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved/question" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.question}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% else %}
-                            <a href="/saved/question" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.question}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved/question" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.question}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% endif %}
                         {% if filter == "answer" %}
-                            <a href="/saved/answer" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.answer}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved/answer" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.answer}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% else %}
-                            <a href="/saved/answer" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.answer}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved/answer" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.answer}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% endif %}
                         {% if filter == "poll" %}
-                            <a href="/saved/poll" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.poll}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved/poll" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.poll}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% else %}
-                            <a href="/saved/poll" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.poll}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved/poll" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.poll}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% endif %}
                         {% if filter == "quiz" %}
-                            <a href="/saved/quiz" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.quiz}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved/quiz" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.quiz}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% else %}
-                            <a href="/saved/quiz" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.quiz}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved/quiz" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.quiz}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% endif %}
                         {% if filter == "media" %}
-                            <a href="/saved/media" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.media}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved/media" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.media}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% else %}
-                            <a href="/saved/media" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.media}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="/feed/saved/media" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.media}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% endif %}
                         {% if filter == "link" %}
-                            <a href="/saved/link" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.link}}</a>
+                            <a href="/feed/saved/link" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb active">{{post_types_dict.link}}</a>
                         {% else %}
-                            <a href="/saved/link" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.link}}</a>
+                            <a href="/feed/saved/link" class="fs15 cg2 p1020 bcg hand border2 br19 hoverb">{{post_types_dict.link}}</a>
                         {% endif %}
                     </div>
                 </div>

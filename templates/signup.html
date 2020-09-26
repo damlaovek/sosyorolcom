@@ -214,22 +214,25 @@
                     }else{
                         var email = document.getElementsByName("signup_email")[0].value;
                         var password = document.getElementsByName("signup_password")[0].value;
-                        firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
-                            alert("error");
-                        });
-                        firebase.auth().onAuthStateChanged(function(user) {
-                            if (user) {
-                                firebase.database().ref('users/' + user.uid).set({
-                                    username: document.getElementsByName("username")[0].value,
-                                    email: email,
-                                    firstname : document.getElementsByName("firstname")[0].value,
-                                    lastname : document.getElementsByName("lastname")[0].value
-                                });
-                                var signin_form = document.getElementById("signin_form");
-                                document.getElementsByName("uid")[0].value = user.uid;
-                                signin_form.action = "/";
-                                signin_form.submit();
-                            }
+                        firebase.auth().createUserWithEmailAndPassword(email, password).then(function(){
+                            firebase.auth().onAuthStateChanged(function(user) {
+                                if (user) {
+                                    firebase.database().ref('users/' + user.uid).set({
+                                        username: document.getElementsByName("username")[0].value,
+                                        email: email,
+                                        firstname : document.getElementsByName("firstname")[0].value,
+                                        lastname : document.getElementsByName("lastname")[0].value
+                                    });
+                                    var signin_form = document.getElementById("signin_form");
+                                    document.getElementsByName("uid")[0].value = user.uid;
+                                    signin_form.action = "/";
+                                    signin_form.submit();
+                                }
+                            });
+                        }).catch(function(error) {
+                            // Invalid or expired action code. Ask user to try to reset the password
+                            // again.
+                            displayAlert(error.message);
                         });
                     }
                 }else{

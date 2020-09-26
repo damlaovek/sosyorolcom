@@ -1,26 +1,21 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from sosyorol.models import *
-from sosyorol.forms import *
 from django.db.models import Q
 import os
 from os import listdir
 from os.path import isfile, join
 from bs4 import BeautifulSoup as BSHTML
 import datetime as dt
-import re
 from urllib.request import urlopen
 import json
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 import time
-from colorthief import ColorThief
-from PIL import Image
 import requests
 import sosyorol.functions as fun
-#import pyrebase
 import firebase_admin
 from firebase_admin import auth, credentials, exceptions
-import hashlib
+from itertools import chain
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATICFILES_DIR = os.path.join(BASE_DIR, 'static')
@@ -38,48 +33,31 @@ if not firebase_admin._apps:
 -----------------------------------------'''
 def header(word_list):
     header_dict = {}
-    home = word_list.filter(Q(var_name = 'home'))[0].translation.upper()
-    quizzes = word_list.filter(Q(var_name = 'quizzes'))[0].translation.upper()
-    questions = word_list.filter(Q(var_name = 'questions'))[0].translation.upper()
-    polls = word_list.filter(Q(var_name = 'polls'))[0].translation.upper()
-    communities = word_list.filter(Q(var_name = 'communities'))[0].translation.upper()
-    settings = fun.ucfirst(word_list.filter(Q(var_name = 'settings'))[0].translation)
-    profile = fun.ucfirst(word_list.filter(Q(var_name = 'profile'))[0].translation)
-    messages = fun.ucfirst(word_list.filter(Q(var_name = 'messages'))[0].translation)
-    search = fun.ucfirst(word_list.filter(Q(var_name = 'search'))[0].translation)
-    notifications = fun.ucfirst(word_list.filter(Q(var_name = 'notifications'))[0].translation)
-    header_dict['createpost'] = fun.ucwords(word_list.filter(Q(var_name = 'create-post'))[0].translation)
-    header_dict['home'] = home
-    header_dict['quizzes'] = quizzes
-    header_dict['questions'] = questions
-    header_dict['polls'] = polls
-    header_dict['communities'] = communities
-    header_dict['settings'] = settings
-    header_dict['profile'] = profile
-    header_dict['messages'] = messages
-    header_dict['search'] = search
-    header_dict['notifications'] = notifications
+    header_dict['createpost'] = word_list.get(var_name = 'create-post').translation
+    header_dict['profile'] = word_list.get(var_name = 'profile').translation
+    header_dict['messages'] = word_list.get(var_name = 'messages').translation
+    header_dict['notifications'] = word_list.get(var_name = 'notifications').translation
     return header_dict
 
 def left_menu(word_list):
     left_menu_dict = {}
-    left_menu_dict['createpost'] = fun.ucwords(word_list.filter(Q(var_name = 'create-post'))[0].translation)
-    left_menu_dict['feed'] = fun.ucfirst(word_list.filter(Q(var_name = 'feed'))[0].translation)
-    left_menu_dict['darkmode'] = fun.ucfirst(word_list.filter(Q(var_name = 'dark-mode'))[0].translation)
-    left_menu_dict['lightmode'] = fun.ucfirst(word_list.filter(Q(var_name = 'light-mode'))[0].translation)
-    left_menu_dict['country'] = fun.ucfirst(word_list.filter(Q(var_name = 'lang'))[0].translation)
-    left_menu_dict['about'] = fun.ucfirst(word_list.filter(Q(var_name = 'about'))[0].translation)
-    left_menu_dict['careers'] = fun.ucfirst(word_list.filter(Q(var_name = 'careers'))[0].translation)
-    left_menu_dict['advertise'] = fun.ucfirst(word_list.filter(Q(var_name = 'advertise'))[0].translation)
-    left_menu_dict['helpvar'] = fun.ucfirst(word_list.filter(Q(var_name = 'help'))[0].translation)
-    left_menu_dict['termsvar'] = fun.ucfirst(word_list.filter(Q(var_name = 'terms'))[0].translation)
-    left_menu_dict['createlist'] = fun.ucwords(word_list.filter(Q(var_name = 'create-list'))[0].translation)
-    left_menu_dict['lists'] = fun.ucfirst(word_list.filter(Q(var_name = 'lists'))[0].translation)
-    left_menu_dict['visithistory'] = fun.ucfirst(word_list.filter(Q(var_name = 'visithistory'))[0].translation)
-    left_menu_dict['savedposts'] = fun.ucfirst(word_list.filter(Q(var_name = 'savedposts'))[0].translation)
-    left_menu_dict['more'] = fun.ucfirst(word_list.filter(Q(var_name = 'more'))[0].translation)
-    left_menu_dict['less'] = fun.ucfirst(word_list.filter(Q(var_name = 'less'))[0].translation)
-    left_menu_dict['createcommunity'] = fun.ucwords(word_list.filter(Q(var_name = 'create-community'))[0].translation)
+    left_menu_dict['createpost'] = word_list.get(var_name = 'create-post').translation
+    left_menu_dict['feed'] = word_list.get(var_name = 'feed').translation
+    left_menu_dict['darkmode'] = word_list.get(var_name = 'dark-mode').translation
+    left_menu_dict['lightmode'] = word_list.get(var_name = 'light-mode').translation
+    left_menu_dict['country'] = word_list.get(var_name = 'lang').translation
+    left_menu_dict['about'] = word_list.get(var_name = 'about').translation
+    left_menu_dict['careers'] = word_list.get(var_name = 'careers').translation
+    left_menu_dict['advertise'] = word_list.get(var_name = 'advertise').translation
+    left_menu_dict['helpvar'] = word_list.get(var_name = 'help').translation
+    left_menu_dict['termsvar'] = word_list.get(var_name = 'terms').translation
+    left_menu_dict['createlist'] = word_list.get(var_name = 'create-list').translation
+    left_menu_dict['lists'] = word_list.get(var_name = 'lists').translation
+    left_menu_dict['visithistory'] = word_list.get(var_name = 'visithistory').translation
+    left_menu_dict['savedposts'] = word_list.get(var_name = 'savedposts').translation
+    left_menu_dict['more'] = word_list.get(var_name = 'more').translation
+    left_menu_dict['less'] = word_list.get(var_name = 'less').translation
+    left_menu_dict['createcommunity'] = word_list.get(var_name = 'create-community').translation
     return left_menu_dict
 
 def lists_achive(word_list):
@@ -112,50 +90,31 @@ def list_info(word_list):
 
 def right_menu(word_list):
     right_menu_dict = {}
-    right_menu_dict['interaction'] = fun.ucwords(word_list.filter(Q(var_name = 'interaction'))[0].translation)
-    right_menu_dict['scrolltotop'] = fun.localized_upper(word_list.filter(Q(var_name = 'scroll-to-top'))[0].translation)
-    right_menu_dict['viewprofile'] = fun.ucwords(word_list.filter(Q(var_name = 'go-to-profile'))[0].translation)
-    right_menu_dict['myprofile'] = fun.ucwords(word_list.filter(Q(var_name = 'my-profile'))[0].translation)
-    right_menu_dict['createpost'] = fun.ucfirst(word_list.filter(Q(var_name = 'create-post'))[0].translation)
-    right_menu_dict['seeall'] = fun.ucwords(word_list.filter(Q(var_name = 'see-all'))[0].translation)
-    right_menu_dict['popularcommunities'] = fun.ucwords(word_list.filter(Q(var_name = 'popular-communities'))[0].translation)
-    right_menu_dict['subscribe'] = fun.ucwords(word_list.filter(Q(var_name = 'subscribe'))[0].translation)
-    right_menu_dict['trendsofcountrytitle'] = fun.ucfirst(word_list.filter(Q(var_name = 'trends-of-country-title'))[0].translation)
-    right_menu_dict['showmore'] = fun.ucfirst(word_list.filter(Q(var_name = 'show-more'))[0].translation)
-    right_menu_dict['usersyoumayfollow'] = fun.ucfirst(word_list.filter(Q(var_name = 'users-you-may-follow'))[0].translation)
-    right_menu_dict['follow'] = fun.ucfirst(word_list.filter(Q(var_name = 'follow'))[0].translation)
-    right_menu_dict['createcommunity'] = fun.ucfirst(word_list.filter(Q(var_name = 'create-community'))[0].translation)
+    right_menu_dict['interaction'] = word_list.get(var_name = 'interaction').translation
+    right_menu_dict['scrolltotop'] = word_list.get(var_name = 'scroll-to-top').translation
+    right_menu_dict['viewprofile'] = word_list.get(var_name = 'go-to-profile').translation
+    right_menu_dict['myprofile'] = word_list.get(var_name = 'my-profile').translation
+    right_menu_dict['createpost'] = word_list.get(var_name = 'create-post').translation
+    right_menu_dict['seeall'] = word_list.get(var_name = 'see-all').translation
+    right_menu_dict['popularcommunities'] = word_list.get(var_name = 'popular-communities').translation
+    right_menu_dict['subscribe'] = word_list.get(var_name = 'subscribe').translation
+    right_menu_dict['trendsofcountrytitle'] = word_list.get(var_name = 'trends-of-country-title').translation
+    right_menu_dict['showmore'] = word_list.get(var_name = 'show-more').translation
+    right_menu_dict['usersyoumayfollow'] = word_list.get(var_name = 'users-you-may-follow').translation
+    right_menu_dict['follow'] = word_list.get(var_name = 'follow').translation
+    right_menu_dict['createcommunity'] = word_list.get(var_name = 'create-community').translation
     return right_menu_dict
 
 def feed(word_list):
     feed_dict = {}
-    feed_dict['createpost'] = fun.ucwords(word_list.filter(Q(var_name = 'create-post'))[0].translation)
-    feed_dict['trend'] = fun.ucwords(word_list.filter(Q(var_name = 'trends'))[0].translation)
-    feed_dict['new'] = fun.ucwords(word_list.filter(Q(var_name = 'new'))[0].translation)
-    feed_dict['contra'] = fun.ucwords(word_list.filter(Q(var_name = 'controversial'))[0].translation)
-    feed_dict['rising'] = fun.ucwords(word_list.filter(Q(var_name = 'rising'))[0].translation)
-    feed_dict['best'] = fun.ucwords(word_list.filter(Q(var_name = 'best'))[0].translation)
-    feed_dict['now'] = fun.ucwords(word_list.filter(Q(var_name = 'now'))[0].translation)
-    feed_dict['today'] = fun.ucwords(word_list.filter(Q(var_name = 'today'))[0].translation)
-    feed_dict['thisweek'] = fun.ucwords(word_list.filter(Q(var_name = 'this-week'))[0].translation)
-    feed_dict['thismonth'] = fun.ucwords(word_list.filter(Q(var_name = 'this-month'))[0].translation)
-    feed_dict['thisyear'] = fun.ucwords(word_list.filter(Q(var_name = 'this-year'))[0].translation)
-    feed_dict['alltime'] = fun.ucwords(word_list.filter(Q(var_name = 'all-time'))[0].translation)
-    feed_dict['answerthequestions'] = fun.ucwords(word_list.filter(Q(var_name = 'all-time'))[0].translation)
-    feed_dict['discovernewtopics'] = fun.ucwords(word_list.filter(Q(var_name = 'discover-more-communities'))[0].translation)
-    feed_dict['morem'] = fun.ucwords(word_list.filter(Q(var_name = 'more'))[0].translation)
-    feed_dict['followmoreusers'] = fun.ucwords(word_list.filter(Q(var_name = 'follow-more-users'))[0].translation)
-    feed_dict['hiddentakeback'] = fun.ucwords(word_list.filter(Q(var_name = 'hidden-take-back'))[0].translation)
-    feed_dict['hiddenusers'] = fun.ucwords(word_list.filter(Q(var_name = 'hidden-users'))[0].translation)
-    feed_dict['media'] = fun.ucwords(word_list.filter(Q(var_name = 'media'))[0].translation)
-    feed_dict['link'] = fun.ucwords(word_list.filter(Q(var_name = 'link'))[0].translation)
-    feed_dict['quiz'] = fun.ucwords(word_list.filter(Q(var_name = 'quiz'))[0].translation)
-    feed_dict['poll'] = fun.ucwords(word_list.filter(Q(var_name = 'poll'))[0].translation)
-    feed_dict['question'] = fun.ucwords(word_list.filter(Q(var_name = 'question'))[0].translation)
-    feed_dict['answerthequestions'] = fun.ucwords(word_list.filter(Q(var_name = 'answer-the-questions'))[0].translation)
-    feed_dict['discoverthenewtopics'] = fun.ucwords(word_list.filter(Q(var_name = 'discover-more-communities'))[0].translation)
-    feed_dict['followmoreusers'] = fun.ucwords(word_list.filter(Q(var_name = 'follow-more-users'))[0].translation)
-    feed_dict['follow'] = fun.ucwords(word_list.filter(Q(var_name = 'follow'))[0].translation)
+    feed_dict['hiddentakeback'] = word_list.get(var_name = 'hidden-take-back').translation
+    feed_dict['hiddenusers'] = word_list.get(var_name = 'hidden-users').translation
+    feed_dict['media'] = word_list.get(var_name = 'media').translation
+    feed_dict['link'] = word_list.get(var_name = 'link').translation
+    feed_dict['quiz'] = word_list.get(var_name = 'quiz').translation
+    feed_dict['poll'] = word_list.get(var_name = 'poll').translation
+    feed_dict['question'] = word_list.get(var_name = 'question').translation
+    feed_dict['follow'] = word_list.get(var_name = 'follow').translation
     return feed_dict
 
 def new_community_tips(word_list):
@@ -171,30 +130,31 @@ def new_community_tips(word_list):
 
 def post_template(word_list):
     post_template_dict = {}
-    post_template_dict['article'] = fun.ucwords(word_list.filter(Q(var_name = 'article'))[0].translation)
-    post_template_dict['media'] = fun.ucwords(word_list.filter(Q(var_name = 'media'))[0].translation)
-    post_template_dict['link'] = fun.ucwords(word_list.filter(Q(var_name = 'link'))[0].translation)
-    post_template_dict['answer'] = fun.ucwords(word_list.filter(Q(var_name = 'answer'))[0].translation)
-    post_template_dict['poll'] = fun.ucwords(word_list.filter(Q(var_name = 'poll'))[0].translation)
-    post_template_dict['answernoun'] = fun.ucwords(word_list.filter(Q(var_name = 'answer-noun'))[0].translation)
-    post_template_dict['recommendedfy'] = fun.ucwords(word_list.filter(Q(var_name = 'recommended-for-you'))[0].translation)
-    post_template_dict['more'] = fun.ucwords(word_list.filter(Q(var_name = 'more'))[0].translation)
-    post_template_dict['share'] = fun.ucwords(word_list.filter(Q(var_name = 'share'))[0].translation)
-    post_template_dict['comments'] = fun.ucwords(word_list.filter(Q(var_name = 'comments'))[0].translation)
-    post_template_dict['repost'] = fun.ucwords(word_list.filter(Q(var_name = 'repost'))[0].translation)
-    post_template_dict['upvote'] = fun.ucwords(word_list.filter(Q(var_name = 'upvote'))[0].translation)
-    post_template_dict['downvote'] = fun.ucwords(word_list.filter(Q(var_name = 'downvote'))[0].translation)
-    post_template_dict['send'] = fun.ucwords(word_list.filter(Q(var_name = 'send'))[0].translation)
-    post_template_dict['subscribe'] = fun.ucwords(word_list.filter(Q(var_name = 'subscribe'))[0].translation)
-    post_template_dict['vote'] = fun.ucwords(word_list.filter(Q(var_name = 'vote'))[0].translation)
-    post_template_dict['votenoun'] = fun.localized_lower(word_list.filter(Q(var_name = 'vote-noun'))[0].translation)
-    post_template_dict['votesnoun'] = fun.localized_lower(word_list.filter(Q(var_name = 'votes-noun'))[0].translation)
+    post_template_dict['article'] = fun.ucwords(word_list.get(var_name = 'article').translation)
+    post_template_dict['media'] = fun.ucwords(word_list.get(var_name = 'media').translation)
+    post_template_dict['link'] = fun.ucwords(word_list.get(var_name = 'link').translation)
+    post_template_dict['answer'] = fun.ucwords(word_list.get(var_name = 'answer').translation)
+    post_template_dict['question'] = fun.ucwords(word_list.get(var_name = 'question').translation)
+    post_template_dict['poll'] = fun.ucwords(word_list.get(var_name = 'poll').translation)
+    post_template_dict['answernoun'] = fun.ucwords(word_list.get(var_name = 'answer-noun').translation)
+    post_template_dict['recommendedfy'] = fun.ucwords(word_list.get(var_name = 'recommended-for-you').translation)
+    post_template_dict['more'] = fun.ucwords(word_list.get(var_name = 'more').translation)
+    post_template_dict['share'] = fun.ucwords(word_list.get(var_name = 'share').translation)
+    post_template_dict['comments'] = fun.ucwords(word_list.get(var_name = 'comments').translation)
+    post_template_dict['repost'] = fun.ucwords(word_list.get(var_name = 'repost').translation)
+    post_template_dict['upvote'] = fun.ucwords(word_list.get(var_name = 'upvote').translation)
+    post_template_dict['downvote'] = fun.ucwords(word_list.get(var_name = 'downvote').translation)
+    post_template_dict['send'] = fun.ucwords(word_list.get(var_name = 'send').translation)
+    post_template_dict['subscribe'] = fun.ucwords(word_list.get(var_name = 'subscribe').translation)
+    post_template_dict['vote'] = fun.ucwords(word_list.get(var_name = 'vote').translation)
+    post_template_dict['votenoun'] = fun.localized_lower(word_list.get(var_name = 'vote-noun').translation)
+    post_template_dict['votesnoun'] = fun.localized_lower(word_list.get(var_name = 'votes-noun').translation)
     return post_template_dict
 
 def comment_editor_dict(word_list):
     comment_editor = {}
-    comment_editor['addcomment'] = fun.ucfirst(word_list.filter(Q(var_name = 'add-comment'))[0].translation)
-    comment_editor['send'] = fun.ucwords(word_list.filter(Q(var_name = 'send'))[0].translation)
+    comment_editor['addcomment'] = word_list.get(var_name = 'add-comment').translation
+    comment_editor['send'] = word_list.get(var_name = 'send').translation
     return comment_editor
 
 def post_types(word_list):
@@ -340,26 +300,49 @@ def sign_dictionary(word_list):
     page_dict["havingtroubleloggingin"] = word_list.filter(Q(var_name = 'having-trouble-logging-in'))[0].translation
     page_dict["resetpassinfo"] = word_list.filter(Q(var_name = 'reset-pass-info'))[0].translation
     page_dict["passresetemailsentmsg"] = word_list.filter(Q(var_name = 'pass-reset-email-sent-msg'))[0].translation
+    page_dict["notmatchingpasserror"] = word_list.filter(Q(var_name = 'not-matching-pass-error'))[0].translation
     return page_dict
 
+def  search_page_dict(word_list):
+    page_dict = {}
+    page_dict['all'] = fun.ucfirst(word_list.filter(Q(var_name = 'see-all'))[0].translation)
+    page_dict["resultsforthissearch"] = word_list.filter(Q(var_name = 'results-for-this-search'))[0].translation
+    page_dict['community'] = fun.ucfirst(word_list.filter(Q(var_name = 'community'))[0].translation)
+    page_dict['user'] = fun.ucfirst(word_list.filter(Q(var_name = 'user'))[0].translation)
+    page_dict['views'] = fun.ucfirst(word_list.filter(Q(var_name = 'views'))[0].translation)
+    page_dict['usersfollowing'] = fun.ucfirst(word_list.filter(Q(var_name = 'users-are-following-this'))[0].translation)
+    return page_dict
+
+def history_dict(word_list):
+    page_dict = {}
+    page_dict["historyPageDesc"] = fun.ucfirst(word_list.filter(Q(var_name = 'historyPageDesc'))[0].translation)
+    page_dict['all'] = fun.ucfirst(word_list.filter(Q(var_name = 'see-all'))[0].translation)
+    page_dict['searchHistory'] = fun.ucfirst(word_list.filter(Q(var_name = 'search-history'))[0].translation)
+    page_dict['community'] = fun.ucfirst(word_list.filter(Q(var_name = 'community'))[0].translation)
+    page_dict['user'] = fun.ucfirst(word_list.filter(Q(var_name = 'user'))[0].translation)
+    page_dict['historytype'] = word_list.filter(Q(var_name = 'history-type'))[0].translation
+    page_dict['clearallhistory'] = word_list.filter(Q(var_name = 'clear-all-history'))[0].translation
+    page_dict['views'] = fun.ucfirst(word_list.filter(Q(var_name = 'views'))[0].translation)
+    page_dict['usersfollowing'] = fun.ucfirst(word_list.filter(Q(var_name = 'users-are-following-this'))[0].translation)
+    return page_dict
 
 '''---------------------------------------
   HELPERS              
 -----------------------------------------'''
 def setup_pollmeta(post, word_list):
     current_uid = 8
-    post.poll_duration = PostMeta.objects.filter(Q(post_id=post.ID)).filter(Q(meta_key="poll_duration"))[0].meta_value
-    post.number_options = int(PostMeta.objects.filter(Q(post_id=post.ID)).filter(Q(meta_key="number_options"))[0].meta_value)
+    post.poll_duration = PostMeta.objects.filter(post_id=post.ID, meta_key="poll_duration")[0].meta_value
+    post.number_options = int(PostMeta.objects.filter(post_id=post.ID, meta_key="number_options")[0].meta_value)
     options_keys = []
     for i in range(0, post.number_options):
         options_keys.append(f'secenek_{i+1}')
-    post.poll_options = PostMeta.objects.filter(Q(post_id=post.ID)).filter(Q(meta_key__in=options_keys))
-    post.votes = SossyComments.objects.filter(Q(post_id=post.ID))
-    total_votes = len(post.votes)
+    post.poll_options = PostMeta.objects.filter(post_id=post.ID, meta_key__in=options_keys)
+    post.votes = SossyComments.objects.filter(post_id=post.ID)
+    total_votes = post.votes.count()
     index = 1
     max_vote = 0
     for vote in post.poll_options:
-        vote.num_votes = len(SossyComments.objects.filter(Q(post_id=post.ID)).filter(Q(choice=index)))
+        vote.num_votes = SossyComments.objects.filter(post_id=post.ID, choice=index).count()
         if vote.num_votes > max_vote:
             max_vote = vote.num_votes
         if total_votes == 0:
@@ -371,16 +354,16 @@ def setup_pollmeta(post, word_list):
         if vote.num_votes == max_vote:
             vote.max_voted = True
             break
-    isvoted = SossyComments.objects.filter(Q(post_id=post.ID)).filter(Q(user_id=current_uid))
-    if(len(isvoted)>0):
+    isvoted = SossyComments.objects.filter(post_id=post.ID, user_id=current_uid)
+    if(isvoted.count()>0):
         post.voted = isvoted[0].choice
-    duration = PostMeta.objects.filter(Q(post_id=post.ID)).filter(Q(meta_key="poll_duration"))[0].meta_value
+    duration = PostMeta.objects.filter(post_id=post.ID, meta_key="poll_duration")[0].meta_value
     if duration == "Unlimited":
-        post.poll_duration_left = fun.ucwords(word_list.filter(Q(var_name = 'unlimited-time'))[0].translation)
+        post.poll_duration_left = word_list.get(var_name = 'unlimited-time').translation
     else:
         days = int(duration.split()[0])
-        ago = fun.localized_lower(word_list.filter(Q(var_name = 'ago'))[0].translation)
-        left = fun.localized_lower(word_list.filter(Q(var_name = 'left'))[0].translation)
+        ago = word_list.get(var_name = 'ago').translation
+        left = word_list.get(var_name = 'left').translation
         to = post.post_date.replace(tzinfo=None) + dt.timedelta(days=days)
         now = dt.datetime.now()
         if now < to:
@@ -389,42 +372,61 @@ def setup_pollmeta(post, word_list):
             post.poll_duration_left = "bitti"       
 
 def setup_postmeta(post, word_list):
+    import re
     current_uid = 8
-    post.like = len(PostRating.objects.filter(Q(post_id=post.ID)).filter(Q(opinion='like')))
-    post.dislike = len(PostRating.objects.filter(Q(post_id=post.ID)).filter(Q(opinion='dislike')))
+    
+    post.like = PostRating.objects.filter(post_id=post.ID, opinion='like').count()
+    post.dislike = PostRating.objects.filter(post_id=post.ID, opinion='dislike').count()
     post.rating = post.like - post.dislike
-    post.repost = len(Repost.objects.filter(Q(post_id=post.ID)))
+    post.repost = Repost.objects.filter(post_id=post.ID).count()
+
+    community_taxonomy_ids = TermRelationship.objects.filter(Q(object_id=post.ID))
+    community_taxonomy_ids = list({x.term_taxonomy_id: x for x in community_taxonomy_ids}.keys())
+    community_ids = TermTaxonomy.objects.filter(term_taxonomy_id__in=community_taxonomy_ids)
+    community_ids = list({x.term_id: x for x in community_ids}.keys())
+    post.communities = Community.objects.filter(term_id__in=community_ids)
+    if post.communities.count() > 0:
+        post.first_community = post.communities[0].name
+
     mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{post.author_id}')
-    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-    avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(post.author_id) + "/" + onlyfiles[0]
+    if (os.path.exists(mypath)):
+        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(post.author_id) + "/" + onlyfiles[0]
+    else:
+        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
     post.author.set_avatar(avatar_url)
     post.time_diff = fun.humanizedate(post.post_date.replace(tzinfo=None), word_list)
-    soup = BSHTML(post.post_content,features="html.parser")
-    images = soup.findAll('img')
-    post.post_images = []
-    featured_img = PostMeta.objects.filter(Q(post_id=post.ID)).filter(Q(meta_key="_thumbnail_id"))
-    if len(featured_img) > 0:
-        featured_id = featured_img[0].meta_value
-        featured_img = Post.objects.filter(Q(ID=featured_id))[0].guid
-        post.post_images.append(featured_img)
-    for img in images:
-        post.post_images.append(img['src'])
-    if len(post.post_images) == 0:
-        post.preview = "not-found"
-    else:
-        post.preview = post.post_images[0]
-    short_content = post.post_content
-    short_content = re.sub("(<img.*?>)", "", short_content, 0, re.IGNORECASE | re.DOTALL | re.MULTILINE)
-    short_content = fun.striphtml(short_content).replace('\n', '').rstrip()
-    post.short_content = short_content
-    post.comments = Comment.objects.filter(Q(comment_post_ID=post.ID))
-    if (post.post_parent == 0):
-        post.parent_title = post.post_title
-    else:
-        post.parent_title = Post.objects.filter(Q(ID=post.post_parent))[0].post_title
+    
+    if post.post_type == "post" or post.post_type == "answer":
+        soup = BSHTML(post.post_content,features="html.parser")
+        images = soup.findAll('img')
+        post.post_images = []
+        featured_img = PostMeta.objects.filter(post_id=post.ID, meta_key="_thumbnail_id")
+        if featured_img.count() > 0:
+            featured_id = featured_img[0].meta_value
+            featured_img = Post.objects.get(ID=featured_id).guid
+            post.post_images.append(featured_img)
+        for img in images:
+            post.post_images.append(img['src'])
+        if len(post.post_images) == 0:
+            post.preview = "not-found"
+        else:
+            post.preview = post.post_images[0]
+    
+        short_content = post.post_content
+        short_content = re.sub("(<img.*?>)", "", short_content, 0, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+        short_content = fun.striphtml(short_content).replace('\n', '').rstrip()
+        post.short_content = short_content
+    
+    post.comments = Comment.objects.filter(comment_post_ID=post.ID)
+    if post.post_type == "answer":
+        if (post.post_parent == 0):
+            post.parent_title = post.post_title
+        else:
+            post.parent_title = Post.objects.get(ID=post.post_parent).post_title
 
-    israted = PostRating.objects.filter(Q(post_id=post.ID)).filter(Q(user_id=current_uid))
-    if len(israted) > 0:
+    israted = PostRating.objects.filter(post_id=post.ID, user_id=current_uid)
+    if israted.count() > 0:
         post.user_rate = israted[0].opinion
     if post.post_type == "poll":
         setup_pollmeta(post, word_list)
@@ -451,16 +453,16 @@ def morefollowedlists(request):
         return render(request, 'lists/morefollowedlists.html', {'limit':limit, 'followedlists':followedlists})
 
 def setup_current_user(current_uid):
-    current_user = User.objects.filter(Q(ID = current_uid))[0]
-    user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
-    current_user.set_description(user_desc.meta_value)
+    current_user = User.objects.get(ID = current_uid)
+    user_desc = UserMeta.objects.filter(user_id = current_uid, meta_key = 'description')[0]
+    current_user.description = user_desc.meta_value
     mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
     if (os.path.exists(mypath)):
         onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
         avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
     else:
         avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
-    current_user.set_avatar(avatar_url)
+    current_user.avatar_url = avatar_url
     return current_user
 
 '''---------------------------------------
@@ -545,6 +547,7 @@ def postrating(request):
 
 @csrf_exempt
 def uploadmedia(request):
+    from sosyorol.forms import MediaFileUploadForm
     form = MediaFileUploadForm(data=request.POST, files=request.FILES)
     if form.is_valid():
         photo = form.save()
@@ -556,6 +559,7 @@ def uploadmedia(request):
 
 @csrf_exempt
 def uploadmediagetcolor(request):
+    from sosyorol.forms import MediaFileUploadForm
     print("uploadmediagetcolor")
     form = MediaFileUploadForm(data=request.POST, files=request.FILES)
     print(form.errors)
@@ -624,7 +628,6 @@ def savethepost(request):
         return HttpResponseRedirect("")
 
 def savenewcommunity(request):
-    print("savenewcommunity")
     title = request.POST["title"]
     # Check if community name is in use:
     creator = 8
@@ -683,25 +686,49 @@ def checkusername(request):
         data = {'is_valid': False}
     return JsonResponse(data)
 
+@csrf_exempt
+def get_search_results(request):
+    search_key = request.POST["search"]
+    response_data = {}
+    results = Community.objects.filter(Q(name__icontains=search_key))[:6]
+    result_count = len(results)
+    for result in results:
+        response_data[result.slug] = "community!:!" + result.profile_img_small + "!:!" + result.name
+    if (result_count < 6):
+        diff = 6 - result_count
+        results = Post.objects.filter(post_status="publish").filter(post_title__icontains=search_key).order_by('-post_date')[:diff]
+        result_count += len(results)
+        for result in results:
+            response_data[result.guid] = "post!:!" +result.post_title
+    if (result_count < 6):
+        diff = 6 - result_count
+        results = User.objects.filter(Q(display_name__icontains=search_key))[:diff]
+        for result in results:
+            result = setup_current_user(result.ID)
+            response_data[result.user_nicename] = "user!:!" + result.avatar_url + "!:!" + result.display_name
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
 '''---------------------------------------
   VIEWS              
 -----------------------------------------'''
 def opensosyorol(request):
     try:
         uid = request.session["uid"]
-        user = auth.get_user(uid)
-        print('Successfully fetched user data: {0}'.format(user.uid))
-        return home(request)
+        if uid is not None:
+            user = auth.get_user(uid)
+            print('Successfully fetched user data: {0}'.format(user.uid))
+            return home(request)
     except:
-        pass
-    try:
-        uid = request.POST.get("uid")
-        request.session["uid"] = uid
-        user = auth.get_user(uid)
-        print('Successfully fetched user data: {0}'.format(user.uid))
-        return home(request)
-    except:
-        pass
+        try:
+            uid = request.POST.get("uid")
+            if uid is not None:
+                request.session["uid"] = uid
+                user = auth.get_user(uid)
+                print('Successfully fetched user data: {0}'.format(user.uid))
+                return home(request)
+        except:
+            pass
+    
     lang = "en-EN"
     dark = ""
     word_list = Languages.objects.filter(Q(lang_code = lang))
@@ -727,12 +754,15 @@ def signup(request):
     return render(request, 'signup.html', {'lang':lang, 'dark':dark, 'country_list':country_list, 'page_dict':page_dict})
 
 def signout(request):
+    '''
     try:
         redirect = request.POST.get("uid")
-        request.session["uid"] = None
-        return HttpResponseRedirect(redirect)
     except:
-        return HttpResponseRedirect("/")
+        redirect = "/"
+    '''
+    redirect = "/"
+    request.session["uid"] = None
+    return HttpResponseRedirect(redirect)
 
 def resetpassword(request):
     try:
@@ -754,13 +784,18 @@ def verifyresetpassword(request):
         user = auth.get_user(uid)
         return HttpResponseRedirect("/")
     except:
-        pass   
-    lang = "en-EN"
-    dark = ""
-    word_list = Languages.objects.filter(Q(lang_code = lang))
-    country_list = Languages.objects.filter(Q(var_name = 'lang'))
-    page_dict = sign_dictionary(word_list)
-    return render(request, "verifyresetpassword.html", {'lang':lang, 'dark':dark, 'country_list':country_list, 'page_dict':page_dict }) 
+        pass
+    if request.GET.get("mode")  == "resetPassword" and request.GET.get("apiKey") == "AIzaSyA9jeHII9FVkhOQfCM_NyoifnN8eIN6EFM" and request.GET.get("oobCode") != None:
+        mode = request.GET.get("mode")
+        oobCode = request.GET.get("oobCode")
+        lang = "en-EN"
+        dark = ""
+        word_list = Languages.objects.filter(Q(lang_code = lang))
+        country_list = Languages.objects.filter(Q(var_name = 'lang'))
+        page_dict = sign_dictionary(word_list)
+        return render(request, "verifyresetpassword.html", {'lang':lang, 'dark':dark, 'country_list':country_list, 'page_dict':page_dict, 'mode':mode, 'oobCode':oobCode }) 
+    else:
+        return HttpResponseRedirect("/")
 
 def phonecodeverification(request):
     try:
@@ -788,72 +823,350 @@ def phonecodeverification(request):
     return render(request, "phoneverification.html", {'lang':lang, 'dark':dark, 'country_list':country_list, 'page_dict':page_dict, 'phone':phone, 'username':username, 'firstname':firstname, 'lastname': lastname })
 
 def home(request):
+    start_start = time.time()
+    current_uid = 8
+
+    start = time.time()
+    current_user = setup_current_user(current_uid)
+    end = time.time() - start
+    print(f"User setup in {end} s")
+
+    start = time.time()
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    end = time.time() - start
+    print(f"Preference setup in {end} s")
+
+    start = time.time()
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    end = time.time() - start
+    print(f"Get word list in {end} s")
+
+    
+    start = time.time()
+    header_dict = header(word_list)
+    end = time.time() - start
+    print(f"Set header_dict in {end} s")
+
+    start = time.time()
+    feed_dict = feed(word_list)
+    end = time.time() - start
+    print(f"Set feed_dict in {end} s")
+
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    
+    myprofile = fun.ucfirst(word_list.get(var_name = 'my-profile').translation)
+    createpost = fun.ucfirst(word_list.get(var_name = 'create-post').translation)
+    seeall = fun.ucfirst(word_list.get(var_name = 'see-all').translation)
+    populercommunities = fun.ucfirst(word_list.get(var_name = 'popular-communities').translation)
+    subscribe = fun.ucfirst(word_list.get(var_name = 'subscribe').translation)
+
+    start = time.time()
+    followed_communities = FollowedCommunities.objects.filter(Q(user_id = current_uid)).order_by('-date').prefetch_related()
+    end = time.time() - start
+    print(f"Get followed communities in {end} s")
+
+    start = time.time()
+    popular_communities = TermTaxonomy.objects.filter(Q(taxonomy="post_tag")).order_by('-count')[:5].prefetch_related()
+    end = time.time() - start
+    print(f"Get popular communities in {end} s")
+
+    post_template_dict = post_template(word_list)
+
+    start = time.time()
+    posts = Post.objects.filter(post_type="post", post_status="publish").order_by('-post_date')[1055:1056].prefetch_related()
+    for post in posts:
+        setup_postmeta(post, word_list)
+    end = time.time() - start
+    print(f"Get and setup posts in {end} s")
+
+    start = time.time()
+    links = Post.objects.filter(post_type="link", post_status="publish").order_by('-post_date')[:1].prefetch_related()
+    for post in links:
+        setup_postmeta(post, word_list)
+        post.photo_from_url = fun.get_photo_from_url(post.post_content)
+    end = time.time() - start
+    print(f"Get and setup links in {end} s")
+
+    start = time.time()
+    answers = Post.objects.filter(post_type="answer", post_status="publish").order_by('-post_date')[:1].prefetch_related()
+    for post in answers:
+        setup_postmeta(post, word_list)
+    end = time.time() - start
+    print(f"Get and setup answers in {end} s")
+
+    start = time.time()
+    questions = Post.objects.filter(post_type="questions", post_status="publish").order_by('-post_date')[:8]
+    end = time.time() - start
+    print(f"Get and setup questions in {end} s")
+
+    start = time.time()
+    polls = Post.objects.filter(post_type="poll", post_status="publish").order_by('-post_date')[:1].prefetch_related()
+    for poll in polls:
+        setup_postmeta(poll, word_list)
+    end = time.time() - start
+    print(f"Get and setup polls in {end} s")
+
+    start = time.time()
+    communities = Community.objects.all()[:10]
+    end = time.time() - start
+    print(f"Get communities in {end} s")
+
+    start = time.time()
+    user_queryset = User.objects.all()[:10]
+    users = []
+    for user in user_queryset:
+        user = setup_current_user(user.ID)
+        users.append(user)
+    end = time.time() - start
+    print(f"Get users in {end} s")
+
+    start = time.time()
+    comment_editor = comment_editor_dict(word_list)
+    end = time.time() - start
+    print(f"Setup comment editor in {end} s")
+
+    end_end = time.time() - start_start
+    print(f"Total: {end_end} s")
+    return render(request, 'index.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'header_dict':header_dict, 'country_list':country_list, 'select_language':select_language,
+                                            'followed_communities':followed_communities, 'feed_dict':feed_dict,
+                                            'popular_communities':popular_communities, 'posts':posts,
+                                            'post_template_dict':post_template_dict, 'comment_editor':comment_editor,
+                                            'links':links, 'answers':answers, 'questions':questions,
+                                            'communities':communities, 'users':users, 'polls':polls,
+                                            'word_list':word_list
+                                            })
+
+def search(request, **kwargs):
     current_uid = 8
     current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
     word_list = Languages.objects.filter(Q(lang_code = lang))
     header_dict = header(word_list)
-    left_menu_dict = left_menu(word_list)
-    right_menu_dict = right_menu(word_list)
-    feed_dict = feed(word_list)
     country_list = Languages.objects.filter(Q(var_name = 'lang'))
     select_language = fun.ucfirst(word_list.filter(Q(var_name = 'select-language'))[0].translation)
-    
-    myprofile = fun.ucfirst(word_list.filter(Q(var_name = 'my-profile'))[0].translation)
-    createpost = fun.ucfirst(word_list.filter(Q(var_name = 'create-post'))[0].translation)
-    seeall = fun.ucfirst(word_list.filter(Q(var_name = 'see-all'))[0].translation)
-    populercommunities = fun.ucfirst(word_list.filter(Q(var_name = 'popular-communities'))[0].translation)
-    subscribe = fun.ucfirst(word_list.filter(Q(var_name = 'subscribe'))[0].translation)
+    search_key = ""
+    try:
+        search_key = request.POST["search_key"]
+        print(search_key)
+    except:
+        try:
+            search_key = request.GET.get("search_key")
+        except:
+            pass
 
-    followed_communities = FollowedCommunities.objects.filter(Q(user_id = current_uid)).order_by('-date').prefetch_related()
-    
-    popular_communities = TermTaxonomy.objects.filter(Q(taxonomy="post_tag")).order_by('-count')[:5].prefetch_related()
+    #Save search history
+    search_history = SearchHistory.objects.filter(user_id=current_uid, search_term=search_key, is_deleted=0)
+    if len(search_history) > 0:
+        counter = search_history[0].counter + 1
+        search_history.update(date=dt.datetime.now(), counter=counter)
+    else:
+        search_history = SearchHistory(user_id=current_uid, search_term=search_key, date=dt.datetime.now(), is_deleted=0, counter=1)
+        search_history.save()
 
-    post_template_dict = post_template(word_list)
-    posts = Post.objects.filter(Q(post_type="post")).filter(Q(post_status="publish")).order_by('-post_date')[1055:1056].prefetch_related()
-    for post in posts:
-        setup_postmeta(post, word_list)
+    #Left
+    left_menu_dict = left_menu(word_list)
+    post_types_dict = post_types(word_list)
+    page_dict = search_page_dict(word_list)
 
-    links = Post.objects.filter(Q(post_type="link")).filter(Q(post_status="publish")).order_by('-post_date')[:1].prefetch_related()
-    for post in links:
-        setup_postmeta(post, word_list)
-        post.photo_from_url = fun.get_photo_from_url(post.post_content)
-
-    answers = Post.objects.filter(Q(post_type="answer")).filter(Q(post_status="publish")).order_by('-post_date')[:2].prefetch_related()
-    for post in answers:
-        setup_postmeta(post, word_list)
-
-    questions = Post.objects.filter(Q(post_type="questions")).filter(Q(post_status="publish")).order_by('-post_date')[:8].prefetch_related()
-    for post in questions:
-        setup_postmeta(post, word_list)
-    
-    polls = Post.objects.filter(Q(post_type="poll")).filter(Q(post_status="publish")).order_by('-post_date').prefetch_related()
-    for poll in polls:
-        setup_postmeta(poll, word_list)
-
-    communities = Community.objects.all()[:10]
-
-    user_queryset = User.objects.all()[:10]
-    users = []
-    for user in user_queryset:
-        user = setup_current_user(user.ID)
-        users.append(user)
-
+    #Middle
     comment_editor = comment_editor_dict(word_list)
-    return render(request, 'index.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+    post_template_dict = post_template(word_list)
+    fltr = "all"
+    try:
+        fltr = request.GET.get("filter")
+        if fltr is None:
+            fltr = "all"
+    except:
+        pass
+
+    community_results = {}
+    if fltr == "community" or fltr == "all":
+        community_results = Community.objects.filter(Q(name__icontains=search_key))
+        for community in community_results:
+            follower_ids = FollowedCommunities.objects.filter(Q(term=community))
+            follower_ids = list({x.user_id: x for x in follower_ids}.keys())
+            community.followers = User.objects.filter(Q(ID__in=follower_ids))
+    
+    post_results = {}
+    question_results = {}
+    if fltr != "profile" and fltr != "community":
+        post_results = Post.objects.filter(post_status="publish").filter(post_title__icontains=search_key).order_by('-post_date')
+        if fltr == "post":
+            post_results = post_results.filter(Q(post_type="post"))
+        elif fltr == "link":
+            post_results = post_results.filter(Q(post_type="link"))
+        elif fltr == "poll":
+            post_results = post_results.filter(Q(post_type="poll"))
+        elif fltr == "quiz":
+            post_results = post_results.filter(Q(post_type="quiz"))
+        elif fltr == "question" or fltr == "all":
+            question_results = post_results.filter(Q(post_type="questions"))
+        elif fltr == "answer":
+            post_results = post_results.filter(Q(post_type="answer"))
+        elif fltr == "media":
+            post_results = post_results.filter(Q(post_type="media"))
+        for post in post_results:
+            setup_postmeta(post, word_list)
+            if post.post_type == "link":
+                post.photo_from_url = fun.get_photo_from_url(post.post_content)
+        for question in question_results:
+            setup_postmeta(question, word_list)
+    
+    user_results = {}
+    if fltr == "profile" or fltr == "all":
+        user_results = User.objects.filter(Q(display_name__icontains=search_key))
+        for user in user_results:
+            user_desc = UserMeta.objects.filter(Q(user_id = user.ID)).filter(Q(meta_key = 'description'))[0]
+            user.set_description(user_desc.meta_value)
+            mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{user.ID}')
+            if (os.path.exists(mypath)):
+                onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+                avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(user.ID) + "/" + onlyfiles[0]
+            else:
+                avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+            user.set_avatar(avatar_url)
+
+    #Right
+    right_menu_dict = right_menu(word_list)
+    users = User.objects.all()[:2]
+    for user in users:
+        user_desc = UserMeta.objects.filter(Q(user_id = user.ID)).filter(Q(meta_key = 'description'))[0]
+        user.set_description(user_desc.meta_value)
+        mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{user.ID}')
+        if (os.path.exists(mypath)):
+            onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+            avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(user.ID) + "/" + onlyfiles[0]
+        else:
+            avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        user.set_avatar(avatar_url)
+    return render(request, "search.html", {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'header_dict':header_dict, 'country_list':country_list,
+                                            'select_language':select_language, 'left_menu_dict':left_menu_dict,
+                                            'right_menu_dict':right_menu_dict, 'users':users, 'post_types_dict':post_types_dict,
+                                            'page_dict':page_dict, 'searchkey': search_key, 'community_results':community_results,
+                                            'post_results':post_results, 'user_results':user_results, 'filter':fltr,
+                                            'comment_editor':comment_editor, 'post_template_dict':post_template_dict,
+                                            'question_results':question_results, 'word_list':word_list
+                                            })
+
+def history(request, **kwargs):
+    import locale
+    import re
+    current_uid = 8
+
+    if 'filter' in kwargs:
+        fltr = kwargs.get("filter").split("_")[0]
+    else:
+        fltr = "all"
+    
+    query = request.GET.get("query")
+    if query is None:
+        query = ""
+
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    header_dict = header(word_list)
+    current_user = setup_current_user(current_uid)
+    page_dict = history_dict(word_list)
+
+    left_menu_dict = left_menu(word_list)
+    select_language = fun.ucfirst(word_list.filter(Q(var_name = 'select-language'))[0].translation)
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    for c in country_list:
+        c.translation = fun.ucfirst(c.translation)
+
+    post_types_dict = post_types(word_list)
+    search_history = SearchHistory.objects.filter(Q(user_id=current_uid)).filter(Q(is_deleted=0)).filter(Q(search_term__icontains=query))
+    post_history = PostHistory.objects.filter(Q(user_id=current_uid)).filter(Q(is_deleted=0))
+    comment_editor = comment_editor_dict(word_list)
+    post_template_dict = post_template(word_list)
+    for p in post_history:
+        if fltr == "all" or fltr == p.post.post_type:
+            setup_postmeta(p.post, word_list)
+            if p.post.post_type == "link":
+                post.photo_from_url = fun.get_photo_from_url(post.post_content)
+
+    community_history = CommunityHistory.objects.filter(Q(user_id=current_uid)).filter(Q(is_deleted=0))
+    for c in community_history:
+        follower_ids = FollowedCommunities.objects.filter(Q(term=c.term))
+        follower_ids = list({x.user_id: x for x in follower_ids}.keys())
+        c.term.followers = User.objects.filter(Q(ID__in=follower_ids))
+            
+    user_history = UserHistory.objects.filter(Q(user_id=current_uid)).filter(Q(is_deleted=0))
+    for user in user_history:
+        user_desc = UserMeta.objects.filter(Q(user_id = user.visited_user.ID)).filter(Q(meta_key = 'description'))[0]
+        user.visited_user.set_description(user_desc.meta_value)
+        mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{user.visited_user.ID}')
+        if (os.path.exists(mypath)):
+            onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+            avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(user.visited_user.ID) + "/" + onlyfiles[0]
+        else:
+            avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        user.visited_user.set_avatar(avatar_url)
+    
+    history = sorted(chain(search_history, post_history, community_history, user_history), key=lambda instance: instance.date, reverse=True)
+    history_groups = {}
+    for h in history:
+        dict_key = h.date
+        locale.setlocale(locale.LC_TIME, lang.replace("-","_"))
+        dict_key = dt.datetime.strftime(dict_key.date(), '%d %B %Y')
+        if dict_key in history_groups:
+            if h.history_type == "post":
+                if re.search(query, h.post.post_title, re.IGNORECASE):
+                    history_groups[dict_key].append(h)
+            elif h.history_type == "community":
+                if re.search(query, h.term.name, re.IGNORECASE):
+                    history_groups[dict_key].append(h)
+            elif h.history_type == "profile":
+                if re.search(query, h.visited_user.display_name, re.IGNORECASE) or re.search(query, h.visited_user.user_login, re.IGNORECASE):
+                    history_groups[dict_key].append(h)
+            else:
+                history_groups[dict_key].append(h)
+        else:
+            if fltr == "all" or fltr == h.history_type:
+                if h.history_type == "post":
+                    if re.search(query, h.post.post_title, re.IGNORECASE):
+                        history_groups[dict_key] = [h]
+                elif h.history_type == "community":
+                    if re.search(query, h.term.name, re.IGNORECASE):
+                        history_groups[dict_key] = [h]
+                elif h.history_type == "profile":
+                    if re.search(query, h.visited_user.display_name, re.IGNORECASE) or re.search(query, h.visited_user.user_login, re.IGNORECASE):
+                        history_groups[dict_key] = [h]
+                else:
+                    history_groups[dict_key] = [h]
+                    
+
+    print(history_groups)
+
+    right_menu_dict = right_menu(word_list)
+    users = User.objects.all()[:2]
+    for user in users:
+        user_desc = UserMeta.objects.filter(Q(user_id = user.ID)).filter(Q(meta_key = 'description'))[0]
+        user.set_description(user_desc.meta_value)
+        mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{user.ID}')
+        if (os.path.exists(mypath)):
+            onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+            avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(user.ID) + "/" + onlyfiles[0]
+        else:
+            avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        user.set_avatar(avatar_url)
+    return render(request, "history.html", {'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
                                             'country_list':country_list, 'select_language':select_language,
-                                            'followed_communities':followed_communities,
-                                            'right_menu_dict':right_menu_dict, 'feed_dict':feed_dict,
-                                            'popular_communities':popular_communities, 'posts':posts,
-                                            'post_template_dict':post_template_dict, 'comment_editor':comment_editor,
-                                            'links':links, 'answers':answers, 'questions':questions,
-                                            'communities':communities, 'users':users, 'polls':polls
-                                            })
+                                            'right_menu_dict':right_menu_dict, 'users':users, 'post_types_dict':post_types_dict,
+                                            'page_dict':page_dict, 'filter':fltr, 'history':history_groups,
+                                            'comment_editor':comment_editor, 'post_template_dict':post_template_dict, 'query':query,
+                                            'word_list':word_list})
 
 @csrf_exempt
 def lists(request):
+    print("lists")
     limit = 3
     current_uid = 8
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
@@ -924,6 +1237,7 @@ def newpost(request):
                                             'newpost_actions_dict':newpost_actions_dict, 'drafts':drafts})
 
 def createlist(request):
+    print("hello create list")
     current_uid = 8
     current_user = User.objects.filter(Q(ID = current_uid))[0]
     user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
@@ -958,13 +1272,14 @@ def createlist(request):
                                             'tips':tips, 'create_list_dict':create_list_dict})
 
 def listdetail(request, slug, **kwargs):
-    if slug == "undefined":
+    print("list detail")
+    if slug == "undefined" or slug == "create":
         return createlist(request)
     if 'filter' in kwargs:
         fltr = kwargs.get("filter")
     else:
         fltr = "all"
-    print(fltr)
+
     if fltr == "post":
         lst.posts = lst.posts.filter(Q(post_type="post"))
     elif fltr == "link":
@@ -1136,16 +1451,7 @@ def savedposts(request, **kwargs):
     for c in country_list:
         c.translation = fun.ucfirst(c.translation)
     select_language = fun.ucfirst(word_list.filter(Q(var_name = 'select-language'))[0].translation)
-    current_user = User.objects.filter(Q(ID = current_uid))[0]
-    user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
-    current_user.set_description(user_desc.meta_value)
-    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
-    if (os.path.exists(mypath)):
-        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
-    else:
-        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
-    current_user.set_avatar(avatar_url)
+    current_user = setup_current_user(current_uid)
 
     followed_communities = FollowedCommunities.objects.filter(Q(user_id = current_uid)).order_by('-date').prefetch_related()
     for i in followed_communities:
@@ -1201,8 +1507,16 @@ def savedpostsfilter(request, post_type):
     return savedposts(request, filter=post_type)
 
 def communitydetail(request, slug,  **kwargs):
+    print("community detail")
     if slug == "lists":
-        return lists(request)
+        path = kwargs.get("filter")
+        tokens = path.split("/")
+        if (len(tokens) == 1):
+            print(kwargs)
+            print(path)
+            return listdetail(request, path)
+        else:
+            return listdetailfilter(request, tokens[0], post_type=tokens[1])
     elif slug == "communities/create":
         return newcommunity(request)
 
@@ -1240,6 +1554,16 @@ def communitydetail(request, slug,  **kwargs):
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
     word_list = Languages.objects.filter(Q(lang_code = lang))
+
+    #Save history
+    history = CommunityHistory.objects.filter(Q(user_id=current_uid)).filter(Q(term=community)).filter(Q(is_deleted=0))
+    if len(history) > 0:
+        counter = history[0].counter + 1
+        history.update(date=dt.datetime.now(), counter=counter)
+    else:
+        history = CommunityHistory(user_id=current_uid, term=community, date=dt.datetime.now(), is_deleted=0, counter=1)
+        history.save()
+
     for post in community.posts:
         setup_postmeta(post, word_list)
         if post.post_type == "link":

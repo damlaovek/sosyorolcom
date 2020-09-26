@@ -1,0 +1,276 @@
+{% load static %}
+{% load index %}
+{% include 'includes/general/head.html' %}
+        <title>Sosyorol - Sosyal İçerik Platformu</title>
+        <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
+        <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
+        <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
+        <script src="{% static 'js/new/autosize.min.js' %}"></script>
+        <script src="{% static 'js/new/user-list.min.js' %}"></script>
+        <script src="{% static 'js/index.js' %}"></script>
+    </head>
+    <body class="{{darkmode}}">
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
+        <div class="full-width inline-flex">
+            {% include 'includes/general/left_menu.html' %}
+            <style>
+                .box{box-shadow:0px 3px 4px rgba(173,173,173, 0.53);}
+                .box .box{box-shadow:none;}
+                .hide{display:none;}
+            </style>
+            <div class="section-middle">
+                <div class="bsbb full-shadow-border box" style="width:812px;margin:auto;margin-top:8px;">
+                    <div class="bsbb full-width p20">
+                        <h1 class="fs19 fwblack ctitle">{{left_menu_dict.visithistory|ucfirst}}</h1>
+                        <p class="lh24 mt20 fs15 cg2 mxw500">{{page_dict.historyPageDesc}}</p>
+                        <form class="bsbb mw200" method="GET" action="">
+                            <input class="p1020 lh30 br25 mt10 bcg mw200" type="text" autocomplete="off" name="query" id="history_search" placeholder="Geçmişte ara" value="{{query}}">
+                            <svg class="absolute aligntr svg-icon" viewBox="0 0 15 15" style="top:5px; right:10px;">
+                                <g>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 14.667969 13.039062 L 11.578125 9.945312 C 12.320312 8.867188 12.695312 7.667969 12.695312 6.347656 C 12.695312 5.488281 12.527344 4.664062 12.195312 3.882812 C 11.859375 3.097656 11.410156 2.421875 10.84375 1.851562 C 10.273438 1.285156 9.597656 0.835938 8.8125 0.5 C 8.027344 0.167969 7.207031 0 6.347656 0 C 5.488281 0 4.664062 0.167969 3.882812 0.5 C 3.097656 0.835938 2.421875 1.285156 1.851562 1.851562 C 1.285156 2.421875 0.832031 3.097656 0.5 3.882812 C 0.167969 4.667969 0 5.488281 0 6.347656 C 0 7.207031 0.167969 8.027344 0.5 8.8125 C 0.832031 9.597656 1.285156 10.273438 1.851562 10.839844 C 2.421875 11.410156 3.097656 11.859375 3.882812 12.195312 C 4.664062 12.527344 5.488281 12.695312 6.347656 12.695312 C 7.667969 12.695312 8.867188 12.320312 9.945312 11.578125 L 13.039062 14.660156 C 13.253906 14.886719 13.523438 15.003906 13.847656 15.003906 C 14.160156 15.003906 14.433594 14.886719 14.660156 14.660156 C 14.886719 14.433594 15.003906 14.160156 15.003906 13.847656 C 15.003906 13.53125 14.890625 13.257812 14.667969 13.039062 Z M 9.199219 9.199219 C 8.410156 9.992188 7.460938 10.386719 6.347656 10.386719 C 5.234375 10.386719 4.285156 9.992188 3.492188 9.199219 C 2.703125 8.410156 2.308594 7.460938 2.308594 6.347656 C 2.308594 5.234375 2.703125 4.285156 3.492188 3.492188 C 4.285156 2.703125 5.234375 2.308594 6.347656 2.308594 C 7.460938 2.308594 8.410156 2.703125 9.199219 3.492188 C 9.992188 4.285156 10.386719 5.234375 10.386719 6.347656 C 10.386719 7.460938 9.992188 8.410156 9.199219 9.199219 Z M 9.199219 9.199219 "/>
+                                </g>
+                            </svg>
+                            <input type="submit" 
+                        style="position: absolute; left: -9999px; width: 1px; height: 1px;"
+                        tabindex="-1"/>
+                        </form>
+                    </div>
+                </div>
+                {% for key, values in history.items %}
+                    <div class="bsbb full-width mt20" id="posts" style="width:812px;margin:auto;margin-top:20px;">
+                        <div class="full-width">
+                            <p class="cg2 fwbold mb10">{{key}}</p>
+                            {% for value in values %}
+                                {% if value.history_type == 'search' %}
+                                    {% if filter == "all" or filter == "search" %}
+                                        <div class="box full-width">
+                                            {% include 'search/search_history_template.html' with search=value %}
+                                        </div>
+                                    {% endif %}
+                                {% elif value.history_type == 'community' %}
+                                    {% if filter == "all" or filter == "community" %}
+                                        {% include 'communities/communitytemplates/community_template.html' with community=value.term %}
+                                    {% endif %}
+                                {% elif value.history_type == "post" %}
+                                    {%if value.post.post_type == "post" %}
+                                        {% if filter == "all" or filter == "post" %}
+                                            {% include 'posts/posttemplates/post_template.html' with post=value.post %}
+                                        {% endif %}
+                                    {% elif post.post_type == "media" %}
+                                        {% if filter == "all" or filter == "media" %}
+                                            {% include 'posts/posttemplates/media_template.html' with post=value.post  %}
+                                        {% endif %}
+                                    {% elif value.post.post_type == "link" %}
+                                        {% if filter == "all" or filter == "link" %}    
+                                            {% include 'posts/posttemplates/link_template.html' with link=value.post %}
+                                        {% endif %}
+                                    {% elif value.post.post_type == "answer" %}
+                                        {% if filter == "all" or filter == "answer" %}
+                                            {% include 'posts/posttemplates/answer_template.html' with answer=value.post %}
+                                        {% endif %}
+                                    {% elif value.post.post_type == "poll" %}
+                                        {% if filter == "all" or filter == "poll" %}
+                                            {% include 'posts/posttemplates/poll_template.html' with poll=value.post %}
+                                        {% endif %}
+                                    {% elif value.post.post_type == "quiz" %}
+                                    {% endif %}
+                                {% elif value.history_type == "profile" %}
+                                    {% if filter == "all" or filter == "profile" %}
+                                        {% include 'users/usertemplates/user_template.html' with user=value.visited_user %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="section-right fixed">
+                <div class="bsbb full-shadow-border section-right-top full-width" style="padding:0;width:calc(100% - 60px);">
+                    <div class="bsbb full-width inline-block p1020 bb">
+                        <p class="fs19 fwblack ctitle left">{{page_dict.historytype}}</p>
+                        <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="bsbb full-width">
+                        {% if filter == "all" or filter == '' %}
+                            <a href="/feed/history" class="bsbb full-width p1020 inline-block">
+                                <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 p010 cb fwbold">{{page_dict.all}}</p>
+                            </a>
+                        {% else %}
+                            <a href="/feed/history" class="bsbb full-width p1020 inline-block">
+                                <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 cg2 p010">{{page_dict.all}}</p>
+                            </a>
+                        {% endif %}
+                        {% if filter == "search" %}
+                            <a href="/feed/history/search_history" class="bsbb full-width p1020 bt inline-block">
+                                <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 p010 cb fwbold">{{page_dict.searchHistory}}</p>
+                            </a>
+                        {% else %}
+                            <a href="/feed/history/search_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 cg2 p010">{{page_dict.searchHistory}}</p>
+                            </a>
+                        {% endif %}
+                        {% if filter == "post" %}
+                            <a href="/feed/history/post_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 p010 cb fwbold">{{post_types_dict.post}}</p>
+                            </a>
+                        {% else %}
+                            <a href="/feed/history/post_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 cg2 p010">{{post_types_dict.post}}</p>
+                            </a>
+                        {% endif %}
+                        {% if filter == "question" %}
+                            <a href="/feed/history/question_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 p010 cb fwbold">{{post_types_dict.question}}</p>
+                            </a>
+                        {% else %}
+                            <a href="/feed/history/question_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 cg2 p010">{{post_types_dict.question}}</p>
+                            </a>
+                        {% endif %}
+                        {% if filter == "answer" %}
+                            <a href="/feed/history/answer_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 p010 cb fwbold">{{post_types_dict.answer}}</p>
+                            </a>
+                        {% else %}
+                            <a href="/feed/history/answer_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 cg2 p010">{{post_types_dict.answer}}</p>
+                            </a>
+                        {% endif %}
+                        {% if filter == "poll" %}
+                            <a href="/feed/history/poll_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 p010 cb fwbold">{{post_types_dict.poll}}</p>
+                            </a>
+                        {% else %}
+                            <a href="/feed/history/poll_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 cg2 p010">{{post_types_dict.poll}}</p>
+                            </a>
+                        {% endif %}
+                        {% if filter == "quiz" %}
+                            <a href="/feed/history/quiz_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 p010 cb fwbold">{{post_types_dict.quiz}}</p>
+                            </a>
+                        {% else %}
+                            <a href="/feed/history/quiz_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 cg2 p010">{{post_types_dict.quiz}}</p>
+                            </a>
+                        {% endif %}
+                        {% if filter == "media" %}
+                            <a href="/feed/history/media_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 p010 cb fwbold">{{post_types_dict.media}}</p>
+                            </a>
+                        {% else %}
+                            <a href="/feed/history/media_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 cg2 p010">{{post_types_dict.media}}</p>
+                            </a>
+                        {% endif %}
+                        {% if filter == "link" %}
+                            <a href="/feed/history/link_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 p010 cb fwbold">{{post_types_dict.link}}</p>
+                            </a>
+                        {% else %}
+                            <a href="/feed/history/link_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 cg2 p010">{{post_types_dict.link}}</p>
+                            </a>
+                        {% endif %}
+                        {% if filter == "community" %}
+                            <a href="/feed/history/community_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 p010 cb fwbold">{{page_dict.community}}</p>
+                            </a>
+                        {% else %}
+                            <a href="/feed/history/community_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 cg2 p010">{{page_dict.community}}</p>
+                            </a>
+                        {% endif %}
+                        {% if filter == "profile" %}
+                            <a href="/feed/history/profile_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 p010 cb fwbold">{{page_dict.user}}</p>
+                            </a>
+                        {% else %}
+                            <a href="/feed/history/profile_history" class="bsbb full-width p1020 bt  inline-block">
+                                <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <p class="lh28 ml30 cg2 p010">{{page_dict.user}}</p>
+                            </a>
+                        {% endif %}
+                        <div class="bsbb full-width p100 bt">
+                            <a href="" class="cb p020">{{page_dict.clearallhistory}}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
