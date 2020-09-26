@@ -1,9 +1,10 @@
 {% load static %}
+{% load index %}
 <div class="section-right fixed" id="section-right">
     <div class="full-shadow-border section-right-top">
         <div class="absolute aligntl bb full-width mt40"></div>
         <div class="inline-block full-width" style="margin-top:-10px;">
-            <p class="fwblack fs19 lh40">{{right_menu_dict.myprofile}}</p>
+            <p class="fwblack fs19 lh40">{{word_list|getword:"my-profile"|ucwords}}</p>
             <svg viewBox="0 0 20 20" id="profile-more-actions" class="absolute icon hand right">
                 <g>
                     <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12 " transform="matrix(0.833333,0,0,0.833333,0,0)"/>
@@ -19,7 +20,7 @@
                             <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 15.003222 11.997149 C 15.003222 13.652864 13.652864 15.003222 11.997149 15.003222 C 10.34822 15.003222 8.997862 13.652864 8.997862 11.997149 C 8.997862 10.34822 10.34822 8.997862 11.997149 8.997862 C 13.652864 8.997862 15.003222 10.34822 15.003222 11.997149 Z M 15.003222 11.997149 " transform="matrix(0.575658,0,0,0.575658,0,0)"/>
                         </g>
                     </svg>
-                    <p id="viewPRofile">{{right_menu_dict.viewprofile}}</p>
+                    <p id="viewPRofile">{{word_list|getword:"go-to-profile"|ucwords}}</p>
                 </a>
             </div>
         </div>
@@ -55,12 +56,12 @@
             </svg>
         </div>
         <p id="user-bio">{{current_user.description}}</p>
-        <a href="https://www.sosyorol.com/submit" class="full-width"><p class="btn full-width" id="cp-btn" style="font-weight:bold;">{{right_menu_dict.createpost}}</p></a>
-        <a href="/c/communities/create" class="full-width mt10"><p class="btn full-width" id="cp-btn" style="font-weight:bold;">{{right_menu_dict.createcommunity}}</p></a>
+        <a href="https://www.sosyorol.com/submit" class="full-width"><p class="btn full-width" id="cp-btn" style="font-weight:bold;">{{word_list|getword:"create-post"|ucwords}}</p></a>
+        <a href="/c/communities/create" class="full-width mt10"><p class="btn full-width" id="cp-btn" style="font-weight:bold;">{{word_list|getword:"create-community"|ucwords}}</p></a>
     </div>
     <div  class="full-shadow-border section-right-bottom">
         <div class="bsbb inline-block full-width p1020">
-            <p class="fwblack fs19 left">{{right_menu_dict.popularcommunities}}</p>
+            <p class="fwblack fs19 left">{{word_list|getword:"popular-communities"|ucwords}}</p>
             <a href="" class="right" style="top:1px;">
                 <svg width="16px" height="16px" viewBox="0 0 20 20">
                     <g>
@@ -106,11 +107,11 @@
             {% endfor %}
         </ul>
         <div class="bsbb p1020 bt hand right-list-item">
-            <a href="" class="cb">{{right_menu_dict.showmore}}</a>
+            <a href="" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
         </div>
         <div class="absolute aligntr bl" style="height:calc(100% - 39px);margin-right:56px;"></div>
     </div>
-    <p class="btn hand scroll-to-top dnone">{{right_menu_dict.scrolltotop}}</p>
+    <p class="btn hand scroll-to-top dnone">{{word_list|getword:"scroll-to-top"|toupper}}</p>
 </div>
 <script>
     var j = jQuery.noConflict();

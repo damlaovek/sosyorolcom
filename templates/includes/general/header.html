@@ -1,5 +1,6 @@
 
 {% load static %}
+{% load index %}
 <div class='waiting' id='page-loader'></div>
 <header>
     <div class="header-left">
@@ -18,7 +19,7 @@
                 </picture>
             </a>
         </div>
-        <div class="header-icon" id="search-icon" data-title="{{header_dict.search}}">
+       <!--<div class="header-icon" id="search-icon" data-title="{{header_dict.search}}">
             <a href="" class="right">
                 <div class="header-icon-background full-shadow-border">
                     <svg class="svg-icon" viewBox="0 0 15 15">
@@ -28,28 +29,28 @@
                     </svg>
                 </div>
     		</a>
-    	</div>
+    	</div>-->
     </div>
     <div class="header-elems-container">
         <div class="horizontally-centered-auto-width">
             <a class="horizontally-centered-auto-width-item" href="/">
-                <div class="header-elems selected">{{header_dict.home}}</div>
+                <div class="header-elems selected">{{word_list|getword:"home"|toupper}}</div>
                 <div class="header-elems-border"></div>
             </a>
             <a class="horizontally-centered-auto-width-item" href="#">
-                <div class="header-elems">{{header_dict.quizzes}}</div>
+                <div class="header-elems">{{word_list|getword:"quizzes"|toupper}}</div>
                 <div class="header-elems-border"></div>
             </a>
             <a class="horizontally-centered-auto-width-item" href="#">
-                <div class="header-elems">{{header_dict.questions}}</div>
+                <div class="header-elems">{{word_list|getword:"questions"|toupper}}</div>
                 <div class="header-elems-border"></div>
             </a>
             <a class="horizontally-centered-auto-width-item" href="#">
-                <div class="header-elems">{{header_dict.polls}}</div>
+                <div class="header-elems">{{word_list|getword:"polls"|toupper}}</div>
                 <div class="header-elems-border"></div>
             </a>
             <a class="horizontally-centered-auto-width-item" href="#">
-                <div class="header-elems">{{header_dict.communities}}</div>
+                <div class="header-elems">{{word_list|getword:"communities"|toupper}}</div>
                 <div class="header-elems-border"></div>
             </a>
         </div>
@@ -64,7 +65,7 @@
                 </svg>
             </div>
     	</a>
-    	<div class="header-icon" data-title="{{header_dict.profile}}">
+    	<div class="header-icon" data-title="{{header_dict.profile|ucwords}}">
             <a href="" class="right" id="header-icon-profile">
                 <div class="header-icon-background full-shadow-border">
                     <svg class="svg-icon" viewBox="0 0 15 15">
@@ -76,7 +77,7 @@
                 </div>
     		</a>
     	</div>
-    	<div class="header-icon" data-title="{{header_dict.messages}}">
+    	<div class="header-icon" data-title="{{header_dict.messages|ucwords}}">
             <a href="" class="right">
                 <div class="header-icon-background full-shadow-border">
                     <svg class="svg-icon" viewBox="0 0 15 15">
@@ -87,7 +88,7 @@
                 </div>
     		</a>
     	</div>
-    	<div class="header-icon" data-title="{{header_dict.notifications}}">
+    	<div class="header-icon" data-title="{{header_dict.notifications|ucwords}}">
             <a href="" class="right">
                 <div class="header-icon-background full-shadow-border">
                     <svg class="svg-icon" viewBox="0 0 15 15">
@@ -98,7 +99,7 @@
                 </div>
     		</a>
     	</div>
-    	<div class="header-icon" data-title="{{header_dict.createpost}}">
+    	<div class="header-icon" data-title="{{header_dict.createpost|ucwords}}">
             <a href="/submit/" class="right">
                 <div class="header-icon-background full-shadow-border">
                     <svg class="svg-icon" viewBox="0 0 15 15">

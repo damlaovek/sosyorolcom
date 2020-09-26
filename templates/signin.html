@@ -8,19 +8,17 @@
                 <div class="full-width inline-flex">
                     <div class="bsbb half-width p200 mt60 ml-20">
                         <div class="p040 ml30">
-                            <a href="/" title="Sosyorol">
-                                <picture class="logo-picture">
-                                    {% if dark == 'dark' %}
-                                        <source id="logo3" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo3-dark.webp' %}" type="image/webp">
-                                        <source id="logo2" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo1-dark.jpg' %}" type="image/jpeg"> 
-                                        <img id="logo1" class="full non-draggable" src="{% static 'assets/img/header/sosyorol-logo1-dark.jpg' %}" alt="Sosyorol">
-                                    {% else %}
-                                        <source id="logo3" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo3.webp' %}" type="image/webp">
-                                        <source id="logo2" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo1.jpg' %}" type="image/jpeg"> 
-                                        <img id="logo1" class="full non-draggable" src="{% static 'assets/img/header/sosyorol-logo1.jpg' %}" alt="Sosyorol">
-                                    {% endif %}
-                                </picture>
-                            </a><br>
+                            <picture class="logo-picture">
+                                {% if dark == 'dark' %}
+                                    <source id="logo3" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo3-dark.webp' %}" type="image/webp">
+                                    <source id="logo2" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo1-dark.jpg' %}" type="image/jpeg"> 
+                                    <img id="logo1" class="full non-draggable" src="{% static 'assets/img/header/sosyorol-logo1-dark.jpg' %}" alt="Sosyorol">
+                                {% else %}
+                                    <source id="logo3" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo3.webp' %}" type="image/webp">
+                                    <source id="logo2" class="full non-draggable" srcset="{% static 'assets/img/header/sosyorol-logo1.jpg' %}" type="image/jpeg"> 
+                                    <img id="logo1" class="full non-draggable" src="{% static 'assets/img/header/sosyorol-logo1.jpg' %}" alt="Sosyorol">
+                                {% endif %}
+                            </picture><br>
                             <p class="mt20 p100 cg fwmedium">{{page_dict.slogan}}.</p>
                         </div>
                         <div class="full-width">
@@ -31,9 +29,9 @@
                                 </form>
                                 <form method="POST" name="login-form" onsubmit="return submitForm()">
                                     {% csrf_token %}
-                                    <input class="bsbb cg full-width p20 bcw br30 border" type="text" name="email" placeholder="{{ page_dict.emailorphone }} / {{page_dict.username}}">
-                                    <input class="bsbb cg full-width p20 mt20 bcw br30 border" name="password" type="password" placeholder="{{page_dict.password}}">
-                                    <input type="submit" class="bsbb full-width p20 m200 bcb cw br20 full-shadow2 fwbold hand" value="{{page_dict.signin}}">
+                                    <input class="bsbb cg full-width p20 bcw br20 border" type="text" name="email" placeholder="{{ page_dict.emailorphone }} / {{page_dict.username}}" onkeyup="validateForm();">
+                                    <input class="bsbb cg full-width p20 mt20 bcw br20 border" name="password" type="password" placeholder="{{page_dict.password}}" onkeyup="validateForm();" autocomplete="on">
+                                    <input type="submit" disabled class="bsbb full-width p20 m200 bcb cw br20 full-shadow2 fwbold hand" value="{{page_dict.signin}}" name="login_btn">
                                 </form>
                                 <a href="/accounts/password/reset/" class="ml20 cg fwmedium">{{page_dict.forgottenpass}}?</a>
                                 <div class="full-width bt m200"></div>
@@ -43,17 +41,17 @@
                     </div>
                     <div class="bsbb half-width p20">
                         <div class="full-width inline-block mt60">
-                            <div class="bsbb p40 m20 bcw br30 full-shadow2 right mr-40 w428">
+                            <div class="bsbb p40 m20 bcw br20 full-shadow2 right mr-40 w428">
                                 <p class="full-width tac cg mb20">{{page_dict.sosyorolinfo}}.</p>
-                                <div class="bsbb full-width p20 bcw br30 full-shadow2 fwmedium inline-flex mt20 hand" id="facebookLogin">
+                                <div class="bsbb full-width p20 bcw br20 full-shadow2 fwmedium inline-flex mt20 hand" id="facebookLogin">
                                     <img src="{% static 'assets/img/icons/facebook-btn-icon.png' %}" class="sqr20">
                                     <p class="lh20 fwmedium ml20">{{page_dict.signinwithfacebook}}</p>
                                 </div>
-                                <div class="bsbb full-width p20 bcw br30 full-shadow2 fwmedium inline-flex mt20 hand" id="googleLogin">
+                                <div class="bsbb full-width p20 bcw br20 full-shadow2 fwmedium inline-flex mt20 hand" id="googleLogin">
                                     <img src="{% static 'assets/img/icons/google-btn-icon.png' %}" class="sqr20">
                                     <p class="lh20 fwmedium ml20" >{{page_dict.signinwithgoogle}}</p>
                                 </div>
-                                <div class="bsbb full-width p20 bcw br30 full-shadow2 fwmedium inline-flex mt20 hand" id="twitterLogin">
+                                <div class="bsbb full-width p20 bcw br20 full-shadow2 fwmedium inline-flex mt20 hand" id="twitterLogin">
                                     <img src="{% static 'assets/img/icons/twitter-btn-icon.png' %}" class="sqr20">
                                     <p class="lh20 fwmedium ml20">{{page_dict.signinwithtwitter}}</p>
                                 </div>
@@ -73,6 +71,8 @@
         <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script>
         <script defer src="https://www.gstatic.com/firebasejs/7.19.1/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-database.js"></script>
+        <script type="text/javascript" src="{% static 'js/firebase.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/login.js' %}"></script>
         {% include 'includes/sign_footer.html' %}
     </body>

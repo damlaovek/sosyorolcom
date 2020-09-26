@@ -1,0 +1,43 @@
+<div class="box full-width">
+    <div class="inline-flex wrapper-title">
+        <div style="width:15px;height:15px;overflow:hidden;"> 
+            <svg  width="15px" height="15px" viewBox="0 0 20 20" style="top:-2.5px;">
+                <g>
+                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 14.84375 5.242188 C 14.84375 8.136719 12.496094 10.484375 9.601562 10.484375 C 6.707031 10.484375 4.359375 8.136719 4.359375 5.242188 C 4.359375 2.347656 6.707031 0 9.601562 0 C 12.496094 0 14.84375 2.347656 14.84375 5.242188 Z M 14.84375 5.242188 "/>
+                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 3.800781 11.394531 L 2.070312 15.160156 C 1.765625 16.015625 2.171875 17.046875 2.980469 17.464844 L 8.496094 19.664062 C 9.304688 20.078125 10.632812 20.113281 11.460938 19.742188 L 17.109375 17.386719 C 17.9375 17.011719 18.269531 16.054688 17.847656 15.25 L 15.609375 11.304688 C 15.1875 10.496094 14.34375 10.398438 13.578125 10.886719 C 12.6875 11.453125 11.347656 12.039062 9.601562 12.039062 C 7.855469 12.039062 6.515625 11.453125 5.628906 10.886719 C 4.859375 10.398438 4.109375 10.539062 3.800781 11.394531 Z M 3.800781 11.394531 "/>
+                </g>
+            </svg>
+        </div>
+        <p class="fs19 fwbold" style="color:var(--title-color)">Kullanıcılar</p>
+    </div>
+    <ul class="full-width">
+        {% for user in user_list %}
+            {% if forloop.counter < 5 or filter == "profile" %}
+                <li class="bsbb full-width p20 bcw bt inline-block">
+                    <a href="/u/{{user.user_login}}" class="left inline-flex">
+                        <img class="sqr40 rounded lh30 left" src="{{user.avatar_url}}"/>
+                        <div class="ml10 left">
+                            <p class="lh20 fwblack ctitle">{{user.display_name}}</p>
+                            <p class="cg2 lh20">u/{{user.user_login}}</p>
+                        </div>
+                    </a>
+                    <div class="right" style="top:5.5px;">
+                        <p class="btn hand"><span class="p115">{{right_menu_dict.follow}}</span></p>
+                    </div>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    {% if user_list|length > 4 and filter != "profile" %}
+    <div class="bsbb full-width more-container bcw p150 bt">
+        <div class="inline-flex">
+            <a href="" style="color:var(--light-gray);font-size:15px;">{{post_template_dict.more}}</a>
+            <svg width="9px" height="9px" viewBox="0 0 8 8" version="1.1" style="margin-top: 5.25px; margin-left: 10px;">
+                <g>
+                    <path style="stroke:var(--light-gray); stroke-width:1px;fill-rule:nonzero;fill:var(--light-gray);fill-opacity:1;" d="M 6.046875 3.839844 L 2.273438 0.0664062 C 2.183594 -0.0234375 2.042969 -0.0234375 1.953125 0.0664062 C 1.863281 0.15625 1.863281 0.296875 1.953125 0.386719 L 5.566406 4 L 1.953125 7.613281 C 1.863281 7.703125 1.863281 7.84375 1.953125 7.933594 C 1.996094 7.976562 2.054688 8 2.113281 8 C 2.171875 8 2.230469 7.976562 2.273438 7.933594 L 6.046875 4.160156 C 6.136719 4.070312 6.136719 3.925781 6.046875 3.839844 Z M 6.046875 3.839844 "/>
+                </g>
+            </svg>
+        </div>
+    </div>
+    {% endif %}
+</div>

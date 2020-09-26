@@ -172,7 +172,7 @@
                     <div class="bsbb inline-block p040 full-width" style="margin-top:16px;">
                         {% for list in listsyoumaylike %}
                             {% if forloop.counter == 1 %}
-                                <a href="/c/lists/{{list.url}}" class="left box" style="position:relative;width:calc(33% - 23px); height:460px;">
+                                <a href="/feed/lists/{{list.url}}" class="left box" style="position:relative;width:calc(33% - 23px); height:460px;">
                                     <div class="full-width" style="height:93px;background-color: {{list.color}};border-top-left-radius:3px;border-top-right-radius:3px;"></div>
                                     <img class='rounded sqr130 twb full-shadow2' style="margin:auto;margin-top:-70px;left:calc(50% - 70px);" src="{{list.photo_large}}"/>
                                     <p class="p020 mt20 fs19 fwblack ctitle">{{list.name}}</p>
@@ -201,7 +201,7 @@
                                 </a>
                             {% endif %}
                             {% if forloop.counter == 2 %}
-                                <a href="/c/lists/{{list.url}}" class="left box" style="position:relative;width:calc(33% - 23px); margin: 0 34px; height:460px;">
+                                <a href="/feed/lists/{{list.url}}" class="left box" style="position:relative;width:calc(33% - 23px); margin: 0 34px; height:460px;">
                                     <div class="full-width" style="height:93px;background-color: {{list.color}};border-top-left-radius:3px;border-top-right-radius:3px;"></div>
                                     <img class='rounded sqr130 twb full-shadow2' style="margin:auto;margin-top:-70px;left:calc(50% - 70px);" src="{{list.photo_large}}"/>
                                     <p class="p020 mt20 fs19 fwblack ctitle">{{list.name}}</p>
@@ -230,7 +230,7 @@
                                 </a>
                             {% endif %}
                             {% if forloop.counter == 3 %}
-                                <a href="/c/lists/{{list.url}}" class="left box" style="position:relative;width:calc(33% - 23px); height:460px;">
+                                <a href="/feed/lists/{{list.url}}" class="left box" style="position:relative;width:calc(33% - 23px); height:460px;">
                                     <div class="full-width" style="height:93px;background-color: {{list.color}};border-top-left-radius:3px;border-top-right-radius:3px;"></div>
                                     <img class='rounded sqr130 twb full-shadow2' style="margin:auto;margin-top:-70px;left:calc(50% - 70px);" src="{{list.photo_large}}"/>
                                     <p class="p020 mt20 fs19 fwblack ctitle">{{list.name}}</p>

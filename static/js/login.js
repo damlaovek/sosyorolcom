@@ -1,14 +1,3 @@
-var firebaseConfig = {
-    apiKey: "AIzaSyA9jeHII9FVkhOQfCM_NyoifnN8eIN6EFM",
-    authDomain: "sosyorol-b6ab6.firebaseapp.com",
-    databaseURL: "https://sosyorol-b6ab6.firebaseio.com",
-    projectId: "sosyorol-b6ab6",
-    storageBucket: "sosyorol-b6ab6.appspot.com",
-    messagingSenderId: "565098272319",
-    appId: "1:565098272319:web:5105dd611ce14cf98c8a8a",
-    measurementId: "G-18ZNPD8JH4",
-};
-firebase.initializeApp(firebaseConfig), firebase.analytics();
 var googleLogin = document.getElementById("googleLogin");
 googleLogin.onclick = function () {
     var o = new firebase.auth.GoogleAuthProvider();
@@ -58,24 +47,71 @@ twitterlogin.onclick = function () {
         });
 };
 
-function submitForm() {
-    //var o = document.getElementsByName("login-form")[0];
-   // return o.submit(), o.reset(), !1;
+function validateForm(){
+    /*
+        1. Check if username/email field has at least 3 characters
+        2. Check if password field has at least 6 characters
+    */
     var email = document.getElementsByName("email")[0].value;
     var password = document.getElementsByName("password")[0].value;
-    firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+    if (email.length >= 3 && password.length >= 6){
+        document.getElementsByName("login_btn")[0].disabled = false;
+        return true;
+    }else{
+        document.getElementsByName("login_btn")[0].disabled = true;
+        return false;
+    }
+}
+
+function submitForm() {
+    /*
+        1. Check if username or email has been entered
+        2. Login accordingly
+    */
+    var email = document.getElementsByName("email")[0].value;
+    var password = document.getElementsByName("password")[0].value;
+    if(email.includes("@")){ // User has entered his/her email
+        console.log("User has entered his/her email");
+        loginWithEmailAndPassword(email, password);
+    }else{ // User has entered his/her username
+        firebase.database().ref('/users/').once('value', function(snapshot) {
+            snapshot.forEach(function(childSnapshot) {
+                var childKey = childSnapshot.key;
+                var childData = childSnapshot.val();
+                if(childData.username == email){
+                    console.log(childData.username);
+                    var userEmail = childData.email;
+                    loginWithEmailAndPassword(userEmail, password);
+                }
+            });
+            displayAlert("User not found! Please check your credentials.");
+        });
+    }
+    return false;
+}
+
+function loginWithEmailAndPassword(email, password){
+    /*
+        1. Login with email and password
+        2. Set user id as session variable (uid)
+    */
+    var promise = firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
-        alert(errorMessage);
+        displayAlert(errorMessage);
     });
-    firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-            var signin_form = document.getElementById("signin_form");
-            document.getElementsByName("uid")[0].value = user.uid;
-            signin_form.action = "/";
-            signin_form.submit();
-        }
+    promise.then(function(){
+        var user = firebase.auth().user;
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                console.log(user.uid);
+                var signin_form = document.getElementById("signin_form");
+                document.getElementsByName("uid")[0].value = user.uid;
+                signin_form.action = "/";
+                signin_form.submit();
+            }
+        });
     });
     return false;
 }

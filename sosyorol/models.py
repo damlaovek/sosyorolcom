@@ -30,7 +30,7 @@ class User(models.Model):
 
 class UserMeta(models.Model):
     umeta_id = models.BigIntegerField(primary_key = True)
-    user_id = models.BigIntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     meta_key = models.TextField()
     meta_value = models.TextField()
     class Meta:
@@ -75,13 +75,15 @@ class Post(models.Model):
     voted = 0
     vote_percentages = []
     user_rate = ""
+    communities = models.QuerySet()
+    first_community = ""
     class Meta:
         db_table = "wpmu_posts"
 
 class PostRating(models.Model):
     ID = models.BigIntegerField(primary_key = True)
-    post_id = models.BigIntegerField()
-    user_id = models.BigIntegerField()
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     opinion = models.TextField()
     date = models.DateTimeField()
     class Meta:
@@ -156,6 +158,7 @@ class Community(models.Model):
     views = models.BigIntegerField()
     posts = models.QuerySet()
     flairs = models.QuerySet()
+    followers = models.QuerySet()
     class Meta:
         db_table = "communities"
 
@@ -280,3 +283,50 @@ class Country(models.Model):
     phonecode = models.TextField()
     class Meta:
         db_table = "country_phone_code"
+
+
+# History
+class SearchHistory(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='search_history_user')
+    search_term = models.TextField()
+    date = models.DateTimeField()
+    history_type="search"
+    is_deleted = models.IntegerField()
+    counter = models.BigIntegerField()
+    class Meta:
+        db_table = "search_history"
+
+class PostHistory(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post_history_user')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_history_post')
+    date = models.DateTimeField()
+    history_type="post"
+    is_deleted = models.IntegerField()
+    counter = models.BigIntegerField()
+    class Meta:
+        db_table = "post_history"
+
+class CommunityHistory(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='community_history_user')
+    term = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='community_history_community')
+    date = models.DateTimeField()
+    history_type="community"
+    is_deleted = models.IntegerField()
+    counter = models.BigIntegerField()
+    class Meta:
+        db_table = "community_history"
+
+class UserHistory(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_history_user')
+    visited_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_history_visited_user')
+    date = models.DateTimeField()
+    history_type="profile"
+    is_deleted = models.IntegerField()
+    counter = models.BigIntegerField()
+    class Meta:
+        db_table = "user_history"
+
