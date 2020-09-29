@@ -16,6 +16,7 @@ import sosyorol.functions as fun
 import firebase_admin
 from firebase_admin import auth, credentials, exceptions
 from itertools import chain
+from django.views.generic.list import ListView
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATICFILES_DIR = os.path.join(BASE_DIR, 'static')
@@ -452,6 +453,42 @@ def morefollowedlists(request):
             followedlists = followedlists[offset:]
         return render(request, 'lists/morefollowedlists.html', {'limit':limit, 'followedlists':followedlists})
 
+def morecommunities(request):
+    print("loadmoreleaderboardcommunities")
+    try:
+        offset = int(request.GET["offset"])
+        limit = int(request.GET["limit"])
+        fltr = request.GET["filter"]
+    except:
+        offset = 20
+        limit = 20
+        fltr = "all"
+    hasMore = "True"
+    if fltr == "all":
+        communities = Community.objects.all()
+        if communities.count() < offset :
+            return render(request, 'communities/communitytemplates/leaderboard_template.html')
+            hasMore = "False"
+        elif communities.count() < offset + limit:
+            communities = communities[offset:]
+            hasMore = "False"
+        else:
+            communities = communities[offset:(offset + limit)]
+    else:
+        selected_category = CommunityCategories.objects.get(name=fun.localized_upper(fltr))
+        communities = CommunityCategoryRelation.objects.filter(category=selected_category)
+        if communities.count() < offset :
+            return render(request, 'communities/communitytemplates/leaderboard_template.html')
+            hasMore = "False"
+        elif communities.count() < offset + limit:
+            communities = communities[offset:]
+            hasMore = "False"
+        else:
+            communities = communities[offset:(offset + limit)]
+    
+    print(hasMore)
+    return render(request, 'communities/communitytemplates/leaderboard_template.html', {'communities':communities, 'filter':fltr, 'offset':offset, 'hasMore':hasMore})
+        
 def setup_current_user(current_uid):
     current_user = User.objects.get(ID = current_uid)
     user_desc = UserMeta.objects.filter(user_id = current_uid, meta_key = 'description')[0]
@@ -464,6 +501,24 @@ def setup_current_user(current_uid):
         avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
     current_user.avatar_url = avatar_url
     return current_user
+
+def communitiesfiltered(request, **kwargs):
+    if 'filter' in kwargs:
+        fltr = kwargs.get("filter")
+    else:
+        fltr = "all"
+    try:
+        fromcompage = request.GET["fromcompage"]
+        if fromcompage != "yes":
+            return communities(request, filter=fltr)
+    except:
+        return communities(request, filter=fltr)
+    if fltr == "all":
+        community_list = Community.objects.all()[0:20]
+    else:
+        selected_category = CommunityCategories.objects.get(name=fun.localized_upper(fltr))
+        community_list = CommunityCategoryRelation.objects.filter(category=selected_category)[:20]
+    return render(request, 'communities/communitytemplates/leaderboard.html', {'communities':community_list, 'filter':fltr})
 
 '''---------------------------------------
   OPERATIONS              
@@ -1206,10 +1261,12 @@ def lists(request):
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
                                             'country_list':country_list, 'select_language':select_language,
                                             'followed_communities':followed_communities, 'lists_dict':lists_dict,
-                                            'listsyoumaylike':listsyoumaylike, 'followedlists':followedlists, 'limit':limit
+                                            'listsyoumaylike':listsyoumaylike, 'followedlists':followedlists, 'limit':limit,
+                                            'word_list':word_list
                                             })
 
 def newpost(request):
+    print("new post")
     try:
         post_type = request.GET['post']
     except:
@@ -1234,7 +1291,7 @@ def newpost(request):
     return render(request, 'newpost.html', {'post_type':post_type,'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict, 'post_types_dict':post_types_dict,
                                             'create_post_rules_dict': create_post_rules_dict, 'tips':tips, 'create_post_dict':create_post_dict,
-                                            'newpost_actions_dict':newpost_actions_dict, 'drafts':drafts})
+                                            'newpost_actions_dict':newpost_actions_dict, 'drafts':drafts, 'word_list':word_list})
 
 def createlist(request):
     print("hello create list")
@@ -1338,7 +1395,7 @@ def listdetail(request, slug, **kwargs):
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
                                             'list_dict':list_dict, 'post_types_dict':post_types_dict,
                                             'comment_editor':comment_editor, 'post_template_dict':post_template_dict,
-                                            'filter':fltr}))
+                                            'filter':fltr,'word_list':word_list}))
 
 def listdetailfilter(request, slug, post_type):
     print("listdetailfilter")
@@ -1398,7 +1455,7 @@ def listdetailfilter(request, slug, post_type):
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
                                             'list_dict':list_dict, 'post_types_dict':post_types_dict,
                                             'comment_editor':comment_editor, 'post_template_dict':post_template_dict,
-                                            'filter':fltr}))
+                                            'filter':fltr, 'word_list':word_list}))
 
 def aboutlist(request, slug):
     lst = List.objects.get(url=slug)
@@ -1500,11 +1557,47 @@ def savedposts(request, **kwargs):
                                             'followed_communities':followed_communities, 'savedposts_dict':savedposts_dict,
                                             'post_types_dict':post_types_dict, 'savedposts':savedposts, 'filter': fltr,
                                             'comment_editor':comment_editor, 'post_template_dict':post_template_dict,
-                                            'right_menu_dict':right_menu_dict, 'users':users
+                                            'right_menu_dict':right_menu_dict, 'users':users, 'word_list':word_list
                                             })
 
 def savedpostsfilter(request, post_type):
     return savedposts(request, filter=post_type)
+
+def communities(request, **kwargs):
+    if 'filter' in kwargs:
+        fltr = kwargs.get("filter")
+    else:
+        fltr = "all"
+    try:
+        fromcompage = request.GET["fromcompage"]
+        if fromcompage == "yes":
+            return communitiesfiltered(request, filter=fltr)
+    except:
+        pass
+    current_uid = 8
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    header_dict = header(word_list)
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.filter(Q(var_name = 'select-language'))[0].translation)
+    categories = CommunityCategories.objects.all()
+    random_cat1 = categories.order_by('?')[0]
+    random_cat2 = categories.order_by('?')[1]
+    if fltr == "all":
+        communities = Community.objects.all()[0:20]
+    else:
+        selected_category = CommunityCategories.objects.get(name=fun.localized_upper(fltr))
+        communities = CommunityCategoryRelation.objects.filter(category=selected_category)[:20]
+    random_communities1 = CommunityCategoryRelation.objects.filter(category=random_cat1)[:5]
+    random_communities2 = CommunityCategoryRelation.objects.filter(category=random_cat2)[:5]
+    return render(request, 'communities/communities.html', {'current_user':current_user, 'lang':lang, 'dark':dark,
+                                                            'word_list':word_list, 'header_dict':header_dict,
+                                                            'country_list':country_list, 'select_language':select_language,
+                                                            'categories':categories, 'communities':communities, 
+                                                            'random_cat1':random_cat1, 'random_cat2':random_cat2,
+                                                            'random_communities1':random_communities1, 'random_communities2':random_communities2, 'filter':fltr})
 
 def communitydetail(request, slug,  **kwargs):
     print("community detail")
@@ -1589,7 +1682,7 @@ def communitydetail(request, slug,  **kwargs):
                                                                 'feed_dict':feed_dict, 'page_dict':page_dict,
                                                                 'followers':followers, 'comment_editor':comment_editor,
                                                                 'post_template_dict': post_template_dict, 'followings':followings,
-                                                                'moderators':moderators, 'current_user': current_user
+                                                                'moderators':moderators, 'current_user': current_user, 'word_list':word_list
                                                                 })
 
 def newcommunity(request):
@@ -1607,6 +1700,6 @@ def newcommunity(request):
     return render(request, 'communities/newcommunity.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict, 
                                             'tips':tips, 'create_list_dict':create_list_dict, 'communitycats':communitycats,
-                                            'new_community_tips_dict':new_community_tips_dict})
+                                            'new_community_tips_dict':new_community_tips_dict, 'word_list':word_list})
 
 

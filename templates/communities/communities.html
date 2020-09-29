@@ -1,0 +1,236 @@
+{% load static %}
+{% load index %}
+{% include 'includes/general/head.html' %}
+        <title>Sosyorol - Sosyal İçerik Platformu</title>
+        <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
+        <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
+        <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
+        <script src="{% static 'js/new/autosize.min.js' %}"></script>
+        <script src="{% static 'js/new/user-list.min.js' %}"></script>
+        <script src="{% static 'js/index.js' %}"></script>
+    </head>
+    <body class="{{darkmode}}">
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
+        <input type="hidden" name="filter" id="filter" value="{{filter}}">
+        <div class="full-width inline-flex">
+            {% include 'includes/general/left_menu2.html' with title=word_list|getword:"categories"|ucfirst menu_list=categories %}
+            <div class="section-middle" style="margin-top:58px;">
+                <style>
+                    .box{box-shadow:0px 3px 4px rgba(173,173,173, 0.53);}
+                    .box .box{box-shadow:none;}
+                    .hide{display:none;}
+                </style>
+                <div class="hcentered" style="max-width: 812px;">
+                    <div class="box">
+                        <div class="inline-block wrapper-title">
+                            <div class="left" style="width:15px;height:15px;overflow:hidden;"> 
+                                <svg width="15px" height="16px" viewBox="0 0 25 16" version="1.1" class="hcentered" style="top:-1px;">
+                                    <g>
+                                        <path style="fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(90.980392%,94.901961%,97.647059%);stroke-opacity:1;stroke-miterlimit:4;" d="M 24.483781 8.99985 L 14.561281 18.923434 L 9.33425 13.698092 L 1.500031 21.53818 " transform="matrix(0.925926,0,0,0.941176,0.575926,-6.474353)"/>
+                                        <path style="fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(90.980392%,94.901961%,97.647059%);stroke-opacity:1;stroke-miterlimit:4;" d="M 25.498719 8.99985 L 31.767781 8.99985 L 31.767781 15.266939 " transform="matrix(0.925926,0,0,0.941176,-6.168519,-6.474353)"/>
+                                    </g>
+                                </svg>
+                            </div>
+                            <p class="left fs15 lh25" style="top:0px;">{{word_list|getword:"todays-top-growing-comms"}}</p>
+                            <p class="right lh25 fs15 cg2">{{word_list|getword:"rank-change"|ucwords}}</p>
+                        </div>
+                        <div id="community-results-container">
+                            {% include 'communities/communitytemplates/leaderboard.html' %}
+                        </div>
+                    </div>
+                    <div id="loader" class="full-width tac dnone">
+                        <img src="{% static 'assets/img/sosyorol-loader.gif' %}" style="margin:auto; height: 80px;">
+                    </div>
+                </div>
+            </div>
+            <div class="section-right fixed">
+                <div  class="full-shadow-border section-right-bottom">
+                    <div class="bsbb inline-block full-width p1020">
+                        <p class="fwblack fs19 left">{{random_cat1.name|ucwords}}</p>
+                        <a href="" class="right" style="top:1px;">
+                            <svg width="16px" height="16px" viewBox="0 0 20 20">
+                                <g>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                                </g>
+                            </svg>
+                        </a>
+                    </div>
+                    <ul class="full-width">
+                        {% for c in random_communities1 %}
+                            <a href="c/{{c.community.slug}}" title="{{c.community.name}}" class="full-width">
+                                <li class="bsbb full-width p1020 bt inline-block right-list-item">
+                                    <p class="left fwbold lh40">{{forloop.counter}}</p>
+                                    {% if c.community.profile_img == '' %}
+                                        <img class="p5 left sqrt30 rounded img-sd non-draggable ml10" src="{% static 'assets/img/defaults/default-community.png' %}" style="background-color:var(--main-color)"/>
+                                    {% else %}
+                                        <img class="p5 left sqrt30 rounded img-sd non-draggable ml10" src="{{c.community.profile_img}}" style="background-color:{{c.community.cover_color}}"/>
+                                    {% endif %}
+                                    <div class="left" id="community-info">
+                                        <p  class="ellipsis underline-onhover lh30 fwbold w150">c/{{c.community.name}}</p>
+                                    </div>
+                                    {% if forloop.counter|divisibleby:2 %}
+                                    <div class="pl20 right pt11">
+                                        <svg width="16px" height="16px" viewBox="0 0 20 12">
+                                            <g>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:rgb(19.215686%,90.196078%,16.078431%);fill-opacity:1;" d="M 18.425781 11.746094 L 1.691406 11.746094 C 1.007812 11.746094 0.390625 11.335938 0.128906 10.707031 C -0.132812 10.074219 0.0078125 9.347656 0.492188 8.863281 L 8.863281 0.496094 C 9.179688 0.179688 9.609375 0 10.054688 0 C 10.503906 0 10.933594 0.179688 11.246094 0.496094 L 19.613281 8.863281 C 20.101562 9.34375 20.246094 10.070312 19.984375 10.703125 C 19.726562 11.335938 19.109375 11.746094 18.425781 11.746094 Z M 18.425781 11.746094 "/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    {% else %}
+                                    <div class="pl20 right pt11">
+                                        <svg width="16px" height="16px" viewBox="0 0 20 12">
+                                            <g>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,21.960784%,21.960784%);fill-opacity:1;" d="M 1.691406 0 L 18.425781 0 C 19.109375 0 19.722656 0.410156 19.988281 1.039062 C 20.25 1.671875 20.105469 2.398438 19.625 2.882812 L 11.253906 11.25 C 10.9375 11.566406 10.507812 11.746094 10.058594 11.746094 C 9.613281 11.746094 9.183594 11.566406 8.867188 11.25 L 0.5 2.882812 C 0.015625 2.402344 -0.132812 1.675781 0.128906 1.042969 C 0.390625 0.410156 1.007812 0 1.691406 0 Z M 1.691406 0 "/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    {% endif %}
+                                </li>
+                            </a>
+                        {% endfor %}
+                    </ul>
+                    <div class="bsbb p1020 bt hand right-list-item">
+                        <a href="/communities/leaderboard/{{random_cat1.name|tolower}}" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
+                    </div>
+                    <div class="absolute aligntr bl" style="height:calc(100% - 39px);margin-right:56px;"></div>
+                </div>
+                <div  class="full-shadow-border section-right-bottom">
+                    <div class="bsbb inline-block full-width p1020">
+                        <p class="fwblack fs19 left">{{random_cat2.name|ucwords}}</p>
+                        <a href="" class="right" style="top:1px;">
+                            <svg width="16px" height="16px" viewBox="0 0 20 20">
+                                <g>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                                </g>
+                            </svg>
+                        </a>
+                    </div>
+                    <ul class="full-width">
+                        {% for c in random_communities2 %}
+                            <a href="c/{{c.community.slug}}" title="{{c.community.name}}" class="full-width">
+                                <li class="bsbb full-width p1020 bt inline-block right-list-item">
+                                    <p class="left fwbold lh40">{{forloop.counter}}</p>
+                                    {% if c.community.profile_img == '' %}
+                                        <img class="p5 left sqrt30 rounded img-sd non-draggable ml10" src="{% static 'assets/img/defaults/default-community.png' %}" style="background-color:var(--main-color)"/>
+                                    {% else %}
+                                        <img class="p5 left sqrt30 rounded img-sd non-draggable ml10" src="{{c.community.profile_img}}" style="background-color:{{c.community.cover_color}}"/>
+                                    {% endif %}
+                                    <div class="left" id="community-info">
+                                        <p  class="ellipsis underline-onhover lh30 fwbold w150">c/{{c.community.name}}</p>
+                                    </div>
+                                    {% if forloop.counter|divisibleby:2 %}
+                                    <div class="pl20 right pt11">
+                                        <svg width="16px" height="16px" viewBox="0 0 20 12">
+                                            <g>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:rgb(19.215686%,90.196078%,16.078431%);fill-opacity:1;" d="M 18.425781 11.746094 L 1.691406 11.746094 C 1.007812 11.746094 0.390625 11.335938 0.128906 10.707031 C -0.132812 10.074219 0.0078125 9.347656 0.492188 8.863281 L 8.863281 0.496094 C 9.179688 0.179688 9.609375 0 10.054688 0 C 10.503906 0 10.933594 0.179688 11.246094 0.496094 L 19.613281 8.863281 C 20.101562 9.34375 20.246094 10.070312 19.984375 10.703125 C 19.726562 11.335938 19.109375 11.746094 18.425781 11.746094 Z M 18.425781 11.746094 "/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    {% else %}
+                                    <div class="pl20 right pt11">
+                                        <svg width="16px" height="16px" viewBox="0 0 20 12">
+                                            <g>
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,21.960784%,21.960784%);fill-opacity:1;" d="M 1.691406 0 L 18.425781 0 C 19.109375 0 19.722656 0.410156 19.988281 1.039062 C 20.25 1.671875 20.105469 2.398438 19.625 2.882812 L 11.253906 11.25 C 10.9375 11.566406 10.507812 11.746094 10.058594 11.746094 C 9.613281 11.746094 9.183594 11.566406 8.867188 11.25 L 0.5 2.882812 C 0.015625 2.402344 -0.132812 1.675781 0.128906 1.042969 C 0.390625 0.410156 1.007812 0 1.691406 0 Z M 1.691406 0 "/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    {% endif %}
+                                </li>
+                            </a>
+                        {% endfor %}
+                    </ul>
+                    <div class="bsbb p1020 bt hand right-list-item">
+                        <a href="/communities/leaderboard/{{random_cat2.name|tolower}}" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
+                    </div>
+                    <div class="absolute aligntr bl" style="height:calc(100% - 39px);margin-right:56px;"></div>
+                </div>
+            </div>
+        </div>
+        <script>
+            var offset = 20;
+            var limit = 20;
+            var isLoading = false;
+            var hasMore = true;
+            window.onload = () => {
+                offset = 20;
+                isLoading = false;
+                hasMore = true;
+            }
+
+            var j = jQuery.noConflict();
+            j(document).ready(function()
+            {
+                j("#others a").click(function(event) {
+                    event.preventDefault();
+                    var src = j(this).attr("data-target")
+                    window.history.pushState("", "", "/communities/leaderboard/"+src);
+                    var filter = src;
+                    if(src == ""){
+                        filter = "all";
+                    }
+                    j.ajax({
+                        url:"/communities/leaderboard/"+src,
+                        type : "GET", // http method
+                        data : { filter: filter, fromcompage: "yes"}, // data sent with the post request
+                        // handle a successful response
+                        success : function(json) {
+                            console.log("success"); // another sanity check
+                            document.getElementById("community-results-container").innerHTML = json;
+                            offset = 20;
+                            isLoading = false;
+                            hasMore = true;
+                            j('#others .left-list-item-link').each(function(i, obj) {
+                                j(obj).removeClass("active");
+                            });
+                            if(src == ""){
+                                document.getElementById("filter").value = "all";
+                                document.getElementById("allcategories").classList.add("active");
+                            } else {
+                                document.getElementById("filter").value = src;
+                                document.getElementById(src).classList.add("active");
+                            }
+                            window.scrollTo(0, 0);
+                        }
+                     });
+                });
+            });
+            window.onscroll = () => {
+                if (document.documentElement.scrollHeight - document.documentElement.scrollTop === document.documentElement.clientHeight){
+                    if(hasMore){
+                        if(isLoading){
+                            return;
+                        }else{
+                            isLoading = true;
+                            document.getElementById("loader").classList.remove("dnone");
+                            var filter = document.getElementById("filter").value;
+                            j.ajax({
+                                url:"{% url 'loadmoreleaderboardcommunities' %}",
+                                type : "GET", // http method
+                                data : { limit: limit, offset: offset, filter: filter}, // data sent with the post request
+                                // handle a successful response
+                                success : function(json) {
+                                    // log the returned json to the console
+                                    console.log("success"); // another sanity check
+                                    document.getElementById("communities-container").innerHTML += json;
+                                    if (document.getElementById("has-more-"+offset).value == false || document.getElementById("has-more-"+offset).value == "False"){
+                                        hasMore = false;
+                                    }
+                                    offset += limit;
+                                    isLoading = false;
+                                    document.getElementById("loader").classList.add("dnone");
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        </script>
+    </body>
+</html>
