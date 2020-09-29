@@ -1,0 +1,365 @@
+{% load static %}
+{% load index %}
+<div class="fixed section-left" id="section-left" style="overflow-x: hidden;">
+    <ul class="nav">
+        <form method="GET" action="/search" class="relative" style="margin:0;width:calc(100% + 80px);margin-left:-22px;margin-top:-58px;z-index:99;filter:drop-shadow(0 1px 6px rgba(0, 0, 0, .161));" id="search_form">
+            {% csrf_token %}
+            <input type="text" name="search_key" id="search" class="bsbb full-width p20" style="padding-top:58px;padding-left:32px;padding-right:70px;" placeholder="Search in Sosyorol"  autocomplete='off'>
+            <svg class="absolute aligntr svg-icon" style="top: 38px; right:40px;" viewBox="0 0 15 15">
+                <g>
+                    <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 14.667969 13.039062 L 11.578125 9.945312 C 12.320312 8.867188 12.695312 7.667969 12.695312 6.347656 C 12.695312 5.488281 12.527344 4.664062 12.195312 3.882812 C 11.859375 3.097656 11.410156 2.421875 10.84375 1.851562 C 10.273438 1.285156 9.597656 0.835938 8.8125 0.5 C 8.027344 0.167969 7.207031 0 6.347656 0 C 5.488281 0 4.664062 0.167969 3.882812 0.5 C 3.097656 0.835938 2.421875 1.285156 1.851562 1.851562 C 1.285156 2.421875 0.832031 3.097656 0.5 3.882812 C 0.167969 4.667969 0 5.488281 0 6.347656 C 0 7.207031 0.167969 8.027344 0.5 8.8125 C 0.832031 9.597656 1.285156 10.273438 1.851562 10.839844 C 2.421875 11.410156 3.097656 11.859375 3.882812 12.195312 C 4.664062 12.527344 5.488281 12.695312 6.347656 12.695312 C 7.667969 12.695312 8.867188 12.320312 9.945312 11.578125 L 13.039062 14.660156 C 13.253906 14.886719 13.523438 15.003906 13.847656 15.003906 C 14.160156 15.003906 14.433594 14.886719 14.660156 14.660156 C 14.886719 14.433594 15.003906 14.160156 15.003906 13.847656 C 15.003906 13.53125 14.890625 13.257812 14.667969 13.039062 Z M 9.199219 9.199219 C 8.410156 9.992188 7.460938 10.386719 6.347656 10.386719 C 5.234375 10.386719 4.285156 9.992188 3.492188 9.199219 C 2.703125 8.410156 2.308594 7.460938 2.308594 6.347656 C 2.308594 5.234375 2.703125 4.285156 3.492188 3.492188 C 4.285156 2.703125 5.234375 2.308594 6.347656 2.308594 C 7.460938 2.308594 8.410156 2.703125 9.199219 3.492188 C 9.992188 4.285156 10.386719 5.234375 10.386719 6.347656 C 10.386719 7.460938 9.992188 8.410156 9.199219 9.199219 Z M 9.199219 9.199219 "/>
+                </g>
+            </svg>
+            <input type="submit" 
+                        style="position: absolute; left: -9999px; width: 1px; height: 1px;"
+                        tabindex="-1"/>
+        </form><br>
+        <div class="absolute full-width aligntl" style="width:calc(100% + 40px);top:62px; background-color:var(--white); z-index:100;">
+            <ul id="search_results_container" class="full-width p020 full-shadow2" style="width:calc(100% - 40px); background-color: var(--white); z-index:100;">
+            </ul>
+        </div>
+        <style>
+            .segctrl-btn.active{background-color: var(--white); border-radius: 8px;}
+            .left-list-item-link.active .left-list-item{background-color: var(--main-color);}
+            .left-list-item-link.active p{color:white;}
+        </style>
+        <div class="full-width bb" style="width:calc(100% + 70px);left:-25px;top:-16px;background-color:">
+            <div class="bsbb w20 inline-block m10 border p2 br10" style="background-color: #e8e8e8;">
+                <div class="half-width p100 cg2 tac left hand segctrl-btn" onclick="shortcutsSelected()">Kısayollar</div>
+                <div class="half-width p100 cg2 tac right hand segctrl-btn active" onclick="othersSelected()">{{title}}</div>
+            </div>
+        </div>
+        <div class="full-width dnone" id="shortcuts" style="width:calc(100% + 20px);">
+            <a href="/">
+                <div class="full-width hand">
+                    <li class="inline-flex" id="home">
+                        <p class="non-draggable rounded background-image" id="home-icon"></p>
+                        <p class="fs19" id="home-text">{{word_list|getword:"feed"|ucfirst}}</p>
+                    </li>
+                </div>
+            </a>
+            {% for c in followed_communities %}
+                {% if forloop.counter <= 4 %}
+                    <div class="full-width">
+                        <a href="c/{{c.term.slug}}" title="{{c.name}}" class="full-width">
+                            <div class="full-width hand left-list-item-link">
+                                <li class="left-list-item">
+                                    {% if c.term.profile_img == '' %}
+                                        <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
+                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                    {% else %}
+                                        <img src="{{c.term.profile_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.term.cover_color}}" data-no-lazy="1"/>
+                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                    {% endif %}
+                                </li>
+                            </div>
+                        </a>
+                    </div>
+                {% elif forloop.counter == 5 %}
+                    {% if followed_communities|length|add:-4 < 10 %}
+                    <div class="full-width hand left-list-item-link" id="loadmore" onclick="loadMoreCommunities(this)">
+                        <li class="left-list-item">
+                            <p class="non-draggable rounded fwblack fs19" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">+{{followed_communities|length|add:-4}}</p>
+                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
+                        </li>
+                    </div>
+                    {% else %}
+                    <div class="full-width hand left-list-item-link" id="loadmore" onclick="loadMoreCommunities(this)">
+                        <li class="left-list-item">
+                            <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
+                                <i class="fa fa-chevron-down cb fs19" style="top:4px" aria-hidden="true"></i>
+                            </div>
+                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
+                        </li>
+                    </div>
+                    {% endif %}
+                    <div class="full-width com dnone">
+                        <a href="c/{{c.term.slug}}" title="{{c.name}}" class="full-width">
+                            <div class="full-width hand left-list-item-link">
+                                <li class="left-list-item">
+                                    {% if c.term.profile_img == '' %}
+                                        <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
+                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                    {% else %}
+                                        <img src="{{c.term.profile_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.term.cover_color}}" data-no-lazy="1"/>
+                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                    {% endif %}
+                                </li>
+                            </div>
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="full-width com dnone">
+                        <a href="c/{{c.term.slug}}" title="{{c.name}}" class="full-width">
+                            <div class="full-width hand left-list-item-link">
+                                <li class="left-list-item">
+                                    {% if c.term.profile_img == '' %}
+                                        <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
+                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                    {% else %}
+                                        <img src="{{c.term.profile_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.term.cover_color}}" data-no-lazy="1"/>
+                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                    {% endif %}
+                                </li>
+                            </div>
+                        </a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <div class="full-width hand left-list-item-link com dnone"  id="showless" onclick="showLessCommunities(this)">
+                <li class="left-list-item">
+                    <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
+                        <i class="fa fa-chevron-up cb fs19" style="top:2px;" aria-hidden="true"></i>
+                    </div>
+                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"less"|ucwords}}</p>
+                </li>
+            </div>
+            <div id="divider" style="margin:0;width:calc(100% + 70px);left:-25px;z-index:99;margin-bottom:20px;"></div>
+            <div class="full-width" style="margin-top:0; top:0;padding-top:0;">
+                <div class="full-width">
+                    <a href="/feed/lists" class="full-width">
+                        <div class="full-width hand left-list-item-link">
+                            <li class="left-list-item">
+                                <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                    <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                        <g>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 16.667969 0 L 3.332031 0 C 1.496094 0 0 1.496094 0 3.332031 L 0 16.667969 C 0 18.503906 1.496094 20 3.332031 20 L 16.667969 20 C 18.503906 20 20 18.503906 20 16.667969 L 20 3.332031 C 20 1.496094 18.503906 0 16.667969 0 Z M 18.332031 16.667969 C 18.332031 17.585938 17.585938 18.332031 16.667969 18.332031 L 3.332031 18.332031 C 2.414062 18.332031 1.667969 17.585938 1.667969 16.667969 L 1.667969 3.332031 C 1.667969 2.414062 2.414062 1.667969 3.332031 1.667969 L 16.667969 1.667969 C 17.585938 1.667969 18.332031 2.414062 18.332031 3.332031 Z M 18.332031 16.667969 "/>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 6.164062 6.667969 C 6.164062 7.355469 5.605469 7.917969 4.914062 7.917969 C 4.222656 7.917969 3.664062 7.355469 3.664062 6.667969 C 3.664062 5.976562 4.222656 5.417969 4.914062 5.417969 C 5.605469 5.417969 6.164062 5.976562 6.164062 6.667969 Z M 6.164062 6.667969 "/>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 15.503906 5.832031 L 8.664062 5.832031 C 8.203125 5.832031 7.828125 6.207031 7.828125 6.667969 C 7.828125 7.125 8.203125 7.5 8.664062 7.5 L 15.503906 7.5 C 15.964844 7.5 16.335938 7.125 16.335938 6.667969 C 16.335938 6.207031 15.964844 5.832031 15.503906 5.832031 Z M 15.503906 5.832031 "/>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 6.164062 10 C 6.164062 10.691406 5.605469 11.25 4.914062 11.25 C 4.222656 11.25 3.664062 10.691406 3.664062 10 C 3.664062 9.308594 4.222656 8.75 4.914062 8.75 C 5.605469 8.75 6.164062 9.308594 6.164062 10 Z M 6.164062 10 "/>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 15.503906 9.167969 L 8.664062 9.167969 C 8.203125 9.167969 7.828125 9.539062 7.828125 10 C 7.828125 10.460938 8.203125 10.832031 8.664062 10.832031 L 15.503906 10.832031 C 15.964844 10.832031 16.335938 10.460938 16.335938 10 C 16.335938 9.539062 15.964844 9.167969 15.503906 9.167969 Z M 15.503906 9.167969 "/>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 6.164062 13.332031 C 6.164062 14.023438 5.605469 14.582031 4.914062 14.582031 C 4.222656 14.582031 3.664062 14.023438 3.664062 13.332031 C 3.664062 12.644531 4.222656 12.082031 4.914062 12.082031 C 5.605469 12.082031 6.164062 12.644531 6.164062 13.332031 Z M 6.164062 13.332031 "/>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 15.503906 12.5 L 8.664062 12.5 C 8.203125 12.5 7.828125 12.875 7.828125 13.332031 C 7.828125 13.792969 8.203125 14.167969 8.664062 14.167969 L 15.503906 14.167969 C 15.964844 14.167969 16.335938 13.792969 16.335938 13.332031 C 16.335938 12.875 15.964844 12.5 15.503906 12.5 Z M 15.503906 12.5 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                                <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"lists"|ucfirst}}</p>
+                            </li>
+                        </div>
+                    </a>
+                </div>
+                <div class="full-width">
+                    <a href="/feed/history" class="full-width">
+                        <div class="full-width hand left-list-item-link">
+                            <li class="left-list-item">
+                                <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                    <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                        <defs>
+                                            <filter id="alpha" filterUnits="objectBoundingBox" x="0%" y="0%" width="100%" height="100%">
+                                                <feColorMatrix type="matrix" in="SourceGraphic" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/>
+                                            </filter>
+                                            <mask id="mask0">
+                                                <g filter="url(#alpha)">
+                                                    <rect x="0" y="0" width="20" height="20" style="fill:white;fill-opacity:0.901961;stroke:none;"/>
+                                                </g>
+                                            </mask>
+                                            <clipPath id="clip1">
+                                                <rect width="20" height="20"/>
+                                            </clipPath>
+                                            <g id="surface6" clip-path="url(#clip1)">
+                                                <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 10.5 0.5 C 7 0.5 3.898438 2.398438 2.300781 5.300781 L 0 3 L 0 9.5 L 6.5 9.5 L 3.699219 6.699219 C 5 4.199219 7.5 2.5 10.5 2.5 C 14.601562 2.5 18 5.898438 18 10 C 18 14.101562 14.601562 17.5 10.5 17.5 C 7.199219 17.5 4.5 15.398438 3.398438 12.5 L 1.300781 12.5 C 2.398438 16.5 6.101562 19.5 10.5 19.5 C 15.800781 19.5 20 15.199219 20 10 C 20 4.800781 15.699219 0.5 10.5 0.5 Z M 9 5.5 L 9 10.601562 L 13.699219 13.398438 L 14.5 12.101562 L 10.5 9.699219 L 10.5 5.5 Z M 9 5.5 "/>
+                                            </g>
+                                        </defs>
+                                        <g>
+                                            <use xlink:href="#surface6" mask="url(#mask0)"/>
+                                        </g>
+                                    </svg>
+                                </div>
+                                <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"visithistory"|ucfirst}}</p>
+                            </li>
+                        </div>
+                    </a>
+                </div>
+                <div class="full-width">
+                    <a href="/feed/saved" class="full-width">
+                        <div class="full-width hand left-list-item-link">
+                            <li class="left-list-item">
+                                <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                    <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                        <g>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 15.832031 0 L 4.230469 0 C 3.285156 0 2.453125 0.777344 2.453125 1.699219 L 2.453125 18.863281 C 2.453125 19.171875 2.539062 19.429688 2.679688 19.628906 C 2.84375 19.863281 3.109375 20 3.394531 20 C 3.664062 20 3.953125 19.878906 4.21875 19.652344 L 9.410156 15.246094 C 9.570312 15.109375 9.800781 15.03125 10.039062 15.03125 C 10.277344 15.03125 10.507812 15.109375 10.667969 15.246094 L 15.84375 19.652344 C 16.109375 19.878906 16.378906 20 16.644531 20 C 17.101562 20 17.546875 19.648438 17.546875 18.863281 L 17.546875 1.699219 C 17.546875 0.777344 16.777344 0 15.832031 0 Z M 15.832031 0 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                                <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"savedposts"|ucfirst}}</p>
+                            </li>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="full-width" id="others" style="width:calc(100% + 20px);">
+            {% if filter == "all" %}
+                <div class="full-width">
+                    <a href="/communities/leaderboard" class="full-width" data-target="">
+                        <div class="full-width hand left-list-item-link active" id="allcategories">
+                            <li class="left-list-item">
+                                <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
+                                <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"all"|ucfirst}}</p>
+                            </li>
+                        </div>
+                    </a>
+                </div>
+            {% else %}
+                <div class="full-width">
+                    <a href="/communities/leaderboard/" class="full-width" data-target="">
+                        <div class="full-width hand left-list-item-link"  id="allcategories">
+                            <li class="left-list-item">
+                                <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
+                                <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"all"|ucfirst}}</p>
+                            </li>
+                        </div>
+                    </a>
+                </div>
+            {% endif %}
+
+            {% for item in menu_list %}
+                {% if forloop.counter < 8 %}
+                    {% if filter == item.name|tolower %}
+                    <div class="full-width">
+                        <a href="/communities/leaderboard/{{item.name|tolower}}" class="full-width" data-target="{{item.name|tolower}}">
+                            <div class="full-width hand left-list-item-link active" id="{{item.name|tolower}}">
+                                <li class="left-list-item">
+                                    <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
+                                    <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
+                                </li>
+                            </div>
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="full-width">
+                        <a href="/communities/leaderboard/{{item.name|tolower}}" class="full-width" data-target="{{item.name|tolower}}">
+                            <div class="full-width hand left-list-item-link" id="{{item.name|tolower}}">
+                                <li class="left-list-item">
+                                    <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
+                                    <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
+                                </li>
+                            </div>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    {% if forloop.counter == 8 %}
+                        <div class="full-width hand left-list-item-link" id="loadmorecats" onclick="loadMoreCategories(this)">
+                            <li class="left-list-item">
+                                <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
+                                    <i class="fa fa-chevron-down cb fs19" style="top:4px" aria-hidden="true"></i>
+                                </div>
+                                <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
+                            </li>
+                        </div>
+                    {% endif %}
+                    {% if filter == item.name|tolower %}
+                        <div class="full-width category dnone">
+                            <a href="/communities/leaderboard/{{item.name|tolower}}" class="full-width" data-target="{{item.name|tolower}}">
+                                <div class="full-width hand left-list-item-link active" id="{{item.name|tolower}}">
+                                    <li class="left-list-item">
+                                        <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
+                                        <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
+                                    </li>
+                                </div>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="full-width category dnone">
+                            <a href="/communities/leaderboard/{{item.name|tolower}}" class="full-width" data-target="{{item.name|tolower}}">
+                                <div class="full-width hand left-list-item-link" id="{{item.name|tolower}}">
+                                    <li class="left-list-item">
+                                        <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
+                                        <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
+                                    </li>
+                                </div>
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            <div class="full-width hand left-list-item-link category dnone"  id="showless" onclick="showLessCategories(this)">
+                <li class="left-list-item">
+                    <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
+                        <i class="fa fa-chevron-up cb fs19" style="top:2px;" aria-hidden="true"></i>
+                    </div>
+                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"less"|ucwords}}</p>
+                </li>
+            </div>
+        </div>
+    </ul>
+    <div id="divider" style="width: calc(100% + 55px);left:-35px;"></div>
+    <div class="section-left-options inline-block">
+        <div class="lang-container" onclick="selectLanguage()">
+            <svg width="13pt" height="13pt" viewBox="0 0 13 13">
+                <g>
+                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 12.472656 8.527344 C 12.703125 7.863281 12.828125 7.152344 12.828125 6.414062 C 12.828125 5.675781 12.703125 4.964844 12.472656 4.304688 C 12.464844 4.28125 12.457031 4.265625 12.453125 4.246094 C 11.558594 1.773438 9.191406 0 6.414062 0 C 3.636719 0 1.269531 1.773438 0.378906 4.246094 C 0.371094 4.265625 0.363281 4.28125 0.359375 4.304688 C 0.128906 4.964844 0 5.675781 0 6.414062 C 0 7.152344 0.128906 7.863281 0.359375 8.527344 C 0.363281 8.546875 0.371094 8.5625 0.378906 8.582031 C 1.269531 11.054688 3.636719 12.828125 6.414062 12.828125 C 9.191406 12.828125 11.558594 11.054688 12.453125 8.582031 C 12.457031 8.5625 12.464844 8.546875 12.472656 8.527344 Z M 6.414062 11.910156 C 6.171875 11.910156 5.777344 11.464844 5.445312 10.480469 C 5.289062 10.003906 5.160156 9.453125 5.066406 8.859375 L 7.761719 8.859375 C 7.667969 9.453125 7.539062 10.003906 7.382812 10.480469 C 7.050781 11.464844 6.660156 11.910156 6.414062 11.910156 Z M 4.957031 7.941406 C 4.910156 7.449219 4.886719 6.9375 4.886719 6.414062 C 4.886719 5.890625 4.910156 5.378906 4.957031 4.886719 L 7.871094 4.886719 C 7.917969 5.378906 7.941406 5.890625 7.941406 6.414062 C 7.941406 6.9375 7.917969 7.449219 7.871094 7.941406 Z M 0.917969 6.414062 C 0.917969 5.886719 0.996094 5.371094 1.136719 4.886719 L 4.035156 4.886719 C 3.992188 5.390625 3.96875 5.902344 3.96875 6.414062 C 3.96875 6.925781 3.992188 7.441406 4.035156 7.941406 L 1.136719 7.941406 C 0.996094 7.457031 0.917969 6.941406 0.917969 6.414062 Z M 6.414062 0.917969 C 6.660156 0.917969 7.050781 1.363281 7.382812 2.347656 C 7.539062 2.828125 7.667969 3.375 7.761719 3.96875 L 5.066406 3.96875 C 5.160156 3.375 5.289062 2.828125 5.445312 2.347656 C 5.777344 1.363281 6.171875 0.917969 6.414062 0.917969 Z M 8.792969 4.886719 L 11.691406 4.886719 C 11.832031 5.371094 11.910156 5.886719 11.910156 6.414062 C 11.910156 6.941406 11.832031 7.457031 11.691406 7.941406 L 8.792969 7.941406 C 8.835938 7.441406 8.859375 6.925781 8.859375 6.414062 C 8.859375 5.902344 8.835938 5.390625 8.792969 4.886719 Z M 11.335938 3.96875 L 8.691406 3.96875 C 8.527344 2.84375 8.246094 1.832031 7.851562 1.109375 C 9.378906 1.523438 10.640625 2.578125 11.335938 3.96875 Z M 4.976562 1.109375 C 4.582031 1.832031 4.304688 2.84375 4.140625 3.96875 L 1.492188 3.96875 C 2.1875 2.578125 3.449219 1.523438 4.976562 1.109375 Z M 1.492188 8.859375 L 4.140625 8.859375 C 4.304688 9.984375 4.582031 11 4.976562 11.71875 C 3.449219 11.304688 2.1875 10.25 1.492188 8.859375 Z M 7.851562 11.71875 C 8.246094 11 8.527344 9.984375 8.691406 8.859375 L 11.335938 8.859375 C 10.640625 10.25 9.378906 11.304688 7.851562 11.71875 Z M 7.851562 11.71875 "/>
+                </g>
+            </svg>
+            <p id="lang-text">{{word_list|getword:"lang"|ucfirst}}</p>
+        </div>
+        {% if dark == "dark"  %}
+            <div class="switch__container left">
+                <input id="switch-shadow" class="switch switch--shadow" type="checkbox" checked>
+                <label for="switch-shadow"></label>
+            </div>
+            <p id="mode-text">{{word_list|getword:"dark-mode"|ucfirst}}</p>
+        {% else %}
+            <div class="switch__container left">
+                <input id="switch-shadow" class="switch switch--shadow" type="checkbox">
+                <label for="switch-shadow"></label>
+            </div>
+            <p id="mode-text">{{word_list|getword:"light-mode"|ucfirst}}</p>
+        {% endif %}
+    </div>
+    <div class="corporate-footer">
+        <div class="full-width inline-block">
+            <a href="#" class="left">{{word_list|getword:"about"|ucfirst}}</a>
+            <a href="#" class="left m010">{{word_list|getword:"careers"|ucfirst}}</a>
+            <a href="#"  class="left">{{word_list|getword:"terms"|ucfirst}}</a>
+            <a href="#" class="left m010">{{word_list|getword:"advertise"|ucfirst}}</a>
+            <a href="#" class="left">{{word_list|getword:"help"|ucfirst}}</a>
+        </div>
+        <p class="copyright">&copy; 2020 Sosyorol, Inc.</p>
+    </div>
+</div>
+<script type="text/javascript" src="{% static 'js/search.js' %}"></script>
+<script>
+    var j = jQuery.noConflict();
+    function loadMoreCommunities(elem){
+        elem.classList.add("dnone");
+        hiddencoms = document.getElementsByClassName("com");
+        for (var i = 0; i < hiddencoms.length; i++) {
+            hiddencoms[i].classList.remove("dnone");
+        }
+    }
+    function showLessCommunities(elem){
+        hiddencoms = document.getElementsByClassName("com");
+        for (var i = 0; i < hiddencoms.length; i++) {
+            hiddencoms[i].classList.add("dnone");
+        }
+        document.getElementById("loadmore").classList.remove("dnone");
+    }
+    function loadMoreCategories(elem){
+        elem.classList.add("dnone");
+        hiddencoms = document.getElementsByClassName("category");
+        for (var i = 0; i < hiddencoms.length; i++) {
+            hiddencoms[i].classList.remove("dnone");
+        }
+    }
+    function showLessCategories(elem){
+        hiddencoms = document.getElementsByClassName("category");
+        for (var i = 0; i < hiddencoms.length; i++) {
+            hiddencoms[i].classList.add("dnone");
+        }
+        document.getElementById("loadmorecats").classList.remove("dnone");
+    }
+    function shortcutsSelected(){
+        document.getElementsByClassName("segctrl-btn")[0].classList.add('active');
+        document.getElementsByClassName("segctrl-btn")[1].classList.remove('active');
+        document.getElementById("shortcuts").classList.remove("dnone");
+        document.getElementById("others").classList.add("dnone");
+    }
+    function othersSelected(){
+        document.getElementsByClassName("segctrl-btn")[0].classList.remove('active');
+        document.getElementsByClassName("segctrl-btn")[1].classList.add('active');
+        document.getElementById("shortcuts").classList.add("dnone");
+        document.getElementById("others").classList.remove("dnone");
+    }
+</script>
