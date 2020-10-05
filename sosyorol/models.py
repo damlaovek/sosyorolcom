@@ -77,8 +77,20 @@ class Post(models.Model):
     user_rate = ""
     communities = models.QuerySet()
     first_community = ""
+    quiz_questions = []
+    quiz_results = []
     class Meta:
         db_table = "wpmu_posts"
+
+class QuizQuestion(models.Model):
+    text = ""
+    answers = []
+    related_result = 0
+
+class QuizResult(models.Model):
+    ID = 0
+    text = ""
+    img = ""
 
 class PostRating(models.Model):
     ID = models.BigIntegerField(primary_key = True)

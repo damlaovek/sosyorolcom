@@ -1,0 +1,15 @@
+{% load static %}
+{% load index %}
+<div class="bsbb cp-container hcentered mt10 quiz_result" id="quiz_result{{number}}">
+    <p class="fwbold cg2 mt20">{{word_list|getword:"result"|ucfirst}} <span class="fwbold cg2 mt20" id="quiz_result_number{{number}}">{{number}}</span></p>
+    <div class="bsbb box p20 m100">
+        <div class="full-width box">
+            <textarea name="quiz_result_title{{number}}" rows="1" class="bsbb full-width p10 lh20 fs15 text textarea" maxlength="250" placeholder="{{word_list|getword:'title'|ucfirst}}"></textarea>
+        </div>
+        <textarea class="bsbb box full-width mt10 p10" rows="7" style="overflow:auto;resize:none" placeholder="{{word_list|getword:'description'|ucfirst}}"></textarea>
+        <div id="quiz_result_img_container{{number}}"></div>
+        <p class="noselect hand bsbb full-width lh40 tac bcba cb mt10 br4">{{word_list|getword:"add-an-img"|ucfirst}}</p>
+        <p class="noselect hand bsbb full-width lh40 tac bcr cw mt10 br4 dnone" id="remove_quiz_result{{number}}" onclick="removeResult({{number}});">{{word_list|getword:"remove-result"|ucfirst}}</p>
+        <p class="noselect hand bsbb full-width lh40 tac bcb cw mt10 br4" id="add_quiz_result{{number}}" onclick="addAnotherResult({{number}});">{{word_list|getword:"add-another-result"|ucfirst}}</p>
+    </div>
+</div>

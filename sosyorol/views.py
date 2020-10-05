@@ -136,6 +136,7 @@ def post_template(word_list):
     post_template_dict['link'] = fun.ucwords(word_list.get(var_name = 'link').translation)
     post_template_dict['answer'] = fun.ucwords(word_list.get(var_name = 'answer').translation)
     post_template_dict['question'] = fun.ucwords(word_list.get(var_name = 'question').translation)
+    post_template_dict['quiz'] = fun.ucwords(word_list.get(var_name = 'quiz').translation)
     post_template_dict['poll'] = fun.ucwords(word_list.get(var_name = 'poll').translation)
     post_template_dict['answernoun'] = fun.ucwords(word_list.get(var_name = 'answer-noun').translation)
     post_template_dict['recommendedfy'] = fun.ucwords(word_list.get(var_name = 'recommended-for-you').translation)
@@ -330,6 +331,16 @@ def history_dict(word_list):
 '''---------------------------------------
   HELPERS              
 -----------------------------------------'''
+def setup_quizmeta(post, word_list):
+    import re
+    current_uid = 8
+    post.quiz_questions = []
+    for i in range(1,6):
+        question = PostMeta.objects.filter(post_id=post.ID, meta_key="5_sorulu_test_sorular_soru_"+str(i))[0].meta_value
+        question = re.sub("(<h2.*?>)", "", question, 0, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+        question = re.sub("(</h2>)", "", question, 0, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+        post.quiz_questions.append(question)
+
 def setup_pollmeta(post, word_list):
     current_uid = 8
     post.poll_duration = PostMeta.objects.filter(post_id=post.ID, meta_key="poll_duration")[0].meta_value
@@ -519,6 +530,15 @@ def communitiesfiltered(request, **kwargs):
         selected_category = CommunityCategories.objects.get(name=fun.localized_upper(fltr))
         community_list = CommunityCategoryRelation.objects.filter(category=selected_category)[:20]
     return render(request, 'communities/communitytemplates/leaderboard.html', {'communities':community_list, 'filter':fltr})
+
+def addanotherquizresult(request):
+    nmr = str(int(request.GET["number"]) + 1)
+    current_uid = 8
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    return render(request, 'posts/createpost/quiz_result.html', {'number':nmr, 'word_list':word_list})
 
 '''---------------------------------------
   OPERATIONS              
@@ -964,6 +984,18 @@ def home(request):
     print(f"Get and setup polls in {end} s")
 
     start = time.time()
+    community = Community.objects.filter(slug="test")[0]
+    taxonomy = TermTaxonomy.objects.filter(term_id=community.term_id)[0].term_taxonomy_id
+    post_ids = TermRelationship.objects.filter(Q(term_taxonomy_id=taxonomy))
+    post_ids = list({x.object_id: x for x in post_ids}.keys())
+    quizzes = Post.objects.filter(Q(ID__in=post_ids)).order_by('-post_date')[:4].prefetch_related()
+    for quiz in quizzes:
+        setup_postmeta(quiz, word_list)
+        setup_quizmeta(quiz, word_list)
+    end = time.time() - start
+    print(f"Get and setup quizzes in {end} s")
+
+    start = time.time()
     communities = Community.objects.all()[:10]
     end = time.time() - start
     print(f"Get communities in {end} s")
@@ -989,7 +1021,7 @@ def home(request):
                                             'followed_communities':followed_communities, 'feed_dict':feed_dict,
                                             'popular_communities':popular_communities, 'posts':posts,
                                             'post_template_dict':post_template_dict, 'comment_editor':comment_editor,
-                                            'links':links, 'answers':answers, 'questions':questions,
+                                            'links':links, 'answers':answers, 'questions':questions, 'quizzes':quizzes,
                                             'communities':communities, 'users':users, 'polls':polls,
                                             'word_list':word_list
                                             })
@@ -1326,7 +1358,7 @@ def createlist(request):
     create_list_dict['clear'] = fun.ucwords(word_list.filter(Q(var_name = 'clear'))[0].translation)
     return render(request, 'lists/newlist.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict, 
-                                            'tips':tips, 'create_list_dict':create_list_dict})
+                                            'tips':tips, 'create_list_dict':create_list_dict,'word_list':word_list})
 
 def listdetail(request, slug, **kwargs):
     print("list detail")

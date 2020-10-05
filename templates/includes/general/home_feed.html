@@ -125,6 +125,11 @@
             </div>
         </div>
         <div class="full-width link-wrapper">
+            {% for quiz in quizzes %}
+                 {% include 'posts/posttemplates/quiz_template.html' with number=forloop.counter %}
+            {% endfor %}
+        </div>
+        <div class="full-width link-wrapper">
             {% for media in medias %}
                  {% include 'posts/posttemplates/media_template.html' %}
             {% endfor %}
