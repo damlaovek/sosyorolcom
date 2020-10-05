@@ -36,6 +36,7 @@ urlpatterns = [
     path('feed/saved/<path:post_type>', sv.savedpostsfilter, name="savedpostsfilter"),
     path('save-the-post/', sv.savethepost, name="save-the-post"),
     path('submit/', sv.newpost, name="newpost"),
+    path('addanotherquizresult/', sv.addanotherquizresult, name="addanotherquizresult"),
     path('votepoll/', sv.votepoll, name='votepoll'),
     path('postrating/', sv.postrating, name='postrating'),
     path('uploadmedia/', sv.uploadmedia, name='uploadmedia'),

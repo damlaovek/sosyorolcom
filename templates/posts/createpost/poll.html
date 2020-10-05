@@ -105,8 +105,8 @@
                     <textarea style='padding-right:70px;' placeholder="{{create_post_dict.option}}" rows="1" onblur='this.classList.remove("active");document.getElementById("poll-option-1-counter").innerHTML = "";' onfocus='this.classList.add("active");var len = this.value.length;document.getElementById("poll-option-1-counter").innerHTML = len+"/"+120;' onkeyup="updateTextareaCounter(this, 'poll-option-1-counter', 120)" class="bsbb full-width box p10 lh20 fs15 text textarea" maxlength="120"></textarea>
                     <p class='noselect fs13 absolute cg2' style="bottom:0;right:10px;line-height:40px;" id='poll-option-1-counter'></p>
                 </div>
-                <p class="sqrt30 box border rounded hand cg2 poll-option-btn" style='line-height:30px; text-align:center;font-size:18px;margin:5px 0;margin-right:10px;' onclick="addPollOption('poll-option-1','{{create_post_dict.option}}', '{{create_post_dict.addrule}}', '{{create_post_dict.removerule}}');">+</p>
-                <p class="sqrt30 box border rounded hand cg2 poll-option-btn" style='line-height:30px; text-align:center;font-size:20px;margin:5px 0;' onclick="removePollOption('poll-option-1', '{{create_post_dict.removerule}}');">-</p>
+                <p class="sqrt30 border rounded hand cg2 poll-option-btn" style='line-height:30px; text-align:center;font-size:18px;margin:5px 0;margin-right:10px;' onclick="addPollOption('poll-option-1','{{create_post_dict.option}}', '{{create_post_dict.addrule}}', '{{create_post_dict.removerule}}');">+</p>
+                <p class="sqrt30 border rounded hand cg2 poll-option-btn" style='line-height:30px; text-align:center;font-size:20px;margin:5px 0;' onclick="removePollOption('poll-option-1', '{{create_post_dict.removerule}}');">-</p>
             </li>
             <li class="full-width inline-flex hand mt10" id='poll-option-2'>
                 <p style="line-height:12px;margin:14px 0;" class="cg2 hand">=</p>
@@ -114,8 +114,8 @@
                     <textarea style='padding-right:70px;' placeholder="{{create_post_dict.option}}" rows="1" onblur='this.classList.remove("active");document.getElementById("poll-option-2-counter").innerHTML = "";' onfocus='this.classList.add("active");var len = this.value.length;document.getElementById("poll-option-2-counter").innerHTML = len+"/"+120;' onkeyup="updateTextareaCounter(this, 'poll-option-2-counter', 120)" class="bsbb full-width box p10 lh20 fs15 text textarea" maxlength="120"></textarea>
                     <p class='noselect fs13 absolute cg2' style="bottom:0;right:10px;line-height:40px;" id='poll-option-2-counter'></p>
                 </div>
-                <p class="sqrt30 box border rounded hand cg2 poll-option-btn" style='line-height:30px; text-align:center;font-size:18px;margin:5px 0;margin-right:10px;' onclick="addPollOption('poll-option-2','{{create_post_dict.option}}', '{{create_post_dict.addrule}}', '{{create_post_dict.removerule}}');">+</p>
-                <p class="sqrt30 box border rounded hand cg2 poll-option-btn" style='line-height:30px; text-align:center;font-size:20px;margin:5px 0;' onclick="removePollOption('poll-option-2', '{{create_post_dict.removerule}}');">-</p>
+                <p class="sqrt30 border rounded hand cg2 poll-option-btn" style='line-height:30px; text-align:center;font-size:18px;margin:5px 0;margin-right:10px;' onclick="addPollOption('poll-option-2','{{create_post_dict.option}}', '{{create_post_dict.addrule}}', '{{create_post_dict.removerule}}');">+</p>
+                <p class="sqrt30 border rounded hand cg2 poll-option-btn" style='line-height:30px; text-align:center;font-size:20px;margin:5px 0;' onclick="removePollOption('poll-option-2', '{{create_post_dict.removerule}}');">-</p>
             </li>
         </ul>
     </div>

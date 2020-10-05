@@ -1,0 +1,439 @@
+{% load index %}
+{% load static %}
+<div class="full-width align-center mt10">
+    <form>
+        <div class="bsbb box p20 title fs19 cp-container" id="cp-container">
+            {{word_list|getword:"create-quiz"|ucwords}}
+            <div class="absolute inline-flex" style="right:20px;top:1px;">
+                <div class="btn p010 hand m100" style="border-radius:4px; height: 30px;" onclick="document.getElementById('drafts-popup').classList.toggle('hidden');">
+                    <p  class="fs15 noselect lh30" id='drafts'>{{newpost_actions_dict.drafts}}&nbsp;({{drafts|length}})</p>
+                </div>
+            </div>
+        </div>
+        <div class="bsbb box p20 title fs18 cp-container" style="margin:10px auto;">
+            <div class="full-width">
+                <textarea name="cp-title" style='padding-right:70px;' rows="1" onblur='this.classList.remove("active");document.getElementById("title-counter").innerHTML = "";' onfocus='this.classList.add("active");var len = this.value.length;document.getElementById("title-counter").innerHTML = len+"/"+250;' onkeyup="updateTextareaCounter(this, 'title-counter', 250)" class="bsbb box full-width p10 lh20 fs15 text textarea" maxlength="250" placeholder="{{newpost_actions_dict.title}}"></textarea>
+                <p class='noselect fs13 absolute cg2' style="bottom:0;right:10px;line-height:40px;" id='title-counter'></p>
+            </div>
+            <div class="bsbb full-width box mt10">
+                {% include 'posts/createpost/rich_text_editor.html' %}
+            </div>
+        </div>
+        <div id="results-container">
+            {% include 'posts/createpost/quiz_result.html' with number=1 %}
+        </div>
+        <div class="bsbb cp-container hcentered mt10" id="question-view">
+            <p class="fwbold cg2 mt20">{{word_list|getword:"question-view"|ucwords}}</p>
+            <style>
+                #question-view .box:hover{border:1px solid var(--gray2);}
+                #question-view .box.active{border: 1px solid var(--black);}
+                .answer-view .box:hover{border:1px solid var(--gray2);}
+                .answer-view .box.active{border: 1px solid var(--black);}
+                .media-answer{width:calc(50% - 10px);height: 150px; background-image: url('{% static "assets/img/add-image.svg" %}'); background-position: center; background-size: 40px; background-repeat: no-repeat;}
+                .media-answer:nth-child(2n){margin-left: 20px;}
+                .colorbox-answer:nth-child(2n){margin-left: 20px;}
+            </style>
+            <div class="bsbb full-width inline-flex p100">
+                <div class="bsbb box p20 one-third-width hand" id="question-view1" onclick="questionViewSelected('text')">
+                    <p class="cg2 mb30">{{word_list|getword:"plain-text"|ucfirst}}</p>
+                    <div class="full-width mt20 bcb" style="height:4px;"></div>
+                    <div class="half-width mt10 bcb mb20" style="height:4px;"></div>
+                </div>
+                <div class="bsbb box m020 p20 one-third-width hand" id="question-view2" onclick="questionViewSelected('media')">
+                    <p class="cg2 mb20">{{word_list|getword:"question-with-media"|ucfirst}}</p>
+                    <div class="half-width m100 bcb" style="height:4px;"></div>
+                    <div class="bsbb br10 p150 full-width bcb tac mb20">
+                        <svg width="15px" height="15px" viewBox="0 0 15 15" class="hcentered">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 13.457031 0 L 1.542969 0 C 0.933594 0 0.441406 0.492188 0.441406 1.101562 L 0.441406 13.898438 C 0.441406 14.507812 0.933594 15 1.542969 15 L 13.457031 15 C 14.066406 15 14.558594 14.507812 14.558594 13.898438 L 14.558594 1.101562 C 14.558594 0.492188 14.066406 0 13.457031 0 Z M 13.234375 11.46875 L 11.910156 11.46875 L 8.601562 4.851562 L 6.398438 9.265625 L 5.292969 7.058594 L 3.089844 11.46875 L 1.765625 11.46875 L 1.765625 1.324219 L 13.234375 1.324219 Z M 13.234375 11.46875 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 5.734375 3.96875 C 5.734375 4.703125 5.144531 5.292969 4.410156 5.292969 C 3.679688 5.292969 3.089844 4.703125 3.089844 3.96875 C 3.089844 3.238281 3.679688 2.648438 4.410156 2.648438 C 5.144531 2.648438 5.734375 3.238281 5.734375 3.96875 Z M 5.734375 3.96875 "/>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+                <div class="bsbb box p20 one-third-width hand"  id="question-view3" onclick="questionViewSelected('colorBox')">
+                    <p class="cg2 mb20">{{word_list|getword:"color-box"|ucfirst}}</p>
+                    <div class="bsbb br10 mt10 p200 full-width bcb tac mb20">
+                        <div class="half-width bcw hcentered" style="height:4px;"></div>
+                        <div class="one-third-width bcw hcentered mt10" style="height:4px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="questions-container" class="dnone">
+            {% include 'posts/createpost/quiz_question.html' with number=1 %}
+        </div>
+    </form>
+</div>
+<script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/jquery.textfill.js'></script>
+<script>
+    var j = jQuery.noConflict();
+    var selectedQuestionView = "";
+    var selectedAnswerView = {};
+    var selectedColors = {1:"red"};
+    function addAnotherResult(number){
+        var elems = document.getElementsByClassName("quiz_result");
+        if(elems.length < 100){
+            j.ajax({
+                url:"{% url 'addanotherquizresult' %}",
+                type : "GET", // http method
+                data : { number: number}, // data sent with the post request
+                // handle a successful response
+                success : function(json) {
+                    console.log(json); // another sanity check
+                    document.getElementById("add_quiz_result"+number).classList.add("dnone");
+                    document.getElementById("remove_quiz_result"+number).classList.remove("dnone");
+                    document.getElementById("results-container").innerHTML += json;
+                    elems = document.getElementsByClassName("quiz_result");
+                    if(elems.length < 100){
+                        document.getElementById("remove_quiz_result"+(number + 1)).classList.remove("dnone");
+                    }
+                }
+            });
+        }
+    }
+    function removeResult(number){
+        var elems = document.getElementsByClassName("quiz_result");
+        document.getElementById("quiz_result"+number).id= "quiz_result_remove";
+        for(var j = number; j < elems.length; j++){
+            elems[j].id = "quiz_result"+j;
+            document.getElementById("quiz_result_number"+(j+1)).innerHTML = j;
+            document.getElementById("quiz_result_number"+(j+1)).id = "quiz_result_number"+j;
+            document.getElementById("quiz_result_img_container"+(j+1)).id = "quiz_result_img_container"+j;
+            document.getElementById("remove_quiz_result"+(j+1)).setAttribute( "onClick", "removeResult("+j+")" );
+            document.getElementById("remove_quiz_result"+(j+1)).id = "remove_quiz_result"+j;
+            document.getElementById("add_quiz_result"+(j+1)).setAttribute( "onClick", "addAnotherResult("+j+")" );
+            document.getElementById("add_quiz_result"+(j+1)).id = "add_quiz_result"+j;
+        }
+        document.getElementById("quiz_result_remove").remove();
+        elems = document.getElementsByClassName("quiz_result");
+        document.getElementById("add_quiz_result"+elems.length).classList.remove("dnone");
+        if(elems.length == 1){
+            document.getElementById("remove_quiz_result1").classList.add("dnone");
+        }
+    }
+    function coloredBCSelected(number){
+        document.getElementById("quiz_question_title"+number).classList.add("dnone");
+        document.getElementById("quiz_question_colored_title"+number).classList.remove("dnone");
+        document.getElementById("quiz_question_colored_title"+number).classList.add("resizable");
+        document.getElementById("quiz_question_colored_title"+number).style.backgroundColor = "var(--question-color-red)";
+        document.getElementById("quiz_question_colored_title"+number).style.color = "var(--question-color-red-text)";
+    }
+    function colorChanged(elem, number, color){
+        document.getElementById("quiz_question_colored_title"+number).style.backgroundColor = "var(--question-color-"+color+")";
+        document.getElementById("quiz_question_colored_title"+number).style.color = "var(--question-color-"+color+"-text)";
+        var colors = document.getElementsByClassName("color-container-item");
+        for (var i = 0; i < colors.length; i++) {
+            colors[i].classList.remove("border2");
+            colors[i].classList.add("borderw");
+        }
+        elem.classList.remove("borderw");
+        elem.classList.add("border2");
+        selectedColors[number] = color;
+    }
+    function answerColorChanged(elem, number, color){
+        var answers = document.getElementsByClassName("colorbox-answer"+number);
+        for(var i=0; i<answers.length; i++){
+            answers[i].style.backgroundColor = "var(--question-color-"+color+")";
+        }
+        var colors = document.getElementsByClassName("colorbox-answer"+number+"-color");
+        for (var i = 0; i < colors.length; i++) {
+            colors[i].classList.remove("border2");
+            colors[i].classList.add("borderw");
+        }
+        elem.classList.remove("borderw");
+        elem.classList.add("border2");
+        document.getElementById("selectedAnswerColor"+number).value = color;
+    }
+    j('.quiz_question_colored_title').keydown(function(e) { 
+        if (e.keyCode === 13) {
+            document.execCommand('insertHTML', false, '');
+            return false;
+        }
+        if(e.keyCode === 46 && j('div[contenteditable]').text().length() === 0){
+            document.execCommand('insertHTML', false, '<span class="test"></span>');
+            return false;
+        }
+        resizeContents();
+    });
+    j('.quiz_answer_colored_title').keydown(function(e) { 
+        console.log(e.keyCode);
+        if (e.keyCode === 13) {
+            document.execCommand('insertHTML', false, '');
+            return false;
+        }
+        if(e.keyCode === 46 && j('div[contenteditable]').text().length() === 0){
+            document.execCommand('insertHTML', false, '<span class="test"></span>');
+            return false;
+        }
+        j('.quiz_answer_colored_title').textfill({
+            maxFontPixels: 82,
+            minFontPixels: 15
+        });
+    });
+    
+    document.querySelectorAll('.quiz_question_colored_title').forEach(item => {
+        item.addEventListener('keypress',function(evt){
+            var range = window.getSelection().getRangeAt(0),
+                modifiers = [0,8]; // List of keys to ignore (0 is arrows & 8 is delete in firefox)
+            
+            if(range.startContainer.parentNode.className!=='test' && modifiers.indexOf(evt.which) <  0){
+                if(!range.collapsed){
+                    range.deleteContents();
+                }
+                var el =  document.createElement('span');
+                el.appendChild(document.createTextNode('A'));
+                el.className = 'test';
+                range.insertNode(el);
+                
+                var sel = window.getSelection();		
+                range.setStartBefore(el.childNodes[0]);
+                range.setEndAfter(el.childNodes[0]);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        });
+    });
+    
+    function resizeContents() {
+        j('.quiz_question_colored_title').textfill({
+            maxFontPixels: 120,
+            minFontPixels: 15
+        });
+    }
+
+    function questionViewSelected(op){
+        document.getElementById("questions-container").classList.remove("dnone");
+        if(op == "text"){
+            document.getElementById("question-view1").classList.add("active");
+            document.getElementById("question-view2").classList.remove("active");
+            document.getElementById("question-view3").classList.remove("active");
+            selectedQuestionView = "text";
+            var media = document.getElementsByClassName("question-media");
+            for (var i = 0; i < media.length; i++) {
+                media[i].classList.add("dnone");
+            }
+            var texts = document.getElementsByClassName("question-text");
+            for (var i = 0; i < texts.length; i++) {
+                texts[i].classList.remove("dnone");
+            }
+            var colorboxes = document.getElementsByClassName("question-colorBox");
+            for (var i = 0; i < colorboxes.length; i++) {
+                colorboxes[i].classList.add("dnone");
+            }
+            colorboxes = document.getElementsByClassName("color-container");
+            for (var i = 0; i < colorboxes.length; i++) {
+                colorboxes[i].classList.add("dnone");
+            }
+        }else if(op == "media"){
+            document.getElementById("question-view1").classList.remove("active");
+            document.getElementById("question-view2").classList.add("active");
+            document.getElementById("question-view3").classList.remove("active");
+            selectedQuestionView = "media";
+            var media = document.getElementsByClassName("question-media");
+            for (var i = 0; i < media.length; i++) {
+                media[i].classList.remove("dnone");
+            }
+            var texts = document.getElementsByClassName("question-text");
+            for (var i = 0; i < texts.length; i++) {
+                texts[i].classList.remove("dnone");
+            }
+            var colorboxes = document.getElementsByClassName("question-colorBox");
+            for (var i = 0; i < colorboxes.length; i++) {
+                colorboxes[i].classList.add("dnone");
+            }
+            colorboxes = document.getElementsByClassName("color-container");
+            for (var i = 0; i < colorboxes.length; i++) {
+                colorboxes[i].classList.add("dnone");
+            }
+        }else if(op == "colorBox"){
+            document.getElementById("question-view1").classList.remove("active");
+            document.getElementById("question-view2").classList.remove("active");
+            document.getElementById("question-view3").classList.add("active");
+            selectedQuestionView = "colorBox";
+            var media = document.getElementsByClassName("question-media");
+            for (var i = 0; i < media.length; i++) {
+                media[i].classList.add("dnone");
+            }
+            var texts = document.getElementsByClassName("question-text");
+            for (var i = 0; i < texts.length; i++) {
+                texts[i].classList.add("dnone");
+            }
+            var colorboxes = document.getElementsByClassName("question-colorBox");
+            for (var i = 0; i < colorboxes.length; i++) {
+                colorboxes[i].classList.remove("dnone");
+            }
+            colorboxes = document.getElementsByClassName("color-container");
+            for (var i = 0; i < colorboxes.length; i++) {
+                colorboxes[i].classList.remove("dnone");
+            }
+            coloredBCSelected(1);
+        }
+    }
+
+    function answerViewSelected(number, op){
+        if(op == "text"){
+            document.getElementById("answer-view"+number+"-1").classList.add("active");
+            document.getElementById("answer-view"+number+"-2").classList.remove("active");
+            document.getElementById("answer-view"+number+"-3").classList.remove("active");
+            selectedAnswerView[number] = "text";
+            document.getElementById("plain-text-answers"+number).classList.remove("dnone");
+            document.getElementById("media-answers"+number).classList.add("dnone");
+            document.getElementById("media-answers"+number).classList.remove("inline-block");
+            document.getElementById("colorBox-answers"+number).classList.add("dnone");
+        }else if(op == "media"){
+            document.getElementById("answer-view"+number+"-1").classList.remove("active");
+            document.getElementById("answer-view"+number+"-2").classList.add("active");
+            document.getElementById("answer-view"+number+"-3").classList.remove("active");
+            selectedAnswerView[number] = "media";
+            document.getElementById("plain-text-answers"+number).classList.add("dnone");
+            document.getElementById("media-answers"+number).classList.remove("dnone");
+            document.getElementById("media-answers"+number).classList.add("inline-block");
+            document.getElementById("colorBox-answers"+number).classList.add("dnone");
+        }else if(op == "colorBox"){
+            document.getElementById("answer-view"+number+"-1").classList.remove("active");
+            document.getElementById("answer-view"+number+"-2").classList.remove("active");
+            document.getElementById("answer-view"+number+"-3").classList.add("active");
+            selectedAnswerView[number] = "colorBox";
+            document.getElementById("plain-text-answers"+number).classList.add("dnone");
+            document.getElementById("media-answers"+number).classList.add("dnone");
+            document.getElementById("media-answers"+number).classList.remove("inline-block");
+            document.getElementById("colorBox-answers"+number).classList.remove("dnone");
+        }
+    }
+    
+    function coloredBoxFocus(number){
+        /*var txt = document.getElementById("questionContenteditable"+number).innerText;
+        if (txt == "{{word_list|getword:'question'|ucfirst}}"){
+            document.getElementById("questionContenteditable"+number).innerHTML = "";
+            document.getElementById("quiz_question_colored_title"+number).style.color = "white";
+        }else{
+            document.getElementById("questionContenteditable"+number).style.fontSize = "15px";
+        }*/
+        return true;
+    } 
+
+    function coloredBoxBlur(number){
+        var txt = document.getElementById("questionContenteditable"+number).innerText;
+        if (document.getElementById("questionContenteditable"+number).innerText == "" || document.getElementById("questionContenteditable"+number).innerHTML == "<br>"){
+            document.getElementById("questionContenteditable"+number).innerHTML = "<span class='test'>{{word_list|getword:'question'|ucfirst}}</span>";
+            document.getElementById("quiz_question_colored_title"+number).style.color = "var(--question-color-"+selectedColors[number]+"-text)";
+        }
+        return true;
+    }
+    function uploadImg(number){
+        var input = document.getElementById('imageUpload'+number);
+        var j = jQuery.noConflict();
+        if (input.files && input.files[0]) {
+            var fd = new FormData();
+            var files = input.files[0];
+            var fullPath = input.value;
+            var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+            var filename = fullPath.substring(startIndex);
+            if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+                filename = filename.substring(1);
+            }
+            newName = filename.hashCode();
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('question-media'+number).src = e.target.result;
+                document.getElementById('question-media'+number).style.objectFit = "cover";
+            }
+            reader.readAsDataURL(input.files[0]);
+            fd.append('file',files,newName);
+            j.ajax({
+                type: "POST",
+                url:"{% url 'uploadmedia' %}",
+                data: fd,
+                processData: false, 
+                contentType: false,
+                cache: false,
+                async: false,
+                success: function(response) {
+                    if(response != ""){
+                        document.getElementById('question-media'+number).src = response.url;
+                    }
+                }
+            });
+        }
+    }
+
+    function addMediaAnswer(number, counter){
+        var i=document.createElement("li");
+        i.setAttribute("class","bsbb half-width left mt10 border br10 media-answer bcgrayish");
+        var r=document.createElement("img");
+        r.setAttribute("class","full-width dnone");
+        r.setAttribute("id","media-answer{{number}}-img"+counter);
+        i.append(r);
+        var s=document.createElement("input");
+        s.setAttribute("type","file");
+        s.setAttribute("class", "absolute aligntr full");
+        s.style.opacity = "0";
+        s.setAttribute("accept", ".png, .jpg, .jpeg");
+        i.append(s);
+        var k=document.createElement("p");
+        k.setAttribute("class", "hand absolute aligntr m10 sqr20 lh20 rounded bcr cw tac p5 full-shadow");
+        k.innerHTML = "&#10005;";
+        i.append(k);
+        if(document.getElementById("add-media-answer"+number).classList.contains("ml20")){
+            document.getElementById("add-media-answer"+number).classList.remove("ml20");
+        }else{
+            document.getElementById("add-media-answer"+number).classList.add("ml20");
+        }
+        counter = counter + 1;
+        document.getElementById("add-media-answer"+number).onclick = function() {addMediaAnswer(number, counter);};
+        j("#add-media-answer"+number).before(i)
+        document.getElementById("media-answer"+number+"-remove1").classList.remove("dnone");
+    }
+
+    function addColorBoxAnswer(number, counter){
+        var color = document.getElementById("selectedAnswerColor"+number).value;
+        if(color == "lightgreen"){
+            color = "lgreen";
+        }
+        var i=document.createElement("li");
+        i.setAttribute("class","bsbb half-width left mt10 border bcq"+color+" colorbox-answer colorbox-answer"+number);
+        i.style.width = "calc(50% - 10px)";
+        var r=document.createElement("div");
+        r.setAttribute("class","bsbb full-width oh p20");
+        var s=document.createElement("div");
+        s.setAttribute("class", "bsbb vam tac full-width fwbold inline-block quiz_answer_colored_title cw");
+        s.style.height = "110px";
+        s.setAttribute("contenteditable", "true");
+        var m=document.createElement("span");
+        m.innerHTML = "{{word_list|getword:'answer-noun'|ucfirst}}";
+        m.setAttribute("class", "test");
+        s.append(m);
+        r.append(s);
+        i.append(r);
+        var k=document.createElement("p");
+        k.setAttribute("class", "hand absolute aligntr m10 sqr20 lh20 rounded bcr cw tac p5 full-shadow");
+        k.innerHTML = "&#10005;";
+        i.append(k);
+        if(document.getElementById("add-colorBox-answer"+number).classList.contains("ml20")){
+            document.getElementById("add-colorBox-answer"+number).classList.remove("ml20");
+        }else{
+            document.getElementById("add-colorBox-answer"+number).classList.add("ml20");
+        }
+        counter = counter + 1;
+        document.getElementById("add-colorBox-answer"+number).onclick = function() {addColorBoxAnswer(number, counter);};
+        j("#add-colorBox-answer"+number).before(i)
+        document.getElementById("colorBox-answer"+number+"-remove1").classList.remove("dnone");
+
+        j('.quiz_answer_colored_title').keydown(function(e) { 
+            console.log(e.keyCode);
+            if (e.keyCode === 13) {
+                document.execCommand('insertHTML', false, '');
+                return false;
+            }
+            if(e.keyCode === 46 && j('div[contenteditable]').text().length() === 0){
+                document.execCommand('insertHTML', false, '<span class="test"></span>');
+                return false;
+            }
+            j('.quiz_answer_colored_title').textfill({
+                maxFontPixels: 82,
+                minFontPixels: 15
+            });
+        });
+    }
+</script>
