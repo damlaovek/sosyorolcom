@@ -1,7 +1,8 @@
 {% load index %}
 {% load static %}
 <div class="full-width align-center mt10">
-    <form>
+    <form method="POST" onsubmit="return false;">
+        <input type="hidden" id="question_type" name="question_type">
         <div class="bsbb box p20 title fs19 cp-container" id="cp-container">
             {{word_list|getword:"create-quiz"|ucwords}}
             <div class="absolute inline-flex" style="right:20px;top:1px;">
@@ -10,13 +11,35 @@
                 </div>
             </div>
         </div>
-        <div class="bsbb box p20 title fs18 cp-container" style="margin:10px auto;">
+        <div class="bsbb box p20 title cp-container" style="margin:10px auto;">
             <div class="full-width">
-                <textarea name="cp-title" style='padding-right:70px;' rows="1" onblur='this.classList.remove("active");document.getElementById("title-counter").innerHTML = "";' onfocus='this.classList.add("active");var len = this.value.length;document.getElementById("title-counter").innerHTML = len+"/"+250;' onkeyup="updateTextareaCounter(this, 'title-counter', 250)" class="bsbb box full-width p10 lh20 fs15 text textarea" maxlength="250" placeholder="{{newpost_actions_dict.title}}"></textarea>
+                <textarea name="cp-title" style='padding-right:70px;' rows="1" onblur='this.classList.remove("active");document.getElementById("title-counter").innerHTML = "";' onfocus='this.classList.add("active");var len = this.value.length;document.getElementById("title-counter").innerHTML = len+"/"+80;' onkeyup="updateTextareaCounter(this, 'title-counter', 80);validateForm();" class="bsbb box full-width p10 lh20 fs15 text textarea" maxlength="80" placeholder="{{newpost_actions_dict.title}}"></textarea>
                 <p class='noselect fs13 absolute cg2' style="bottom:0;right:10px;line-height:40px;" id='title-counter'></p>
             </div>
             <div class="bsbb full-width box mt10">
                 {% include 'posts/createpost/rich_text_editor.html' %}
+            </div>
+        </div>
+        <div class="bsbb box p020 title cp-container">
+            <div class="p100 full-width inline-flex" id="flair_container">
+                <div class="nocommunity textarea p10 fs15 cg2 hand box flair" data-title="{{newpost_actions_dict.spoiler}}" id="flair" onclick="this.classList.toggle('active');" style="border-radius:18px;">&nbsp;&nbsp;Spoiler&nbsp;&nbsp;</div>
+                <div class="nocommunity textarea p10 fs15 cg2 ml10 hand box flair" data-title="{{newpost_actions_dict.nsfw}}" id="flair"  onclick="this.classList.toggle('active');" style="border-radius:18px;">&nbsp;&nbsp;NSFW&nbsp;&nbsp;</div>
+            </div>
+        </div>
+        <div class="cp-container" style="margin:10px auto;">
+            <p class="fwbold cg2 mt20 mb10">{{word_list|getword:"where-to-publish"|ucwords}}</p>
+            <div class="bsbb box p20 title">
+                <div class="full-width" id="selected-communities">
+                    <ul class="inline-block full-width">
+                        <li class="inline-flex btn left p010 selected-community noselect" style="height:30px;border-radius: 20px;opacity:1;">
+                            <img src="{{current_user.avatar_url}}" class="rounded sqr20" style="margin:5px 0;"/>
+                            <p class="lh20 fs15 noselect" style="margin:5px 10px;">u/{{current_user.user_login}}</p>
+                        </li>
+                    </ul>
+                </div>
+                <textarea rows="1" onblur='this.classList.remove("active");' onfocus='this.classList.add("active");' class="bsbb box full-width p10 lh20 fs15 text oh" style="resize:none;height:40px;overflow:hidden;" placeholder="{{newpost_actions_dict.searchcommunity}}" id="communitysearch"></textarea>
+                <div class="full-width dropdown hidden" style="width:calc(100% - 40px); max-height: 220px; overflow: scroll; border-bottom: 1px solid var(--border-color);" id="communities">
+                </div>
             </div>
         </div>
         <div id="results-container">
@@ -25,13 +48,55 @@
         <div class="bsbb cp-container hcentered mt10" id="question-view">
             <p class="fwbold cg2 mt20">{{word_list|getword:"question-view"|ucwords}}</p>
             <style>
+                select{
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                    appearance: none;
+                    background: url("{% static 'assets/img/download.png' %}") no-repeat 90% 50%;
+                }
                 #question-view .box:hover{border:1px solid var(--gray2);}
                 #question-view .box.active{border: 1px solid var(--black);}
                 .answer-view .box:hover{border:1px solid var(--gray2);}
                 .answer-view .box.active{border: 1px solid var(--black);}
-                .media-answer{width:calc(50% - 10px);height: 150px; background-image: url('{% static "assets/img/add-image.svg" %}'); background-position: center; background-size: 40px; background-repeat: no-repeat;}
+                .media-answer{width:calc(50% - 10px);}
+                .media-answer div{height: 150px; background-image: url('{% static "assets/img/add-image.svg" %}'); background-position: center; background-size: 40px; background-repeat: no-repeat;}
                 .media-answer:nth-child(2n){margin-left: 20px;}
+                .media-answer img{object-fit: cover;height: 148px; border-radius: 9px;}
+                .colorbox-answer{height:200px;overflow:hidden;}
                 .colorbox-answer:nth-child(2n){margin-left: 20px;}
+                .question-media{background-image: url('{% static "assets/img/add-image.svg" %}'); background-position: center; background-size: 40px; background-repeat: no-repeat;}
+                .qred[placeholder]:empty::before {
+                    content: attr(placeholder);
+                    color: var(--question-color-red-text);
+                }
+                .qpink[placeholder]:empty::before {
+                    content: attr(placeholder);
+                    color: var(--question-color-pink-text);
+                }
+                .qpurple[placeholder]:empty::before {
+                    content: attr(placeholder);
+                    color: var(--question-color-purple-text);
+                }
+                .qblue[placeholder]:empty::before {
+                    content: attr(placeholder);
+                    color: var(--question-color-blue-text);
+                }
+                .qgreen[placeholder]:empty::before {
+                    content: attr(placeholder);
+                    color: var(--question-color-green-text);
+                }
+                .qlightgreen[placeholder]:empty::before {
+                    content: attr(placeholder);
+                    color: var(--question-color-lightgreen-text);
+                }
+                .qblack[placeholder]:empty::before {
+                    content: attr(placeholder);
+                    color: var(--question-color-black-text);
+                }
+
+                [placeholder]:empty:focus::before {
+                    content: "";
+                }
             </style>
             <div class="bsbb full-width inline-flex p100">
                 <div class="bsbb box p20 one-third-width hand" id="question-view1" onclick="questionViewSelected('text')">
@@ -63,6 +128,14 @@
         <div id="questions-container" class="dnone">
             {% include 'posts/createpost/quiz_question.html' with number=1 %}
         </div>
+        <div class="cp-container">
+            <div class="bsbb box p20 mt20 title full-width inline-block">
+                <div class="bsbb p10 hand left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;' style="width:calc(25% - 15px); text-align:center;border-radius:4px;">{{newpost_actions_dict.cancel}}</div>
+                <div class="bsbb p10 m020 hand left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;'  style="width:calc(25% - 15px); text-align:center;border-radius:4px;">{{newpost_actions_dict.clear}}</div>
+                <div class="bsbb p10 hand left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;'  style="width:calc(25% - 15px);margin-right:20px; text-align:center;border-radius:4px;">{{newpost_actions_dict.save}}</div>
+                <input disabled type="submit" id="cp-sendBtn" class="btn p10 left fs15 lh20 noselect" style="border-radius:4px;height:30px;width:calc(25% - 35px); border:none; text-align:center; color:var(--main-color); font-weight:700;" value="{{newpost_actions_dict.send}}" onclick="return saveQuiz()"/>
+            </div>
+        </div>
     </form>
 </div>
 <script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/jquery.textfill.js'></script>
@@ -80,63 +153,347 @@
                 data : { number: number}, // data sent with the post request
                 // handle a successful response
                 success : function(json) {
-                    console.log(json); // another sanity check
                     document.getElementById("add_quiz_result"+number).classList.add("dnone");
                     document.getElementById("remove_quiz_result"+number).classList.remove("dnone");
-                    document.getElementById("results-container").innerHTML += json;
+                    j("#results-container").append(json);
                     elems = document.getElementsByClassName("quiz_result");
                     if(elems.length < 100){
                         document.getElementById("remove_quiz_result"+(number + 1)).classList.remove("dnone");
                     }
+                    var options = document.getElementsByClassName("quiz_answer_options");
+                    for(var i=0; i<options.length; i++){
+                        var opt = document.createElement('option');
+                        // create text node to add to option element (opt)
+                        opt.appendChild( document.createTextNode("{{word_list|getword:'result'|ucwords}} "+(number + 1)));
+                        // set value property of opt
+                        opt.value = 'result'+(number + 1); 
+                        // add opt to end of select box (sel)
+                        options[i].appendChild(opt); 
+                    }
                 }
             });
         }
+        validateForm();
+    }
+    function addAnotherQuestion(number){
+        var qtype = document.getElementById("question_type").value;
+        j.ajax({
+                url:"{% url 'addanotherquizquestion' %}",
+                type : "GET", // http method
+                data : { number: number, type: qtype}, // data sent with the post request
+                // handle a successful response
+                success : function(json) {
+                    document.getElementById("add_quiz_question"+number).classList.add("dnone");
+                    j("#questions-container").append(json);
+                    if(number == 1){
+                        document.getElementById("remove_quiz_question"+number).classList.remove("dnone");
+                    }
+                    document.getElementById("remove_quiz_question"+(number+1)).classList.remove("dnone");
+                    if(qtype=="colorBox"){
+                        coloredBCSelected(number+1);
+                    }
+                    var sel = document.getElementById("quiz_answer_question"+(number+1)+"_answer1_options");
+                    for(var i=0; i<sel.options.length; i++){
+                        sel.options[i].remove();
+                    }
+                    var results = document.getElementsByClassName("quiz_result");
+                    for(var i=0; i<results.length; i++){
+                        var opt = document.createElement('option');
+                        // create text node to add to option element (opt)
+                        var val = document.getElementsByName("quiz_result_title"+(i+1))[0].value;
+                        if(val == ""){
+                            val = "{{word_list|getword:'result'|ucwords}} "+(i + 1);
+                        }
+                        opt.appendChild(document.createTextNode(val));
+                        // set value property of opt
+                        opt.value = 'result'+(i + 1); 
+                        // add opt to end of select box (sel)
+                        sel.appendChild(opt); 
+                    }
+                    sel = document.getElementById("quiz_answer_question"+(number+1)+"_answer1_options_media");
+                    for(var i=0; i<sel.options.length; i++){
+                        sel.options[i].remove();
+                    }
+                    for(var i=0; i<results.length; i++){
+                        var opt = document.createElement('option');
+                        // create text node to add to option element (opt)
+                        var val = document.getElementsByName("quiz_result_title"+(i+1))[0].value;
+                        if(val == ""){
+                            val = "{{word_list|getword:'result'|ucwords}} "+(i + 1);
+                        }
+                        opt.appendChild(document.createTextNode(val));
+                        // set value property of opt
+                        opt.value = 'result'+(i + 1); 
+                        // add opt to end of select box (sel)
+                        sel.appendChild(opt); 
+                    }
+                    sel = document.getElementById("quiz_answer_question"+(number+1)+"_answer1_options_colorBox");
+                    for(var i=0; i<sel.options.length; i++){
+                        sel.options[i].remove();
+                    }
+                    for(var i=0; i<results.length; i++){
+                        var opt = document.createElement('option');
+                        // create text node to add to option element (opt)
+                        var val = document.getElementsByName("quiz_result_title"+(i+1))[0].value;
+                        if(val == ""){
+                            val = "{{word_list|getword:'result'|ucwords}} "+(i + 1);
+                        }
+                        opt.appendChild(document.createTextNode(val));
+                        // set value property of opt
+                        opt.value = 'result'+(i + 1); 
+                        // add opt to end of select box (sel)
+                        sel.appendChild(opt); 
+                    }
+                    document.querySelectorAll('.quiz_question_colored_title').forEach(item => {
+                        item.addEventListener('keypress',function(evt){
+                            var range = window.getSelection().getRangeAt(0),
+                                modifiers = [0,8]; // List of keys to ignore (0 is arrows & 8 is delete in firefox)
+                            
+                            if(range.startContainer.parentNode.className!=='test' && modifiers.indexOf(evt.which) <  0){
+                                if(!range.collapsed){
+                                    range.deleteContents();
+                                }
+                                var el =  document.createElement('span');
+                                el.appendChild(document.createTextNode('A'));
+                                el.className = 'test';
+                                range.insertNode(el);
+                                
+                                var sel = window.getSelection();		
+                                range.setStartBefore(el.childNodes[0]);
+                                range.setEndAfter(el.childNodes[0]);
+                                sel.removeAllRanges();
+                                sel.addRange(range);
+                            }
+                        });
+                    });
+                    j('.quiz_question_colored_title').keydown(function(e) { 
+                        if (e.keyCode === 13) {
+                            document.execCommand('insertHTML', false, '');
+                            return false;
+                        }
+                        if(e.keyCode === 46 && j('div[contenteditable]').text().length() === 0){
+                            document.execCommand('insertHTML', false, '<span class="test"></span>');
+                            return false;
+                        }
+                        resizeContents();
+                    });
+                    j('.quiz_answer_colored_title').keydown(function(e) { 
+                        console.log(e.keyCode);
+                        if (e.keyCode === 13) {
+                            document.execCommand('insertHTML', false, '');
+                            return false;
+                        }
+                        if(e.keyCode === 46 && j('div[contenteditable]').text().length() === 0){
+                            document.execCommand('insertHTML', false, '<span class="test"></span>');
+                            return false;
+                        }
+                        j('.quiz_answer_colored_title').textfill({
+                            maxFontPixels: 82,
+                            minFontPixels: 15
+                        });
+                    });
+                    document.querySelectorAll('.quiz_answer_colored_title').forEach(item => {
+                        item.addEventListener('keypress',function(evt){
+                            var range = window.getSelection().getRangeAt(0),
+                                modifiers = [0,8]; // List of keys to ignore (0 is arrows & 8 is delete in firefox)
+                            
+                            if(range.startContainer.parentNode.className!=='test' && modifiers.indexOf(evt.which) <  0){
+                                if(!range.collapsed){
+                                    range.deleteContents();
+                                }
+                                var el =  document.createElement('span');
+                                el.appendChild(document.createTextNode('A'));
+                                el.className = 'test';
+                                range.insertNode(el);
+                                
+                                var sel = window.getSelection();		
+                                range.setStartBefore(el.childNodes[0]);
+                                range.setEndAfter(el.childNodes[0]);
+                                sel.removeAllRanges();
+                                sel.addRange(range);
+                            }
+                        });
+                    });
+                    validateForm();
+                }
+            });
+    }
+    function removeQuestion(number){
+        var elems = document.getElementsByClassName("quiz_question");
+        document.getElementById("quiz_question"+number).id= "quiz_question_remove";
+        for(var j = number; j < elems.length; j++){
+            elems[j].id = "quiz_question"+j;
+            document.getElementById("quiz_question_number"+(j+1)).innerHTML = j;
+            document.getElementById("quiz_question_number"+(j+1)).id = "quiz_result_number"+j;
+            var colorelems = document.getElementById("color-container"+(j+1)).getElementsByClassName("color-container-item");
+            var colors = ["red", "pink", "purple", "blue", "green", "lightgreen", "black"];
+            for(var i=0; i<colorelems.length; i++){
+                colorelems[i].setAttribute( "onClick", "colorChanged(this, "+j+", '"+colors[i]+"')" );
+            }
+            document.getElementById("color-container"+(j+1)).id = "color-container"+j;
+            document.getElementById("quiz_question_title"+(j+1)).name = "quiz_question_title"+j;
+            document.getElementById("quiz_question_title"+(j+1)).id = "quiz_question_title"+j;
+            document.getElementById("quiz_question_colored_title"+(j+1)).id = "quiz_question_colored_title"+j;
+            document.getElementById("questionContenteditable"+(j+1)).id = "questionContenteditable"+j;
+            document.getElementById("question-media"+(j+1)).id = "question-media"+j;
+            document.getElementById("question-media"+(j+1)+"-img").id = "question-media"+j+"-img";
+            document.getElementById("imageUpload"+(j+1)).setAttribute( "onChange", "uploadQuestionImg("+j+")" );
+            document.getElementById("imageUpload"+(j+1)).name = "imageUpload"+j;
+            document.getElementById("imageUpload"+(j+1)).id = "imageUpload"+j;
+            document.getElementById("answer_view_number"+(j+1)).innerHTML = j;
+            document.getElementById("answer_view_number"+(j+1)).id = "answer_view_number"+j;
+            document.getElementById("answer-view-"+(j+1)).id = "answer-view-"+j;
+            document.getElementById("answer-view"+(j+1)+"-1").setAttribute( "onClick", "answerViewSelected("+j+", 'text')" );
+            document.getElementById("answer-view"+(j+1)+"-1").id = "answer-view"+j+"-1";
+            document.getElementById("answer-view"+(j+1)+"-2").setAttribute( "onClick", "answerViewSelected("+j+", 'media')" );
+            document.getElementById("answer-view"+(j+1)+"-2").id = "answer-view"+j+"-2";
+            document.getElementById("answer-view"+(j+1)+"-3").setAttribute( "onClick", "answerViewSelected("+j+", 'colorBox')" );
+            document.getElementById("answer-view"+(j+1)+"-3").id = "answer-view"+j+"-3";
+            document.getElementById("answer-container"+(j+1)).id = "answer-container"+j;
+            var plainTextAnswers = document.getElementById("plain-text-answers"+(j+1)).getElementsByClassName("plain-text-answer-"+(j+1));
+            for(var i=0; i<plainTextAnswers.length; i++){
+                plainTextAnswers[i].id = "plain-text-answer-"+j+"-"+(i+1);
+                document.getElementById("quiz_answer_question"+(j+1)+"_answer"+(i+1)).name = "quiz_answer_question"+j+"_answer"+(i+1);
+                document.getElementById("quiz_answer_question"+(j+1)+"_answer"+(i+1)).id = "quiz_answer_question"+j+"_answer"+(i+1);
+                document.getElementById("quiz_answer_question"+(j+1)+"_answer"+(i+1)+"_options").id = "quiz_answer_question"+j+"_answer"+(i+1)+"_options";
+                plainTextAnswers[i].getElementsByTagName("p")[0].setAttribute( "onClick", "addTextAnswer("+j+", "+(i+1)+")" );
+                plainTextAnswers[i].getElementsByTagName("p")[1].setAttribute( "onClick", "removeTextAnswer("+j+", "+(i+1)+")" );
+            }
+            document.getElementById("plain-text-answers"+(j+1)).id = "plain-text-answers"+j;
+            var mediaAnswers = document.getElementById("media-answers"+(j+1)).getElementsByClassName("media-answer");
+            for(var i=0; i<mediaAnswers.length; i++){
+                document.getElementById("media-answer"+(j+1)+"-img"+(i+1)).id = "media-answer"+j+"-img"+(i+1);
+                document.getElementById("media-answer"+(j+1)+"-img"+(i+1)+"-upload").name = "media-answer"+j+"-img"+(i+1)+"-upload";
+                document.getElementById("media-answer"+(j+1)+"-img"+(i+1)+"-upload").setAttribute("onChange", "uploadAnswerImg("+j+", "+(i+1)+")");
+                document.getElementById("media-answer"+(j+1)+"-img"+(i+1)+"-upload").id = "media-answer"+j+"-img"+(i+1)+"-upload";
+                document.getElementById("media-answer"+(j+1)+"-remove"+(i+1)).setAttribute("onClick", "removeMediaAnswer("+j+", "+(i+1)+")");
+                document.getElementById("media-answer"+(j+1)+"-remove"+(i+1)).id = "media-answer"+j+"-remove"+(i+1);
+                document.getElementById("quiz_answer_question"+(j+1)+"_answer"+(i+1)+"_options_media").id = "quiz_answer_question"+j+"_answer"+(i+1)+"_options_media";
+            }
+            document.getElementById("add-media-answer"+(j+1)).setAttribute("onClick", "addMediaAnswer("+j+", 1);");
+            document.getElementById("add-media-answer"+(j+1)).id = "add-media-answer"+j;
+            document.getElementById("media-answers"+(j+1)).id = "media-answers"+j;
+
+            var colorBtns = document.getElementsByClassName("colorbox-answer"+(j+1)+"-color");
+            for(var i=0; i<colorBtns.length; i++){
+                colorBtns[i].setAttribute("onClick", "answerColorChanged(this, "+j+", '"+colors[i]+"')");
+                colorBtns[i].classList.add("colorbox-answer"+j);
+                colorBtns[i].classList.remove("colorbox-answer"+(j+1));
+            }
+            document.getElementById("selectedAnswerColor"+(j+1)).id = "selectedAnswerColor"+j;
+            var colorBoxAnswers = document.getElementsByClassName("colorbox-answer"+(j+1));
+            for(var i=0; i<colorBoxAnswers.length; i++){
+                colorBoxAnswers[i].classList.add("colorbox-answer"+j);
+                colorBoxAnswers[i].classList.remove("colorbox-answer"+(j+1));
+                document.getElementById("colorBox-answer"+(j+1)+"-remove"+(i+1)).setAttribute("onClick", "removeColorBoxAnswer("+j+", "+(i+1)+")");
+                document.getElementById("colorBox-answer"+(j+1)+"-remove"+(i+1)).id = "colorBox-answer"+j+"-remove"+(i+1);
+                document.getElementById("quiz_answer_question"+(j+1)+"_answer"+(i+1)+"_options_colorBox").id = "quiz_answer_question"+j+"_answer"+(i+1)+"_options_colorBox";
+            }
+            document.getElementById("add-colorBox-answer"+(j+1)).setAttribute("onClick", "addColorBoxAnswer("+j+", 1)");
+            document.getElementById("add-colorBox-answer"+(j+1)).id = "add-colorBox-answer"+j;
+            document.getElementById("colorBox-answers"+(j+1)).id = "colorBox-answers"+j;
+
+            document.getElementById("add_quiz_question"+(j+1)).setAttribute( "onClick", "addAnotherQuestion("+j+")" );
+            document.getElementById("add_quiz_question"+(j+1)).id = "add_quiz_question"+j;
+            document.getElementById("remove_quiz_question"+(j+1)).setAttribute( "onClick", "removeQuestion("+j+")" );
+            document.getElementById("remove_quiz_question"+(j+1)).id = "remove_quiz_question"+j;
+        }
+        document.getElementById("quiz_question_remove").remove();
+        elems = document.getElementsByClassName("quiz_question");
+        document.getElementById("add_quiz_question"+elems.length).classList.remove("dnone");
+        if(elems.length == 1){
+            document.getElementById("remove_quiz_question1").classList.add("dnone");
+        }
+        validateForm();
     }
     function removeResult(number){
-        var elems = document.getElementsByClassName("quiz_result");
         document.getElementById("quiz_result"+number).id= "quiz_result_remove";
-        for(var j = number; j < elems.length; j++){
-            elems[j].id = "quiz_result"+j;
+        document.getElementById("quiz_result_remove").remove();
+        var elems = document.getElementsByClassName("quiz_result");
+        for(var j = number; j <= elems.length; j++){
+            document.getElementById("quiz_result"+(j+1)).id = "quiz_result"+j;
             document.getElementById("quiz_result_number"+(j+1)).innerHTML = j;
             document.getElementById("quiz_result_number"+(j+1)).id = "quiz_result_number"+j;
+            document.getElementById("quiz_result_title"+(j+1)).setAttribute("onkeyup", "resultTitleChanged(this, "+j+")");
+            document.getElementById("quiz_result_title"+(j+1)).name = "quiz_result_title"+j;
+            document.getElementById("quiz_result_title"+(j+1)).id = "quiz_result_title"+j;
             document.getElementById("quiz_result_img_container"+(j+1)).id = "quiz_result_img_container"+j;
+            document.getElementById("quiz_result_img"+(j+1)).id = "quiz_result_img"+j;
             document.getElementById("remove_quiz_result"+(j+1)).setAttribute( "onClick", "removeResult("+j+")" );
             document.getElementById("remove_quiz_result"+(j+1)).id = "remove_quiz_result"+j;
+            document.getElementById("add-result-img-btn"+(j+1)).id = "add-result-img-btn"+j;
+            document.getElementById("add-result-img"+(j+1)).setAttribute("onChange", "addResultImage(this, "+j+")");
+            document.getElementById("add-result-img"+(j+1)).id = "add-result-img"+j;
             document.getElementById("add_quiz_result"+(j+1)).setAttribute( "onClick", "addAnotherResult("+j+")" );
             document.getElementById("add_quiz_result"+(j+1)).id = "add_quiz_result"+j;
+            document.getElementById("edit_quiz_result_img"+(j+1)).setAttribute( "onChange", "addResultImage(this, "+j+")" );
+            document.getElementById("edit_quiz_result_img"+(j+1)).id = "edit_quiz_result_img"+j;
+            document.getElementById("remove_quiz_result_img"+(j+1)).setAttribute( "onClick", "removeResultImage("+j+")" );
+            document.getElementById("remove_quiz_result_img"+(j+1)).id = "remove_quiz_result_img"+j;
         }
-        document.getElementById("quiz_result_remove").remove();
         elems = document.getElementsByClassName("quiz_result");
         document.getElementById("add_quiz_result"+elems.length).classList.remove("dnone");
         if(elems.length == 1){
             document.getElementById("remove_quiz_result1").classList.add("dnone");
         }
+        var select = document.getElementsByClassName("quiz_answer_options");
+        for(var i=0; i<select.length; i++){
+            var length = select[i].options.length;
+            for (var d = length-1; d >= 0; d--) {
+                select[i].remove(d);
+            }
+        }
+        select = document.getElementsByClassName("quiz_answer_options");
+        for(var i=0; i<select.length; i++){
+            for(var d=0; d<elems.length; d++){
+                var opt = document.createElement('option');
+                // create text node to add to option element (opt)
+                var val = document.getElementsByName("quiz_result_title"+(d+1))[0].value;
+                if(val == ""){
+                    val = "{{word_list|getword:'result'|ucwords}} "+(d + 1);
+                }
+                opt.appendChild(document.createTextNode(val));
+                // set value property of opt
+                opt.value = 'result'+(d + 1); 
+                // add opt to end of select box (sel)
+                select[i].appendChild(opt);
+            }
+        }
+        validateForm();
     }
     function coloredBCSelected(number){
         document.getElementById("quiz_question_title"+number).classList.add("dnone");
         document.getElementById("quiz_question_colored_title"+number).classList.remove("dnone");
         document.getElementById("quiz_question_colored_title"+number).classList.add("resizable");
         document.getElementById("quiz_question_colored_title"+number).style.backgroundColor = "var(--question-color-red)";
-        document.getElementById("quiz_question_colored_title"+number).style.color = "var(--question-color-red-text)";
+        document.getElementById("questionContenteditable"+number).classList.add("qred");
+        selectedColors[number] = "red";
     }
     function colorChanged(elem, number, color){
+        var oldColor = selectedColors[number];
         document.getElementById("quiz_question_colored_title"+number).style.backgroundColor = "var(--question-color-"+color+")";
-        document.getElementById("quiz_question_colored_title"+number).style.color = "var(--question-color-"+color+"-text)";
-        var colors = document.getElementsByClassName("color-container-item");
+        document.getElementById("questionContenteditable"+number).classList.remove("q"+oldColor);
+        document.getElementById("questionContenteditable"+number).classList.add("q"+color);
+        var colors = document.getElementById("color-container"+number).getElementsByClassName("color-container-item");
         for (var i = 0; i < colors.length; i++) {
             colors[i].classList.remove("border2");
             colors[i].classList.add("borderw");
         }
         elem.classList.remove("borderw");
         elem.classList.add("border2");
+        document.getElementById("question_color"+number).value = color;
         selectedColors[number] = color;
     }
     function answerColorChanged(elem, number, color){
-        var answers = document.getElementsByClassName("colorbox-answer"+number);
+        var answers = document.getElementById("colorBox-answers"+number).getElementsByClassName("colorbox-answer"+number);
+        var oldColor = answers[0].getElementsByTagName("div")[0].getElementsByTagName("div")[0].classList;
+        oldColor = oldColor.item(oldColor.length - 1).replace("q", "");
         for(var i=0; i<answers.length; i++){
-            answers[i].style.backgroundColor = "var(--question-color-"+color+")";
+            answers[i].getElementsByTagName("div")[0].style.backgroundColor = "var(--question-color-"+color+")";
+            answers[i].getElementsByTagName("div")[0].getElementsByTagName("div")[0].classList.remove("q"+oldColor);
+            answers[i].getElementsByTagName("div")[0].getElementsByTagName("div")[0].classList.add("q"+color);
         }
-        var colors = document.getElementsByClassName("colorbox-answer"+number+"-color");
+        var colors = document.getElementById("colorBox-answers"+number).getElementsByClassName("colorbox-answer"+number+"-color");
         for (var i = 0; i < colors.length; i++) {
             colors[i].classList.remove("border2");
             colors[i].classList.add("borderw");
@@ -167,7 +524,7 @@
             return false;
         }
         j('.quiz_answer_colored_title').textfill({
-            maxFontPixels: 82,
+            maxFontPixels: 94,
             minFontPixels: 15
         });
     });
@@ -194,10 +551,33 @@
             }
         });
     });
+
+    document.querySelectorAll('.quiz_answer_colored_title').forEach(item => {
+        item.addEventListener('keypress',function(evt){
+            var range = window.getSelection().getRangeAt(0),
+                modifiers = [0,8]; // List of keys to ignore (0 is arrows & 8 is delete in firefox)
+            
+            if(range.startContainer.parentNode.className!=='test' && modifiers.indexOf(evt.which) <  0){
+                if(!range.collapsed){
+                    range.deleteContents();
+                }
+                var el =  document.createElement('span');
+                el.appendChild(document.createTextNode('A'));
+                el.className = 'test';
+                range.insertNode(el);
+                
+                var sel = window.getSelection();		
+                range.setStartBefore(el.childNodes[0]);
+                range.setEndAfter(el.childNodes[0]);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        });
+    });
     
     function resizeContents() {
         j('.quiz_question_colored_title').textfill({
-            maxFontPixels: 120,
+            maxFontPixels: 160,
             minFontPixels: 15
         });
     }
@@ -267,8 +647,13 @@
             for (var i = 0; i < colorboxes.length; i++) {
                 colorboxes[i].classList.remove("dnone");
             }
-            coloredBCSelected(1);
+            var elems = document.getElementsByClassName("quiz_question");
+            for (var i = 1; i <= media.length; i++) {
+                coloredBCSelected(i);
+            } 
         }
+        document.getElementById("question_type").value = op;
+        validateForm();
     }
 
     function answerViewSelected(number, op){
@@ -300,28 +685,215 @@
             document.getElementById("media-answers"+number).classList.remove("inline-block");
             document.getElementById("colorBox-answers"+number).classList.remove("dnone");
         }
+        document.getElementById("answer_type"+number).value = op;
+        validateForm();
     }
-    
-    function coloredBoxFocus(number){
-        /*var txt = document.getElementById("questionContenteditable"+number).innerText;
-        if (txt == "{{word_list|getword:'question'|ucfirst}}"){
-            document.getElementById("questionContenteditable"+number).innerHTML = "";
-            document.getElementById("quiz_question_colored_title"+number).style.color = "white";
-        }else{
-            document.getElementById("questionContenteditable"+number).style.fontSize = "15px";
-        }*/
-        return true;
-    } 
-
-    function coloredBoxBlur(number){
-        var txt = document.getElementById("questionContenteditable"+number).innerText;
-        if (document.getElementById("questionContenteditable"+number).innerText == "" || document.getElementById("questionContenteditable"+number).innerHTML == "<br>"){
-            document.getElementById("questionContenteditable"+number).innerHTML = "<span class='test'>{{word_list|getword:'question'|ucfirst}}</span>";
-            document.getElementById("quiz_question_colored_title"+number).style.color = "var(--question-color-"+selectedColors[number]+"-text)";
+    function addResultImage(elem, number){
+        var input = elem;
+        var j = jQuery.noConflict();
+        if (input.files && input.files[0]) {
+            var fd = new FormData();
+            var files = input.files[0];
+            var fullPath = input.value;
+            var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+            var filename = fullPath.substring(startIndex);
+            if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+                filename = filename.substring(1);
+            }
+            newName = filename.hashCode();
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('quiz_result_img_container'+number).classList.remove("dnone");
+                document.getElementById('quiz_result_img'+number).src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+            fd.append('file',files,newName);
+            j.ajax({
+                type: "POST",
+                url:"{% url 'uploadmedia' %}",
+                data: fd,
+                processData: false, 
+                contentType: false,
+                cache: false,
+                async: false,
+                success: function(response) {
+                    if(response != ""){
+                        document.getElementById('quiz_result_img'+number).src = response.url;
+                    }
+                }
+            });
         }
-        return true;
+        document.getElementById('add-result-img-btn'+number).classList.add("dnone");
     }
-    function uploadImg(number){
+
+    function uploadAnswerImg(number, counter){
+        var input = document.getElementById("media-answer"+number+"-img"+counter+"-upload");
+        var j = jQuery.noConflict();
+        if (input.files && input.files[0]) {
+            var fd = new FormData();
+            var files = input.files[0];
+            var fullPath = input.value;
+            var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+            var filename = fullPath.substring(startIndex);
+            if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+                filename = filename.substring(1);
+            }
+            newName = filename.hashCode();
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('media-answer'+number+'-img'+counter).classList.remove("dnone");
+                document.getElementById('media-answer'+number+'-img'+counter).src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+            fd.append('file',files,newName);
+            j.ajax({
+                type: "POST",
+                url:"{% url 'uploadmedia' %}",
+                data: fd,
+                processData: false, 
+                contentType: false,
+                cache: false,
+                async: false,
+                success: function(response) {
+                    if(response != ""){
+                        document.getElementById('media-answer'+number+'-img'+counter).src = response.url;
+                        validateForm();
+                    }
+                }
+            });
+        }
+        document.getElementById('add-result-img-btn'+number).classList.add("dnone");
+    }
+   
+    function addTextAnswer(number, counter){
+        var answers = document.getElementById("plain-text-answers"+number).getElementsByClassName("plain-text-answer-"+number);
+        for (var i = answers.length - 1; i >= counter ; i--) {
+            document.getElementById("plain-text-answer-"+number+"-"+(i+1)).name = "plain-text-answer-"+number+"-"+(i+2);
+            document.getElementById("plain-text-answer-"+number+"-"+(i+1)).id = "plain-text-answer-"+number+"-"+(i+2);
+            document.getElementById("quiz_answer_question"+number+"_answer"+(i+1)).name = "quiz_answer_question"+number+"_answer"+(i+2);
+            document.getElementById("quiz_answer_question"+number+"_answer"+(i+1)).id = "quiz_answer_question"+number+"_answer"+(i+2);
+            document.getElementById("quiz_answer_question"+number+"_answer"+(i+1)+"_options").id = "quiz_answer_question"+number+"_answer"+(i+2)+"_options";
+            document.getElementById("plain-text-answer-"+number+"-"+(i+2)).getElementsByTagName("p")[0].setAttribute("onClick", "addTextAnswer("+number+", "+(i+2)+");");
+            document.getElementById("plain-text-answer-"+number+"-"+(i+2)).getElementsByTagName("p")[1].setAttribute("onClick", "removeTextAnswer("+number+", "+(i+2)+");");
+        }
+        var li=document.createElement("li");
+        li.setAttribute("class", "bsbb full-width inline-flex border m50 mt10 p10 br4 plain-text-answer-"+number);
+        li.setAttribute("id", "plain-text-answer-"+number+"-"+(counter+1));
+        var circle = document.createElement("div");
+        circle.setAttribute("class", "noselect border2 sqr20 rounded m100");
+        li.append(circle);
+        var div = document.createElement("div");
+        div.setAttribute("class", "m010");
+        div.style.width = "calc(100% - 240px)";
+        var ta = document.createElement("textarea");
+        ta.setAttribute("class", "bsbb full-width p10 lh20 fs15 text textarea br4");
+        ta.setAttribute("name", "quiz_answer_question"+number+"_answer"+(counter+1));
+        ta.setAttribute("id", "quiz_answer_question"+number+"_answer"+(counter+1));
+        ta.setAttribute("onkeyup", "validateForm()");
+        ta.setAttribute("rows", "1");
+        ta.setAttribute("maxlength", "250");
+        ta.setAttribute("placeholder", "{{word_list|getword:'answer-noun'|ucfirst}}");
+        div.append(ta);
+        li.append(div);
+        var sel = document.createElement("select");
+        sel.setAttribute("class", "br4 cb bcba p010 quiz_answer_options mr10");
+        sel.style.width = "120px";
+        sel.setAttribute("id", "quiz_answer_question"+number+"_answer"+(counter+1)+"_options");
+        var results = document.getElementsByClassName("quiz_result");
+        for(var r=0; r<results.length; r++){
+            var opt = document.createElement('option');
+            // create text node to add to option element (opt)
+            var val = document.getElementsByName("quiz_result_title"+(r+1))[0].value;
+            if(val == ""){
+                val = "{{word_list|getword:'result'|ucwords}} "+(r + 1);
+            }
+            opt.appendChild(document.createTextNode(val));
+            // set value property of opt
+            opt.value = 'result'+(r + 1);
+            // add opt to end of select box (sel)
+            sel.appendChild(opt); 
+        }
+        li.append(sel);
+        var add = document.createElement("p");
+        add.setAttribute("class", "sqrt30 border rounded hand cg2 lh30 tac fs18 m50 mr10");
+        add.setAttribute("onClick", "addTextAnswer("+number+", "+(counter+1)+")");
+        add.innerHTML = "+";
+        li.append(add);
+        var remove = document.createElement("p");
+        remove.setAttribute("class", "sqrt30 border rounded hand cg2 lh30 tac fs20 m50");
+        remove.setAttribute("onClick", "removeTextAnswer("+number+", "+(counter+1)+")");
+        remove.innerHTML = "-";
+        li.append(remove);
+        j("#plain-text-answer-"+number+"-"+counter).after(li);
+        validateForm();
+    }
+
+    function removeTextAnswer(number, counter){
+        var answers = document.getElementById("plain-text-answers"+number).getElementsByClassName("plain-text-answer-"+number);
+        if(counter == 1 && answers.length == 1){
+
+        }else{
+            document.getElementById("plain-text-answer-"+number+"-"+counter).id = "plain-text-answer-"+number+"-remove";
+            for (var i = counter; i < answers.length ; i++) {
+                document.getElementById("plain-text-answer-"+number+"-"+(i+1)).name = "plain-text-answer-"+number+"-"+i;
+                document.getElementById("plain-text-answer-"+number+"-"+(i+1)).id = "plain-text-answer-"+number+"-"+i;
+                document.getElementById("quiz_answer_question"+number+"_answer"+(i+1)).name = "quiz_answer_question"+number+"_answer"+i;
+                document.getElementById("quiz_answer_question"+number+"_answer"+(i+1)).id = "quiz_answer_question"+number+"_answer"+i;
+                document.getElementById("quiz_answer_question"+number+"_answer"+(i+1)+"_options").id = "quiz_answer_question"+number+"_answer"+i+"_options";
+                document.getElementById("plain-text-answer-"+number+"-"+i).getElementsByTagName("p")[0].setAttribute("onClick", "addTextAnswer("+number+", "+i+");");
+                document.getElementById("plain-text-answer-"+number+"-"+i).getElementsByTagName("p")[1].setAttribute("onClick", "removeTextAnswer("+number+", "+i+");");
+            }
+            document.getElementById("plain-text-answer-"+number+"-remove").remove();
+        }
+    }
+
+    function removeResultImage(number){
+        document.getElementById('quiz_result_img_container'+number).classList.add("dnone");
+        document.getElementById('quiz_result_img'+number).src = ""
+        document.getElementById('add-result-img-btn'+number).classList.remove("dnone");
+    }
+    function removeMediaAnswer(number, counter){
+        var answers = document.getElementById("media-answers"+number).getElementsByClassName("media-answer");
+        for (var i = counter; i < answers.length; i++) {
+            document.getElementById("media-answer"+number+"-img"+(i+1)).id = "media-answer"+number+"-img"+i;
+            document.getElementById("media-answer"+number+"-img"+(i+1)+"-upload").name = "media-answer"+number+"-img"+i+"-upload";
+            document.getElementById("media-answer"+number+"-img"+(i+1)+"-upload").setAttribute("onChange", "uploadAnswerImg("+number+", "+i+")");
+            document.getElementById("media-answer"+number+"-img"+(i+1)+"-upload").id = "media-answer"+number+"-img"+i+"-upload";
+            document.getElementById("media-answer"+number+"-remove"+(i+1)).setAttribute("onClick", "removeMediaAnswer("+number+","+i+")");
+            document.getElementById("media-answer"+number+"-remove"+(i+1)).id = "media-answer"+number+"-remove"+i;
+        }
+        answers[counter - 1].remove();
+        answers = document.getElementById("media-answers"+number).getElementsByClassName("media-answer");
+        if(document.getElementById("add-media-answer"+number).classList.contains("ml20")){
+            document.getElementById("add-media-answer"+number).classList.remove("ml20");
+        }else{
+            document.getElementById("add-media-answer"+number).classList.add("ml20");
+        }
+        document.getElementById("add-media-answer"+number).setAttribute("onClick","addMediaAnswer("+number+", "+answers.length+")");
+        if(answers.length == 1){
+            document.getElementById("media-answer"+number+"-remove1").classList.add("dnone");
+        }
+    }
+    function removeColorBoxAnswer(number, counter){
+        var answers = document.getElementById("colorBox-answers"+number).getElementsByClassName("colorbox-answer");
+        for (var i = counter; i < answers.length; i++) {
+            document.getElementById("colorBox-answer"+number+"-remove"+(i+1)).setAttribute("onClick", "removeColorBoxAnswer("+number+","+i+")");
+            document.getElementById("colorBox-answer"+number+"-remove"+(i+1)).id = "colorBox-answer"+number+"-remove"+i;
+        }
+        answers[counter - 1].remove();
+        answers = document.getElementById("colorBox-answers"+number).getElementsByClassName("colorbox-answer");
+        if(document.getElementById("add-colorBox-answer"+number).classList.contains("ml20")){
+            document.getElementById("add-colorBox-answer"+number).classList.remove("ml20");
+        }else{
+            document.getElementById("add-colorBox-answer"+number).classList.add("ml20");
+        }
+        document.getElementById("add-colorBox-answer"+number).setAttribute("onClick","addColorBoxAnswer("+number+", "+answers.length+")");
+        if(answers.length == 1){
+            document.getElementById("colorBox-answer"+number+"-remove1").classList.add("dnone");
+        }
+    }
+
+    function uploadQuestionImg(number){
         var input = document.getElementById('imageUpload'+number);
         var j = jQuery.noConflict();
         if (input.files && input.files[0]) {
@@ -336,8 +908,9 @@
             newName = filename.hashCode();
             var reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('question-media'+number).src = e.target.result;
-                document.getElementById('question-media'+number).style.objectFit = "cover";
+                document.getElementById('question-media'+number+'-img').classList.remove("dnone");
+                document.getElementById('question-media'+number+'-img').src = e.target.result;
+                document.getElementById('question-media'+number+'-img').style.objectFit = "cover";
             }
             reader.readAsDataURL(input.files[0]);
             fd.append('file',files,newName);
@@ -351,7 +924,7 @@
                 async: false,
                 success: function(response) {
                     if(response != ""){
-                        document.getElementById('question-media'+number).src = response.url;
+                        document.getElementById('question-media'+number+'-img').src = response.url;
                     }
                 }
             });
@@ -359,31 +932,58 @@
     }
 
     function addMediaAnswer(number, counter){
+        counter = counter + 1;
         var i=document.createElement("li");
-        i.setAttribute("class","bsbb half-width left mt10 border br10 media-answer bcgrayish");
+        i.setAttribute("class","bsbb half-width left mt10 oh media-answer");
+        var div = document.createElement("div");
+        div.setAttribute("class", "bsbb bcgrayish br10 border full");
         var r=document.createElement("img");
         r.setAttribute("class","full-width dnone");
-        r.setAttribute("id","media-answer{{number}}-img"+counter);
-        i.append(r);
+        r.setAttribute("id","media-answer"+number+"-img"+counter);
+        div.append(r);
         var s=document.createElement("input");
         s.setAttribute("type","file");
+        s.setAttribute("id","media-answer"+number+"-img"+counter+"-upload");
+        s.setAttribute("name","media-answer"+number+"-img"+counter+"-upload");
+        s.setAttribute("onChange", "uploadAnswerImg("+number+", "+counter+")");
         s.setAttribute("class", "absolute aligntr full");
         s.style.opacity = "0";
         s.setAttribute("accept", ".png, .jpg, .jpeg");
-        i.append(s);
+        div.append(s);
         var k=document.createElement("p");
         k.setAttribute("class", "hand absolute aligntr m10 sqr20 lh20 rounded bcr cw tac p5 full-shadow");
         k.innerHTML = "&#10005;";
-        i.append(k);
+        k.setAttribute("id", "media-answer"+number+"-remove"+counter);
+        k.setAttribute("onClick", "removeMediaAnswer("+number+", "+counter+")");
+        div.append(k);
+        i.append(div)
+        var sel = document.createElement("select");
+        sel.setAttribute("class", "bsbb full-width br4 cb bcba mt10 p10 quiz_answer_options");
+        sel.setAttribute("id", "quiz_answer_question"+number+"_answer"+counter+"_options_media");
+        var results = document.getElementsByClassName("quiz_result");
+        for(var r=0; r<results.length; r++){
+            var opt = document.createElement('option');
+            // create text node to add to option element (opt)
+            var val = document.getElementsByName("quiz_result_title"+(r+1))[0].value;
+            if(val == ""){
+                val = "{{word_list|getword:'result'|ucwords}} "+(r + 1);
+            }
+            opt.appendChild(document.createTextNode(val));
+            // set value property of opt
+            opt.value = 'result'+(r + 1);
+            // add opt to end of select box (sel)
+            sel.appendChild(opt); 
+        }
+        i.append(sel);
         if(document.getElementById("add-media-answer"+number).classList.contains("ml20")){
             document.getElementById("add-media-answer"+number).classList.remove("ml20");
         }else{
             document.getElementById("add-media-answer"+number).classList.add("ml20");
         }
-        counter = counter + 1;
         document.getElementById("add-media-answer"+number).onclick = function() {addMediaAnswer(number, counter);};
-        j("#add-media-answer"+number).before(i)
+        j("#add-media-answer"+number).before(i);
         document.getElementById("media-answer"+number+"-remove1").classList.remove("dnone");
+        validateForm();
     }
 
     function addColorBoxAnswer(number, counter){
@@ -392,36 +992,104 @@
             color = "lgreen";
         }
         var i=document.createElement("li");
-        i.setAttribute("class","bsbb half-width left mt10 border bcq"+color+" colorbox-answer colorbox-answer"+number);
+        i.setAttribute("class","bsbb half-width left mt10 colorbox-answer colorbox-answer"+number);
         i.style.width = "calc(50% - 10px)";
         var r=document.createElement("div");
-        r.setAttribute("class","bsbb full-width oh p20");
+        r.setAttribute("class","bsbb full-width oh p20 br10 bcq"+color);
         var s=document.createElement("div");
-        s.setAttribute("class", "bsbb vam tac full-width fwbold inline-block quiz_answer_colored_title cw");
+        s.setAttribute("class", "bsbb vam tac full-width fwbold inline-block quiz_answer_colored_title cw q"+color);
         s.style.height = "110px";
         s.setAttribute("contenteditable", "true");
-        var m=document.createElement("span");
-        m.innerHTML = "{{word_list|getword:'answer-noun'|ucfirst}}";
-        m.setAttribute("class", "test");
-        s.append(m);
+        s.setAttribute("placeholder", "{{word_list|getword:'answer-noun'|ucfirst}}");
         r.append(s);
         i.append(r);
         var k=document.createElement("p");
         k.setAttribute("class", "hand absolute aligntr m10 sqr20 lh20 rounded bcr cw tac p5 full-shadow");
         k.innerHTML = "&#10005;";
+        k.setAttribute("id", "colorBox-answer"+number+"-remove"+(counter + 1));
+        k.setAttribute("onClick", "removeColorBoxAnswer("+number+", "+(counter+1)+")");
         i.append(k);
         if(document.getElementById("add-colorBox-answer"+number).classList.contains("ml20")){
             document.getElementById("add-colorBox-answer"+number).classList.remove("ml20");
         }else{
             document.getElementById("add-colorBox-answer"+number).classList.add("ml20");
         }
+        var sel = document.createElement("select");
+        sel.setAttribute("class", "bsbb full-width mt10 br4 cb bcba p10 quiz_answer_options");
+        sel.setAttribute("id", "quiz_answer_question"+number+"_answer"+(counter+1)+"_options_colorBox");
+        var results = document.getElementsByClassName("quiz_result");
+        for(var r=0; r<results.length; r++){
+            var opt = document.createElement('option');
+            // create text node to add to option element (opt)
+            var val = document.getElementsByName("quiz_result_title"+(r+1))[0].value;
+            if(val == ""){
+                val = "{{word_list|getword:'result'|ucwords}} "+(r + 1);
+            }
+            opt.appendChild(document.createTextNode(val));
+            // set value property of opt
+            opt.value = 'result'+(r + 1);
+            // add opt to end of select box (sel)
+            sel.appendChild(opt); 
+        }
+        i.append(sel);
         counter = counter + 1;
         document.getElementById("add-colorBox-answer"+number).onclick = function() {addColorBoxAnswer(number, counter);};
         j("#add-colorBox-answer"+number).before(i)
         document.getElementById("colorBox-answer"+number+"-remove1").classList.remove("dnone");
-
+        var newelem = document.getElementById("colorBox-answers"+number).getElementsByTagName("ul")[0].getElementsByTagName("li")[counter - 1].getElementsByTagName("div")[0].getElementsByClassName("quiz_answer_colored_title")[0];
+        newelem.addEventListener('focus',function(evt){
+            newelem.style.color = "white";
+        });
+        newelem.addEventListener('keyup',function(evt){
+            if(newelem.innerText.length > 0){
+                newelem.style.fontSize = "15px";
+            }else{
+                newelem.style.fontSize = "94px";   
+            }
+            if(newelem.innerHTML == "<br>"){
+                newelem.innerHTML = "";
+                newelem.style.fontSize = "94px";
+            }
+            validateForm();
+        });
+        newelem.addEventListener('keydown',function(e){
+            if (e.keyCode === 13) {
+                document.execCommand('insertHTML', false, '');
+                return false;
+            }
+            if(e.keyCode === 46 && item.text().length() === 0 && item.innerHTML.length === 0){
+                document.execCommand('insertHTML', false, '<span class="test"></span>');
+                return false;
+            }
+            j('.quiz_answer_colored_title').textfill({
+                maxFontPixels: 94,
+                minFontPixels: 15
+            });
+        });
+        newelem.addEventListener('keypress',function(evt){
+            var range = window.getSelection().getRangeAt(0),
+            modifiers = [0,8]; // List of keys to ignore (0 is arrows & 8 is delete in firefox)
+                
+            if(range.startContainer.parentNode.className!=='test' && modifiers.indexOf(evt.which) <  0){
+                if(!range.collapsed){
+                    range.deleteContents();
+                }
+                var el =  document.createElement('span');
+                el.appendChild(document.createTextNode('A'));
+                el.className = 'test';
+                range.insertNode(el);
+                var sel = window.getSelection();		
+                range.setStartBefore(el.childNodes[0]);
+                range.setEndAfter(el.childNodes[0]);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+            if (!newelem.innerText.trim().length) {
+                newelem.empty();
+                newelem.css("font-size", "94px");
+            }
+        });
         j('.quiz_answer_colored_title').keydown(function(e) { 
-            console.log(e.keyCode);
             if (e.keyCode === 13) {
                 document.execCommand('insertHTML', false, '');
                 return false;
@@ -430,10 +1098,356 @@
                 document.execCommand('insertHTML', false, '<span class="test"></span>');
                 return false;
             }
-            j('.quiz_answer_colored_title').textfill({
-                maxFontPixels: 82,
-                minFontPixels: 15
-            });
+            resizeContents();
         });
+        validateForm();
+    }
+
+    function resultTitleChanged(elem, number){
+        var options = document.getElementsByClassName("quiz_answer_options");
+        for(var i=0; i<options.length; i++){
+            options[i][number - 1].text = elem.value;
+        }
+        validateForm();
+    }
+
+    const commSearchBar = document.querySelector("#communitysearch");
+    const commSearchResultsContainer = document.querySelector("#communities");
+    const selectedCommsContainer = document.querySelector("#selected-communities");
+    const flairContainer = document.querySelector("#flair_container");
+
+    commSearchBar.addEventListener("keyup", function(e) {
+        if (e.target.value.trim().length > 0){
+            getSearchResults(e.target.value);
+        }else{
+            commSearchResultsContainer.innerHTML = "";
+            commSearchResultsContainer.classList.add("hidden");
+        }
+    });
+
+    const getSearchResults = searchTerm => {
+        searchTerm = searchTerm.toLowerCase();
+        selectedComms = "";
+        var communities = document.getElementsByClassName("selected-community");        
+        for(var i = 1; i<communities.length; i++){
+            if(i == 1){
+                selectedComms = selectedComms + communities[i].getElementsByTagName("p")[0].innerText.split("/")[1];
+            }else{
+                selectedComms = selectedComms + ", " + communities[i].getElementsByTagName("p")[0].innerText.split("/")[1];
+            }
+        }
+        j.ajax({
+            type: "POST",
+            url: "/pickpostcommunities",
+            data: {search: searchTerm, selectedComms:selectedComms},
+            success: function(response) {
+                commSearchResultsContainer.innerHTML = response;
+                if(commSearchResultsContainer.classList.contains("hidden")){
+                    commSearchResultsContainer.classList.remove("hidden");
+                }
+            }
+        });
+    };
+    j(document).mouseup(function(e) 
+    {
+        var container = j("#communities");
+
+        // if the target of the click isn't the container nor a descendant of the container
+        if (!container.is(e.target) && container.has(e.target).length === 0) 
+        {
+            commSearchResultsContainer.classList.add("hidden");
+        }
+    });
+    function addSelectedCommunity(elem){
+        commSearchBar.value = "";
+        commSearchResultsContainer.innerHTML = "";
+        commSearchResultsContainer.classList.add("hidden");
+        selectedCommsList = selectedCommsContainer.getElementsByTagName("ul")[0];
+        if(selectedCommsContainer.classList.contains("dnone")){
+            selectedCommsContainer.classList.remove("dnone");
+        }
+        var liId = selectedCommsList.length + 1;
+        var imgUrl = elem.getElementsByTagName('img')[0].src;
+        var bc = elem.getElementsByTagName('img')[0].style.backgroundColor;
+        var commName = elem.getElementsByTagName('p')[0].innerHTML;
+        var li = document.createElement('li');
+        li.setAttribute("class","inline-flex btn left p010 selected-community noselect");
+        li.setAttribute("id","selected-community-"+liId);
+        li.style.height = "30px";
+        li.style.borderRadius = "20px";
+        li.style.opacity = "1";
+        var img = document.createElement('img');
+        img.style.backgroundColor = bc;
+        img.src = imgUrl;
+        img.setAttribute("class","rounded sqr20");
+        img.style.margin = "5px 0";
+        var p = document.createElement('p');
+        p.innerHTML = commName;
+        p.setAttribute("class","lh20 fs15 noselect");
+        p.style.margin = "5px 10px";
+        var x = document.createElement('p');
+        x.setAttribute("class","fs13 lh20 hand");
+        x.style.margin = "6px 0";
+        x.innerHTML = "&#x2715";
+        x.setAttribute("onclick","removeSelectedCommunity("+liId+")");
+        li.appendChild(img);
+        li.appendChild(p);
+        li.appendChild(x);
+        selectedCommsList.appendChild(li);
+        j.ajax({
+            type: "POST",
+            url: "/getcommunityflairs",
+            data: {community: commName.replace("c/", "")},
+            success: function(response) {
+                flairContainer.innerHTML += response;
+            }
+        });
+    }
+    function removeSelectedCommunity(liId){
+        var commname = document.getElementById('selected-community-'+liId).getElementsByTagName('p')[0].innerHTML.replace("c/", "");
+        var flairs = document.getElementsByClassName(commname);
+        for(var i=0; i<flairs.length; i++){
+            flairs[i].remove();
+        }
+        document.getElementById('selected-community-'+liId).remove();
+        selectedCommsList = selectedCommsContainer.getElementsByTagName("ul")[0];
+        if(selectedCommsList.getElementsByTagName("li").length == 0){
+            selectedCommsContainer.classList.add("dnone");
+        }
+    }
+    function saveQuiz(){
+        var quizTitle = document.getElementsByName("cp-title")[0].value;
+        var quizDesc = document.getElementById("editor").innerHTML;
+        var flairDict = {};
+        var flairCounter = 1;
+        var flairs = document.getElementsByClassName("flair");
+        for(var i = 0; i<flairs.length; i++){
+            if(flairs[i].classList.contains("active")){
+                flairDict[flairCounter] = flairs[i].getElementsByTagName("p")[0].innerHTML.replace("&nspb;","").replace("\xa0","")+"--"+flairs[i].classList[0];
+                flairCounter++;
+            }
+        }
+        var publishCounter = 1;
+        var placesToPublish = {};
+        var communities = document.getElementsByClassName("selected-community");        
+        for(var i = 1; i<communities.length; i++){
+            placesToPublish[publishCounter] = communities[i].getElementsByTagName("p")[0].innerText.split("/")[1];
+            publishCounter++;
+        }
+        var resultDict = {};
+        var results = document.getElementsByClassName("quiz_result");
+        for(var i=0; i<results.length; i++){
+            var rDict = {};
+            rDict["title"] = document.getElementById("quiz_result_title"+(i+1)).value;
+            rDict["desc"] = results[i].getElementsByTagName("textarea")[1].value;
+            if(document.getElementById("quiz_result_img_container"+(i+1)).classList.contains("dnone")){
+                rDict["img"] = "";
+            }else{
+                rDict["img"] = document.getElementById("quiz_result_img"+(i+1)).src;
+            }
+            resultDict[i+1] = rDict;
+        }
+        var questionType = document.getElementById("question_type").value;
+        var questionDict = {};
+        var questions = document.getElementsByClassName("quiz_question");
+        for(var i=0; i<questions.length; i++){
+            var qDict = {};
+            qDict["answerType"] = document.getElementById("answer_type"+(i+1)).value;
+            if(questionType == "colorBox"){
+                qDict["question"] = document.getElementById("questionContenteditable"+(i+1)).innerText;
+                qDict["color"] = document.getElementById("question_color"+(i+1)).value;
+            }else if(questionType == "media"){
+                qDict["question"] = document.getElementById("quiz_question_title"+(i+1)).value;
+                if(document.getElementById("question-media"+(i+1)+"-img").classList.contains("dnone")){
+                    qDict["img"] = "";
+                }else{
+                    qDict["img"] = document.getElementById("question-media"+(i+1)+"-img").src;
+                }
+            }else{
+                qDict["question"] = document.getElementById("quiz_question_title"+(i+1)).value;
+            }
+            var answersDict = {};
+            if(qDict["answerType"] == "text"){
+                var answers = document.getElementsByClassName("plain-text-answer-"+(i+1));
+                for(var j= 0; j<answers.length; j++){
+                    var aDict = {};
+                    aDict["content"] = document.getElementById("quiz_answer_question"+(i+1)+"_answer"+(j+1)).value;
+                    aDict["assocResult"] = document.getElementById("quiz_answer_question"+(i+1)+"_answer"+(j+1)+"_options").value;
+                    answersDict[j+1] = aDict;
+                }
+            }else if(qDict["answerType"] == "media"){
+                var answers = document.getElementById("media-answers"+(i+1)).getElementsByClassName("media-answer");
+                for(var j= 0; j<answers.length; j++){
+                    var aDict = {};
+                    if(document.getElementById("media-answer"+(i+1)+"-img"+(j+1)).classList.contains("dnone")){
+                        aDict["content"] = "";
+                    }else{
+                        aDict["content"] = document.getElementById("media-answer"+(i+1)+"-img"+(j+1)).src;
+                    }
+                    aDict["assocResult"] = document.getElementById("quiz_answer_question"+(i+1)+"_answer"+(j+1)+"_options_media").value;
+                    answersDict[j+1] = aDict;
+                }
+            }else{
+                var answers = document.getElementsByClassName("colorbox-answer"+(i+1));
+                for(var j= 0; j<answers.length; j++){
+                    var aDict = {};
+                    aDict["content"] = answers[j].getElementsByClassName("quiz_answer_colored_title")[0].innerText;
+                    aDict["color"] = document.getElementById("selectedAnswerColor"+(i+1)).value; 
+                    aDict["assocResult"] = document.getElementById("quiz_answer_question"+(i+1)+"_answer"+(j+1)+"_options_colorBox").value;
+                    answersDict[j+1] = aDict;
+                }
+            }
+            qDict["answers"] = answersDict;
+            questionDict[i+1] = qDict;
+        }
+        var data = {}
+        data = {
+            "quiz_title": quizTitle,
+            "quiz_desc": quizDesc,
+            "flairs": JSON.stringify(flairDict),
+            "communities": JSON.stringify(placesToPublish),
+            "results": JSON.stringify(resultDict),
+            "questionType": questionType,
+            "questions": JSON.stringify(questionDict)
+        }
+        jQuery.ajax({
+            type: "POST",
+            url:"{% url 'savenewquiz' %}",
+            data: data,
+            success: function(response) {
+                displayAlert(response.content);
+            }
+        });
+        return false;
+    }
+    function validateForm(){
+        var quizTitle = document.getElementsByName("cp-title")[0].value;
+        if(quizTitle.length == 0){
+            document.getElementById('cp-sendBtn').classList.remove('active');
+            document.getElementById("cp-sendBtn").disabled = true;
+            return false;
+        }
+        var results = document.getElementsByClassName("quiz_result");
+        for(var i=0; i<results.length; i++){
+            var firstResultTitle = document.getElementById("quiz_result_title"+(i+1)).value;
+            if(firstResultTitle.length == 0){
+                document.getElementById('cp-sendBtn').classList.remove('active');
+                document.getElementById("cp-sendBtn").disabled = true;
+                return false;
+            }
+        }
+        var questionType = document.getElementById("question_type").value;
+        var questions = document.getElementsByClassName("quiz_question");
+        if(questionType == "colorBox"){
+            for(var i=0; i<questions.length; i++){
+                var firstQuestion = document.getElementById("questionContenteditable"+(i+1)).innerText;
+                if(firstQuestion.length == 0){
+                    document.getElementById('cp-sendBtn').classList.remove('active');
+                    document.getElementById("cp-sendBtn").disabled = true;
+                    return false;
+                }
+                var answerType = document.getElementById("answer_type"+(i+1)).value;
+                if(answerType == "text"){
+                    var answers = document.getElementsByClassName("plain-text-answer-"+(i+1));
+                    for(var j= 0; j<answers.length; j++){
+                        var firstAnswer = document.getElementById("quiz_answer_question"+(i+1)+"_answer"+(j+1)).value;
+                        if(firstAnswer.length == 0){
+                            document.getElementById('cp-sendBtn').classList.remove('active');
+                            document.getElementById("cp-sendBtn").disabled = true;
+                            return false;
+                        }
+                    }
+                }else if(answerType == "media"){
+                    var answers = document.getElementById("media-answers"+(i+1)).getElementsByClassName("media-answer");
+                    for(var j= 0; j<answers.length; j++){
+                        if(document.getElementById("media-answer"+(i+1)+"-img"+(j+1)).classList.contains("dnone")){
+                            document.getElementById('cp-sendBtn').classList.remove('active');
+                            document.getElementById("cp-sendBtn").disabled = true;
+                            return false;
+                        }
+                    }
+                }else if(answerType == "colorBox"){
+                    var answers = document.getElementsByClassName("colorbox-answer"+(i+1));
+                    for(var j= 0; j<answers.length; j++){
+                        var firstAnswer = answers[j].getElementsByClassName("quiz_answer_colored_title")[0].innerText;
+                        if(firstAnswer.length == 0){
+                            document.getElementById('cp-sendBtn').classList.remove('active');
+                            document.getElementById("cp-sendBtn").disabled = true;
+                            return false;
+                        }
+                    }
+                }else{
+                    document.getElementById('cp-sendBtn').classList.remove('active');
+                    document.getElementById("cp-sendBtn").disabled = true;
+                    return false;
+                }
+            }
+        }else if(questionType == "text" || questionType == "media"){
+            for(var i=0; i<questions.length; i++){
+                var firstQuestion = document.getElementById("quiz_question_title"+(i+1)).value;
+                if(firstQuestion.length == 0){
+                    document.getElementById('cp-sendBtn').classList.remove('active');
+                    document.getElementById("cp-sendBtn").disabled = true;
+                    return false;
+                }
+                if(questionType == "media" && document.getElementById("question-media"+(i+1)+"-img").classList.contains("dnone")){
+                    document.getElementById('cp-sendBtn').classList.remove('active');
+                    document.getElementById("cp-sendBtn").disabled = true;
+                    return false;
+                }
+                var answerType = document.getElementById("answer_type"+(i+1)).value;
+                if(answerType == "text"){
+                    var answers = document.getElementsByClassName("plain-text-answer-"+(i+1));
+                    for(var j= 0; j<answers.length; j++){
+                        var firstAnswer = document.getElementById("quiz_answer_question"+(i+1)+"_answer"+(j+1)).value;
+                        if(firstAnswer.length == 0){
+                            document.getElementById('cp-sendBtn').classList.remove('active');
+                            document.getElementById("cp-sendBtn").disabled = true;
+                            return false;
+                        }
+                    }
+                }else if(answerType == "media"){
+                    var answers = document.getElementById("media-answers"+(i+1)).getElementsByClassName("media-answer");
+                    for(var j= 0; j<answers.length; j++){
+                        if(document.getElementById("media-answer"+(i+1)+"-img"+(j+1)).classList.contains("dnone")){
+                            document.getElementById('cp-sendBtn').classList.remove('active');
+                            document.getElementById("cp-sendBtn").disabled = true;
+                            return false;
+                        }
+                    }
+                }else if(answerType == "colorBox"){
+                    var answers = document.getElementsByClassName("colorbox-answer"+(i+1));
+                    for(var j= 0; j<answers.length; j++){
+                        var firstAnswer = answers[j].getElementsByClassName("quiz_answer_colored_title")[0].innerText;
+                        if(firstAnswer.length == 0){
+                            document.getElementById('cp-sendBtn').classList.remove('active');
+                            document.getElementById("cp-sendBtn").disabled = true;
+                            return false;
+                        }
+                    }
+                }else{
+                    document.getElementById('cp-sendBtn').classList.remove('active');
+                    document.getElementById("cp-sendBtn").disabled = true;
+                    return false;
+                }
+            }
+        }else{
+            document.getElementById('cp-sendBtn').classList.remove('active');
+            document.getElementById("cp-sendBtn").disabled = true;
+            return false;
+        }
+        document.getElementById('cp-sendBtn').classList.add('active');
+        document.getElementById("cp-sendBtn").disabled = false;
+        return true;
+    }
+    function toggleFlair(elem, bc, tc){
+        if(elem.classList.contains("active")){
+            elem.style.backgroundColor = "var(--white)";
+            elem.style.color = "var(--gray2)";
+        }else{
+            elem.style.backgroundColor = bc;
+            elem.style.color = tc;
+        }
+        elem.classList.toggle("active");
     }
 </script>

@@ -114,8 +114,7 @@
             </div>
         </div>
     </div>
-    <div contenteditable id="editor">
-    </div>
+    <div contenteditable id="editor"></div>
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=es6,Array.prototype.includes,CustomEvent,Object.entries,Object.values,URL"></script>
     <script src="https://unpkg.com/plyr@3"></script>
     <script type="text/javascript">
@@ -123,6 +122,9 @@
         var promot = new CustomPrompt();
         j(document).on('click', '.promptBtn',function(e) { 
             e.preventDefault();
+        });
+        j("#editor").keyup(function(e){
+            validateForm();
         });
         j("#editor").keydown(function(e){
             if ( e.which === 9 ) {

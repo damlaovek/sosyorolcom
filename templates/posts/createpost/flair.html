@@ -1,0 +1,11 @@
+{% load static %}
+{% for flair in flairs %}
+<div class="{{community.name}} textarea p10 fs15 cg2 ml10 hand box flair inline-flex" data-title="{{flair.flair}}" id="flair"  onclick="toggleFlair(this, '{{flair.background_color}}', '{{flair.text_color}}')" style="border-radius:18px;">
+    {% if community.profile_img == '' %}
+    <img src="{% static '/assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="width:18px;height:18px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
+    {% else %}
+    <img src="{{community.profile_img}}" class="non-draggable rounded" style="width:18px;height:18px;object-fit:scale-down; background-color:{{community.cover_color}}" data-no-lazy="1"/>
+    {% endif %}
+    <p class="noselect">&nbsp;&nbsp;{{flair.flair}}&nbsp;&nbsp;</p>
+</div>
+{% endfor %}

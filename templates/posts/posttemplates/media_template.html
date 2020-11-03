@@ -20,8 +20,9 @@
                 <a href='{{media.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{media.post_title}}</a>
                 <div class="full-width mt10">
                     <div class="bsbb answer-img p020">
+                        {% if media.media_type == "video" %}
                         <video id="player" playsinline controls class="js-player" autoplay="true" style="min-height: 400px;" muted="muted">
-                            <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
+                            <source src="{{media.media_url}}" type="video/mp4" />
                         </video>
                         <script src='https://cdn.polyfill.io/v2/polyfill.min.js?features=es6,Array.prototype.includes,CustomEvent,Object.entries,Object.values,URL'></script>
                         <script src='https://unpkg.com/plyr@3'></script>
@@ -30,6 +31,9 @@
                             window.player = player;
                             window.player.play();
                         </script>
+                        {% else %}
+                            <img src="{{media.media_url}}" class="full" style="object-fit: contain;"/>
+                        {% endif %}
                     </div>
                 </div>
             </div>

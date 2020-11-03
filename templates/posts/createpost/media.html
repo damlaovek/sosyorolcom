@@ -1,0 +1,335 @@
+{% load index %}
+{% load static %}
+<div class="full-width align-center mt10">
+    <style>
+       #media-container{background-image: url('{% static "assets/img/add-image.svg" %}'); background-position: center; background-size: 40px; background-repeat: no-repeat;}
+    </style>
+    <form>
+        <div class="bsbb box p20 title fs19 cp-container" id="cp-container">
+            {{word_list|getword:"create-media"|ucwords}}
+            <div class="absolute inline-flex" style="right:20px;top:1px;">
+                <div class="btn p010 hand m100" style="border-radius:4px; height: 30px;" onclick="document.getElementById('drafts-popup').classList.toggle('hidden');">
+                    <p  class="fs15 noselect lh30" id='drafts'>{{newpost_actions_dict.drafts}}&nbsp;({{drafts|length}})</p>
+                </div>
+                <div class="bsbb full-width box mt10 dnone">
+                    {% include 'posts/createpost/rich_text_editor.html' %}
+                </div>
+            </div>
+        </div>
+        <div class="bsbb box p20 title cp-container" style="margin:10px auto;">
+            <div class="full-width">
+                <textarea name="cp-title" style='padding-right:70px;' rows="1" onblur='this.classList.remove("active");document.getElementById("title-counter").innerHTML = "";' onfocus='this.classList.add("active");var len = this.value.length;document.getElementById("title-counter").innerHTML = len+"/"+80;' onkeyup="updateTextareaCounter(this, 'title-counter', 80);validateForm();" class="bsbb box full-width p10 lh20 fs15 text textarea" maxlength="80" placeholder="{{newpost_actions_dict.title}}"></textarea>
+                <p class='noselect fs13 absolute cg2' style="bottom:0;right:10px;line-height:40px;" id='title-counter'></p>
+            </div>
+            <div class="bsbb full-width box mt10">
+                <div class="bsbb w20 m10 question-media bcgrayish" style="height:300px;" id="media-container">
+                    <img src="" id="media_post_media" class="bsbb full dnone bcgrayish"/>
+                    <div class="bsbb dnone full" id="media_post_video_container">
+                        <video id="media_post_video" playsinline controls class="js-player bcgrayish" autoplay="true" style="min-height: 300px;" muted="muted"><source type="video/mp4" id="media_post_videoPreview" src="" /></video>
+                    </div>
+                    <input type="file" class="absolute aligntr full hand" style="opacity: 0;" onchange="uploadResultImg(this);"  id="mediaUpload" name="mediaUpload" accept=".png, .jpg, .jpeg, video/mp4, video/x-m4v,video/*">
+                    <div class="absolute aligntr m10 bsbb sqrt30 p10 borderblue rounded full-shadow bcma hand dnone" style="right:40px;" id="edit_result_img_svg">
+                        <svg width="13px" height="13px" viewBox="0 0 13 13" style="top:-7.5px;left:-3px;z-index:5;">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 0 10.296875 L 0 13.003906 L 2.710938 13.003906 L 10.699219 5.015625 L 7.988281 2.304688 Z M 12.792969 2.921875 C 12.929688 2.785156 13.003906 2.601562 13.003906 2.410156 C 13.003906 2.21875 12.929688 2.035156 12.792969 1.902344 L 11.101562 0.210938 C 10.964844 0.078125 10.78125 0 10.589844 0 C 10.398438 0 10.214844 0.078125 10.082031 0.210938 L 8.761719 1.53125 L 11.472656 4.242188 Z M 12.792969 2.921875 "/>
+                            </g>
+                        </svg>   
+                    </div>
+                    <div class="absolute aligntr m10 bsbb borderblue rounded full-shadow bcma" style="right:40px;">
+                        <input class="sqrt30 rounded oh hand dnone" id="edit_result_img"style="opacity:0;z-index:6;" type="file" onchange="uploadResultImg(this)" accept=".png, .jpg, .jpeg, video/mp4, video/x-m4v,video/*">
+                    </div>
+                    <div class="absolute aligntr m10 bsbb borderred rounded full-shadow bcr hand dnone" id="remove_result_img" onclick="removeResultImage()">
+                        <p class="full cw sqrt30 rounded tac hand lh30">&#10005;</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bsbb box p020 title cp-container">
+            <div class="p100 full-width inline-flex" id="flair_container">
+                <div class="nocommunity textarea p10 fs15 cg2 hand box flair" data-title="{{newpost_actions_dict.spoiler}}" id="flair" onclick="this.classList.toggle('active');" style="border-radius:18px;">&nbsp;&nbsp;Spoiler&nbsp;&nbsp;</div>
+                <div class="nocommunity textarea p10 fs15 cg2 ml10 hand box flair" data-title="{{newpost_actions_dict.nsfw}}" id="flair"  onclick="this.classList.toggle('active');" style="border-radius:18px;">&nbsp;&nbsp;NSFW&nbsp;&nbsp;</div>
+            </div>
+        </div>
+        <div class="cp-container" style="margin:10px auto;">
+            <p class="fwbold cg2 mt20 mb10">{{word_list|getword:"where-to-publish"|ucwords}}</p>
+            <div class="bsbb box p20 title">
+                <div class="full-width" id="selected-communities">
+                    <ul class="inline-block full-width">
+                        <li class="inline-flex btn left p010 selected-community noselect" style="height:30px;border-radius: 20px;opacity:1;">
+                            <img src="{{current_user.avatar_url}}" class="rounded sqr20" style="margin:5px 0;"/>
+                            <p class="lh20 fs15 noselect" style="margin:5px 10px;">u/{{current_user.user_login}}</p>
+                        </li>
+                    </ul>
+                </div>
+                <textarea rows="1" onblur='this.classList.remove("active");' onfocus='this.classList.add("active");' class="bsbb box full-width p10 lh20 fs15 text oh" style="resize:none;height:40px;overflow:hidden;" placeholder="{{newpost_actions_dict.searchcommunity}}" id="communitysearch"></textarea>
+                <div class="full-width dropdown hidden" style="width:calc(100% - 40px); max-height:220px; overflow:scroll;" id="communities">
+                </div>
+            </div>
+        </div>
+        <div class="cp-container">
+            <div class="bsbb box p20 mt20 title full-width inline-block">
+                <div class="bsbb p10 hand left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;' style="width:calc(25% - 15px); text-align:center;border-radius:4px;">{{newpost_actions_dict.cancel}}</div>
+                <div class="bsbb p10 m020 hand left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;'  style="width:calc(25% - 15px); text-align:center;border-radius:4px;">{{newpost_actions_dict.clear}}</div>
+                <div class="bsbb p10 hand left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;'  style="width:calc(25% - 15px);margin-right:20px; text-align:center;border-radius:4px;">{{newpost_actions_dict.save}}</div>
+                <input disabled type="submit" id="cp-sendBtn" class="btn p10 left fs15 lh20 noselect" style="border-radius:4px;height:30px;width:calc(25% - 35px); border:none; text-align:center; color:var(--main-color); font-weight:700;" value="{{newpost_actions_dict.send}}" onclick="return saveMedia()"/>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    var type = "";
+    const commSearchBar = document.querySelector("#communitysearch");
+    const commSearchResultsContainer = document.querySelector("#communities");
+    const selectedCommsContainer = document.querySelector("#selected-communities");
+    const flairContainer = document.querySelector("#flair_container");
+
+    commSearchBar.addEventListener("keyup", function(e) {
+        if (e.target.value.trim().length > 0){
+            getSearchResults(e.target.value);
+        }else{
+            commSearchResultsContainer.innerHTML = "";
+            commSearchResultsContainer.classList.add("hidden");
+        }
+    });
+    const getSearchResults = searchTerm => {
+        searchTerm = searchTerm.toLowerCase();
+        selectedComms = "";
+        var communities = document.getElementsByClassName("selected-community");        
+        for(var i = 1; i<communities.length; i++){
+            if(i == 1){
+                selectedComms = selectedComms + communities[i].getElementsByTagName("p")[0].innerText.split("/")[1];
+            }else{
+                selectedComms = selectedComms + ", " + communities[i].getElementsByTagName("p")[0].innerText.split("/")[1];
+            }
+        }
+        j.ajax({
+            type: "POST",
+            url: "/pickpostcommunities",
+            data: {search: searchTerm, selectedComms: selectedComms},
+            success: function(response) {
+                commSearchResultsContainer.innerHTML = response;
+                if(commSearchResultsContainer.classList.contains("hidden")){
+                    commSearchResultsContainer.classList.remove("hidden");
+                }
+            }
+        });
+    };
+    function addSelectedCommunity(elem){
+        commSearchBar.value = "";
+        commSearchResultsContainer.innerHTML = "";
+        commSearchResultsContainer.classList.add("hidden");
+        selectedCommsList = selectedCommsContainer.getElementsByTagName("ul")[0];
+        if(selectedCommsContainer.classList.contains("dnone")){
+            selectedCommsContainer.classList.remove("dnone");
+        }
+        var liId = selectedCommsList.length + 1;
+        var imgUrl = elem.getElementsByTagName('img')[0].src;
+        var bc = elem.getElementsByTagName('img')[0].style.backgroundColor;
+        var commName = elem.getElementsByTagName('p')[0].innerHTML;
+        var li = document.createElement('li');
+        li.setAttribute("class","inline-flex btn left p010 selected-community noselect");
+        li.setAttribute("id","selected-community-"+liId);
+        li.style.height = "30px";
+        li.style.borderRadius = "20px";
+        li.style.opacity = "1";
+        var img = document.createElement('img');
+        img.style.backgroundColor = bc;
+        img.src = imgUrl;
+        img.setAttribute("class","rounded sqr20");
+        img.style.margin = "5px 0";
+        var p = document.createElement('p');
+        p.innerHTML = commName;
+        p.setAttribute("class","lh20 fs15 noselect");
+        p.style.margin = "5px 10px";
+        var x = document.createElement('p');
+        x.setAttribute("class","fs13 lh20 hand");
+        x.style.margin = "6px 0";
+        x.innerHTML = "&#x2715";
+        x.setAttribute("onclick","removeSelectedCommunity("+liId+")");
+        li.appendChild(img);
+        li.appendChild(p);
+        li.appendChild(x);
+        selectedCommsList.appendChild(li);
+        j.ajax({
+            type: "POST",
+            url: "/getcommunityflairs",
+            data: {community: commName.replace("c/", "")},
+            success: function(response) {
+                flairContainer.innerHTML += response;
+            }
+        });
+    }
+    function removeSelectedCommunity(liId){
+        var commname = document.getElementById('selected-community-'+liId).getElementsByTagName('p')[0].innerHTML.replace("c/", "");
+        var flairs = document.getElementsByClassName(commname);
+        for(var i=0; i<flairs.length; i++){
+            flairs[i].remove();
+        }
+        document.getElementById('selected-community-'+liId).remove();
+        selectedCommsList = selectedCommsContainer.getElementsByTagName("ul")[0];
+        if(selectedCommsList.getElementsByTagName("li").length == 0){
+            selectedCommsContainer.classList.add("dnone");
+        }
+    }
+    function toggleFlair(elem, bc, tc){
+        if(elem.classList.contains("active")){
+            elem.style.backgroundColor = "var(--white)";
+            elem.style.color = "var(--gray2)";
+        }else{
+            elem.style.backgroundColor = bc;
+            elem.style.color = tc;
+        }
+        elem.classList.toggle("active");
+    }
+    j(document).mouseup(function(e) 
+    {
+        var container = j("#communities");
+
+        // if the target of the click isn't the container nor a descendant of the container
+        if (!container.is(e.target) && container.has(e.target).length === 0) 
+        {
+            commSearchResultsContainer.classList.add("hidden");
+        }
+    });
+
+    function validateForm(){
+        var title = document.getElementsByName("cp-title")[0].value;
+        if(title.length == 0){
+            document.getElementById('cp-sendBtn').classList.remove('active');
+            document.getElementById("cp-sendBtn").disabled = true;
+            return false;
+        }
+        if(type == ""){
+            document.getElementById('cp-sendBtn').classList.remove('active');
+            document.getElementById("cp-sendBtn").disabled = true;
+            return false;
+        }else if(type == "image"){
+            if(document.getElementById("media_post_media").classList.contains("dnone")){
+                document.getElementById('cp-sendBtn').classList.remove('active');
+                document.getElementById("cp-sendBtn").disabled = true;
+                return false;
+            }
+        }else if(type == "video"){
+            if(document.getElementById("media_post_video_container").classList.contains("dnone")){
+                document.getElementById('cp-sendBtn').classList.remove('active');
+                document.getElementById("cp-sendBtn").disabled = true;
+                return false;
+            }
+        }
+        document.getElementById('cp-sendBtn').classList.add('active');
+        document.getElementById("cp-sendBtn").disabled = false;
+        return true;
+    }
+
+    function saveMedia(){
+        var mediaTitle = document.getElementsByName("cp-title")[0].value;
+        var mediaUrl = "";
+        if(type=="image"){
+            mediaUrl = document.getElementById("media_post_media").src;
+        }else if(type == "video"){
+            mediaUrl = document.getElementById('media_post_videoPreview').src;
+        }
+        var flairDict = {};
+        var flairCounter = 1;
+        var flairs = document.getElementsByClassName("flair");
+        for(var i = 0; i<flairs.length; i++){
+            if(flairs[i].classList.contains("active")){
+                flairDict[flairCounter] = flairs[i].getElementsByTagName("p")[0].innerHTML.replace("&nspb;","").replace("\xa0","")+"--"+flairs[i].classList[0];
+                flairCounter++;
+            }
+        }
+        var publishCounter = 1;
+        var placesToPublish = {};
+        var communities = document.getElementsByClassName("selected-community");        
+        for(var i = 1; i<communities.length; i++){
+            placesToPublish[publishCounter] = communities[i].getElementsByTagName("p")[0].innerText.split("/")[1];
+            publishCounter++;
+        }
+        var data = {}
+        data = {
+            "post_title": mediaTitle,
+            "media_url": mediaUrl,
+            "media_type": type,
+            "flairs": JSON.stringify(flairDict),
+            "communities": JSON.stringify(placesToPublish),
+        }
+        jQuery.ajax({
+            type: "POST",
+            url:"{% url 'savenewmediapost' %}",
+            data: data,
+            success: function(response) {
+                displayAlert(response.content);
+            }
+        });
+        return false;
+    }
+
+    function uploadResultImg(input){
+        var j = jQuery.noConflict();
+        if (input.files && input.files[0]) {
+            var fd = new FormData();
+            var files = input.files[0];
+            var fullPath = input.value;
+            var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+            var filename = fullPath.substring(startIndex);
+            if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+                filename = filename.substring(1);
+            }
+            newName = filename.hashCode();
+            var reader = new FileReader();
+            // Allowing file type 
+            var allowedExtensions =  /(\.jpg|\.jpeg|\.png|\.gif)$/i; 
+            reader.onload = function(e) {
+                document.getElementById('edit_result_img_svg').classList.remove("dnone");
+                document.getElementById('edit_result_img').classList.remove("dnone");
+                document.getElementById('remove_result_img').classList.remove("dnone");   
+                document.getElementById('mediaUpload').classList.add("dnone");           
+                if (allowedExtensions.exec(filename)) { 
+                    document.getElementById('media_post_media').classList.remove("dnone");
+                    document.getElementById('media_post_media').src = e.target.result;
+                    document.getElementById('media_post_media').style.objectFit = "contain";
+                    document.getElementById('media_post_video_container').classList.add("dnone");
+                    type = "image";
+                }else{
+                    document.getElementById('media_post_media').classList.add("dnone");
+                    document.getElementById('media_post_video_container').classList.remove("dnone");
+                    document.getElementById('media_post_videoPreview').src = e.target.result;
+                    type = "video";
+                    const player = new Plyr("#media_post_video", {captions: {active: true}});
+                    window.player = player;
+                    window.player.stop();
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+            fd.append('file',files,newName);
+            j.ajax({
+                type: "POST",
+                url:"{% url 'uploadmedia' %}",
+                data: fd,
+                processData: false, 
+                contentType: false,
+                cache: false,
+                async: false,
+                success: function(response) {
+                    if(response != ""){
+                        if(type=="image"){
+                            document.getElementById('media_post_media').src = response.url;
+                        }else{
+                            document.getElementById('media_post_videoPreview').src = response.url;
+                        }
+                        validateForm();
+                    }
+                }
+            });
+        }
+    }
+    function removeResultImage(){
+        document.getElementById('media_post_media').classList.add("dnone");
+        document.getElementById('media_post_video_container').classList.add("dnone");
+        document.getElementById('edit_result_img_svg').classList.add("dnone");
+        document.getElementById('edit_result_img').classList.add("dnone");
+        document.getElementById('remove_result_img').classList.add("dnone");
+        document.getElementById('mediaUpload').classList.remove("dnone");
+    }
+
+</script>

@@ -1,9 +1,15 @@
 {% load static %}
 {% load index %}
 <div class="bsbb cp-container hcentered mt10 quiz_question" id="quiz_question{{number}}">
-    <p class="fwbold cg2 mt20">{{word_list|getword:"question"|ucfirst}} <span class="fwbold cg2 mt20" id="quiz_result_number{{number}}">{{number}}</span></p>
+    <input type="hidden" name="answer_type{{number}}" id="answer_type{{number}}">
+    <input type="hidden" name="question_color{{number}}" id="question_color{{number}}" value="red">
+    <p class="fwbold cg2 mt20">{{word_list|getword:"question"|ucfirst}} <span class="fwbold cg2 mt20" id="quiz_question_number{{number}}">{{number}}</span></p>
     <div class="bsbb box p20 m100">
+        {% if qtype == "colorBox" %}
+        <div class="full-width color-container">
+        {% else %}
         <div class="full-width dnone color-container">
+        {% endif %}
             <div class="inline-flex border br4" id="color-container{{number}}" style="padding: 7.5px 10px;">
                 <div class="hand p5 border2 rounded color-container-item" onclick="colorChanged(this, {{number}}, 'red')">
                     <p class="sqr20 rounded bcqred"></p>
@@ -28,23 +34,40 @@
                 </div>
             </div>     
         </div>
-        <div class="full-width mt10 box">
+
+        <div class="full-width mt10">
             <style>
+                .quiz_question_colored_title{font-size: 160px;}
                 .quiz_question_colored_title span{font-weight: bold;}
-                .quiz_question_colored_title .test{font-size: 120px; font-weight: bold;}
+                .quiz_question_colored_title .test{font-size: 160px; font-weight: bold;}
+                .quiz_answer_colored_title{font-size: 94px;}
                 .quiz_answer_colored_title span{font-weight: bold;}
-                .quiz_answer_colored_title .test{font-size: 82px; font-weight: bold;}
+                .quiz_answer_colored_title .test{font-size: 94px; font-weight: bold;}
             </style>
-            <textarea name="quiz_question_title{{number}}" id="quiz_question_title{{number}}" rows="1" class="bsbb full-width p10 lh20 fs15 box text textarea question-text" maxlength="250" placeholder="{{word_list|getword:'question'|ucfirst}}"></textarea>
+            {% if qtype != "colorBox" %}
+            <textarea name="quiz_question_title{{number}}" onkeyup="validateForm();" id="quiz_question_title{{number}}" rows="1" class="bsbb full-width p10 lh20 fs15 box text textarea question-text" maxlength="250" placeholder="{{word_list|getword:'question'|ucfirst}}"></textarea>
+            {% else %}
+            <textarea name="quiz_question_title{{number}}" id="quiz_question_title{{number}}" rows="1" class="bsbb full-width p10 lh20 fs15 box text textarea question-text dnone" maxlength="250" placeholder="{{word_list|getword:'question'|ucfirst}}"></textarea>
+            {% endif %}
+            {% if qtype == "colorBox" %}
+            <div class="question-colorBox">
+            {% else %}
             <div class="question-colorBox dnone">
-                <div class="bsbb full-width oh p40" id="quiz_question_colored_title{{number}}">
-                    <div class="bsbb vam tac full-width fwbold inline-block h180 quiz_question_colored_title" id="questionContenteditable{{number}}" contenteditable="true"><span class="test">{{word_list|getword:'question'|ucfirst}}</span></div>
+            {% endif %}
+                <div class="bsbb full-width oh br10 p40" id="quiz_question_colored_title{{number}}">
+                    <div class="bsbb vam tac full-width fwbold inline-block h180 quiz_question_colored_title qred" id="questionContenteditable{{number}}" contenteditable="true" placeholder="{{word_list|getword:'question'|ucfirst}}"></div>
                 </div>
             </div>
-            <img src="{% static 'assets/img/photo-camera.svg' %}" class="bsbb w20 m10 bcgrayish hand dnone question-media" id="question-media{{number}}" style="height:300px;"/>
-            <input type="file" class="absolute aligntr full" style="opacity:0;" onchange="uploadImg({{number}});"  id="imageUpload{{number}}" name="imageUpload{{number}}" accept=".png, .jpg, .jpeg">
+            {% if qtype == "media" %}
+            <div class="bsbb w20 m10 question-media hand bcgrayish" id="question-media{{number}}" style="height:300px;">
+            {% else %}
+            <div class="bsbb w20 m10 dnone question-media bcgrayish hand" id="question-media{{number}}" style="height:300px;">
+            {% endif %}
+                <img src="" id="question-media{{number}}-img" class="bsbb full dnone"/>
+                <input type="file" class="absolute aligntr full" style="opacity: 0;" onchange="uploadQuestionImg({{number}});"  id="imageUpload{{number}}" name="imageUpload{{number}}" accept=".png, .jpg, .jpeg">
+            </div>
         </div>
-        <p class="fwbold cg2 mt20">{{number}}. {{word_list|getword:"answer-view"|ucwords}}</p>
+        <p class="fwbold cg2 mt20"><span id="answer_view_number{{number}}">{{number}}</span>. {{word_list|getword:"answer-view"|ucwords}}</p>
         <div class="bsbb full-width inline-flex p100 answer-view" id="answer-view-{{number}}">
             <div class="bsbb box p20 one-third-width hand" id="answer-view{{number}}-1" onclick="answerViewSelected({{number}}, 'text')">
                 <p class="cg2 mb20">{{word_list|getword:"plain-text"|ucfirst}}</p>
@@ -82,20 +105,28 @@
         </div> 
         <div class="full-width answer-container" id="answer-container{{number}}">
             <ul class="full-width dnone" id="plain-text-answers{{number}}">
-                <li class="bsbb full-width inline-flex border m50 p10 br4">
+                <li class="bsbb full-width inline-flex border m50 p10 br4 plain-text-answer-{{number}}" id="plain-text-answer-{{number}}-1">
                     <div class="noselect border2 sqr20 rounded m100"></div>
-                    <div class='m010' style='width:calc(100% - 80px)'>
-                        <textarea name="quiz_answer_question{{number}}_answer1" id="quiz_answer_question{{number}}_answer1" rows="1" class="bsbb w20 ml10 p10 lh20 fs15 text textarea br4" maxlength="250" placeholder="{{word_list|getword:'answer-noun'|ucfirst}}"></textarea>
+                    <div class='m010' style='width:calc(100% - 240px)'>
+                        <textarea name="quiz_answer_question{{number}}_answer1" id="quiz_answer_question{{number}}_answer1" rows="1" class="bsbb full-width p10 lh20 fs15 text textarea br4" maxlength="250" placeholder="{{word_list|getword:'answer-noun'|ucfirst}}" onkeyup="validateForm();"></textarea>
                     </div>
-                    <p class="sqrt30 border rounded hand cg2" style='line-height:30px; text-align:center;font-size:18px;margin:5px 0;margin-right:10px;' onclick="addTextAnswer('poll-option-2','{{create_post_dict.option}}', '{{create_post_dict.addrule}}', '{{create_post_dict.removerule}}');">+</p>
-                    <p class="sqrt30 border rounded hand cg2" style='line-height:30px; text-align:center;font-size:20px;margin:5px 0;' onclick="removeTextAnswer('poll-option-2', '{{create_post_dict.removerule}}');">-</p>
+                    <select class="br4 cb bcba p010 quiz_answer_options" style="margin-right: 10px; width:120px;" id="quiz_answer_question{{number}}_answer1_options">
+                        <option value="result_1">{{word_list|getword:'result'|ucwords}} 1</option>
+                    </select>
+                    <p class="sqrt30 border rounded hand cg2" style='line-height:30px; text-align:center;font-size:18px;margin:5px 0; margin-right: 10px;' onclick="addTextAnswer({{number}}, 1);">+</p>
+                    <p class="sqrt30 border rounded hand cg2" style='line-height:30px; text-align:center;font-size:20px;margin:5px 0;' onclick="removeTextAnswer({{number}}, 1);">-</p>
                 </li>
             </ul>
             <ul class="full-width dnone" id="media-answers{{number}}">
-                <li class="bsbb half-width left mt10 border br10 media-answer bcgrayish">
-                    <img class="full-width dnone" src="" id="media-answer{{number}}-img1">
-                    <input type="file" class="absolute aligntr full" style="opacity:0;" onchange=""  id="" name="" accept=".png, .jpg, .jpeg">
-                    <p class="hand absolute aligntr m10 sqr20 lh20 rounded bcr cw tac p5 full-shadow dnone" id="media-answer{{number}}-remove1">&#10005;</p>
+                <li class="bsbb half-width left mt10 oh media-answer">
+                    <div class="bsbb bcgrayish br10 border full">
+                        <img class="full-width oh dnone br10" src="" id="media-answer{{number}}-img1">
+                        <input type="file" class="absolute aligntr full" style="opacity:0;" onchange="uploadAnswerImg({{number}}, 1)"  id="media-answer{{number}}-img1-upload" name="media-answer{{number}}-img1-upload" accept=".png, .jpg, .jpeg">
+                        <p class="hand absolute aligntr m10 sqr20 lh20 rounded bcr cw tac p5 full-shadow dnone" id="media-answer{{number}}-remove1" onclick="removeMediaAnswer({{number}}, 1)">&#10005;</p>
+                    </div>
+                    <select class="bsbb full-width br4 cb bcba mt10 p10 quiz_answer_options" id="quiz_answer_question{{number}}_answer1_options_media">
+                        <option value="result_1">{{word_list|getword:'result'|ucwords}} 1</option>
+                    </select>
                 </li>
                 <li class="bsbb left mt10 border br10 ml20 tac hand fs19 bcgrayish cb fwbold" id="add-media-answer{{number}}" style="line-height: 150px;width:calc(50% - 10px);" onclick="addMediaAnswer({{number}}, 1);">
                     {{word_list|getword:'add-answer'|ucwords}}
@@ -127,36 +158,95 @@
                     <input type="hidden" value="red" id="selectedAnswerColor{{number}}">
                 </div>
                 <ul class="full-width inline-block">
-                    <li class="bsbb half-width left mt10 border bcqred colorbox-answer colorbox-answer{{number}}" style="width:calc(50% - 10px);">
-                        <div class="bsbb full-width oh p20">
-                            <div class="bsbb vam tac full-width fwbold inline-block quiz_answer_colored_title cw" style="height:110px" id="" contenteditable="true"><span class="test">{{word_list|getword:'answer-noun'|ucfirst}}</span></div>
+                    <li class="bsbb half-width left mt10 colorbox-answer colorbox-answer{{number}}" style="width:calc(50% - 10px);">
+                        <div class="bsbb full-width oh p20 bcqred br10 border">
+                            <div class="bsbb vam tac full-width fwbold inline-block quiz_answer_colored_title cw qred" style="height:110px" id="" contenteditable="true" placeholder="{{word_list|getword:'answer-noun'|ucfirst}}"></div>
                         </div>
-                        <p class="hand absolute aligntr m10 sqr20 lh20 rounded bcr cw tac p5 full-shadow dnone" id="colorBox-answer{{number}}-remove1">&#10005;</p>
+                        <p class="hand absolute aligntr sqr20 m10 lh20 rounded bcr cw tac p5 full-shadow dnone" id="colorBox-answer{{number}}-remove1" onclick="removeColorBoxAnswer({{number}}, 1)">&#10005;</p>
+                        <select class="bsbb full-width br4 mt10 cb bcba p10 quiz_answer_options" id="quiz_answer_question{{number}}_answer1_options_colorBox">
+                            <option value="result_1">{{word_list|getword:'result'|ucwords}} 1</option>
+                        </select>
                     </li>
-                    <li class="bsbb left mt10 border ml20 tac hand fs19 bcgrayish cb fwbold" id="add-colorBox-answer{{number}}" style="line-height: 150px;width:calc(50% - 10px);" onclick="addColorBoxAnswer({{number}}, 1);">
+                    <li class="bsbb left mt10 border br10 ml20 tac hand fs19 bcgrayish cb fwbold" id="add-colorBox-answer{{number}}" style="line-height: 150px;width:calc(50% - 10px);" onclick="addColorBoxAnswer({{number}}, 1);">
                         {{word_list|getword:'add-answer'|ucwords}}
                     </li>
                 </ul>
             </div>
         </div>
+        <p class="noselect hand bsbb full-width lh40 tac bcr cw mt10 br4 dnone" id="remove_quiz_question{{number}}" onclick="removeQuestion({{number}});">{{word_list|getword:"remove-question"|ucfirst}}</p>
     </div>
+    <p class="noselect hand bsbb full-width lh40 tac bcb cw mt10 br4" id="add_quiz_question{{number}}" onclick="addAnotherQuestion({{number}});">{{word_list|getword:"add-another-question"|ucfirst}}</p>
 </div>
 <script>
     var j = jQuery.noConflict();
     j('#questionContenteditable{{number}}').on('activate', function() {
-        var txt = document.getElementById("questionContenteditable{{number}}").innerText;
-        if (txt == "{{word_list|getword:'question'|ucfirst}}"){
-            document.getElementById("questionContenteditable{{number}}").innerHTML = "";
-            document.getElementById("quiz_question_colored_title{{number}}").style.color = "white";
-        }else{
-            document.getElementById("questionContenteditable{{number}}").style.fontSize = "15px";
-        }
+        document.getElementById("quiz_question_colored_title{{number}}").style.color = "white";
     });
 
     j('#questionContenteditable{{number}}').focus(function() {
-        var txt = document.getElementById("questionContenteditable{{number}}").innerText;
-        if (txt == "{{word_list|getword:'question'|ucfirst}}"){
-            document.getElementById("quiz_question_colored_title{{number}}").style.color = "white";
+        document.getElementById("quiz_question_colored_title{{number}}").style.color = "white";
+    });
+    j('#questionContenteditable{{number}}').keyup(function() {
+        if(document.getElementById("questionContenteditable{{number}}").innerText.length > 0){
+            document.getElementById("questionContenteditable{{number}}").style.fontSize = "15px";
+        }else{
+            document.getElementById("questionContenteditable{{number}}").style.fontSize = "160px";   
         }
+        if(document.getElementById("questionContenteditable{{number}}").innerHTML == "<br>"){
+            document.getElementById("questionContenteditable{{number}}").innerHTML = "";
+            document.getElementById("questionContenteditable{{number}}").style.fontSize = "160px";
+        }
+        validateForm();
+    });
+    document.querySelectorAll('.quiz_answer_colored_title').forEach(item => {
+        item.addEventListener('focus',function(evt){
+            item.style.color = "white";
+        });
+        item.addEventListener('keyup',function(evt){
+            if(item.innerText.length > 0){
+                item.style.fontSize = "15px";
+            }else{
+                item.style.fontSize = "94px";   
+            }
+            if(item.innerHTML == "<br>"){
+                item.innerHTML = "";
+                item.style.fontSize = "94px";
+            }
+            j('.quiz_answer_colored_title').textfill({
+                maxFontPixels: 94,
+                minFontPixels: 15
+            });
+            validateForm();
+        });
+        item.addEventListener('keydown',function(e){
+            if (e.keyCode === 13) {
+                document.execCommand('insertHTML', false, '');
+                return false;
+            }
+            if(e.keyCode === 46 && item.text().length() === 0){
+                document.execCommand('insertHTML', false, '<span class="test"></span>');
+                return false;
+            }
+            j('.quiz_answer_colored_title').textfill({
+                maxFontPixels: 94,
+                minFontPixels: 15
+            });
+        });
+    });
+    jQuery(function($){
+        $(".quiz_question_colored_title").focusout(function(){
+            var element = $(this);        
+            if (!element.text().trim().length) {
+                element.empty();
+                element.css("font-size", "160px");
+            }
+        });
+        $(".quiz_answer_colored_title").focusout(function(){
+            var element = $(this);        
+            if (!element.text().trim().length) {
+                element.empty();
+                element.css("font-size", "94px");
+            }
+        });
     });
 </script>
