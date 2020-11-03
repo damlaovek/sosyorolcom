@@ -341,6 +341,24 @@ def setup_quizmeta(post, word_list):
         question = re.sub("(</h2>)", "", question, 0, re.IGNORECASE | re.DOTALL | re.MULTILINE)
         post.quiz_questions.append(question)
 
+def setup_colorbox_quizmeta(post, word_list):
+    num_questions = int(PostMeta.objects.filter(post_id=post.ID, meta_key="question_number")[0].meta_value)
+    post.quiz_questions = []
+    for i in range(1, num_questions + 1):
+        question = dict()
+        question["question_text"] = PostMeta.objects.filter(post_id=post.ID, meta_key="soru_"+str(i)+"_question")[0].meta_value
+        question["question_color"] = PostMeta.objects.filter(post_id=post.ID, meta_key="soru_"+str(i)+"_color")[0].meta_value
+        post.quiz_questions.append(question)
+
+def setup_media_quizmeta(post, word_list):
+    num_questions = int(PostMeta.objects.filter(post_id=post.ID, meta_key="question_number")[0].meta_value)
+    post.quiz_questions = []
+    for i in range(1, num_questions + 1):
+        question = dict()
+        question["question_text"] = PostMeta.objects.filter(post_id=post.ID, meta_key="soru_"+str(i)+"_question")[0].meta_value
+        question["question_img"] = PostMeta.objects.filter(post_id=post.ID, meta_key="soru_"+str(i)+"_img")[0].meta_value
+        post.quiz_questions.append(question)
+
 def setup_pollmeta(post, word_list):
     current_uid = 8
     post.poll_duration = PostMeta.objects.filter(post_id=post.ID, meta_key="poll_duration")[0].meta_value
@@ -370,7 +388,7 @@ def setup_pollmeta(post, word_list):
     if(isvoted.count()>0):
         post.voted = isvoted[0].choice
     duration = PostMeta.objects.filter(post_id=post.ID, meta_key="poll_duration")[0].meta_value
-    if duration == "Unlimited":
+    if duration == "Unlimited" or duration == word_list.get(var_name = 'unlimited-time').translation:
         post.poll_duration_left = word_list.get(var_name = 'unlimited-time').translation
     else:
         days = int(duration.split()[0])
@@ -381,12 +399,16 @@ def setup_pollmeta(post, word_list):
         if now < to:
             post.poll_duration_left = fun.humanizedate(now, word_list, to=to).replace(ago, left)
         else:
-            post.poll_duration_left = "bitti"       
+            post.poll_duration_left = "bitti"   
+
+def setup_mediameta(post):
+    post.media_type = PostMeta.objects.filter(post_id=post.ID, meta_key="media_type")[0].meta_value
+    post.media_url = PostMeta.objects.filter(post_id=post.ID, meta_key="media_url")[0].meta_value
 
 def setup_postmeta(post, word_list):
     import re
     current_uid = 8
-    
+    post.post_title = post.post_title.replace(" - Sosyorol", "")
     post.like = PostRating.objects.filter(post_id=post.ID, opinion='like').count()
     post.dislike = PostRating.objects.filter(post_id=post.ID, opinion='dislike').count()
     post.rating = post.like - post.dislike
@@ -499,6 +521,28 @@ def morecommunities(request):
     
     print(hasMore)
     return render(request, 'communities/communitytemplates/leaderboard_template.html', {'communities':communities, 'filter':fltr, 'offset':offset, 'hasMore':hasMore})
+
+@csrf_exempt
+def pickpostcommunities(request):
+    search_key = request.POST["search"]
+    selectedComms = request.POST["selectedComms"]
+    selected = selectedComms.split(", ")
+    selected = [i for i in selected if i]
+    communities = Community.objects.all()
+    if len(selected) > 0:
+        condition = Q(name=selected[0])
+        for string in selected[1:]:
+            condition &= Q(name=string)
+        communities = communities.exclude(condition)
+    communities = communities.filter(name__icontains=search_key)[:10]
+    return render(request, 'posts/createpost/communitylist.html', {'communities':communities})
+
+@csrf_exempt
+def getcommunityflairs(request):
+    community = request.POST["community"]
+    comm_obj = Community.objects.filter(name=community)[0]
+    flairs = Flairs.objects.filter(term_id=comm_obj.term_id).filter(flair_type="post")
+    return render(request, 'posts/createpost/flair.html', {'community':comm_obj, 'flairs': flairs})
         
 def setup_current_user(current_uid):
     current_user = User.objects.get(ID = current_uid)
@@ -539,6 +583,16 @@ def addanotherquizresult(request):
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
     word_list = Languages.objects.filter(Q(lang_code = lang))
     return render(request, 'posts/createpost/quiz_result.html', {'number':nmr, 'word_list':word_list})
+
+def addanotherquizquestion(request):
+    nmr = str(int(request.GET["number"]) + 1)
+    current_uid = 8
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    qtype = request.GET["type"]
+    return render(request, 'posts/createpost/quiz_question.html', {'number':nmr, 'word_list':word_list, 'qtype':qtype})
 
 '''---------------------------------------
   OPERATIONS              
@@ -635,6 +689,7 @@ def uploadmedia(request):
 @csrf_exempt
 def uploadmediagetcolor(request):
     from sosyorol.forms import MediaFileUploadForm
+    from colorthief import ColorThief
     print("uploadmediagetcolor")
     form = MediaFileUploadForm(data=request.POST, files=request.FILES)
     print(form.errors)
@@ -782,6 +837,322 @@ def get_search_results(request):
             result = setup_current_user(result.ID)
             response_data[result.user_nicename] = "user!:!" + result.avatar_url + "!:!" + result.display_name
     return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
+def savenewquiz(request):
+    import re
+    current_uid = 8
+    quiz_title = request.POST["quiz_title"]
+    quiz_desc = request.POST["quiz_desc"]
+    results = json.loads(request.POST['results'])
+    quiz_type = request.POST["questionType"]
+    communities = json.loads(request.POST['communities'])
+    questions = json.loads(request.POST['questions'])
+    
+    flairs = json.loads(request.POST['flairs'])
+
+    post_excerpt = re.sub("(<img.*?>)", "", quiz_desc, 0, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+    post_excerpt = fun.striphtml(post_excerpt).replace('\n', '').rstrip()
+    
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    solveXQuiz = word_list.get(var_name = 'solve-x-quiz').translation
+    solveXQuiz = solveXQuiz.replace("quiz_name", quiz_title)
+    solveXQuiz = fun.ucfirst(solveXQuiz)
+    if len(post_excerpt) < 106:
+        post_excerpt = post_excerpt+" "+solveXQuiz
+    
+    if len(quiz_title) <= 51:
+        quiz_title += " - Sosyorol"
+
+    current_user = setup_current_user(current_uid)
+    new_quiz = Post(post_title=quiz_title, post_content=quiz_desc, post_date=dt.datetime.now(), author=current_user, to_ping="", pinged="", post_content_filtered="", post_status="publish", post_type="quiz", post_excerpt=post_excerpt, post_parent=0)
+    new_quiz.save()
+    new_quiz = Post.objects.filter(post_title=quiz_title).order_by('-post_date')[0]
+    new_quiz_type = PostMeta(post_id=new_quiz.ID, meta_key="quiz_type", meta_value=quiz_type)
+    new_quiz_type.save()
+
+    for (k, v) in communities.items():
+        term = Community.objects.get(name=str(v))
+        term_tax = TermTaxonomy.objects.get(term=term)
+        new_relation = TermRelationship(object_id=new_quiz.ID, term_taxonomy_id=term_tax.term_taxonomy_id, term_order=0)
+        new_relation.save()
+
+    for (k, v) in flairs.items():
+        tokens = str(v).replace("&nbsp;", "").split("--")
+        flair = tokens[0]
+        community =  Community.objects.get(name=tokens[1])
+        flr = Flairs.objects.filter(flair=flair, term_id=community.term_id)[0]
+        new_flair = PostFlair(post_id=new_quiz.ID, flair=flr)
+        new_flair.save()
+    
+    resultCounter = 1
+    for (k, v) in results.items():
+        result_text = "<h2>"+str(v["title"])+"</h2><br>"+str(v["desc"])
+        result_img = str(v["img"])
+        new_result_text = PostMeta(post_id=new_quiz.ID, meta_key="test_sonuc_"+str(resultCounter)+"_result_text", meta_value=result_text)
+        new_result_text.save()
+        new_result_img = PostMeta(post_id=new_quiz.ID, meta_key="test_sonuc_"+str(resultCounter)+"_result_img", meta_value=result_img)
+        new_result_img.save()
+        resultCounter += 1
+    new_result_number = PostMeta(post_id=new_quiz.ID, meta_key="result_number", meta_value=(resultCounter - 1))
+    new_result_number.save()
+    
+    questionCounter = 1
+    for (k, v) in questions.items():
+        question_text = str(v["question"])
+        new_question_text = PostMeta(post_id=new_quiz.ID, meta_key="soru_"+str(questionCounter)+"_question", meta_value=question_text)
+        new_question_text.save()
+        if quiz_type == "media":
+            question_img = str(v["img"])
+            new_question_img = PostMeta(post_id=new_quiz.ID, meta_key="soru_"+str(questionCounter)+"_img", meta_value=question_img)
+            new_question_img.save()
+        elif quiz_type == "colorBox":
+            question_color = str(v["color"])
+            new_question_color = PostMeta(post_id=new_quiz.ID, meta_key="soru_"+str(questionCounter)+"_color", meta_value=question_color)
+            new_question_color.save()
+        answer_type = str(v["answerType"])
+        new_answer_type = PostMeta(post_id=new_quiz.ID, meta_key="soru_"+str(questionCounter)+"_answer_type", meta_value=answer_type)
+        new_answer_type.save()
+        answerCounter = 1
+        for (key, val) in v["answers"].items():
+            answer_content = str(val["content"])
+            new_answer_text = PostMeta(post_id=new_quiz.ID, meta_key="soru_"+str(questionCounter)+"_answer_"+str(answerCounter)+"_content", meta_value=answer_content)
+            new_answer_text.save()
+            assoc_result = str(val["assocResult"])
+            new_answer_result = PostMeta(post_id=new_quiz.ID, meta_key="soru_"+str(questionCounter)+"_answer_"+str(answerCounter)+"_assoc_result", meta_value=assoc_result)
+            new_answer_result.save()
+            if answer_type == "colorBox":
+                answer_color = str(val["color"])
+                new_answer_color = PostMeta(post_id=new_quiz.ID, meta_key="soru_"+str(questionCounter)+"_answer_"+str(answerCounter)+"_color", meta_value=answer_color)
+                new_answer_color.save()
+            answerCounter += 1
+        new_answer_number = PostMeta(post_id=new_quiz.ID, meta_key="soru_"+str(questionCounter)+"_answer_number", meta_value=(answerCounter - 1))
+        new_answer_number.save()
+        questionCounter += 1
+    new_question_number = PostMeta(post_id=new_quiz.ID, meta_key="question_number", meta_value=(questionCounter - 1))
+    new_question_number.save()
+
+    response_data = {}
+    response_data['content'] = "success"                        
+    return HttpResponse(json.dumps(response_data),content_type="application/json")
+@csrf_exempt
+def savenewpost(request):
+    import re
+    current_uid = 8
+    quiz_title = request.POST["post_title"]
+    quiz_desc = request.POST["post_content"]
+    communities = json.loads(request.POST['communities'])
+    flairs = json.loads(request.POST['flairs'])
+
+    post_excerpt = re.sub("(<img.*?>)", "", quiz_desc, 0, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+    post_excerpt = fun.striphtml(post_excerpt).replace('\n', '').rstrip()
+    
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    if len(quiz_title) <= 51:
+        quiz_title += " - Sosyorol"
+
+    current_user = setup_current_user(current_uid)
+    new_quiz = Post(post_title=quiz_title, post_content=quiz_desc, post_date=dt.datetime.now(), author=current_user, to_ping="", pinged="", post_content_filtered="", post_status="publish", post_type="post", post_excerpt=post_excerpt, post_parent=0)
+    new_quiz.save()
+    new_quiz = Post.objects.filter(post_title=quiz_title).order_by('-post_date')[0]
+
+    for (k, v) in communities.items():
+        term = Community.objects.get(name=str(v))
+        term_tax = TermTaxonomy.objects.get(term=term)
+        new_relation = TermRelationship(object_id=new_quiz.ID, term_taxonomy_id=term_tax.term_taxonomy_id, term_order=0)
+        new_relation.save()
+
+    for (k, v) in flairs.items():
+        tokens = str(v).replace("&nbsp;", "").split("--")
+        flair = tokens[0]
+        community =  Community.objects.get(name=tokens[1])
+        flr = Flairs.objects.filter(flair=flair, term_id=community.term_id)[0]
+        new_flair = PostFlair(post_id=new_quiz.ID, flair=flr)
+        new_flair.save()
+
+    response_data = {}
+    response_data['content'] = "success"                        
+    return HttpResponse(json.dumps(response_data),content_type="application/json")
+@csrf_exempt
+def savenewmediapost(request):
+    current_uid = 8
+    quiz_title = request.POST["post_title"]
+    media_type = request.POST["media_type"]
+    if media_type != "video":
+        media_type = "image"
+    media_url = request.POST["media_url"]
+    communities = json.loads(request.POST['communities'])
+    flairs = json.loads(request.POST['flairs'])
+    
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    if len(quiz_title) <= 51:
+        quiz_title += " - Sosyorol"
+
+    current_user = setup_current_user(current_uid)
+    new_quiz = Post(post_title=quiz_title, post_content="", post_date=dt.datetime.now(), author=current_user, to_ping="", pinged="", post_content_filtered="", post_status="publish", post_type="media", post_excerpt=quiz_title, post_parent=0)
+    new_quiz.save()
+    new_quiz = Post.objects.filter(post_title=quiz_title).order_by('-post_date')[0]
+
+    for (k, v) in communities.items():
+        term = Community.objects.filter(name=str(v))[0]
+        term_tax = TermTaxonomy.objects.get(term=term)
+        new_relation = TermRelationship(object_id=new_quiz.ID, term_taxonomy_id=term_tax.term_taxonomy_id, term_order=0)
+        new_relation.save()
+
+    for (k, v) in flairs.items():
+        tokens = str(v).replace("&nbsp;", "").split("--")
+        flair = tokens[0]
+        community =  Community.objects.get(name=tokens[1])
+        flr = Flairs.objects.filter(flair=flair, term_id=community.term_id)[0]
+        new_flair = PostFlair(post_id=new_quiz.ID, flair=flr)
+        new_flair.save()
+
+    new_media_type = PostMeta(post_id=new_quiz.ID, meta_key="media_type", meta_value=media_type)
+    new_media_type.save()
+
+    new_media_url = PostMeta(post_id=new_quiz.ID, meta_key="media_url", meta_value=media_url)
+    new_media_url.save()
+
+    response_data = {}
+    response_data['content'] = "success"                   
+    return HttpResponse(json.dumps(response_data),content_type="application/json")
+@csrf_exempt
+def savenewlink(request):
+    current_uid = 8
+    quiz_title = request.POST["post_title"]
+    post_url = request.POST["post_url"]
+    communities = json.loads(request.POST['communities'])
+    flairs = json.loads(request.POST['flairs'])
+    
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    if len(quiz_title) <= 51:
+        quiz_title += " - Sosyorol"
+
+    current_user = setup_current_user(current_uid)
+    new_quiz = Post(post_title=quiz_title, post_content="", post_date=dt.datetime.now(), author=current_user, to_ping="", pinged="", post_content_filtered="", post_status="publish", post_type="link", post_excerpt=quiz_title, post_parent=0)
+    new_quiz.save()
+    new_quiz = Post.objects.filter(post_title=quiz_title).order_by('-post_date')[0]
+
+    for (k, v) in communities.items():
+        term = Community.objects.get(name=str(v))
+        term_tax = TermTaxonomy.objects.get(term=term)
+        new_relation = TermRelationship(object_id=new_quiz.ID, term_taxonomy_id=term_tax.term_taxonomy_id, term_order=0)
+        new_relation.save()
+
+    for (k, v) in flairs.items():
+        tokens = str(v).replace("&nbsp;", "").split("--")
+        flair = tokens[0]
+        community =  Community.objects.get(name=tokens[1])
+        flr = Flairs.objects.filter(flair=flair, term_id=community.term_id)[0]
+        new_flair = PostFlair(post_id=new_quiz.ID, flair=flr)
+        new_flair.save()
+
+    post_url = PostMeta(post_id=new_quiz.ID, meta_key="post_url", meta_value=post_url)
+    post_url.save()
+
+    response_data = {}
+    response_data['content'] = "success"                   
+    return HttpResponse(json.dumps(response_data),content_type="application/json")
+@csrf_exempt
+def savenewquestion(request):
+    import re
+    current_uid = 8
+    quiz_title = request.POST["post_title"]
+    post_url = request.POST["post_url"]
+    communities = json.loads(request.POST['communities'])
+    flairs = json.loads(request.POST['flairs'])
+    quiz_desc = request.POST["post_content"]
+
+    post_excerpt = re.sub("(<img.*?>)", "", quiz_desc, 0, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+    post_excerpt = fun.striphtml(post_excerpt).replace('\n', '').rstrip()
+    
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    if len(quiz_title) <= 51:
+        quiz_title += " - Sosyorol"
+
+    current_user = setup_current_user(current_uid)
+    new_quiz = Post(post_title=quiz_title, post_content=quiz_desc, post_date=dt.datetime.now(), author=current_user, to_ping="", pinged="", post_content_filtered="", post_status="publish", post_type="question", post_excerpt=post_excerpt, post_parent=0)
+    new_quiz.save()
+    new_quiz = Post.objects.filter(post_title=quiz_title).order_by('-post_date')[0]
+
+    for (k, v) in communities.items():
+        term = Community.objects.get(name=str(v))
+        term_tax = TermTaxonomy.objects.get(term=term)
+        new_relation = TermRelationship(object_id=new_quiz.ID, term_taxonomy_id=term_tax.term_taxonomy_id, term_order=0)
+        new_relation.save()
+
+    for (k, v) in flairs.items():
+        tokens = str(v).replace("&nbsp;", "").split("--")
+        flair = tokens[0]
+        community =  Community.objects.get(name=tokens[1])
+        flr = Flairs.objects.filter(flair=flair, term_id=community.term_id)[0]
+        new_flair = PostFlair(post_id=new_quiz.ID, flair=flr)
+        new_flair.save()
+
+    post_url = PostMeta(post_id=new_quiz.ID, meta_key="post_url", meta_value=post_url)
+    post_url.save()
+
+    response_data = {}
+    response_data['content'] = "success"                   
+    return HttpResponse(json.dumps(response_data),content_type="application/json")
+
+@csrf_exempt
+def savenewpoll(request):
+    import re
+    current_uid = 8
+    quiz_title = request.POST["post_title"]
+    communities = json.loads(request.POST['communities'])
+    flairs = json.loads(request.POST['flairs'])
+    options = json.loads(request.POST['poll_options'])
+    quiz_desc = request.POST["post_content"]
+    poll_duration = request.POST["poll_duration"]
+
+    post_excerpt = re.sub("(<img.*?>)", "", quiz_desc, 0, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+    post_excerpt = fun.striphtml(post_excerpt).replace('\n', '').rstrip()
+    
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    if len(quiz_title) <= 51:
+        quiz_title += " - Sosyorol"
+
+    current_user = setup_current_user(current_uid)
+    new_quiz = Post(post_title=quiz_title, post_content=quiz_desc, post_date=dt.datetime.now(), author=current_user, to_ping="", pinged="", post_content_filtered="", post_status="publish", post_type="poll", post_excerpt=post_excerpt, post_parent=0)
+    new_quiz.save()
+    new_quiz = Post.objects.filter(post_title=quiz_title).order_by('-post_date')[0]
+
+    for (k, v) in communities.items():
+        term = Community.objects.filter(name=str(v))[0]
+        term_tax = TermTaxonomy.objects.get(term=term)
+        new_relation = TermRelationship(object_id=new_quiz.ID, term_taxonomy_id=term_tax.term_taxonomy_id, term_order=0)
+        new_relation.save()
+
+    optionCounter = 1
+    for (k, v) in options.items():
+        new_poll_option = PostMeta(post_id=new_quiz.ID, meta_key="secenek_"+str(optionCounter), meta_value=str(v))
+        new_poll_option.save()
+        optionCounter = optionCounter + 1
+    new_option_number = PostMeta(post_id=new_quiz.ID, meta_key="number_options", meta_value=(optionCounter - 1))
+    new_option_number.save()
+
+    new_poll_duration = PostMeta(post_id=new_quiz.ID, meta_key="poll_duration", meta_value=poll_duration)
+    new_poll_duration.save()
+
+    for (k, v) in flairs.items():
+        tokens = str(v).replace("&nbsp;", "").split("--")
+        flair = tokens[0]
+        community =  Community.objects.get(name=tokens[1])
+        flr = Flairs.objects.filter(flair=flair, term_id=community.term_id)[0]
+        new_flair = PostFlair(post_id=new_quiz.ID, flair=flr)
+        new_flair.save()
+
+    response_data = {}
+    response_data['content'] = "success"                   
+    return HttpResponse(json.dumps(response_data),content_type="application/json")
 
 '''---------------------------------------
   VIEWS              
@@ -984,6 +1355,15 @@ def home(request):
     print(f"Get and setup polls in {end} s")
 
     start = time.time()
+    mediaposts = Post.objects.filter(post_type="media", post_status="publish").order_by('-post_date').prefetch_related()
+    for m in mediaposts:
+        print(m.ID)
+        setup_postmeta(m, word_list)
+        setup_mediameta(m)
+    end = time.time() - start
+    print(f"Get and setup media in {end} s")
+
+    start = time.time()
     community = Community.objects.filter(slug="test")[0]
     taxonomy = TermTaxonomy.objects.filter(term_id=community.term_id)[0].term_taxonomy_id
     post_ids = TermRelationship.objects.filter(Q(term_taxonomy_id=taxonomy))
@@ -994,6 +1374,28 @@ def home(request):
         setup_quizmeta(quiz, word_list)
     end = time.time() - start
     print(f"Get and setup quizzes in {end} s")
+
+    start = time.time()
+    post_ids = PostMeta.objects.filter(meta_key="quiz_type", meta_value="colorBox")
+    post_ids = list({x.post_id: x for x in post_ids}.keys())
+    colorBox_quizzes = Post.objects.filter(Q(ID__in=post_ids)).order_by('-post_date')[:4].prefetch_related()
+    for quiz in colorBox_quizzes:
+        quiz.post_title = quiz.post_title.replace(" - Sosyorol", "")
+        setup_postmeta(quiz, word_list)
+        setup_colorbox_quizmeta(quiz, word_list)
+    end = time.time() - start
+    print(f"Get and setup colorbox quizzes in {end} s")
+
+    start = time.time()
+    post_ids = PostMeta.objects.filter(meta_key="quiz_type", meta_value="media")
+    post_ids = list({x.post_id: x for x in post_ids}.keys())
+    media_quizzes = Post.objects.filter(Q(ID__in=post_ids)).order_by('-post_date')[:4].prefetch_related()
+    for quiz in media_quizzes:
+        quiz.post_title = quiz.post_title.replace(" - Sosyorol", "")
+        setup_postmeta(quiz, word_list)
+        setup_media_quizmeta(quiz, word_list)
+    end = time.time() - start
+    print(f"Get and setup media quizzes in {end} s")
 
     start = time.time()
     communities = Community.objects.all()[:10]
@@ -1023,7 +1425,7 @@ def home(request):
                                             'post_template_dict':post_template_dict, 'comment_editor':comment_editor,
                                             'links':links, 'answers':answers, 'questions':questions, 'quizzes':quizzes,
                                             'communities':communities, 'users':users, 'polls':polls,
-                                            'word_list':word_list
+                                            'word_list':word_list, 'colorBox_quizzes':colorBox_quizzes, 'media_quizzes':media_quizzes, 'mediaposts':mediaposts
                                             })
 
 def search(request, **kwargs):

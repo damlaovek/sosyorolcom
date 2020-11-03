@@ -4,11 +4,29 @@
     <p class="fwbold cg2 mt20">{{word_list|getword:"result"|ucfirst}} <span class="fwbold cg2 mt20" id="quiz_result_number{{number}}">{{number}}</span></p>
     <div class="bsbb box p20 m100">
         <div class="full-width box">
-            <textarea name="quiz_result_title{{number}}" rows="1" class="bsbb full-width p10 lh20 fs15 text textarea" maxlength="250" placeholder="{{word_list|getword:'title'|ucfirst}}"></textarea>
+            <textarea name="quiz_result_title{{number}}" id="quiz_result_title{{number}}" rows="1" class="bsbb full-width p10 lh20 fs15 text textarea" maxlength="250" placeholder="{{word_list|getword:'title'|ucfirst}}" onkeyup="resultTitleChanged(this, {{number}})"></textarea>
         </div>
         <textarea class="bsbb box full-width mt10 p10" rows="7" style="overflow:auto;resize:none" placeholder="{{word_list|getword:'description'|ucfirst}}"></textarea>
-        <div id="quiz_result_img_container{{number}}"></div>
-        <p class="noselect hand bsbb full-width lh40 tac bcba cb mt10 br4">{{word_list|getword:"add-an-img"|ucfirst}}</p>
+        <div id="quiz_result_img_container{{number}}" class="h250 m100 dnone">
+            <img src="" id="quiz_result_img{{number}}" class="full"/>
+            <div class="absolute aligntr m10 bsbb sqrt30 p10 borderblue rounded full-shadow bcma hand" style="right:40px;">
+                <svg width="13px" height="13px" viewBox="0 0 13 13" style="top:-7.5px;left:-3px;z-index:5;">
+                    <g>
+                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 0 10.296875 L 0 13.003906 L 2.710938 13.003906 L 10.699219 5.015625 L 7.988281 2.304688 Z M 12.792969 2.921875 C 12.929688 2.785156 13.003906 2.601562 13.003906 2.410156 C 13.003906 2.21875 12.929688 2.035156 12.792969 1.902344 L 11.101562 0.210938 C 10.964844 0.078125 10.78125 0 10.589844 0 C 10.398438 0 10.214844 0.078125 10.082031 0.210938 L 8.761719 1.53125 L 11.472656 4.242188 Z M 12.792969 2.921875 "/>
+                    </g>
+                </svg>   
+            </div>
+            <div class="absolute aligntr m10 bsbb borderblue rounded full-shadow bcma" style="right:40px;">
+                <input id="edit_quiz_result_img{{number}}" class="sqrt30 rounded oh" style="opacity:0;z-index:6;" type="file" onchange="addResultImage(this, {{number}})" accept=".png, .jpg, .jpeg">
+            </div>
+            <div class="absolute aligntr m10 bsbb borderred rounded full-shadow bcr hand" id="remove_quiz_result_img{{number}}" onclick="removeResultImage({{number}})">
+                <p class="full cw sqrt30 rounded tac lh30">&#10005;</p>
+            </div>
+        </div>
+        <div class="full-width" id="add-result-img-btn{{number}}">
+            <p class="noselect hand bsbb full-width lh40 tac bcba cb mt10 br4">{{word_list|getword:'add-an-img'|ucfirst}}</p>
+            <input class="absolute aligntr full" style="opacity:0;" type="file" id="add-result-img{{number}}" name="add-result-img{{number}}" onchange="addResultImage(this, {{number}})" accept=".png, .jpg, .jpeg">
+        </div>
         <p class="noselect hand bsbb full-width lh40 tac bcr cw mt10 br4 dnone" id="remove_quiz_result{{number}}" onclick="removeResult({{number}});">{{word_list|getword:"remove-result"|ucfirst}}</p>
         <p class="noselect hand bsbb full-width lh40 tac bcb cw mt10 br4" id="add_quiz_result{{number}}" onclick="addAnotherResult({{number}});">{{word_list|getword:"add-another-result"|ucfirst}}</p>
     </div>

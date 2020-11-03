@@ -57,6 +57,9 @@ class Post(models.Model):
     post_status = models.TextField()
     guid = models.TextField()
     post_type = models.TextField() 
+    to_ping = models.TextField() 
+    pinged = models.TextField()
+    post_content_filtered = models.TextField()
     rating = 0
     likes = 0
     dislikes = 0
@@ -79,18 +82,10 @@ class Post(models.Model):
     first_community = ""
     quiz_questions = []
     quiz_results = []
+    media_type = ""
+    media_url = ""
     class Meta:
         db_table = "wpmu_posts"
-
-class QuizQuestion(models.Model):
-    text = ""
-    answers = []
-    related_result = 0
-
-class QuizResult(models.Model):
-    ID = 0
-    text = ""
-    img = ""
 
 class PostRating(models.Model):
     ID = models.BigIntegerField(primary_key = True)
@@ -183,6 +178,13 @@ class Flairs(models.Model):
     text_color = models.TextField()
     class Meta:
         db_table = "community_flairs"
+
+class PostFlair(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    flair = models.ForeignKey(Flairs, on_delete=models.CASCADE)
+    class Meta:
+        db_table = "post_flair"
 
 class CommunityCategories(models.Model):
     term_id = models.BigIntegerField(primary_key = True)

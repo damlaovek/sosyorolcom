@@ -1,0 +1,16 @@
+{% load static %}
+{% if communities|length > 0 %}
+<ul class="bsbb box full-shadow-border">
+    {% for c in communities %}
+        <li class="bsbb fs14 lh20 text hand p10 noselect inline-flex full-width" onclick="addSelectedCommunity(this);validateForm();">
+            {% if c.profile_img == '' %}
+                <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
+                <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.name}}</p>
+            {% else %}
+                <img src="{{c.profile_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.cover_color}}" data-no-lazy="1"/>
+                <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.name}}</p>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+{% endif %}

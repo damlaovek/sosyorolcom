@@ -3,6 +3,7 @@
     .box{box-shadow:0px 3px 4px rgba(173,173,173, 0.53);}
     .box .box{box-shadow:none;}
 </style>
+<script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/jquery.textfill.js'></script>
 <div class="section-middle" style="margin-top:58px;">
     <div class="hcentered" style="max-width: 893px;">
         <div id="section-middle-top" class="box inline-block p10">
@@ -123,6 +124,21 @@
                     <a href="" class="full-width"><p class="p10" style="font-size:15px;">{{word_list|getword:"all-time"|ucwords}}</p></a>
                 </div>
             </div>
+        </div>
+        <div class="full-width link-wrapper">
+            {% for media in mediaposts %}
+                {% include 'posts/posttemplates/media_template.html' %}
+            {% endfor %}
+        </div>
+        <div class="full-width link-wrapper">
+            {% for quiz in media_quizzes %}
+                 {% include 'posts/posttemplates/media_quiz_template.html' with number=forloop.counter %}
+            {% endfor %}
+        </div>
+        <div class="full-width link-wrapper">
+            {% for quiz in colorBox_quizzes %}
+                 {% include 'posts/posttemplates/colorBox_quiz_template.html' with number=forloop.counter %}
+            {% endfor %}
         </div>
         <div class="full-width link-wrapper">
             {% for quiz in quizzes %}
