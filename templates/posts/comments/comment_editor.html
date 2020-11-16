@@ -1,9 +1,43 @@
 {% load index %}
-<div class='inline-flex' style='width:calc(100% - 40px);border-top:1px solid var(--border); padding:10px 20px 0 20px;'>
+<div class='inline-flex p1020' style='width:calc(100% - 40px);'>
     <img src='{{current_user.avatar_url}}' style='width:40px;height:40px;border-radius:50%;object-fit:cover;'/>
     <div style='position:relative;width:calc(100% - 55px); margin-left:15px;align-items:stretch;align-self:flex-start;display:flex;flex-direction:row;'>
-        <textarea class='comment-editor' id='comment-editor{{post.ID}}' onblur='this.classList.remove("active");' onfocus='this.classList.add("active");' oninput='commentEditorChange({{post.ID}});' id='comment-editor{{post.ID}}' rows='1' placeholder='{{comment_editor.addcomment|ucfirst}}...'></textarea>
-        <div class='comment-send-btn' style='position:relative;opacity:0;'>{{comment_editor.send|ucwords}}</div>
-        <input class='comment-send-btn' style="font-size:15px;" id='comment-send-btn".$index."' type='submit' value='{{comment_editor.send}}'>
+        <textarea class='comment-editor' onblur='this.classList.remove("active");' onfocus='this.classList.add("active");' oninput='commentEditorChange({{post_id}}, {{parent_id}});' id='comment-editor{{post_id}}-{{parent_id}}' rows='1' placeholder='{{word_list|getword:"add-comment"|ucfirst}}...'></textarea>
+        <div class='comment-send-btn' style='position:relative;opacity:0;'>{{word_list|getword:"send"|ucwords}}</div>
+        <input disabled class='fs15 bcb comment-send-btn fs15' id='comment-send-btn{{post_id}}-{{parent_id}}' type='submit' value='{{word_list|getword:"send"|ucfirst}}' onclick="return saveComment({{post_id}}, {{parent_id}})">
     </div>
 </div>
+<script>
+    function commentEditorChange(post_id, parent_id){
+        var textarea = document.getElementById("comment-editor"+post_id+"-"+parent_id);
+        if(textarea.value.trim().length > 0){
+            document.getElementById("comment-send-btn"+post_id+"-"+parent_id).disabled = false;
+            document.getElementById("comment-send-btn"+post_id+"-"+parent_id).style.opacity = "1";
+        }else{
+            document.getElementById("comment-send-btn"+post_id+"-"+parent_id).disabled = true;
+            document.getElementById("comment-send-btn"+post_id+"-"+parent_id).style.opacity = "0.75";
+        }
+    }
+    function saveComment(post_id, parent_id){
+        var j = jQuery.noConflict();
+        var comment = document.getElementById("comment-editor"+post_id+"-"+parent_id).value;
+        var data = {
+            "post_id": post_id,
+            "parent_id": parent_id,
+            "comment": comment,
+        }
+        jQuery.ajax({
+            type: "POST",
+            url:"{% url 'savecomment' %}",
+            data: data,
+            success: function(response) {
+                document.getElementById("comment-editor"+post_id+"-"+parent_id).value = null;
+                document.getElementById("comment-send-btn"+post_id+"-"+parent_id).disabled = true;
+                document.getElementById("comment-send-btn"+post_id+"-"+parent_id).style.opacity = "0.75";
+                j( "#comments-wrapper"+post_id ).load(window.location.href + " #comments-wrapper"+post_id );
+                displayAlert(response.content);
+            }
+        });
+        return false;
+    }
+</script>

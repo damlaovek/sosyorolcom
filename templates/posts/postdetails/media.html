@@ -1,6 +1,12 @@
+{% load static %}
 <div class='full-width'>
     <div class='full-width box answer-template-oc'>
-        <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
+        <div style='width:calc(100% - 20px);' class='p010'>
+            <div class="bsbb full-width inline-block p010 mb10" style="top:-7px;">
+                {% for community in media.communities %}
+                    <a href="/c/{{community.slug}}" class="left p010 mt7 lh30 bcba cb mr10 br4 noselect btn">c/{{community.name}}</a>
+                {% endfor %}
+            </div>
             <div style='width:calc(100% - 20px);' class='p010'>
                 <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon absolute hand' style='top:0;right:0;transform: rotate(90deg);'>
                     <g>
@@ -9,7 +15,6 @@
                         <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
                     </g>
                 </svg>
-                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{post_template_dict.media}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{post_template_dict.recommendedfy}}</span></p>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
                     <img src='{{media.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
@@ -17,7 +22,14 @@
                         <a href='/u/{{media.author.user_login}}/{{media.hex_id}}/{{media.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{media.time_diff}} {{post_template_dict.ago}}</a>
                     </div>
                 </div>
-                <a href='/u/{{media.author.user_login}}/{{media.hex_id}}/{{media.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{media.post_title}}</a>
+                <div class="full-width inline-block">
+                    <a href='/u/{{media.author.user_login}}/{{media.hex_id}}/{{media.guid}}' class='underline-on-hover left lh30' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{media.post_title}}</a>
+                    {% for flair in media.flairs %}
+                        {% if flair.flair.term_id == -1 %}
+                            <div class="noselect left p010 lh30 br15 flair active ml10" id="flair">{{flair.flair.flair}}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
                 <div class="full-width mt10">
                     <div class="bsbb answer-img p020">
                         {% if media.media_type == "video" %}
@@ -111,9 +123,58 @@
                 </div>
             </div>
         </div>
-        <ul class='comments-wrapper bt pt10' id='comments-wrapperanswer{{answer.ID}}'>
-            {% include 'posts/comments/comment_list.html' %}
-        </ul>
-        {% include 'posts/comments/comment_editor.html' %}
+        <div class="bt bb">
+            {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=media.ID %}
+        </div>
+        {% if comments|length > 0 %}
+            <div class='comments-wrapper pt10' id='comments-wrapper{{post.ID}}' style="display:block;">
+                {% include 'posts/comments/comment_list.html' with comments=comments padding=0 %}
+            </div>
+        {% endif %}
+        {% if comment_length > comments|length %}
+            <div id="loader" class="full-width tac dnone">
+                <img src="{% static 'assets/img/sosyorol-loader.gif' %}" style="margin:auto; height: 80px;">
+            </div>
+        {% endif %}
     </div>
 </div>
+<script>
+    var offset = 5;
+    var limit = 5;
+    var isLoading = false;
+    var hasMore = true;
+    window.onload = () => {
+        offset = 5;
+        isLoading = false;
+        hasMore = true;
+    }
+    window.onscroll = () => {
+        if (document.documentElement.scrollHeight - document.documentElement.scrollTop === document.documentElement.clientHeight){
+            if(hasMore){
+                if(isLoading){
+                    return;
+                }else{
+                    isLoading = true;
+                    document.getElementById("loader").classList.remove("dnone");
+                    j.ajax({
+                        url:"{% url 'loadmorecomments' %}",
+                        type : "GET", // http method
+                        data : { limit: limit, offset: offset, post_id: "{{media.ID}}", parent_id:0, padding:0}, // data sent with the post request
+                        // handle a successful response
+                        success : function(json) {
+                            // log the returned json to the console
+                            console.log(json); // another sanity check
+                            document.getElementById("comments-wrapper{{media.ID}}").innerHTML += json;
+                            offset += limit;
+                            if(offset >= {{comment_length}}){
+                                hasMore = false;
+                            }
+                            isLoading = false;
+                            document.getElementById("loader").classList.add("dnone");
+                        }
+                    });
+                }
+            }
+        }
+    }
+</script>

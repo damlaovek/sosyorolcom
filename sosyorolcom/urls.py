@@ -42,6 +42,9 @@ urlpatterns = [
     path('savenewpoll/', sv.savenewpoll, name="savenewpoll"),
     path('savenewquestion/', sv.savenewquestion, name="savenewquestion"),
     path('savenewmediapost/', sv.savenewmediapost, name="savenewmediapost"),
+    path('savenewanswer/', sv.savenewanswer, name="savenewanswer"),
+    path('savecomment/', sv.savecomment, name='savecomment'),
+    path('loadmorecomments/', sv.loadmorecomments, name='loadmorecomments'),
     path('pickpostcommunities', sv.pickpostcommunities, name="pickpostcommunities"),
     path('getcommunityflairs', sv.getcommunityflairs, name="getcommunityflairs"),
     path('addanotherquizresult/', sv.addanotherquizresult, name="addanotherquizresult"),
@@ -64,6 +67,9 @@ urlpatterns = [
     path('feed/lists/create', sv.createlist, name='createlist'),
     path('feed/lists/create/savenewlist/', sv.savenewlist, name='savenewlist'),
     path('feed/lists/<slug:slug>/<path:post_type>', sv.listdetailfilter, name='listdetailfilter'),
+    path('u/<path:parent_author_name>/<path:parent_post_id>/<slug:parent_slug>/answer/<path:author_name>', sv.answerdetail, name="answerdetail"),
+    path('u/<path:username>/<path:post_id>/<slug:slug>', sv.postdetail, name='postdetail'),
+    path('u/<path:username>/<path:post_id>/<slug:slug>/', sv.postdetail, name='postdetail'),
 ]
 
 if settings.DEBUG:
