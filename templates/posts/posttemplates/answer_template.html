@@ -1,3 +1,4 @@
+{% load index %}
 <div class='full-width'>
     <div class='full-width box answer-template-oc'>
         <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
@@ -16,22 +17,22 @@
                 </ul>
                 <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{post_template_dict.answernoun}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="fs13 hide">{{post_template_dict.recommendedfy}}</span></p>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
-                    <img src='{{answer.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
+                    <img src='{{answer.author.avatar_url}}' style='width:40px;height:40px;object-fit: cover;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
                         <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{answer.author.display_name}}</a><br>
-                        <a href='{{answer.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{answer.time_diff}} {{post_template_dict.ago}}</a>
+                        <a href='/u/{{answer.parent.author.user_login}}/{{answer.parent.hex_id}}/{{answer.parent.guid}}/answer/{{answer.author.user_login}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{answer.time_diff}} {{post_template_dict.ago}}</a>
                     </div>
                 </div>
-                <a href='{{answer.guid}}' class='underline-on-hover full-width' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{answer.parent_title}}</a>
+                <a href='/u/{{answer.parent.author.user_login}}/{{answer.parent.hex_id}}/{{answer.parent.guid}}/answer/{{answer.author.user_login}}' class='underline-on-hover full-width hide' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{answer.parent_title}}</a>
                 {% if answer.preview == 'not-found' %}
                     <div class='full-width' class='answer-more-container' id='answer-more-container' style='cursor:pointer;' onclick='this.remove();document.getElementById("answer-template{{answer.ID}}").style.display="block";'>
-                        <p class='answer-shorttext' id='answer-shorttext{{answer.ID}}'>{{answer.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick='document.getElementById("answer-img{{answer.ID}}").style.display="none";document.getElementById("answer-shorttext{{answer.ID}}").style.display="none";document.getElementById("answer-template{{answer.ID}}").style.display="block";this.remove();'>({{post_template_dict.more}})</span></p>
+                        <p class='answer-shorttext' id='answer-shorttext{{answer.ID}}'>{{answer.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick='document.getElementById("answer-img{{answer.ID}}").style.display="none";document.getElementById("answer-shorttext{{answer.ID}}").style.display="none";document.getElementById("answer-template{{answer.ID}}").style.display="block";this.remove();'>({{word_list|getword:"more"|ucfirst}})</span></p>
                     </div>
                     <div class='answer-template' id='answer-template{{answer.ID}}'>{% autoescape off %}{{answer.post_content}}{% endautoescape %}</div>
                 {% else %}
                     <div class='full-width' class='answer-more-container' id='answer-more-container' style='cursor:pointer;' onclick='this.remove();document.getElementById("answer-template{{answer.ID}}").style.display="block";'>
                         <img class='answer-img' id='answer-img{{answer.ID}}' src='{{ answer.preview }}'>
-                        <p class='answer-shorttext' id='answer-shorttext{{answer.ID}}'>{{answer.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick='document.getElementById("answer-img{{answer.ID}}").style.display="none";document.getElementById("answer-shorttext{{answer.ID}}").style.display="none";document.getElementById("answer-template{{answer.ID}}").style.display="block";this.remove();'>({{post_template_dict.more}})</span></p>
+                        <p class='answer-shorttext' id='answer-shorttext{{answer.ID}}'>{{answer.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick='document.getElementById("answer-img{{answer.ID}}").style.display="none";document.getElementById("answer-shorttext{{answer.ID}}").style.display="none";document.getElementById("answer-template{{answer.ID}}").style.display="block";this.remove();'>({{word_list|getword:"more"|ucfirst}})</span></p>
                     </div>
                     <div class='answer-template' id='answer-template{{answer.ID}}'>{% autoescape off %}{{answer.post_content}}{% endautoescape %}</div>
                 {% endif %}

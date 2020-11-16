@@ -331,6 +331,19 @@ def history_dict(word_list):
 '''---------------------------------------
   HELPERS              
 -----------------------------------------'''
+def arrange_post_slug(title):
+    import string
+    title = title.lower()
+    title = title.replace("ı","i")
+    title = title.replace("ç","c")
+    title = title.replace("ş","s")
+    title = title.replace("ö","o")
+    title = title.replace("ü","u")
+    title = title.replace("ğ","g")
+    title = title.translate(str.maketrans('', '', string.punctuation))
+    title = title.replace(' ','_')
+    return title
+
 def setup_quizmeta(post, word_list):
     import re
     current_uid = 8
@@ -408,7 +421,9 @@ def setup_mediameta(post):
 def setup_postmeta(post, word_list):
     import re
     current_uid = 8
+    post.hex_id = hex(post.ID + 100000).replace("x", "s")
     post.post_title = post.post_title.replace(" - Sosyorol", "")
+    post.guid = arrange_post_slug(post.post_title)
     post.like = PostRating.objects.filter(post_id=post.ID, opinion='like').count()
     post.dislike = PostRating.objects.filter(post_id=post.ID, opinion='dislike').count()
     post.rating = post.like - post.dislike
@@ -422,6 +437,7 @@ def setup_postmeta(post, word_list):
     if post.communities.count() > 0:
         post.first_community = post.communities[0].name
 
+    print("author: "+str(post.author_id))
     mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{post.author_id}')
     if (os.path.exists(mypath)):
         onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
@@ -430,6 +446,11 @@ def setup_postmeta(post, word_list):
         avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
     post.author.set_avatar(avatar_url)
     post.time_diff = fun.humanizedate(post.post_date.replace(tzinfo=None), word_list)
+
+    if post.post_type == "answer":
+        post.parent = Post.objects.filter(ID=post.post_parent)[0]
+        post.parent.guid = arrange_post_slug(post.parent.post_title)
+        post.parent.hex_id = hex(post.parent.ID + 100000).replace("x", "s")
     
     if post.post_type == "post" or post.post_type == "answer":
         soup = BSHTML(post.post_content,features="html.parser")
@@ -593,6 +614,50 @@ def addanotherquizquestion(request):
     word_list = Languages.objects.filter(Q(lang_code = lang))
     qtype = request.GET["type"]
     return render(request, 'posts/createpost/quiz_question.html', {'number':nmr, 'word_list':word_list, 'qtype':qtype})
+
+def getchildcomments(post_id, parent_id):
+    comments = Comment.objects.filter(comment_post_ID=post_id, comment_parent=parent_id).order_by('-comment_date').prefetch_related()
+    for c in comments:
+        c.user = setup_current_user(c.user_id)
+        c.child_comments = Comment.objects.none()
+    return comments
+
+def getgrandchildcomments(post_id, comments):
+    if len(comments) == 0:
+        return Comment.objects.none()
+    else:
+        for comment in comments:
+            comment.user = setup_current_user(comment.user_id)
+            comment.child_comments = Comment.objects.none()
+            comment.child_comments = getchildcomments(post_id, comment.comment_ID)
+            return getgrandchildcomments(post_id, comment.child_comments)
+
+def loadmorecomments(request):
+    try:
+        offset = int(request.GET["offset"])
+        limit = int(request.GET["limit"])
+        post_id = int(request.GET["post_id"])
+        parent_id = int(request.GET["parent_id"])
+        padding = int(request.GET["padding"])
+        print(offset)
+        print(limit)
+        comments = Comment.objects.filter(comment_post_ID=post_id, comment_parent=parent_id).order_by('-comment_date').prefetch_related()
+        comments = comments[offset:(offset + limit)]
+        print(comments)
+        current_uid = 8
+        current_user = setup_current_user(current_uid)
+        lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+        word_list = Languages.objects.filter(Q(lang_code = lang))
+        for comment in comments:
+            comment.user = setup_current_user(comment.user.ID)
+            comment.child_comments = Comment.objects.none()
+            comment.child_comments = getchildcomments(post_id, comment.comment_ID)
+            getgrandchildcomments(post_id, comment.child_comments)
+        print(comments)
+    except:
+        print("loadmorecomments except")
+        return HttpResponse(json.dumps({}),content_type="application/json")
+    return render(request, 'posts/comments/comment_list.html', {'comments':comments, 'padding':padding, 'word_list':word_list})
 
 '''---------------------------------------
   OPERATIONS              
@@ -936,6 +1001,7 @@ def savenewquiz(request):
     response_data = {}
     response_data['content'] = "success"                        
     return HttpResponse(json.dumps(response_data),content_type="application/json")
+
 @csrf_exempt
 def savenewpost(request):
     import re
@@ -975,6 +1041,7 @@ def savenewpost(request):
     response_data = {}
     response_data['content'] = "success"                        
     return HttpResponse(json.dumps(response_data),content_type="application/json")
+
 @csrf_exempt
 def savenewmediapost(request):
     current_uid = 8
@@ -1019,6 +1086,7 @@ def savenewmediapost(request):
     response_data = {}
     response_data['content'] = "success"                   
     return HttpResponse(json.dumps(response_data),content_type="application/json")
+
 @csrf_exempt
 def savenewlink(request):
     current_uid = 8
@@ -1152,6 +1220,34 @@ def savenewpoll(request):
 
     response_data = {}
     response_data['content'] = "success"                   
+    return HttpResponse(json.dumps(response_data),content_type="application/json")
+
+@csrf_exempt
+def savecomment(request):
+    current_uid = 8
+    current_user = setup_current_user(current_uid)
+    comment = request.POST["comment"]
+    post_id = request.POST["post_id"]
+    parent_id = request.POST["parent_id"]
+    new_comment = Comment(comment_approved=1, comment_author=current_user.display_name, comment_content=comment, comment_post_ID=post_id, comment_parent=parent_id, comment_author_email=current_user.user_email, comment_date=dt.datetime.now(), user_id=current_uid)
+    new_comment.save()
+    response_data = {}
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    response_data['content'] = Languages.objects.filter(lang_code=lang, var_name="comment-saved-successfully")[0].translation
+    return HttpResponse(json.dumps(response_data),content_type="application/json")
+
+@csrf_exempt
+def savenewanswer(request):
+    current_uid = 8
+    answer = request.POST["answer"]
+    parent_id = int(request.POST["parent"])
+    parent = Post.objects.filter(ID=parent_id)[0]
+    current_user = setup_current_user(current_uid)
+    new_answer = Post(post_title=parent.post_title, post_content=answer, post_date=dt.datetime.now(), author=current_user, post_author=current_uid, to_ping="", pinged="", post_content_filtered="", post_status="publish", post_type="answer", post_excerpt=parent.post_excerpt, post_parent=parent_id)
+    new_answer.save()
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    response_data = {}
+    response_data['content'] = Languages.objects.filter(lang_code=lang, var_name="answer-saved-successfully")[0].translation
     return HttpResponse(json.dumps(response_data),content_type="application/json")
 
 '''---------------------------------------
@@ -1344,6 +1440,8 @@ def home(request):
 
     start = time.time()
     questions = Post.objects.filter(post_type="questions", post_status="publish").order_by('-post_date')[:8]
+    for question in questions:
+        setup_postmeta(question, word_list)
     end = time.time() - start
     print(f"Get and setup questions in {end} s")
 
@@ -2135,5 +2233,67 @@ def newcommunity(request):
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict, 
                                             'tips':tips, 'create_list_dict':create_list_dict, 'communitycats':communitycats,
                                             'new_community_tips_dict':new_community_tips_dict, 'word_list':word_list})
+
+def postdetail(request, username, post_id, slug):
+    pid = int(post_id.replace("s", "x"), 16) - 100000
+    post = Post.objects.filter(ID=pid)[0]
+    current_uid = 8
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    setup_postmeta(post, word_list)
+    if post.post_type == "media":
+        setup_mediameta(post)
+    elif post.post_type == "poll":
+        setup_pollmeta(post, word_list)
+    elif post.post_type == "link":
+        post.photo_from_url = fun.get_photo_from_url(post.post_content)
+    elif post.post_type == "questions":
+        post.answers = Post.objects.filter(post_type="answer", post_status="publish", post_parent=post.ID)
+        for answer in post.answers:
+            setup_postmeta(answer, word_list)
+    followed_communities = FollowedCommunities.objects.filter(Q(user_id = current_uid)).order_by('-date').prefetch_related()
+    post.flairs = PostFlair.objects.filter(post=post)
+    post.comments = Comment.objects.filter(comment_post_ID=post.ID, comment_parent=0).order_by('-comment_date').prefetch_related()
+    comment_length = len(post.comments)
+    post.comments = post.comments[:5]
+    for comment in post.comments:
+        comment.user = setup_current_user(comment.user.ID)
+        comment.child_comments = Comment.objects.none()
+        comment.child_comments = getchildcomments(post.ID, comment.comment_ID)
+        getgrandchildcomments(post.ID, comment.child_comments)
+    return render(request, 'postdetail.html', {'post':post, 'lang':lang, 'dark':dark, 
+                                                'current_user': current_user, 'word_list':word_list,
+                                                'followed_communities':followed_communities, 'comments':post.comments, 'comment_length':comment_length
+                                                })
+    
+def answerdetail(request, parent_author_name, parent_post_id, parent_slug, author_name):
+    print("answer detail")
+    pid = int(parent_post_id.replace("s", "x"), 16) - 100000
+    author = User.objects.filter(user_login=author_name)[0]
+    post = Post.objects.filter(post_parent=pid, post_author=author.ID, post_type="answer", post_status="publish")[0]
+    post.parent = Post.objects.filter(ID=pid)[0]
+    post.parent.guid = arrange_post_slug(post.parent.post_title)
+    post.parent.hex_id = hex(post.parent.ID + 100000).replace("x", "s")
+    current_uid = 8
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    followed_communities = FollowedCommunities.objects.filter(Q(user_id = current_uid)).order_by('-date').prefetch_related()
+    setup_postmeta(post, word_list)
+    post.comments = Comment.objects.filter(comment_post_ID=post.ID, comment_parent=0).order_by('-comment_date').prefetch_related()
+    comment_length = len(post.comments)
+    post.comments = post.comments[:5]
+    for comment in post.comments:
+        comment.user = setup_current_user(comment.user.ID)
+        comment.child_comments = Comment.objects.none()
+        comment.child_comments = getchildcomments(post.ID, comment.comment_ID)
+        getgrandchildcomments(post.ID, comment.child_comments)
+    return render(request, 'answerdetail.html', {'post':post, 'lang':lang, 'dark':dark, 
+                                                'current_user': current_user, 'word_list':word_list,
+                                                'followed_communities':followed_communities, 'comments':post.comments, 'comment_length':comment_length
+                                                })
 
 

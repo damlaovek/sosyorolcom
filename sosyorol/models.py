@@ -48,7 +48,9 @@ class UserRelation(models.Model):
 # Post related models.
 class Post(models.Model):
     ID = models.BigIntegerField(primary_key = True)
+    post_author = models.BigIntegerField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    hex_id = ""
     post_date = models.DateTimeField()
     post_content = models.TextField()
     post_title = models.TextField()
@@ -60,6 +62,7 @@ class Post(models.Model):
     to_ping = models.TextField() 
     pinged = models.TextField()
     post_content_filtered = models.TextField()
+    parent = None
     rating = 0
     likes = 0
     dislikes = 0
@@ -79,11 +82,13 @@ class Post(models.Model):
     vote_percentages = []
     user_rate = ""
     communities = models.QuerySet()
+    flairs = models.QuerySet()
     first_community = ""
     quiz_questions = []
     quiz_results = []
     media_type = ""
     media_url = ""
+    answers = models.QuerySet()
     class Meta:
         db_table = "wpmu_posts"
 
@@ -140,7 +145,11 @@ class Comment(models.Model):
     comment_content = models.TextField()
     comment_approved = models.SmallIntegerField()
     comment_author = models.TextField()
+    comment_parent = models.BigIntegerField()
     comment_author_email = models.TextField()
+    child_comments = models.QuerySet()
+    comment_date = models.DateTimeField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     class Meta:
         db_table = "wpmu_comments"
 

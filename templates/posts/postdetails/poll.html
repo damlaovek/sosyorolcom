@@ -1,20 +1,21 @@
-<div class='bsbb full-width'>
-    <div class='bsbb full-width box answer-template-oc'>
-        <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
+{% load static %}
+{% load index %}
+<div class='full-width'>
+    <div class='full-width box answer-template-oc'>
+        <div style='width:calc(100% - 20px);' class='p010'>
+            <div class="bsbb full-width inline-block p010 mb10" style="top:-7px;">
+                {% for community in media.communities %}
+                    <a href="/c/{{community.slug}}" class="left p010 mt7 lh30 bcba cb mr10 br4 noselect btn">c/{{community.name}}</a>
+                {% endfor %}
+            </div>
             <div style='width:calc(100% - 20px);' class='p010'>
-                <div class='sqr20 icon absolute hand aligntr bringfront' onclick="showMoreOptions(this, {{poll.ID}})">
-                    <svg width='20px' height='20px' viewBox='0 0 20 20' class="rotate90">
-                        <g>
-                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                        </g>
-                    </svg>
-                </div>
-                <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{poll.ID}}">
-                    <li class="hand" onclick="savePost(this, {{poll.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
-                </ul>
-                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{post_template_dict.poll}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{post_template_dict.recommendedfy}}</span></p>
+                <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon absolute hand' style='top:0;right:0;transform: rotate(90deg);'>
+                    <g>
+                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                    </g>
+                </svg>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
                     <img src='{{poll.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
@@ -22,8 +23,15 @@
                         <a href='/u/{{poll.author.user_login}}/{{poll.hex_id}}/{{poll.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{poll.time_diff}} {{post_template_dict.ago}}</a>
                     </div>
                 </div>
-                <a href='/u/{{poll.author.user_login}}/{{poll.hex_id}}/{{poll.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{poll.post_title}}</a>
-                <div class='bsbb full-width box m100 oh' id='poll-content-{{poll.ID}}'>
+                <div class="full-width inline-block">
+                    <a href='/u/{{poll.author.user_login}}/{{poll.hex_id}}/{{poll.guid}}' class='underline-on-hover left lh30' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{poll.post_title}}</a>
+                    {% for flair in poll.flairs %}
+                        {% if flair.flair.term_id == -1 %}
+                            <div class="noselect left p010 lh30 br15 flair active ml10" id="flair">{{flair.flair.flair}}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class='bsbb full-width box m100' id='poll-content-{{poll.ID}}'>
                     {% if poll.voted > 0 %}
                         <div class='bsbb full-width'>
                             {% for option in poll.poll_options %}
@@ -72,31 +80,31 @@
                             <div class="full-width bt"></div>
                             <div class='bsbb full-width p10 inline-flex'>
                                 <div style="position:relative;width:120px; height:38px;">
-                                    <input onclick="votepoll('{{poll.ID}}')" type="submit" class="btn p10 hand blocked" id="votebtn" style="border-radius:4px;" value="{{post_template_dict.vote}}">
+                                    <input onclick="votepoll({{poll.ID}})" type="submit" class="btn p10 hand blocked" id="votebtn" style="border-radius:4px;" value="{{word_list|getword:'vote'|ucwords}}">
                                     <div class="loader hidden"></div>
                                 </div>
                                 {% if poll.votes|length == 1 %}
-                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;margin-left:20px;'>{{poll.votes|length}} {{post_template_dict.votenoun}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
+                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;margin-left:20px;'>{{poll.votes|length}} {{word_list|getword:"vote-noun"|ucwords}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
                                 {% else %}
-                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;margin-left:20px;'>{{poll.votes|length}} {{post_template_dict.votesnoun}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
+                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;margin-left:20px;'>{{poll.votes|length}} {{word_list|getword:"vote-noun"|ucwords}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
                                 {% endif %}
                             </div>
                         </form>
                     {% endif %}
                 </div>
             </div>
-            <div class='bsbb full-width' style='display:inline-block;margin-top:5px;'>
+            <div class='full-width' style='display:inline-block;margin-top:5px;'>
                 {% if poll.user_rate == "like" %}
-                    <div class='icon left answer-hint' onclick='upvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.upvote}}'>
-                        <svg width='20px' height='20px' id='upvote{{poll.ID}}' class='upvote active' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+                    <div class='icon left answer-hint' onclick="upvote({{media.ID}}, '{{csrf_token}}');" data-title='{{post_template_dict.upvote}}'>
+                        <svg width='20px' height='20px' id='upvote{{media.ID}}' class='upvote active' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
                             <g id='surface1'>
                                 <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
                             </g>
                         </svg>
                     </div>
                 {% else %}
-                    <div class='icon left answer-hint' onclick='upvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.upvote}}'>
-                        <svg width='20px' height='20px' id='upvote{{poll.ID}}' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+                    <div class='icon left answer-hint' onclick="upvote({{media.ID}}, '{{csrf_token}}');" data-title='{{post_template_dict.upvote}}'>
+                        <svg width='20px' height='20px' id='upvote{{media.ID}}' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
                             <g id='surface1'>
                                 <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
                             </g>
@@ -159,12 +167,61 @@
                 </div>
             </div>
         </div>
-        <ul class='comments-wrapper bt pt10' id='comments-wrapperanswer{{answer.ID}}'>
-            {% include 'posts/comments/comment_list.html' %}
-        </ul>
-        {% include 'posts/comments/comment_editor.html' %}
+        <div class="bt bb">
+            {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=poll.ID %}
+        </div>
+        {% if comments|length > 0 %}
+            <div class='comments-wrapper pt10' id='comments-wrapper{{post.ID}}' style="display:block;">
+                {% include 'posts/comments/comment_list.html' with comments=comments padding=0 %}
+            </div>
+        {% endif %}
+        {% if comment_length > comments|length %}
+            <div id="loader" class="full-width tac dnone">
+                <img src="{% static 'assets/img/sosyorol-loader.gif' %}" style="margin:auto; height: 80px;">
+            </div>
+        {% endif %}
     </div>
 </div>
+<script>
+    var offset = 5;
+    var limit = 5;
+    var isLoading = false;
+    var hasMore = true;
+    window.onload = () => {
+        offset = 5;
+        isLoading = false;
+        hasMore = true;
+    }
+    window.onscroll = () => {
+        if (document.documentElement.scrollHeight - document.documentElement.scrollTop === document.documentElement.clientHeight){
+            if(hasMore){
+                if(isLoading){
+                    return;
+                }else{
+                    isLoading = true;
+                    document.getElementById("loader").classList.remove("dnone");
+                    j.ajax({
+                        url:"{% url 'loadmorecomments' %}",
+                        type : "GET", // http method
+                        data : { limit: limit, offset: offset, post_id: "{{poll.ID}}", parent_id:0, padding:0}, // data sent with the post request
+                        // handle a successful response
+                        success : function(json) {
+                            // log the returned json to the console
+                            console.log(json); // another sanity check
+                            document.getElementById("comments-wrapper{{poll.ID}}").innerHTML += json;
+                            offset += limit;
+                            if(offset >= {{comment_length}}){
+                                hasMore = false;
+                            }
+                            isLoading = false;
+                            document.getElementById("loader").classList.add("dnone");
+                        }
+                    });
+                }
+            }
+        }
+    }
+</script>
 <script type="text/javascript"> 
     var a = "{{poll.ID|escapejs}}";
     var j = jQuery.noConflict();

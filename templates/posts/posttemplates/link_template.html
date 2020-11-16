@@ -17,13 +17,13 @@
             <img src='{{link.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
             <div style='margin-left:10px;width:calc(100% - 50px);'>
                 <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{link.author.display_name}}</a><br>
-                <a href='{{link.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{link.time_diff}} {{post_template_dict.ago}}</a>
+                <a href='/u/{{link.author.user_login}}/{{link.hex_id}}/{{link.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{link.time_diff}} {{post_template_dict.ago}}</a>
             </div>
         </div>
     </div>
     <div class='full-width p020 inline-block bsbb'>
         <div class='left mw430 bsbb'>
-            <a href='{{link.guid}}' class='underline-on-hover full-width' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{link.post_title}}</a>
+            <a href='/u/{{link.author.user_login}}/{{link.hex_id}}/{{link.guid}}' class='underline-on-hover full-width' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{link.post_title}}</a>
             <div class='full-width m100'></div>
             <a href='{{link.post_content}}' rel='noopener nofollow noreferrer' target='_blank' class='inline-flex'>
                 <p class='underline-on-hover lh20 fs14 m100 ellipsis' style='color:var(--main-color); width:200px;'>{{link.post_content}}</p>

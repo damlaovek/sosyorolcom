@@ -1,54 +1,43 @@
+{% load static %}
+{% load index %}
 <div class='full-width'>
     <div class='full-width box answer-template-oc'>
         <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
             <div style='width:calc(100% - 20px);' class='p010'>
-                <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon absolute hand' style='top:0;right:0;transform: rotate(90deg);'>
-                    <g>
-                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                    </g>
-                </svg>
-                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{post_template_dict.media}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{post_template_dict.recommendedfy}}</span></p>
+                <div class='sqr20 icon absolute hand aligntr bringfront' onclick="showMoreOptions(this, {{answer.ID}})">
+                    <svg width='20px' height='20px' viewBox='0 0 20 20' class="rotate90">
+                        <g>
+                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                        </g>
+                    </svg>
+                </div>
+                <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{answer.ID}}">
+                    <li class="hand" onclick="savePost(this, {{answer.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
+                </ul>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
-                    <img src='{{media.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
+                    <img src='{{answer.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
-                        <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{media.author.display_name}}</a><br>
-                        <a href='/u/{{media.author.user_login}}/{{media.hex_id}}/{{media.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{media.time_diff}} {{post_template_dict.ago}}</a>
+                        <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{answer.author.display_name}}</a><br>
+                        <a href='/u/{{answer.parent.author.user_login}}/{{answer.parent.hex_id}}/{{answer.parent.guid}}/answer/{{answer.author.user_login}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{answer.time_diff}} {{post_template_dict.ago}}</a>
                     </div>
                 </div>
-                <a href='/u/{{media.author.user_login}}/{{media.hex_id}}/{{media.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{media.post_title}}</a>
-                <div class="full-width mt10">
-                    <div class="bsbb answer-img p020">
-                        {% if media.media_type == "video" %}
-                        <video id="player" playsinline controls class="js-player" autoplay="true" style="min-height: 400px;" muted="muted">
-                            <source src="{{media.media_url}}" type="video/mp4" />
-                        </video>
-                        <script src='https://cdn.polyfill.io/v2/polyfill.min.js?features=es6,Array.prototype.includes,CustomEvent,Object.entries,Object.values,URL'></script>
-                        <script src='https://unpkg.com/plyr@3'></script>
-                        <script>
-                            const player = new Plyr('#player', {captions: {active: true}});
-                            window.player = player;
-                            window.player.play();
-                        </script>
-                        {% else %}
-                            <img src="{{media.media_url}}" class="full" style="object-fit: contain;"/>
-                        {% endif %}
-                    </div>
-                </div>
+                <a href='/u/{{answer.parent.author.user_login}}/{{answer.parent.hex_id}}/{{answer.parent.guid}}/answer/{{answer.author.user_login}}' class='underline-on-hover full-width' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{answer.post_title}}</a>
+                <div class='answer-template' id='answer-template{{answer.ID}}' style="display:block;">{% autoescape off %}{{answer.post_content}}{% endautoescape %}</div>
             </div>
             <div class='full-width' style='display:inline-block;margin-top:5px;'>
-                {% if media.user_rate == "like" %}
-                    <div class='icon left answer-hint' onclick="upvote({{media.ID}}, '{{csrf_token}}');" data-title='{{post_template_dict.upvote}}'>
-                        <svg width='20px' height='20px' id='upvote{{media.ID}}' class='upvote active' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+                {% if answer.user_rate == "like" %}
+                    <div class='icon left answer-hint' onclick="upvote({{answer.ID}}, '{{csrf_token}}');" data-title='{{post_template_dict.upvote}}'>
+                        <svg width='20px' height='20px' id='upvote{{answer.ID}}' class='upvote active' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
                             <g id='surface1'>
                                 <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
                             </g>
                         </svg>
                     </div>
                 {% else %}
-                    <div class='icon left answer-hint' onclick="upvote({{media.ID}}, '{{csrf_token}}');" data-title='{{post_template_dict.upvote}}'>
-                        <svg width='20px' height='20px' id='upvote{{media.ID}}' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+                    <div class='icon left answer-hint' onclick="upvote({{answer.ID}}, '{{csrf_token}}');" data-title='{{post_template_dict.upvote}}'>
+                        <svg width='20px' height='20px' id='upvote{{answer.ID}}' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
                             <g id='surface1'>
                                 <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
                             </g>
@@ -56,25 +45,25 @@
                     </div>
                 {% endif %}
 
-                {% if media.user_rate == "like" %}
-                    <p class='main-color vote noselect' id='vote{{media.ID}}'>{{media.rating}}</p>
-                {% elif media.user_rate == "dislike" %}
-                    <p class='vote noselect red' id='vote{{media.ID}}'>{{media.rating}}</p>
+                {% if answer.user_rate == "like" %}
+                    <p class='main-color vote noselect' id='vote{{answer.ID}}'>{{answer.rating}}</p>
+                {% elif answer.user_rate == "dislike" %}
+                    <p class='vote noselect red' id='vote{{answer.ID}}'>{{answer.rating}}</p>
                 {% else %}
-                    <p class='vote noselect' id='vote{{media.ID}}'>{{media.rating}}</p>
+                    <p class='vote noselect' id='vote{{answer.ID}}'>{{answer.rating}}</p>
                 {% endif %}
                 
-                {% if media.user_rate == "dislike" %}
-                    <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote({{media.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.downvote}}'>
-                        <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{media.ID}}' class='downvote active'>
+                {% if answer.user_rate == "dislike" %}
+                    <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote({{answer.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.downvote}}'>
+                        <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{answer.ID}}' class='downvote active'>
                             <g id='surface1'>
                                 <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
                             </g>
                         </svg>
                     </div>
                 {% else %}
-                    <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote({{media.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.downvote}}'>
-                        <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{media.ID}}' class='downvote'>
+                    <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote({{answer.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.downvote}}'>
+                        <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{answer.ID}}' class='downvote'>
                             <g id='surface1'>
                                 <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
                             </g>
@@ -89,11 +78,11 @@
                         </g>
                     </svg>
                 </div>
-                <p class='vote noselect'>{{media.repost}}</p>
-                {% if comments.count > 0 %}
-                    <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comments-wrapperanswer{{media.ID}}").style.display = "block";' data-title='{{post_template_dict.comments}}'>
+                <p class='vote noselect'>{{answer.repost}}</p>
+                {% if answer.comments.count > 0 %}
+                    <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comments-wrapperanswer{{answer.ID}}").style.display = "block";' data-title='{{post_template_dict.comments}}'>
                 {% else %}
-                    <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comment-editor{{media.ID}}").focus();' data-title='{{post_template_dict.comments}}'>
+                    <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comment-editor{{answer.ID}}").focus();' data-title='{{post_template_dict.comments}}'>
                 {% endif %}
                         <svg width='20px' height='20px' viewBox='0 0 20 20'>
                             <g>
@@ -101,7 +90,7 @@
                             </g>
                         </svg>
                     </div>
-                <p class='vote noselect'>{{comments.count}}</p>
+                <p class='vote noselect'>{{answer.comments|length}}</p>
                 <div class='icon right answer-hint' data-title='{{post_template_dict.share}}'>
                     <svg width='20px' height='20px' viewBox='0 0 20 20'>
                         <g>
@@ -111,9 +100,82 @@
                 </div>
             </div>
         </div>
-        <ul class='comments-wrapper bt pt10' id='comments-wrapperanswer{{answer.ID}}'>
-            {% include 'posts/comments/comment_list.html' %}
-        </ul>
-        {% include 'posts/comments/comment_editor.html' %}
+        <div class="bt bb">
+            {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=answer.ID %}
+        </div>
+        {% if comments|length > 0 %}
+            <div class='comments-wrapper pt10' id='comments-wrapper{{post.ID}}' style="display:block;">
+                {% include 'posts/comments/comment_list.html' with comments=comments padding=0 %}
+            </div>
+        {% endif %}
+        {% if comment_length > comments|length %}
+            <div id="loader" class="full-width tac dnone">
+                <img src="{% static 'assets/img/sosyorol-loader.gif' %}" style="margin:auto; height: 80px;">
+            </div>
+        {% endif %}
     </div>
 </div>
+<script>
+    var j = jQuery.noConflict();
+    function showMoreOptions(elem, postID){
+        if (elem.classList.contains("active")){
+            elem.classList.remove("active");
+            document.getElementById("moreoptions"+postID).classList.add("dnone");
+        }else{
+            elem.classList.add("active");
+            document.getElementById("moreoptions"+postID).classList.remove("dnone");
+        }
+    }
+    function savePost(elem, postID, userID, csrf){
+        j.ajax({
+            url:"{% url 'save-the-post' %}",
+            type : "POST", // http method
+            data : { redirect: window.location.href, csrfmiddlewaretoken: csrf, post_id : postID, operation : "save", user_id : userID}, // data sent with the post request
+            // handle a successful response
+            success : function(json) {
+                 // log the returned json to the console
+                console.log("success"); // another sanity check
+            }
+        });
+    }
+</script>
+<script>
+    var offset = 5;
+    var limit = 5;
+    var isLoading = false;
+    var hasMore = true;
+    window.onload = () => {
+        offset = 5;
+        isLoading = false;
+        hasMore = true;
+    }
+    window.onscroll = () => {
+        if (document.documentElement.scrollHeight - document.documentElement.scrollTop === document.documentElement.clientHeight){
+            if(hasMore){
+                if(isLoading){
+                    return;
+                }else{
+                    isLoading = true;
+                    document.getElementById("loader").classList.remove("dnone");
+                    j.ajax({
+                        url:"{% url 'loadmorecomments' %}",
+                        type : "GET", // http method
+                        data : { limit: limit, offset: offset, post_id: "{{poll.ID}}", parent_id:0, padding:0}, // data sent with the post request
+                        // handle a successful response
+                        success : function(json) {
+                            // log the returned json to the console
+                            console.log(json); // another sanity check
+                            document.getElementById("comments-wrapper{{poll.ID}}").innerHTML += json;
+                            offset += limit;
+                            if(offset >= {{comment_length}}){
+                                hasMore = false;
+                            }
+                            isLoading = false;
+                            document.getElementById("loader").classList.add("dnone");
+                        }
+                    });
+                }
+            }
+        }
+    }
+</script>
