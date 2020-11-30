@@ -1,0 +1,93 @@
+{% load index %}
+<div class="absolute bcba dnone popup-container" id="education-popup">
+    <div class="popup box full-shadow-border p20">
+        <p class="title fs19">{{word_list|getword:"edit-credentials"|ucfirst}}</p>
+        <p class="cg2 p100 bb">{{word_list|getword:"edit-credentials-info"}}</p>
+        <svg style="position:absolute;top:20px;right:20px;cursor:pointer;padding:5px;width:15px;height:15px;z-index:9999;" class="icon hand" onclick="document.getElementById('education-popup').classList.toggle('dnone');" viewBox="0 0 15 15" version="1.1">
+            <g id="surface1">
+                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0.132812 14.878906 C 0.222656 14.964844 0.335938 15.011719 0.453125 15.011719 C 0.570312 15.011719 0.683594 14.964844 0.773438 14.878906 L 7.503906 8.144531 L 14.238281 14.878906 C 14.324219 14.964844 14.441406 15.011719 14.558594 15.011719 C 14.675781 15.011719 14.789062 14.964844 14.878906 14.878906 C 15.054688 14.703125 15.054688 14.414062 14.878906 14.238281 L 8.144531 7.503906 L 14.878906 0.773438 C 15.054688 0.597656 15.054688 0.308594 14.878906 0.132812 C 14.703125 -0.0429688 14.414062 -0.0429688 14.238281 0.132812 L 7.503906 6.863281 L 0.773438 0.132812 C 0.597656 -0.0429688 0.308594 -0.0429688 0.132812 0.132812 C -0.0429688 0.308594 -0.0429688 0.597656 0.132812 0.773438 L 6.863281 7.503906 L 0.132812 14.238281 C -0.0429688 14.414062 -0.0429688 14.703125 0.132812 14.878906 Z M 0.132812 14.878906 "/>
+            </g>
+        </svg>
+        <div class="full-width inline-block">
+            <div class="full-width inline-flex mt10">
+                <svg width="20px" height="20px" viewBox="0 0 20 20">
+                    <g>
+                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 19.855469 12.699219 C 19.855469 12.402344 19.683594 12.15625 19.433594 12.03125 L 19.433594 7.4375 C 19.492188 7.417969 19.527344 7.363281 19.523438 7.304688 C 19.523438 7.246094 19.484375 7.191406 19.433594 7.171875 L 9.949219 3.828125 C 9.828125 3.785156 9.695312 3.785156 9.574219 3.828125 L 0.09375 7.171875 C 0.0390625 7.191406 0 7.246094 0 7.304688 C 0 7.363281 0.0351562 7.417969 0.0898438 7.4375 L 9.558594 11.125 C 9.6875 11.171875 9.835938 11.171875 9.96875 11.125 L 18.78125 7.691406 L 18.78125 12.03125 C 18.53125 12.15625 18.359375 12.402344 18.359375 12.699219 C 18.359375 13.003906 18.546875 13.273438 18.8125 13.386719 C 18.546875 13.917969 18.359375 15.003906 18.359375 15.3125 C 18.359375 15.726562 18.695312 16.0625 19.109375 16.0625 C 19.519531 16.0625 19.855469 15.726562 19.855469 15.3125 C 19.855469 15.003906 19.667969 13.917969 19.398438 13.386719 C 19.667969 13.273438 19.855469 13.007812 19.855469 12.699219 Z M 19.855469 12.699219 "/>
+                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 3.054688 9.292969 C 3.054688 10.355469 3.054688 11.601562 3.054688 11.800781 C 3.054688 13.773438 6.027344 15.378906 9.761719 15.480469 C 13.496094 15.378906 16.46875 13.773438 16.46875 11.800781 C 16.46875 11.601562 16.46875 10.355469 16.46875 9.292969 L 9.964844 11.824219 C 9.832031 11.875 9.6875 11.875 9.554688 11.824219 Z M 3.054688 9.292969 "/>
+                    </g>
+                </svg>
+                <p class="cg2 ml10 lh20 fwbold">{{word_list|getword:"add-education-credential"|ucfirst}}</p>
+            </div>
+            <form class="bsbb full-width p10">
+                <div class="full-width inline-flex">
+                    <label for="school" class="lh40" style="width:35%;">{{word_list|getword:"school"|ucfirst}}:</label><input type="text" class="bsbb p10 border br4 half-width" name="school" id="school" placeholder="Stanford University" onchange="validateEducation();">
+                </div>
+                <div class="full-width mt10 inline-flex">
+                    <label for="major" class="lh40" style="width:35%;">{{word_list|getword:"major"|ucfirst}}:</label><input type="text" class="bsbb  half-width p10 border br4" name="major" id="major" placeholder="Computer Science" onchange="validateEducation();">
+                </div>
+                <div class="full-width mt10 inline-flex">
+                    <label for="minor" class="lh40" style="width:35%;">{{word_list|getword:"minor"|ucfirst}}:</label><input type="text" class="bsbb  half-width p10 border br4" name="minor" id="minor" placeholder="Biology" onchange="validateEducation();">
+                </div>
+                <div class="full-width mt10 inline-flex">
+                    <label for="degree" class="lh40" style="width:35%;">{{word_list|getword:"degree"|ucwords}}:</label><input type="text" class="bsbb  half-width p10 border br4" name="degree" id="degree" placeholder="B.Sc." onchange="validateEducation();">
+                </div>
+                <div class="full-width mt10 inline-flex">
+                    <label for="graduation" class="lh40" style="width:35%;">{{word_list|getword:"graduation-date"|ucwords}}:</label><input type="month" class="bsbb  half-width p10 border br4" name="graduation" id="graduation" placeholder="" onchange="validateEducation();">
+                </div>
+                <div class="mt20 full-width inline-block">
+                    <input disabled type="submit" id="save-education" class="btn p10 right fs15 lh20 noselect" style="border-radius:4px;height:30px;width:calc(25% - 35px); border:none; text-align:center; color:var(--main-color); font-weight:700;opacity:0.8" value="{{word_list|getword:'save'|ucfirst}}" onclick="return saveEducation()"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function validateEducation(){
+        var school = document.getElementById("school");
+        var major = document.getElementById("major");
+        var minor = document.getElementById("minor");
+        var degree = document.getElementById("degree");
+        var graduation = document.getElementById("graduation");
+        if(school.value == "" || major.value == "" || graduation.value == "" || degree.value == ""){
+            document.getElementById("save-education").disabled = true;
+            document.getElementById("save-education").style.opacity = "0.8";
+            document.getElementById("save-education").style.cursor = "default";
+            return false
+        }
+        document.getElementById("save-education").disabled = false;
+        document.getElementById("save-education").style.opacity = "1";
+        document.getElementById("save-education").style.cursor = "pointer";
+        return true;
+    }
+
+    function saveEducation(){
+        var saveBtn = document.getElementById("save-education");
+        if(validateEducation()){
+            var school = document.getElementById("school").value;
+            var major = document.getElementById("major").value;
+            var minor = document.getElementById("minor").value;
+            var graduation = document.getElementById("graduation").value;
+            var degree = document.getElementById("degree").value;
+            var data = {}
+            data = {
+                "type": "education",
+                "school": school,
+                "major": major,
+                "minor": minor,
+                "graduation": graduation,
+                "degree": degree
+            }
+            jQuery.ajax({
+                type: "GET",
+                url:"{% url 'savenewusercredential' %}",
+                data: data,
+                success: function(response) {
+                    displayAlert(response.content);
+                    document.getElementById("education-popup").classList.add("dnone");
+                }
+            });
+        }
+        return false;
+    }
+
+</script>

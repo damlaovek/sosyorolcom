@@ -49,6 +49,7 @@ urlpatterns = [
     path('getcommunityflairs', sv.getcommunityflairs, name="getcommunityflairs"),
     path('addanotherquizresult/', sv.addanotherquizresult, name="addanotherquizresult"),
     path('addanotherquizquestion/', sv.addanotherquizquestion, name="addanotherquizquestion"),
+    path('getquizresult/', sv.getquizresult, name='getquizresult'),
     path('votepoll/', sv.votepoll, name='votepoll'),
     path('postrating/', sv.postrating, name='postrating'),
     path('uploadmedia/', sv.uploadmedia, name='uploadmedia'),
@@ -70,6 +71,12 @@ urlpatterns = [
     path('u/<path:parent_author_name>/<path:parent_post_id>/<slug:parent_slug>/answer/<path:author_name>', sv.answerdetail, name="answerdetail"),
     path('u/<path:username>/<path:post_id>/<slug:slug>', sv.postdetail, name='postdetail'),
     path('u/<path:username>/<path:post_id>/<slug:slug>/', sv.postdetail, name='postdetail'),
+    path('u/<slug:username>', sv.userprofile, name='userprofile'),
+    path('u/<slug:username>/<path:filter>', sv.userprofile, name='userprofile'),
+    path('loadmoreprofileposts', sv.loadmoreprofileposts, name='loadmoreprofileposts'),
+    path('settings', sv.settings, name="settings"),
+    path('savenewusercredential', sv.savenewusercredential, name="savenewusercredential"),
+    path('getlanguages', sv.getlanguages, name="getlanguages")
 ]
 
 if settings.DEBUG:

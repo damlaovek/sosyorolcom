@@ -19,6 +19,13 @@ class User(models.Model):
     display_name = models.TextField()
     description = ""
     avatar_url = ""
+    followers = models.QuerySet()
+    followings = models.QuerySet()
+    posts = models.QuerySet()
+    employments = ""
+    educations = ""
+    languages = ""
+    locations = ""
     class Meta:
         db_table = "wpmu_users"
     
@@ -89,6 +96,7 @@ class Post(models.Model):
     media_type = ""
     media_url = ""
     answers = models.QuerySet()
+    quiz_type = ""
     class Meta:
         db_table = "wpmu_posts"
 

@@ -113,7 +113,7 @@
             </div>
         </div>
         <div class="bt bb">
-            {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=media.ID %}
+            {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=post.ID %}
         </div>
         {% if comments|length > 0 %}
             <div class='comments-wrapper pt10' id='comments-wrapper{{post.ID}}' style="display:block;">

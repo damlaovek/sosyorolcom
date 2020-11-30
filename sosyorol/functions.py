@@ -13,6 +13,7 @@ import operator
 import firebase_admin
 from firebase_admin import auth, credentials, exceptions
 import base64
+import pandas as pd
 
 
 '''---------------------------------------
@@ -318,3 +319,19 @@ def arrange_usernames():
         username = user.user_login.replace(".","_")
         user.user_login = username
         user.save()
+
+def read_langs():
+    xls = pd.ExcelFile('sosyorol/diller.xlsx')
+    df1 = pd.read_excel(xls, 'Sheet1')
+    df2 = pd.read_excel(xls, 'Sheet2')
+    df3 = pd.read_excel(xls, 'Sheet3')
+
+    for index, row in df1.iterrows():
+        #new_lang = sm.Languages(var_name="lang-ns-"+str(index), lang_code="tr-TR", translation=row["TR"])
+        #new_lang.save()
+        new_lang = sm.Languages(var_name="lang-ns-"+str(index), lang_code="en-EN", translation=row["EN"])
+        new_lang.save()
+        new_lang = sm.Languages(var_name="lang-ns-"+str(index), lang_code="de-DE", translation=row["DE"])
+        new_lang.save()
+        
+        

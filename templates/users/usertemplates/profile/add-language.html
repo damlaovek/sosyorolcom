@@ -1,0 +1,103 @@
+{% load index %}
+<div class="absolute bcba dnone popup-container" id="language-popup">
+    <div class="popup box full-shadow-border p20">
+        <p class="title fs19">{{word_list|getword:"edit-credentials"|ucfirst}}</p>
+        <p class="cg2 p100 bb">{{word_list|getword:"edit-credentials-info"}}</p>
+        <svg style="position:absolute;top:20px;right:20px;cursor:pointer;padding:5px;width:15px;height:15px;z-index:9999;" class="icon hand" onclick="document.getElementById('language-popup').classList.toggle('dnone');" viewBox="0 0 15 15" version="1.1">
+            <g id="surface1">
+                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0.132812 14.878906 C 0.222656 14.964844 0.335938 15.011719 0.453125 15.011719 C 0.570312 15.011719 0.683594 14.964844 0.773438 14.878906 L 7.503906 8.144531 L 14.238281 14.878906 C 14.324219 14.964844 14.441406 15.011719 14.558594 15.011719 C 14.675781 15.011719 14.789062 14.964844 14.878906 14.878906 C 15.054688 14.703125 15.054688 14.414062 14.878906 14.238281 L 8.144531 7.503906 L 14.878906 0.773438 C 15.054688 0.597656 15.054688 0.308594 14.878906 0.132812 C 14.703125 -0.0429688 14.414062 -0.0429688 14.238281 0.132812 L 7.503906 6.863281 L 0.773438 0.132812 C 0.597656 -0.0429688 0.308594 -0.0429688 0.132812 0.132812 C -0.0429688 0.308594 -0.0429688 0.597656 0.132812 0.773438 L 6.863281 7.503906 L 0.132812 14.238281 C -0.0429688 14.414062 -0.0429688 14.703125 0.132812 14.878906 Z M 0.132812 14.878906 "/>
+            </g>
+        </svg>
+        <div class="full-width inline-block">
+            <div class="full-width inline-flex mt10">
+                <svg width="20px" height="20px" viewBox="0 0 20 20">
+                    <g>
+                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.5 0 0 4.5 0 10 C 0 15.5 4.5 20 10 20 C 15.5 20 20 15.5 20 10 C 20 4.5 15.5 0 10 0 Z M 16.898438 6 L 14 6 C 13.699219 4.699219 13.199219 3.601562 12.601562 2.398438 C 14.398438 3.101562 16 4.300781 16.898438 6 Z M 10 2 C 10.800781 3.199219 11.5 4.5 11.898438 6 L 8.101562 6 C 8.5 4.601562 9.199219 3.199219 10 2 Z M 2.300781 12 C 2.101562 11.398438 2 10.699219 2 10 C 2 9.300781 2.101562 8.601562 2.300781 8 L 5.699219 8 C 5.601562 8.699219 5.601562 9.300781 5.601562 10 C 5.601562 10.699219 5.699219 11.300781 5.699219 12 Z M 3.101562 14 L 6 14 C 6.300781 15.300781 6.800781 16.398438 7.398438 17.601562 C 5.601562 16.898438 4 15.699219 3.101562 14 Z M 6 6 L 3.101562 6 C 4.101562 4.300781 5.601562 3.101562 7.398438 2.398438 C 6.800781 3.601562 6.300781 4.699219 6 6 Z M 10 18 C 9.199219 16.800781 8.5 15.5 8.101562 14 L 11.898438 14 C 11.5 15.398438 10.800781 16.800781 10 18 Z M 12.300781 12 L 7.699219 12 C 7.601562 11.300781 7.5 10.699219 7.5 10 C 7.5 9.300781 7.601562 8.699219 7.699219 8 L 12.398438 8 C 12.5 8.699219 12.601562 9.300781 12.601562 10 C 12.601562 10.699219 12.398438 11.300781 12.300781 12 Z M 12.601562 17.601562 C 13.199219 16.5 13.699219 15.300781 14 14 L 16.898438 14 C 16 15.699219 14.398438 16.898438 12.601562 17.601562 Z M 14.398438 12 C 14.5 11.300781 14.5 10.699219 14.5 10 C 14.5 9.300781 14.398438 8.699219 14.398438 8 L 17.800781 8 C 18 8.601562 18.101562 9.300781 18.101562 10 C 18.101562 10.699219 18 11.398438 17.800781 12 Z M 14.398438 12 "/>
+                    </g>
+                </svg>
+                <p class="cg2 ml10 lh20 fwbold">{{word_list|getword:"add-a-language-credential"|ucfirst}}</p>
+            </div>
+            <form class="bsbb full-width p10" method="GET">
+                <div class="full-width inline-flex">
+                    <label for="language" class="lh40" style="width:35%;">{{word_list|getword:"select-language"|ucfirst}}:</label>
+                    <input type="text" class="bsbb  half-width p10 border br4" name="language" id="language" placeholder="{{word_list|getword:'search'|ucfirst}}">
+                </div>
+                <div class="mt20 full-width inline-block">
+                    <input disabled type="submit" id="save-language" class="btn p10 right fs15 lh20 noselect" style="border-radius:4px;height:30px;width:calc(25% - 35px); border:none; text-align:center; color:var(--main-color); font-weight:700;opacity:0.8;" value="{{word_list|getword:'save'|ucfirst}}" onclick="return saveLanguage()"/>
+                </div>
+                <div class="absolute full-width aligntl" style="width:288px;left:215px;top:50px;background-color:var(--white); z-index:100; ">
+                    <ul id="lang_results_container" class="full-width full-shadow2" style="border:1px solid var(--main-color); width:calc(100% - 2px); max-height:400px; overflow-y: scroll; background-color: var(--white); z-index:100;">
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+const langBar = document.querySelector("#language");
+const langResultsContainer = document.querySelector("#lang_results_container");
+
+langBar.addEventListener("keyup", function(e) {
+    if (e.target.value.trim().length > 0){
+        getLangResults(e.target.value);
+    }else{
+        langResultsContainer.innerHTML = "";
+        document.getElementById("save-language").disabled = true;
+        document.getElementById("save-language").style.cursor = "default";
+        document.getElementById("save-language").style.opacity = "0.8";
+    }
+});
+
+const getLangResults = searchTerm => {
+    searchTerm = searchTerm.toLowerCase();
+    j.ajax({
+        type: "GET",
+        url: "{% url 'getlanguages' %}",
+        data: {search: searchTerm},
+        success: function(response) {
+            showLangResults(searchTerm, response);
+        }
+    });
+};
+
+function showLangResults(searchTerm, results){
+    langResultsContainer.innerHTML = "";
+    var index = 1;
+    for (var key of Object.keys(results)) {
+        var tokens = results[key].split("!:!");
+        if(index == 1){
+            langResultsContainer.innerHTML += "<li class='bsbb full-width item-hover p020 hand' onclick='selectLanguage(this);'><p class='lh24 full-width p100'>" + tokens[1]; + "</p></li>";
+        }else{
+            langResultsContainer.innerHTML += "<li class='bsbb bt full-width item-hover p020 hand' onclick='selectLanguage(this);'><p class='lh24 full-width p100'>" + tokens[1]; + "</p></li>";
+        }
+        index = index + 1;
+    }
+}
+
+function selectLanguage(elem){
+    var lang = elem.getElementsByTagName("p")[0].innerHTML;
+    document.getElementById("language").value = lang;
+    langResultsContainer.innerHTML = "";
+    document.getElementById("save-language").disabled = false;
+    document.getElementById("save-language").style.cursor = "hand";
+    document.getElementById("save-language").style.opacity = "1";
+}
+
+function saveLanguage(){
+    var language = document.getElementById("language").value;
+    var data = {}
+    data = {
+        "type": "language",
+        "language": language
+    }
+    jQuery.ajax({
+        type: "GET",
+        url:"{% url 'savenewusercredential' %}",
+        data: data,
+        success: function(response) {
+            displayAlert(response.content);
+            document.getElementById("language-popup").classList.add("dnone");
+        }
+    });
+}
+</script>

@@ -59,6 +59,14 @@
                             {% include 'posts/postdetails/link.html' with link=post %}
                         {% elif post.post_type == "post"  %}
                             {% include 'posts/postdetails/post.html' %}
+                        {% elif post.post_type == "quiz"  %}
+                            {% if post.quiz_type == "media" %}
+                                {% include 'posts/postdetails/media_quiz.html' with quiz=post %}
+                            {% elif post.quiz_type == "colorBox" %}
+                                {% include 'posts/postdetails/colorBox_quiz.html' with quiz=post %}
+                            {% else %}
+                                {% include 'posts/postdetails/quiz.html' with quiz=post %}
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>

@@ -13,7 +13,7 @@
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
                     <img src='{{media.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
-                        <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{media.author.display_name}}</a><br>
+                        <a href='/u/{{media.author.user_login}}' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{media.author.display_name}}</a><br>
                         <a href='/u/{{media.author.user_login}}/{{media.hex_id}}/{{media.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{media.time_diff}} {{post_template_dict.ago}}</a>
                     </div>
                 </div>
@@ -21,7 +21,7 @@
                 <div class="full-width mt10">
                     <div class="bsbb answer-img p020">
                         {% if media.media_type == "video" %}
-                        <video id="player" playsinline controls class="js-player" autoplay="true" style="min-height: 400px;" muted="muted">
+                        <video id="player" playsinline controls class="js-player" autoplay="true" style="max-height: 398px;" muted="muted">
                             <source src="{{media.media_url}}" type="video/mp4" />
                         </video>
                         <script src='https://cdn.polyfill.io/v2/polyfill.min.js?features=es6,Array.prototype.includes,CustomEvent,Object.entries,Object.values,URL'></script>

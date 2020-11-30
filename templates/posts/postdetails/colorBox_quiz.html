@@ -1,10 +1,13 @@
+{% load static %}
 {% load index %}
-<style>
-    .media-question-oc:nth-child(2n){margin-left: 20px; margin-right: 20px;}
-</style>
-<div class='full-width'>
+<div class='full-width' id="quiz-content">
     <div class='full-width box answer-template-oc'>
         <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
+            <div class="bsbb full-width inline-block p010 mb10" style="top:-7px;">
+                {% for community in post.communities %}
+                    <a href="/c/{{community.slug}}" class="left p010 mt7 lh30 bcba cb mr10 br4 noselect btn">c/{{community.name}}</a>
+                {% endfor %}
+            </div>
             <div style='width:calc(100% - 20px);' class='p010'>
                 <div class='sqr20 icon absolute hand aligntr bringfront' onclick="showMoreOptions(this, {{quiz.ID}})">
                     <svg width='20px' height='20px' viewBox='0 0 20 20' class="rotate90">
@@ -15,10 +18,9 @@
                         </g>
                     </svg>
                 </div>
-                <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{quiz.ID}}">
+                <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{post.ID}}">
                     <li class="hand" onclick="savePost(this, {{quiz.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
                 </ul>
-                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{post_template_dict.quiz}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{post_template_dict.recommendedfy}}</span></p>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
                     <img src='{{quiz.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
@@ -26,38 +28,15 @@
                         <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{quiz.time_diff}} {{post_template_dict.ago}}</a>
                     </div>
                 </div>
-                <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{quiz.post_title}}</a>
-                
-                <div class="menu-wrapper border mt10" id="menu-wrapper4{{number}}" style="border-top:1px solid var(--border-color);height:auto;">
-                    <div id="menu4{{number}}" class="menu" onscroll="menuScroll('left-paddle4{{number}}','right-paddle4{{number}}','menu4{{number}}',1)">
-                        {% for question in quiz.quiz_questions %}
-                            <div class="media-question-oc">
-                                <div class="p10 border noselect" style="width:208px; height:calc(100% - 20px);">
-                                    <p class="lh20">{{forloop.counter}}. {{question.question_text}}</p>
-                                    <img class="full-width mt10" src="{{question.question_img}}" style="height: 150px;">
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <div class='arrow-btn paddle hidden left-paddle'  id="left-paddle4{{number}}" onclick="scrollToRight('menu4{{number}}')">
-                        <svg width="20pt" height="20pt" viewBox="0 0 30 30">
-                            <g>
-                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 4.785156 10.714844 L 13.78125 19.703125 C 14.175781 20.097656 14.8125 20.097656 15.210938 19.703125 C 15.605469 19.3125 15.605469 18.671875 15.210938 18.277344 L 6.929688 10 L 15.207031 1.722656 C 15.605469 1.328125 15.605469 0.691406 15.207031 0.296875 C 14.8125 -0.0976562 14.175781 -0.0976562 13.777344 0.296875 L 4.785156 9.285156 C 4.398438 9.675781 4.398438 10.324219 4.785156 10.714844 Z M 4.785156 10.714844 "/>
-                            </g>
-                        </svg>
-                    </div>
-                    {% if quiz.quiz_questions|length > 3 %}
-                    <div class='arrow-btn paddle right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
-                    {% else %}
-                    <div class='arrow-btn paddle hidden right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
-                    {% endif %}
-                        <svg width="20pt" height="20pt" viewBox="0 0 30 30">
-                            <g>
-                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 15.214844 9.285156 L 6.21875 0.296875 C 5.824219 -0.0976562 5.1875 -0.0976562 4.789062 0.296875 C 4.394531 0.6875 4.394531 1.328125 4.789062 1.722656 L 13.070312 10 L 4.789062 18.277344 C 4.394531 18.671875 4.394531 19.308594 4.789062 19.703125 C 5.1875 20.097656 5.824219 20.097656 6.21875 19.703125 L 15.214844 10.714844 C 15.601562 10.324219 15.601562 9.675781 15.214844 9.285156 Z M 15.214844 9.285156 "/>
-                            </g>
-                        </svg>
-                    </div>
+                <div class="full-width inline-block">
+                    <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}' class='underline-on-hover left lh30' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{quiz.post_title}}</a>
+                    {% for flair in quiz.flairs %}
+                        {% if flair.flair.term_id == -1 %}
+                            <div class="noselect left p010 lh30 br15 flair active ml10" id="flair">{{flair.flair.flair}}</div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
+                <div class='answer-template' id='post-template{{quiz.ID}}' style="display:block;">{% autoescape off %}{{quiz.post_content}}{% endautoescape %}</div>
             </div>
             <div class='full-width' style='display:inline-block;margin-top:5px;'>
                 {% if quiz.user_rate == "like" %}
@@ -133,33 +112,218 @@
                 </div>
             </div>
         </div>
-        <ul class='comments-wrapper bt pt10' id='comments-wrapperanswer{{quiz.ID}}'>
-            {% include 'posts/comments/comment_list.html' %}
-        </ul>
-        {% include 'posts/comments/comment_editor.html' %}
+        <div id="quiz-content{{quiz.ID}}" class="p040">
+            {% for question in quiz.quiz_questions %}
+                <div class="noselect mb20" id="question{{forloop.counter}}">
+                    <div class="bsbb full-width br10 p20 colorBox-question noselect" style="background-color: var(--question-color-{{question.question_color}});height:260px; line-height:220px;">
+                        <span class="bsbb cw fwbold tac inline-block vam fs19" style="line-height: normal;">{{question.question_text}}</span>
+                    </div>
+                    <div class="full-width inline-block">
+                        {% if question.answer_type == "colorBox" %}
+                            <style>
+                                .colorbox-answer:nth-child(2n){margin-right: 20px;}
+                            </style>
+                            {% for answer in question.answers %}
+                                <div class="bsbb half-width answer left mt10 colorbox-answer hand" style="width:calc(50% - 10px);" onclick="colorboxAnswerSelected(this, '{{answer.assoc_result}}', '{{forloop.parentloop.counter}}')">
+                                    <div class="bsbb full-width oh p20 bcq{{answer.color}} br10 border quiz_answer_colored_title">
+                                        <div class="bsbb vam tac full-width fwbold inline-block cw q{{answer.color}} colorBox-answer-inner" style="height:110px;line-height:110px;">
+                                            <span class="bsbb cw fwbold tac inline-block vam fs19" style="line-height: normal;">{{answer.content}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% elif question.answer_type == "media" %}
+                            <style>
+                                .media-answer:nth-child(2n){margin-right: 20px;}
+                            </style>
+                            {% for answer in question.answers %}
+                                <div class="bsbb half-width answer left mt10 media-answer hand" style="width:calc(50% - 10px);height:150px;" onclick="mediaAnswerSelected(this, '{{answer.assoc_result}}', '{{forloop.parentloop.counter}}')">
+                                    <img src="{{answer.content}}" class="full br4"/>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <style>
+                                .answer_checkbox:hover{border:1px solid var(--black);}
+                                .answer_checkbox p{background-color: var(--white);margin:5px;}
+                                .answer_checkbox.selected p{background-color: var(--main-color);}
+                            </style>
+                            {% for answer in question.answers %}
+                                <div class="bsbb full-width answer inline-flex border m50 p10 br4 mt10 hand" onclick="answerSelected(this, '{{answer.assoc_result}}', '{{forloop.parentloop.counter}}')">
+                                    <div class="noselect border2 sqr20 rounded m100 answer_checkbox tac">
+                                        <p class="sqr10 rounded noselect"></p>
+                                    </div>
+                                    <div class='m010' style='width:calc(100% - 40px)'>
+                                        <p class="bsbb full-width p10 lh20 fs15 text textarea br4">{{answer.content}}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif%}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div id="result-container"></div>
+        <div class="bt bb">
+            {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=quiz.ID %}
+        </div>
+        {% if comments|length > 0 %}
+            <div class='comments-wrapper pt10' id='comments-wrapper{{post.ID}}' style="display:block;">
+                {% include 'posts/comments/comment_list.html' with comments=comments padding=0 %}
+            </div>
+        {% endif %}
+        {% if comment_length > comments|length %}
+            <div id="loader" class="full-width tac dnone">
+                <img src="{% static 'assets/img/sosyorol-loader.gif' %}" style="margin:auto; height: 80px;">
+            </div>
+        {% endif %}
     </div>
 </div>
 <script>
-    var j = jQuery.noConflict();
-    function showMoreOptions(elem, postID){
-        if (elem.classList.contains("active")){
-            elem.classList.remove("active");
-            document.getElementById("moreoptions"+postID).classList.add("dnone");
-        }else{
-            elem.classList.add("active");
-            document.getElementById("moreoptions"+postID).classList.remove("dnone");
+    var offset = 5;
+    var limit = 5;
+    var isLoading = false;
+    var hasMore = true;
+    var answeredQuestions = 0;
+    var results = {};
+    window.onload = () => {
+        offset = 5;
+        isLoading = false;
+        hasMore = true;
+    }
+    window.onscroll = () => {
+        if({{comment_length}} > 0){
+            if (document.documentElement.scrollHeight - document.documentElement.scrollTop === document.documentElement.clientHeight){
+                if(hasMore){
+                    if(isLoading){
+                        return;
+                    }else{
+                        isLoading = true;
+                        document.getElementById("loader").classList.remove("dnone");
+                        j.ajax({
+                            url:"{% url 'loadmorecomments' %}",
+                            type : "GET", // http method
+                            data : { limit: limit, offset: offset, post_id: "{{quiz.ID}}", parent_id:0, padding:0}, // data sent with the post request
+                            // handle a successful response
+                            success : function(json) {
+                                // log the returned json to the console
+                                console.log(json); // another sanity check
+                                document.getElementById("comments-wrapper{{quiz.ID}}").innerHTML += json;
+                                offset += limit;
+                                if(offset >= {{comment_length}}){
+                                    hasMore = false;
+                                }
+                                isLoading = false;
+                                document.getElementById("loader").classList.add("dnone");
+                            }
+                        });
+                    }
+                }
+            }
         }
     }
-    function savePost(elem, postID, userID, csrf){
-        j.ajax({
-            url:"{% url 'save-the-post' %}",
-            type : "POST", // http method
-            data : { redirect: window.location.href, csrfmiddlewaretoken: csrf, post_id : postID, operation : "save", user_id : userID}, // data sent with the post request
-            // handle a successful response
-            success : function(json) {
-                 // log the returned json to the console
-                console.log("success"); // another sanity check
+    jQuery(function($){
+        j('.colorBox-answer-inner').textfill({
+            maxFontPixels: 40,
+            minFontPixels: 15
+        });
+        j('.colorBox-question').textfill({
+            maxFontPixels: 94,
+            minFontPixels: 15
+        });
+    });
+
+    function showResult(){
+        var answers = document.getElementsByClassName("answer");
+        for(var i=0; i<answers.length; i++){
+            answers[i].onclick = function(){return false;};
+        }
+        var result_dict = {}
+        for(key in results){
+            var value = results[key];
+            if(value in result_dict){
+                result_dict[value] += 1;
+            }else{
+                result_dict[value] = 1;
+            }
+        }
+        var selectedResult = Object.keys(result_dict).reduce(function(a, b){ return result_dict[a] > result_dict[b] ? a : b });
+        var data = {}
+        data = {
+            "selectedResult": selectedResult,
+            "quiz_id": "{{quiz.ID}}",
+        }
+        var j = jQuery.noConflict();
+        jQuery.ajax({
+            type: "POST",
+            url:"{% url 'getquizresult' %}",
+            data: data,
+            success: function(response) {
+                document.getElementById("result-container").innerHTML = response;
+                j('html,body').animate({
+                    scrollTop: j("#result-container").offset().top
+                }, 600);
+                //document.getElementById("result-container").scrollIntoView();
             }
         });
+    }
+
+    function answerSelected(elem, assocResult, questionNo){
+        var choices = document.getElementById("question"+questionNo).getElementsByClassName("answer_checkbox");
+        for(var i=0; i<choices.length; i++){
+            if(choices[i].classList.contains("selected")){
+                answeredQuestions--;
+                choices[i].classList.remove("selected");
+            }
+        }
+        elem.getElementsByClassName("answer_checkbox")[0].classList.add("selected");
+        results[questionNo] = assocResult;
+        answeredQuestions++;
+        if(answeredQuestions == {{quiz.quiz_questions|length}}){
+            showResult();
+        }
+    }
+
+    function colorboxAnswerSelected(elem, assocResult, questionNo){
+        var choices = document.getElementById("question"+questionNo).getElementsByClassName("colorbox-answer");
+        for(var i=0; i<choices.length; i++){
+            if(choices[i].classList.contains("selected")){
+                choices[i].classList.remove("selected");
+                answeredQuestions--;
+            }
+            choices[i].style.opacity = "0.5";
+        }
+        elem.classList.add("selected");
+        elem.style.opacity = "1";
+        results[questionNo] = assocResult;
+        answeredQuestions++;
+        if(answeredQuestions == {{quiz.quiz_questions|length}}){
+            showResult();
+        }
+    }
+
+    function mediaAnswerSelected(elem, assocResult, questionNo){
+        var choices = document.getElementById("question"+questionNo).getElementsByClassName("media-answer");
+        for(var i=0; i<choices.length; i++){
+            if(choices[i].classList.contains("selected")){
+                choices[i].classList.remove("selected");
+                answeredQuestions--;
+            }
+            choices[i].style.opacity = "0.5";
+        }
+        elem.classList.add("selected");
+        elem.style.opacity = "1";
+        results[questionNo] = assocResult;
+        answeredQuestions++;
+        if(answeredQuestions == {{quiz.quiz_questions|length}}){
+            showResult();
+        }
+    }
+
+    function tryAgain(){
+        window.top.location = window.top.location;
+        j('html,body').animate({
+            scrollTop: j("#quiz-content").offset().top
+        }, 600);
+        return false;
     }
 </script>

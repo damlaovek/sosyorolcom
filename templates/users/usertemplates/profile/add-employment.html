@@ -1,0 +1,129 @@
+{% load index %}
+<div class="absolute bcba dnone popup-container" id="employment-popup">
+    <div class="popup box full-shadow-border p20">
+        <p class="title fs19">{{word_list|getword:"edit-credentials"|ucfirst}}</p>
+        <p class="cg2 p100 bb">{{word_list|getword:"edit-credentials-info"}}</p>
+        <svg style="position:absolute;top:20px;right:20px;cursor:pointer;padding:5px;width:15px;height:15px;z-index:9999;" class="icon hand" onclick="document.getElementById('employment-popup').classList.toggle('dnone');" viewBox="0 0 15 15" version="1.1">
+            <g id="surface1">
+                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0.132812 14.878906 C 0.222656 14.964844 0.335938 15.011719 0.453125 15.011719 C 0.570312 15.011719 0.683594 14.964844 0.773438 14.878906 L 7.503906 8.144531 L 14.238281 14.878906 C 14.324219 14.964844 14.441406 15.011719 14.558594 15.011719 C 14.675781 15.011719 14.789062 14.964844 14.878906 14.878906 C 15.054688 14.703125 15.054688 14.414062 14.878906 14.238281 L 8.144531 7.503906 L 14.878906 0.773438 C 15.054688 0.597656 15.054688 0.308594 14.878906 0.132812 C 14.703125 -0.0429688 14.414062 -0.0429688 14.238281 0.132812 L 7.503906 6.863281 L 0.773438 0.132812 C 0.597656 -0.0429688 0.308594 -0.0429688 0.132812 0.132812 C -0.0429688 0.308594 -0.0429688 0.597656 0.132812 0.773438 L 6.863281 7.503906 L 0.132812 14.238281 C -0.0429688 14.414062 -0.0429688 14.703125 0.132812 14.878906 Z M 0.132812 14.878906 "/>
+            </g>
+        </svg>
+        <div class="full-width inline-block">
+            <div class="full-width inline-flex mt10">
+                <svg width="20px" height="20px" viewBox="0 0 20 20">
+                    <g>
+                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 13.648438 4.289062 L 13.648438 3.484375 C 13.648438 2.460938 12.816406 1.625 11.789062 1.625 L 8.71875 1.625 C 7.695312 1.625 6.859375 2.460938 6.859375 3.484375 L 6.859375 4.289062 L 3.941406 4.289062 L 3.941406 18.375 L 16.140625 18.375 L 16.140625 4.289062 Z M 12.476562 4.289062 L 8.035156 4.289062 L 8.035156 3.484375 C 8.035156 3.105469 8.339844 2.796875 8.71875 2.796875 L 11.789062 2.796875 C 12.167969 2.796875 12.476562 3.105469 12.476562 3.484375 Z M 12.476562 4.289062 "/>
+                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 2.015625 4.289062 C 0.902344 4.289062 0 5.191406 0 6.300781 L 0 16.359375 C 0 17.46875 0.902344 18.375 2.015625 18.375 L 2.769531 18.375 L 2.769531 4.289062 Z M 2.015625 4.289062 "/>
+                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 17.984375 4.289062 L 17.3125 4.289062 L 17.3125 18.375 L 17.984375 18.375 C 19.097656 18.375 20 17.46875 20 16.359375 L 20 6.300781 C 20 5.191406 19.097656 4.289062 17.984375 4.289062 Z M 17.984375 4.289062 "/>
+                    </g>
+                </svg> 
+                <p class="cg2 ml10 lh20 fwbold">{{word_list|getword:"add-employment-credential"|ucfirst}}</p>
+            </div>
+            <form class="bsbb full-width p10">
+                <div class="full-width inline-flex">
+                    <label for="position" class="lh40" style="width:35%;">{{word_list|getword:"position"|ucfirst}}:</label><input type="text" class="bsbb p10 border br4 half-width" name="position" id="position" placeholder="CEO" onchange="validateEmployment()">
+                </div>
+                <div class="full-width mt10 inline-flex">
+                    <label for="company" class="lh40" style="width:35%;">{{word_list|getword:"company-organization"}}:</label><input type="text" class="bsbb  half-width p10 border br4" name="company" id="company" placeholder="Sosyorol Ltd. Co." onchange="validateEmployment();">
+                </div>
+                <div class="full-width mt10 inline-flex">
+                    <label for="start-date" class="lh40" style="width:35%;">{{word_list|getword:"start-date"|ucwords}}:</label><input type="month" class="bsbb  half-width p10 border br4" name="start-date" id="start-date" placeholder="" onchange="validateEmployment();">
+                </div>
+                <div class="full-width mt10 inline-flex">
+                    <label for="end-date" class="lh40" style="width:35%;">{{word_list|getword:"end-date"|ucwords}}:</label><input type="month" class="bsbb  half-width p10 border br4" name="end-date" id="end-date" placeholder="" onchange="validateEmployment();">
+                </div>
+                <div class="full-width mt10 inline-flex">
+                    <label for="current" class="lh20" style="width:35%;">{{word_list|getword:"currently-working"|ucfirst}}</label>
+                    <div class="checkbox small rounded" id="current" onclick="this.classList.toggle('checked');validateEmployment();">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                </div>
+                <div class="mt20 full-width inline-block">
+                    <input disabled type="submit" id="save-employment" class="btn p10 right fs15 lh20 noselect" style="border-radius:4px;height:30px;width:calc(25% - 35px); border:none; text-align:center; color:var(--main-color); font-weight:700; opacity: 0.8;" value="{{word_list|getword:'save'|ucfirst}}" onclick="return saveEmployment()"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function validateEmployment(){
+        var position = document.getElementById("position");
+        var company = document.getElementById("company");
+        var startDate = document.getElementById("start-date");
+        var endDate = document.getElementById("end-date");
+        var current = document.getElementById("current");
+        if(position.value == "" || company.value == "" || startDate.value == ""){
+            document.getElementById("save-employment").disabled = true;
+            document.getElementById("save-employment").style.opacity = "0.8";
+            document.getElementById("save-employment").style.cursor = "default";
+            return false
+        }
+        if(!current.classList.contains("checked")){
+            endDate.disabled = false;
+            if(endDate.value == ""){
+                document.getElementById("save-employment").disabled = true;
+                document.getElementById("save-employment").style.opacity = "0.8";
+                document.getElementById("save-employment").style.cursor = "default";
+                return false
+            }else{
+                var sdate = new Date(startDate.value);
+                var edate = new Date(endDate.value);
+                if(sdate > edate){
+                    displayAlert("{{word_list|getword:'start-date-end-date-error'}}");
+                    document.getElementById("save-employment").disabled = true;
+                    document.getElementById("save-employment").style.opacity = "0.8";
+                    document.getElementById("save-employment").style.cursor = "default";
+                    return false;
+                }
+            }
+        }else{
+            endDate.disabled = true;
+            var sdate = new Date(startDate.value);
+            var cdate = new Date();
+            if(sdate > cdate){
+                displayAlert("{{word_list|getword:'start-date-end-date-error'}}");
+                document.getElementById("save-employment").disabled = true;
+                document.getElementById("save-employment").style.opacity = "0.8";
+                document.getElementById("save-employment").style.cursor = "default";
+                return false;
+            }
+        }
+        document.getElementById("save-employment").disabled = false;
+        document.getElementById("save-employment").style.opacity = "1";
+        document.getElementById("save-employment").style.cursor = "pointer";
+        return true;
+    }
+
+    function saveEmployment(){
+        var saveBtn = document.getElementById("save-employment");
+        if(validateEmployment()){
+            var position = document.getElementById("position").value;
+            var company = document.getElementById("company").value;
+            var startDate = document.getElementById("start-date").value;
+            var endDate = document.getElementById("end-date").value;
+            var current = document.getElementById("current");
+            if(current.classList.contains("checked")){
+                endDate = "current";
+            }
+            var data = {}
+            data = {
+                "type": "employment",
+                "position": position,
+                "company": company,
+                "startDate": startDate,
+                "endDate": endDate,
+            }
+            jQuery.ajax({
+                type: "GET",
+                url:"{% url 'savenewusercredential' %}",
+                data: data,
+                success: function(response) {
+                    displayAlert(response.content);
+                    document.getElementById("employment-popup").classList.add("dnone");
+                }
+            });
+        }
+        return false;
+    }
+
+</script>

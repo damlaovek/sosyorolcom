@@ -33,7 +33,7 @@
                 <div class="full-width mt10">
                     <div class="bsbb answer-img p020">
                         {% if media.media_type == "video" %}
-                        <video id="player" playsinline controls class="js-player" autoplay="true" style="min-height: 400px;" muted="muted">
+                        <video id="player" playsinline controls class="js-player" autoplay="true" style="max-height: 398px;" muted="muted">
                             <source src="{{media.media_url}}" type="video/mp4" />
                         </video>
                         <script src='https://cdn.polyfill.io/v2/polyfill.min.js?features=es6,Array.prototype.includes,CustomEvent,Object.entries,Object.values,URL'></script>
