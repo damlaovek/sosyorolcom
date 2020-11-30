@@ -1,0 +1,121 @@
+{% load index %}
+<div class="absolute bcba dnone popup-container" id="location-popup">
+    <div class="popup box full-shadow-border p20">
+        <p class="title fs19">{{word_list|getword:"edit-credentials"|ucfirst}}</p>
+        <p class="cg2 p100 bb">{{word_list|getword:"edit-credentials-info"}}</p>
+        <svg style="position:absolute;top:20px;right:20px;cursor:pointer;padding:5px;width:15px;height:15px;z-index:9999;" class="icon hand" onclick="document.getElementById('location-popup').classList.toggle('dnone');" viewBox="0 0 15 15" version="1.1">
+            <g id="surface1">
+                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0.132812 14.878906 C 0.222656 14.964844 0.335938 15.011719 0.453125 15.011719 C 0.570312 15.011719 0.683594 14.964844 0.773438 14.878906 L 7.503906 8.144531 L 14.238281 14.878906 C 14.324219 14.964844 14.441406 15.011719 14.558594 15.011719 C 14.675781 15.011719 14.789062 14.964844 14.878906 14.878906 C 15.054688 14.703125 15.054688 14.414062 14.878906 14.238281 L 8.144531 7.503906 L 14.878906 0.773438 C 15.054688 0.597656 15.054688 0.308594 14.878906 0.132812 C 14.703125 -0.0429688 14.414062 -0.0429688 14.238281 0.132812 L 7.503906 6.863281 L 0.773438 0.132812 C 0.597656 -0.0429688 0.308594 -0.0429688 0.132812 0.132812 C -0.0429688 0.308594 -0.0429688 0.597656 0.132812 0.773438 L 6.863281 7.503906 L 0.132812 14.238281 C -0.0429688 14.414062 -0.0429688 14.703125 0.132812 14.878906 Z M 0.132812 14.878906 "/>
+            </g>
+        </svg>
+        <div class="full-width inline-block">
+            <div class="full-width inline-flex mt10">
+                <svg width="20px" height="20px" viewBox="0 0 20 20">
+                    <g>
+                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 9.96875 0 C 5.921875 0 2.628906 3.292969 2.628906 7.339844 C 2.628906 8.398438 2.84375 9.40625 3.269531 10.339844 C 5.105469 14.355469 8.625 18.59375 9.660156 19.800781 C 9.738281 19.890625 9.851562 19.941406 9.96875 19.941406 C 10.089844 19.941406 10.203125 19.890625 10.28125 19.800781 C 11.316406 18.597656 14.835938 14.355469 16.671875 10.339844 C 17.097656 9.40625 17.3125 8.398438 17.3125 7.339844 C 17.3125 3.292969 14.019531 0 9.96875 0 Z M 9.96875 11.15625 C 7.867188 11.15625 6.15625 9.445312 6.15625 7.339844 C 6.15625 5.238281 7.867188 3.527344 9.96875 3.527344 C 12.074219 3.527344 13.785156 5.238281 13.785156 7.339844 C 13.785156 9.445312 12.074219 11.15625 9.96875 11.15625 Z M 9.96875 11.15625 "/>
+                    </g>
+                </svg>
+                <p class="cg2 ml10 lh20 fwbold">{{word_list|getword:"add-a-location-credential"|ucfirst}}</p>
+            </div>
+            <form class="bsbb full-width p10">
+                <div class="full-width inline-flex">
+                    <label for="location" class="lh40" style="width:35%;">{{word_list|getword:"location"|ucfirst}}:</label><input type="text" class="bsbb p10 border br4 half-width" name="location" id="location" placeholder="New York" onchange="validateLocation();">
+                </div>
+                <div class="full-width mt10 inline-flex">
+                    <label for="start-date-location" class="lh40" style="width:35%;">{{word_list|getword:"start-date"|ucwords}}:</label><input type="month" class="bsbb  half-width p10 border br4" name="start-date-location" id="start-date-location" placeholder="" onchange="validateLocation();">
+                </div>
+                <div class="full-width mt10 inline-flex">
+                    <label for="end-date-location" class="lh40" style="width:35%;">{{word_list|getword:"end-date"|ucwords}}:</label><input type="month" class="bsbb  half-width p10 border br4" name="end-date-location" id="end-date-location" placeholder="" onchange="validateLocation();">
+                </div>
+                <div class="full-width mt10 inline-flex">
+                    <label for="current-location" class="lh20" style="width:35%;">{{word_list|getword:"currently-living"|ucfirst}}</label>
+                    <div class="checkbox small rounded" id="current-location" onclick="this.classList.toggle('checked');validateLocation();">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                </div>
+                <div class="mt20 full-width inline-block">
+                    <input disabled type="submit" id="save-location" class="btn p10 right fs15 lh20 noselect" style="border-radius:4px;height:30px;width:calc(25% - 35px); border:none; text-align:center; color:var(--main-color); font-weight:700; opacity:0.8;" value="{{word_list|getword:'save'|ucfirst}}" onclick="return saveLocation()"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function validateLocation(){
+        var location = document.getElementById("location");
+        var startDate = document.getElementById("start-date-location");
+        var endDate= document.getElementById("end-date-location");
+        var current = document.getElementById("current-location");
+        if(location.value == "" || startDate.value == ""){
+            document.getElementById("save-location").disabled = true;
+            document.getElementById("save-location").style.opacity = "0.8";
+            document.getElementById("save-location").style.cursor = "default";
+            return false
+        }
+        if(!current.classList.contains("checked")){
+            endDate.disabled = false;
+            if(endDate.value == ""){
+                document.getElementById("save-location").disabled = true;
+                document.getElementById("save-location").style.opacity = "0.8";
+                document.getElementById("save-location").style.cursor = "default";
+                return false
+            }else{
+                var sdate = new Date(startDate.value);
+                var edate = new Date(endDate.value);
+                if(sdate > edate){
+                    displayAlert("{{word_list|getword:'start-date-end-date-error'}}");
+                    document.getElementById("save-location").disabled = true;
+                    document.getElementById("save-location").style.opacity = "0.8";
+                    document.getElementById("save-location").style.cursor = "default";
+                    return false;
+                }
+            }
+        }else{
+            endDate.disabled = true;
+            var sdate = new Date(startDate.value);
+            var cdate = new Date();
+            if(sdate > cdate){
+                displayAlert("{{word_list|getword:'start-date-end-date-error'}}");
+                document.getElementById("save-location").disabled = true;
+                document.getElementById("save-location").style.opacity = "0.8";
+                document.getElementById("save-location").style.cursor = "default";
+                return false;
+            }
+        }
+        document.getElementById("save-location").disabled = false;
+        document.getElementById("save-location").style.opacity = "1";
+        document.getElementById("save-location").style.cursor = "pointer";
+        return true;
+    }
+
+    function saveLocation(){
+        var saveBtn = document.getElementById("save-location");
+        if(validateLocation()){
+            var location = document.getElementById("location").value;
+            var startDate = document.getElementById("start-date-location").value;
+            var endDate= document.getElementById("end-date-location").value;
+            var current = document.getElementById("current-location");
+            if(current.classList.contains("checked")){
+                endDate = "current";
+            }
+            var data = {}
+            data = {
+                "type": "location",
+                "location": location,
+                "startDate": startDate,
+                "endDate": endDate,
+            }
+            jQuery.ajax({
+                type: "GET",
+                url:"{% url 'savenewusercredential' %}",
+                data: data,
+                success: function(response) {
+                    displayAlert(response.content);
+                    document.getElementById("location-popup").classList.add("dnone");
+                }
+            });
+        }
+        return false;
+    }
+
+</script>

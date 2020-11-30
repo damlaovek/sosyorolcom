@@ -23,10 +23,10 @@
                     <img src='{{quiz.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
                         <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{quiz.author.display_name}}</a><br>
-                        <a href='{{quiz.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{quiz.time_diff}} {{post_template_dict.ago}}</a>
+                        <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{quiz.time_diff}} {{post_template_dict.ago}}</a>
                     </div>
                 </div>
-                <a href='{{quiz.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{quiz.post_title}}</a>
+                <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{quiz.post_title}}</a>
                 
                 <div class="menu-wrapper border mt10" id="menu-wrapper4{{number}}" style="border-top:1px solid var(--border-color);height:210px">
                     <div id="menu4{{number}}" class="menu" onscroll="menuScroll('left-paddle4{{number}}','right-paddle4{{number}}','menu4{{number}}',1)">

@@ -69,6 +69,10 @@ svg{pointer-events:all;}
 .checkbox{padding: 8px; border:1px solid var(--gray2);}
 .checkbox.checked{padding: 0; border:none;}
 .checkbox.checked .checkbox-inner{border: 9px solid var(--main-color);}
+
+.checkbox.small{padding: 4px; border:1px solid var(--gray2);}
+.checkbox.small.checked{padding: 0; border:none;}
+.checkbox.small.checked .checkbox-inner{border: 5px solid var(--main-color);}
 /*---------------------------------------
   TYPOGRAPHY              
 -----------------------------------------*/

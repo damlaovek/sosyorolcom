@@ -14,6 +14,7 @@ python-resize-image = "*"
 firebase-admin = "*"
 pyrebase = "*"
 hashlib = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.8"

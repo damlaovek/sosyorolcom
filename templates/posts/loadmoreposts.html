@@ -1,0 +1,52 @@
+<input type="hidden" value="{{hasMore}}" id="has-more-{{offset}}">
+{% for morepost in moreposts %}
+    {% if morepost.post_type == "post" %}
+        {% if fltr == "post" %}
+            {% include 'posts/posttemplates/post_template.html' with post=morepost %}
+        {% elif fltr == "all" %}
+            {% include 'posts/posttemplates/post_template.html' with post=morepost %}
+        {% endif %}
+    {% elif morepost.post_type == "media" %}
+        {% if fltr == "media" %}
+            {% include 'posts/posttemplates/media_template.html' with media=morepost %}
+        {% elif fltr == "all" %}
+            {% include 'posts/posttemplates/media_template.html' with media=morepost %}
+        {% endif %}
+    {% elif morepost.post_type == "question" %}
+        {% if fltr == "question" %}
+            {% include 'posts/posttemplates/post_template.html' with post=morepost %}
+        {% elif fltr == "all" %}
+            {% include 'posts/posttemplates/post_template.html' with post=morepost %}
+        {% endif %}
+    {% elif morepost.post_type == "answer" %}
+        {% if fltr == "question" %}
+            {% include 'posts/posttemplates/answer_template.html' with answer=morepost %}
+        {% elif fltr == "all" %}
+            {% include 'posts/posttemplates/answer_template.html' with answer=morepost %}
+        {% endif %}                
+    {% elif morepost.post_type == "poll" %}
+        {% if fltr == "poll" %}
+            {% include 'posts/posttemplates/poll_template.html' with poll=morepost %}
+        {% elif fltr == "all" %}
+            {% include 'posts/posttemplates/poll_template.html' with poll=morepost %}
+        {% endif %}
+    {% elif morepost.post_type == "quiz" %}
+        {% if fltr == "quiz" %}
+            {% if morepost.quiz_type == "colorBox" %}
+                {% include 'posts/posttemplates/colorBox_quiz_template.html' with quiz=morepost %}
+            {% elif morepost.quiz_type == "media" %}
+                {% include 'posts/posttemplates/media_quiz_template.html' with quiz=morepost %}
+            {% else %}
+                {% include 'posts/posttemplates/quiz_template.html' with quiz=morepost %}
+            {% endif %}
+        {% elif fltr == "all" %}
+            {% if morepost.quiz_type == "colorBox" %}
+                {% include 'posts/posttemplates/colorBox_quiz_template.html' with quiz=morepost %}
+            {% elif morepost.quiz_type == "media" %}
+                {% include 'posts/posttemplates/media_quiz_template.html' with quiz=morepost %}
+            {% else %}
+                {% include 'posts/posttemplates/quiz_template.html' with quiz=morepost %}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endfor %}

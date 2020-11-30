@@ -1,0 +1,14 @@
+{% load index %}
+<style>
+    .quiz_result h2{font-size: 19px;}
+</style>
+<div class="bsbb full-width bcb p20 br4 quiz_result" style="width:calc(100% - 80px); margin:10px 40px;">
+    <p class="mb20 fwbold cw">{{quiz_title}}</p>
+    <p class="absolute aligntr mr20 mt20 cw fwbold hand" onclick="return tryAgain();"><i class='fas fa-undo fs13'></i>&nbsp;{{word_list|getword:"try_again"|ucwords}}</p>
+    <div class="bsbb full-width p20 bcw" style="min-height:300px;">
+        <div>{% autoescape off %}{{result.content}}{% endautoescape %}</div>
+        {% if result.img != "" %}
+            <img src="{{result.img}}" class="bsbb full-width"/>
+        {% endif %}
+    </div>
+</div>
