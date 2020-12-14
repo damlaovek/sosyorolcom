@@ -72,11 +72,20 @@ urlpatterns = [
     path('u/<path:username>/<path:post_id>/<slug:slug>', sv.postdetail, name='postdetail'),
     path('u/<path:username>/<path:post_id>/<slug:slug>/', sv.postdetail, name='postdetail'),
     path('u/<slug:username>', sv.userprofile, name='userprofile'),
+    path('u/<slug:username>/followers', sv.userfollowers, name='userfollowers'),
+    path('u/<slug:username>/followings', sv.userfollowings, name='userfollowings'),
+    path('u/<slug:username>/suggested', sv.usersuggested, name='usersuggested'),
     path('u/<slug:username>/<path:filter>', sv.userprofile, name='userprofile'),
     path('loadmoreprofileposts', sv.loadmoreprofileposts, name='loadmoreprofileposts'),
-    path('settings', sv.settings, name="settings"),
     path('savenewusercredential', sv.savenewusercredential, name="savenewusercredential"),
-    path('getlanguages', sv.getlanguages, name="getlanguages")
+    path('deleteusercredential', sv.deleteusercredential, name="deleteusercredential"),
+    path('editusercredential', sv.editusercredential, name="editusercredential"),
+    path('getlanguages', sv.getlanguages, name="getlanguages"),
+    path('followunfollowuser', sv.followunfollowuser, name="followunfollowuser"),
+    path('changeprofilepicture/', sv.changeprofilepicture, name="changeprofilepicture"),
+    path('removeprofilepicture/', sv.removeprofilepicture, name="removeprofilepicture"),
+    path('updatenotification', sv.updatenotification, name="updatenotification"),
+    path('updateallnotifications/', sv.updateallnotifications, name="updateallnotifications")
 ]
 
 if settings.DEBUG:

@@ -1,0 +1,313 @@
+{% load static %}
+{% load index %}
+{% include 'includes/general/head.html' %}
+        <title>{{profile.display_name}} - Sosyorol</title>
+        <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
+        <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
+        <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
+        <script src="{% static 'js/new/autosize.min.js' %}"></script>
+        <script src="{% static 'js/new/user-list.min.js' %}"></script>
+        <script src="{% static 'js/index.js' %}"></script>
+        <script src="{% static 'js/sosyorol.min.js' %}"></script>
+        <script src="{% static 'js/user-actions.js' %}"></script>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script>
+
+        <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyA9jeHII9FVkhOQfCM_NyoifnN8eIN6EFM",
+            authDomain: "sosyorol-b6ab6.firebaseapp.com",
+            databaseURL: "https://sosyorol-b6ab6.firebaseio.com",
+            projectId: "sosyorol-b6ab6",
+            storageBucket: "sosyorol-b6ab6.appspot.com",
+            messagingSenderId: "565098272319",
+            appId: "1:565098272319:web:5105dd611ce14cf98c8a8a",
+            measurementId: "G-18ZNPD8JH4"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+        </script>
+        <style>
+            .box{box-shadow:0px 3px 4px rgba(173,173,173, 0.53);}
+            .box .box{box-shadow:none;}
+            .lst-item{padding:10px 0 15px 0;}
+            .lst-item:hover{border-bottom:5px solid var(--main-color);padding-bottom:10px; color:var(--main-color);}
+            .lst-item.active{border-bottom:5px solid var(--main-color);padding-bottom:10px; color:var(--main-color);}
+            .hide{display:none;}
+            #profileImg{overflow:hidden;left:calc(50% - 65px);}
+            .segctrl-btn.active{background-color: var(--white); border-radius: 8px;}
+            .one-third-width{width:calc(100%/3);}
+        </style>
+    </head>
+    <body class="{{darkmode}}">
+        {% include 'users/usertemplates/profile/user-credential-list.html' %}
+        {% include 'users/usertemplates/profile/add-birthday.html' %}
+        {% include 'users/usertemplates/profile/add-employment.html' %}
+        {% include 'users/usertemplates/profile/add-education.html' %}
+        {% include 'users/usertemplates/profile/add-location.html' %}
+        {% include 'users/usertemplates/profile/add-language.html' %}
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
+        <input type="hidden" name="filter" id="filter" value="{{filter}}">
+        <div class="full-width inline-flex">
+            {% include 'includes/general/left_menu.html' %}
+            <div class="section-middle" style="margin-top:45px; padding-bottom:32px;">
+                <div class="bsbb p2040">
+                    <div class="full-width full-shadow-border box" style="z-index:2;">
+                        <div class="full-width">
+                            <div class="full-width inline-flex" style="padding-bottom: 20px;">
+                                <div class="ml20 mt20 icon-bg-large full-shadow twb tac">
+                                    <img src="{{profile.avatar_url}}" class="rounded sqr130" id="profileImg" style="z-index:4;">
+                                </div>
+                                <div class="ml30 mt10" style="width:600px;">
+                                    <div class="inline-flex">
+                                        <p class="fs19 mt10 fwblack ctitle">{{profile.display_name}}</p>
+                                        <a href="">
+                                            <svg width="16px" height="16px" viewBox="0 0 20 20" style="margin-top:13px;margin-left:10px;">
+                                                <g>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                                                </g>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                    <p class="fs15 cg2 lh20">u/{{profile.user_login}}</p>
+                                    <p class="fs15 cg2 lh20 mt20" id="desc-placeholder">{% autoescape off %}{{profile.description|edit_comm_desc}}{% endautoescape %}</p>
+                                    <div class="full-width inline-flex mt20" id="ff-container">
+                                        <a href="/u/{{profile.user_login}}/followers"><p class="cb"><span class="fwbold" id="num_follower">{{profile.followers|length}}</span>&nbsp;{{word_list|getword:"followers"}}</p></a>
+                                        <a href="/u/{{profile.user_login}}/followings"><p class="cb ml20"><span class="fwbold" id="num_following">{{profile.followings|length}}</span>&nbsp;{{word_list|getword:"followings"}}</p></a>
+                                        <p class="cb ml20"><span class="fwbold">{{profile.posts|length}}</span>&nbsp;{{word_list|getword:"posts"}}</p>
+                                    </div>
+                                    <div class="full-width inline-flex mt20">
+                                        {% if profile.ID != current_user.ID %}
+                                            {% if current_user.followings|isfollowing:profile %}
+                                                <p class="btn hand" style="padding-left:15px;padding-right:15px;background: var(--main-color); color:white; margin-top:3.5px;" onclick="return unfollow(this,'{{current_user.ID}}','{{profile.ID}}', '{{followtxt|ucwords}}', '{{current_user.ID}}','{{profile.ID}}');"><span class="p115">{{word_list|getword:"following"|ucwords}}</span></p>
+                                            {% else %}
+                                                <p class="btn hand" style="padding-left:15px;padding-right:15px;margin-top:3.5px;" onclick="return follow(this,'{{current_user.ID}}','{{profile.ID}}', '{{followingtxt|ucwords}}', '{{current_user.ID}}','{{profile.ID}}');"><span class="p115">{{word_list|getword:"follow"|ucwords}}</span></p>
+                                            {% endif %}
+                                        {% endif %}
+                                        <div class="inline-flex">
+                                            {% if profile.ID != current_user.ID %}
+                                                <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand' style='margin-top:-3.5px;margin-left:10px;transform: rotate(90deg);' onclick="document.getElementById('profile-actions-submenu').classList.toggle('dnone');">
+                                                    <g>
+                                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                    </g>
+                                                </svg>
+                                                <div class="absolute full-shadow-border dnone bcw" style="top:40px;z-index:5;" id="profile-actions-submenu">
+                                                    <p class="hand p10 bb">{{word_list|getword:"send-a-message"|ucfirst}}</p>
+                                                    <p class="hand p10 bb">{{word_list|getword:"block"|ucfirst}}</p>
+                                                    <p class="hand p10">{{word_list|getword:"report"|ucfirst}}</p>
+                                                </div>
+                                            {% else %}
+                                                <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand' style='margin-top:-3.5px;margin-left:-10px;transform: rotate(90deg);' onclick="document.getElementById('profile-actions-submenu').classList.toggle('dnone');">
+                                                    <g>
+                                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                    </g>
+                                                </svg>
+                                            {% endif %}
+                                            {% if profile.followers|length < 3 %}
+                                                <p class="fs13 cg2 lh30 ml20">{% autoescape off %}{{page_dict.followingsinfo}}{% endautoescape %}</p>
+                                            {% else %}
+                                                <div class="inline-flex" style="margin-left:30px;">
+                                                    {% for f in profile.followers %}
+                                                        {% if forloop.counter < 4 %}
+                                                            {% if forloop.counter == 3 %}
+                                                                <a href="/u/{{f.follower.user_nicename}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
+                                                                    <img class="sqrt30 rounded" src="{{f.follower.avatar_url}}">
+                                                                </a>
+                                                                {% if followers|length > 3  %}
+                                                                    <div class="sqrt30 imgbw rounded absolute aligntl tac" style="background-color:rgba(0,0,0,0.7);left:38px;">
+                                                                        <svg width='20px' height='20px' viewBox='0 0 20 20' class='hand' style='margin-top:5px;transform: rotate(90deg);'>
+                                                                            <g>
+                                                                                <path style="fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                                                <path style="fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                                                <path style="fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                                            </g>
+                                                                        </svg>
+                                                                    </div>
+                                                                {% endif %}
+                                                            {%else %}
+                                                                <a href="/u/{{f.follower.user_nicename}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
+                                                                    <img class="sqrt30 rounded" src="{{f.follower.avatar_url}}">
+                                                                </a>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="bsbb full-width p020 full-shadow-border box" style="width:calc(100% + 2px);margin-top: -4px;">
+                        <ul class="full-width mt10 inline-flex" style="top:1px;">
+                            {% if filter == "all" or filter == "" %}
+                            <a href="/u/{{profile.user_login}}"><li class="hand fs15 cg2 fwmedium lst-item active">{{word_list|getword:"all"|ucwords}}</li></a>
+                            {% else %}
+                            <a href="/u/{{profile.user_login}}"><li class="hand fs15 cg2 fwmedium lst-item">{{word_list|getword:"all"|ucwords}}</li></a>
+                            {% endif %}
+                            {% if filter == "post" %}
+                            <a href="/u/{{profile.user_login}}/post"><li class="hand fs15 cg2 fwmedium lst-item m020 active">{{word_list|getword:"post"|ucwords}}</li></a>
+                            {% else %}
+                            <a href="/u/{{profile.user_login}}/post"><li class="hand fs15 cg2 fwmedium lst-item m020">{{word_list|getword:"post"|ucwords}}</li></a>
+                            {% endif %}
+                            {% if filter == "media" %}
+                            <a href="/u/{{profile.user_login}}/media"><li class="hand fs15 cg2 fwmedium lst-item active">{{word_list|getword:"media"|ucwords}}</li></a>
+                            {% else %}
+                            <a href="/u/{{profile.user_login}}/media"><li class="hand fs15 cg2 fwmedium lst-item">{{word_list|getword:"media"|ucwords}}</li></a>
+                            {% endif %}
+                            {% if filter == "link" %}
+                            <a href="/u/{{profile.user_login}}/link"><li class="hand fs15 cg2 fwmedium lst-item m020 active">{{word_list|getword:"link"|ucwords}}</li></a>
+                            {% else %}
+                            <a href="/u/{{profile.user_login}}/link"><li class="hand fs15 cg2 fwmedium lst-item m020">{{word_list|getword:"link"|ucwords}}</li></a>
+                            {% endif %}
+                            {% if filter == "question" %}
+                            <a href="/u/{{profile.user_login}}/question"><li class="hand fs15 cg2 fwmedium lst-item active">{{word_list|getword:"question"|ucwords}}</li></a>
+                            {% else %}
+                            <a href="/u/{{profile.user_login}}/question"><li class="hand fs15 cg2 fwmedium lst-item">{{word_list|getword:"question"|ucwords}}</li></a>
+                            {% endif %}
+                            {% if filter == "answer" %}
+                            <a href="/u/{{profile.user_login}}/answer"><li class="hand fs15 cg2 fwmedium lst-item m020 active">{{word_list|getword:"answer-noun"|ucwords}}</li></a>
+                            {% else %}
+                            <a href="/u/{{profile.user_login}}/answer"><li class="hand fs15 cg2 fwmedium lst-item m020">{{word_list|getword:"answer-noun"|ucwords}}</li></a>
+                            {% endif %}
+                            {% if filter == "poll" %}
+                            <a href="/u/{{profile.user_login}}/poll"><li class="hand fs15 cg2 fwmedium lst-item active">{{word_list|getword:"poll"|ucwords}}</li></a>
+                            {% else %}
+                            <a href="/u/{{profile.user_login}}/poll"><li class="hand fs15 cg2 fwmedium lst-item">{{word_list|getword:"poll"|ucwords}}</li></a>
+                            {% endif %}
+                            {% if filter == "quiz" %}
+                            <a href="/u/{{profile.user_login}}/quiz"><li class="hand fs15 cg2 fwmedium lst-item m020 active">{{word_list|getword:"quiz"|ucwords}}</li></a>
+                            {% else %}
+                            <a href="/u/{{profile.user_login}}/quiz"><li class="hand fs15 cg2 fwmedium lst-item m020">{{word_list|getword:"quiz"|ucwords}}</li></a>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="full-width full-shadow-border box mt20">
+                        <div class="full-width">
+                            <div class="bsbb w20 inline-block m10 border p2 br10" style="background-color: #e8e8e8;">
+                                <div class="one-third-width cg2 tac left hand segctrl-btn">
+                                    <a href="/u/{{profile.user_login}}/followers"><p class="p100">{{word_list|getword:"followers"}}</p></a>
+                                </div>
+                                <div class="one-third-width cg2 tac left hand segctrl-btn">
+                                    <a href="/u/{{profile.user_login}}/followings"><p class="p100">{{word_list|getword:"followings"}}</p></a>
+                                </div>
+                                <div class="one-third-width cg2 tac right hand segctrl-btn active">
+                                    <a href="/u/{{profile.user_login}}/suggested"><p class="p100">{{word_list|getword:"suggested"}}</p></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="full-width full-shadow-border box mt20">
+                        <ul class="full-width">
+                            {% for user in suggesteds %}
+                                <a href="/u/{{user.user_login}}">
+                                    {% if forloop.last %}
+                                    <li class="bsbb full-width p20 inline-block">
+                                    {% else %}
+                                    <li class="bsbb full-width p20 inline-block bb">
+                                    {% endif %}
+                                        <img src="{{user.avatar_url}}" class="sqr60 left rounded"/>
+                                        <div class="ml20 left" style="width:calc(100% - 80px);">
+                                            <p class="fs19 fwblack ctitle">{{user.display_name}} <span class="fwlight cg2 lh20 fs13">{{user.relatives}}</span></p>
+                                            <p class="fs15 cg2 lh20 underline-on-hover">u/{{user.user_login}}</p>
+                                            <p class="fs15 cg2 lh20 mt10" id="desc-placeholder">{% autoescape off %}{{user.description|edit_comm_desc}}{% endautoescape %}</p>
+                                            <div class="absolute aligntr">
+                                                <p class="btn hand" onclick="return follow(this,'{{current_user.ID}}','{{user.ID}}', '{{followingtxt|ucwords}}', '{{current_user.ID}}', '{{profile.ID}}');"><span class="p115">{{word_list|getword:"follow"|ucwords}}</span></p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </a>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="section-right fixed" id="section-right">
+                {% if current_user.ID == profile.ID %}
+                    {% include 'profilesettings.html' with user=profile %}
+                    <div  class="full-shadow-border section-right-bottom" style="padding:10px 0;width:calc(100% - 60px);">
+                        <div class="bsbb full-width inline-block p020 mt5">
+                            <p class="fs19 fwblack ctitle left">{{word_list|getword:"users-you-may-follow"|ucwords}}</p>
+                            <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
+                                <g>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                                </g>
+                            </svg>
+                        </div>
+                        <ul class="full-width mt7 bt">
+                            {% for user in users %}
+                                <li class="bsbb full-width bb right-list-item">
+                                    <a href="" class="bsbb full-width p1020 inline-block">
+                                        <img class="sqr40 rounded lh30 left" src="{{user.avatar_url}}"/>
+                                        <div class="ml10 left">
+                                            <p class="lh20 fwblack ctitle">{{user.display_name}}</p>
+                                            <p class="cg2 lh20">u/{{user.user_login}}</p>
+                                        </div>
+                                        <div class="right" style="top:5.5px;">
+                                            <p class="btn"><span class="p115">{{word_list|getword:"follow"|ucfirst}}</span></p>
+                                        </div>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <div class="bsbb p020 mt10">
+                            <a href="" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
+                        </div>
+                    </div>
+                    <div class="full-shadow-border section-right-bottom" style="padding:0;width:calc(100% - 60px);">
+                        <ul class="full-width inline-block">
+                            {% for media in medias %}
+                                <li class="left" style="width:calc(100% / 3);height:100px;">
+                                    <a class="full" href="/u/{{media.author.user_login}}/{{media.hex_id}}/{{media.guid}}">
+                                        {% if media.media_type == "image" %}
+                                            {% if forloop.counter == 1 %}
+                                                <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-top-left-radius: 5px;"/>
+                                            {% elif forloop.counter == 3 %}
+                                                <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-top-right-radius: 5px;"/>
+                                            {% elif forloop.counter == 4 %}
+                                                <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-bottom-left-radius: 5px;"/>
+                                            {% elif forloop.counter == 6 %}
+                                                <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-bottom-right-radius: 5px;"/>
+                                            {% else %}
+                                                <img src="{{media.media_url}}" class="full" style="object-fit: cover;"/>
+                                            {% endif %}
+                                        {% endif %}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            {% for i in empty_medias %}
+                                {% if forloop.last%}
+                                    <li class="left" style="width:calc(100% / 3);height:100px; background-color:var(--main-color-alpha);">
+                                    </li>
+                                {% else %}
+                                    <li class="left" style="width:calc(100% / 3 - 1px);height:100px; border-right:1px solid var(--white); background-color:var(--main-color-alpha);">
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% else %}
+                {% endif %}
+            </div>
+        </div>
+    </body>
+</html>

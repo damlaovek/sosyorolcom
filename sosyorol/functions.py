@@ -1,6 +1,8 @@
 from PIL import Image
 from resizeimage import resizeimage
 import os
+from os import listdir
+from os.path import isfile, join
 import time
 import locale
 import sosyorol.models as sm 
@@ -14,6 +16,9 @@ import firebase_admin
 from firebase_admin import auth, credentials, exceptions
 import base64
 import pandas as pd
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATICFILES_DIR = os.path.join(BASE_DIR, 'static')
 
 
 '''---------------------------------------
@@ -333,5 +338,29 @@ def read_langs():
         new_lang.save()
         new_lang = sm.Languages(var_name="lang-ns-"+str(index), lang_code="de-DE", translation=row["DE"])
         new_lang.save()
+
+def profile_pictures():
+    users = sm.User.objects.all()
+    for user in users:
+        mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{user.ID}')
+        if (os.path.exists(mypath)):
+            onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+            if len(onlyfiles) > 0:
+                avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(user.ID) + "/" + onlyfiles[0]
+            else:
+                avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        else:
+            avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        new_cred = sm.UserMeta(user=user, meta_key="avatar_url", meta_value=avatar_url)
+        new_cred.save()
+
+def get_birthdays():
+    birthday_data = sm.UserData.objects.filter(field_id=2)
+    for bd in birthday_data:
+        try:
+            new_data = sm.UserMeta(user=bd.user, meta_key="birthday", meta_value=bd.value)
+            new_data.save()
+        except:
+            pass
         
         

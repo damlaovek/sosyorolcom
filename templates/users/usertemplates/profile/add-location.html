@@ -1,5 +1,6 @@
 {% load index %}
 <div class="absolute bcba dnone popup-container" id="location-popup">
+    <input type="hidden" name="edit-location-cred" id="edit-location-cred" value="false">
     <div class="popup box full-shadow-border p20">
         <p class="title fs19">{{word_list|getword:"edit-credentials"|ucfirst}}</p>
         <p class="cg2 p100 bb">{{word_list|getword:"edit-credentials-info"}}</p>
@@ -90,6 +91,7 @@
 
     function saveLocation(){
         var saveBtn = document.getElementById("save-location");
+        var ID = document.getElementById("edit-location-cred").value;
         if(validateLocation()){
             var location = document.getElementById("location").value;
             var startDate = document.getElementById("start-date-location").value;
@@ -100,20 +102,33 @@
             }
             var data = {}
             data = {
+                "ID": ID,
                 "type": "location",
                 "location": location,
                 "startDate": startDate,
                 "endDate": endDate,
             }
-            jQuery.ajax({
-                type: "GET",
-                url:"{% url 'savenewusercredential' %}",
-                data: data,
-                success: function(response) {
-                    displayAlert(response.content);
-                    document.getElementById("location-popup").classList.add("dnone");
-                }
-            });
+            if(ID == "false"){
+                jQuery.ajax({
+                    type: "GET",
+                    url:"{% url 'savenewusercredential' %}",
+                    data: data,
+                    success: function(response) {
+                        displayAlert(response.content);
+                        document.getElementById("location-popup").classList.add("dnone");
+                    }
+                });
+            }else{
+                jQuery.ajax({
+                    type: "GET",
+                    url:"{% url 'editusercredential' %}",
+                    data: data,
+                    success: function(response) {
+                        displayAlert(response.content);
+                        document.getElementById("location-popup").classList.add("dnone");
+                    }
+                });
+            }
         }
         return false;
     }

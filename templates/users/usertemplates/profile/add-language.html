@@ -1,5 +1,6 @@
 {% load index %}
 <div class="absolute bcba dnone popup-container" id="language-popup">
+    <input type="hidden" name="edit-language-cred" id="edit-language-cred" value="false">
     <div class="popup box full-shadow-border p20">
         <p class="title fs19">{{word_list|getword:"edit-credentials"|ucfirst}}</p>
         <p class="cg2 p100 bb">{{word_list|getword:"edit-credentials-info"}}</p>
@@ -85,19 +86,33 @@ function selectLanguage(elem){
 
 function saveLanguage(){
     var language = document.getElementById("language").value;
+    var ID = document.getElementById("edit-language-cred").value;
     var data = {}
     data = {
+        "ID": ID,
         "type": "language",
         "language": language
     }
-    jQuery.ajax({
-        type: "GET",
-        url:"{% url 'savenewusercredential' %}",
-        data: data,
-        success: function(response) {
-            displayAlert(response.content);
-            document.getElementById("language-popup").classList.add("dnone");
-        }
-    });
+    if(ID == "false"){
+        jQuery.ajax({
+            type: "GET",
+            url:"{% url 'savenewusercredential' %}",
+            data: data,
+            success: function(response) {
+                displayAlert(response.content);
+                document.getElementById("language-popup").classList.add("dnone");
+            }
+        });
+    }else{
+        jQuery.ajax({
+            type: "GET",
+            url:"{% url 'editusercredential' %}",
+            data: data,
+            success: function(response) {
+                displayAlert(response.content);
+                document.getElementById("language-popup").classList.add("dnone");
+            }
+        });
+    }
 }
 </script>

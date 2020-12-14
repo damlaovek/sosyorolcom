@@ -26,6 +26,12 @@ class User(models.Model):
     educations = ""
     languages = ""
     locations = ""
+    relatives = ""
+    birthday = dict()
+    employment_credentials = []
+    education_credentials = []
+    language_credentials = []
+    location_credentials = []
     class Meta:
         db_table = "wpmu_users"
     
@@ -50,6 +56,13 @@ class UserRelation(models.Model):
     date = models.DateTimeField()
     class Meta:
         db_table = "user_relations"
+
+class UserData(models.Model):
+    field_id = models.BigIntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
+    value = models.TextField()
+    class Meta:
+        db_table = "wpmu_bp_xprofile_data"
 
 
 # Post related models.
@@ -360,4 +373,21 @@ class UserHistory(models.Model):
     counter = models.BigIntegerField()
     class Meta:
         db_table = "user_history"
+
+# Notifications
+class Notification(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    notification_variable = models.TextField()
+    notification = ""
+    date = models.DateTimeField()
+    seen = models.IntegerField()
+    opened = models.IntegerField()
+    url = models.TextField()
+    from_u = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from_user')
+    to_u = models.ForeignKey(User, on_delete=models.CASCADE, related_name='to_user')
+    related_obj = models.BigIntegerField()
+    date_diff = ""
+    class Meta:
+        db_table = "notifications"
+
 

@@ -11,6 +11,8 @@
         <script src="{% static 'js/new/user-list.min.js' %}"></script>
         <script src="{% static 'js/index.js' %}"></script>
         <script src="{% static 'js/sosyorol.min.js' %}"></script>
+        <script src="{% static 'js/user-actions.js' %}"></script>
+        <script src="{% static 'js/edit-profile.js' %}"></script>
         <!-- The core Firebase JS SDK is always required and must be listed first -->
         <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
 
@@ -45,23 +47,56 @@
         </style>
     </head>
     <body class="{{darkmode}}">
+        {% include 'users/usertemplates/profile/user-credential-list.html' %}
+        {% include 'users/usertemplates/profile/add-birthday.html' %}
         {% include 'users/usertemplates/profile/add-employment.html' %}
         {% include 'users/usertemplates/profile/add-education.html' %}
         {% include 'users/usertemplates/profile/add-location.html' %}
         {% include 'users/usertemplates/profile/add-language.html' %}
+        {% include 'users/usertemplates/profile/edit-name.html' %}
+        {% include 'users/usertemplates/profile/edit-user-desc.html' %}
         {% include 'includes/general/header.html' %}
         {% include 'includes/general/lang_popup.html' %}
         <input type="hidden" name="filter" id="filter" value="{{filter}}">
         <div class="full-width inline-flex">
             {% include 'includes/general/left_menu.html' %}
-            <div class="section-middle" style="margin-top:45px; padding-bottom:32px;">
+            <div class="section-middle" style="margin-top:45px; padding-bottom:32px;" id="profile-section-middle">
                 <div class="bsbb p2040">
                     <div class="full-width full-shadow-border box" style="z-index:2;">
                         <div class="full-width">
                             <div class="full-width inline-flex" style="padding-bottom: 20px;">
+                                {% if current_user.ID != profile.ID %}
                                 <div class="ml20 mt20 icon-bg-large full-shadow twb tac">
                                     <img src="{{profile.avatar_url}}" class="rounded sqr130" id="profileImg" style="z-index:4;">
                                 </div>
+                                {% else %}
+                                <div class="ml20 mt20">
+                                    <div class="icon-bg-large full-shadow twb tac hand cocotarget" onclick="document.getElementById('editProfileImgMenu').classList.toggle('hidden');">
+                                        <div class="bsbb sqr40 p10 borderblue rounded full-shadow bcma" style="top:calc(100% - 40px); left:calc(100% - 40px);z-index:5;">
+                                            <svg width="13px" height="13px" viewBox="0 0 13 13" style="top:-2.5px;">
+                                                <g>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 0 10.296875 L 0 13.003906 L 2.710938 13.003906 L 10.699219 5.015625 L 7.988281 2.304688 Z M 12.792969 2.921875 C 12.929688 2.785156 13.003906 2.601562 13.003906 2.410156 C 13.003906 2.21875 12.929688 2.035156 12.792969 1.902344 L 11.101562 0.210938 C 10.964844 0.078125 10.78125 0 10.589844 0 C 10.398438 0 10.214844 0.078125 10.082031 0.210938 L 8.761719 1.53125 L 11.472656 4.242188 Z M 12.792969 2.921875 "/>
+                                                </g>
+                                            </svg>   
+                                        </div>                                             
+                                    </div>
+                                    <input type="hidden" id="profileImgUrl">
+                                    <br>
+                                    <img src="{{profile.avatar_url}}" class="rounded sqr130" id="profileImg" style="z-index:4;margin-top:-152px; top:-39px;">
+                                    <div class="absolute aligntr tac full-width rounded dnone" id="profileLoader" style="height:140px;background-color: var(--main-color-alpha);">
+                                        <img class="center sqr60 mt40" src="{% static 'assets/img/loader.gif' %}">
+                                    </div>
+                                </div>
+                                <ul class="absolute box aligntl full-shadow coco dropdown hidden" id="editProfileImgMenu" style="margin-top: 155px;margin-left: 114px;">
+                                    <li class="p1020 hand">
+                                        <p class="noselect">{{word_list|getword:"edit"|ucfirst}}</p>
+                                        <input type='file' onchange="changeProfileImg(this, {% url 'changeprofilepicture' %});" class="hand absolute aligntl full-width" style="height:40px;overflow:hidden;opacity:0;z-index:6;" id="profileUpload" name="file" accept=".png, .jpg, .jpeg" />
+                                    </li>
+                                    <li class="p1020 hand" id="removeProfileImg" onclick="removeProfileImg({% url 'removeprofilepicture' %})">
+                                        <p class="noselect">{{word_list|getword:"remove"|ucfirst}}</p>
+                                    </li>
+                                </ul>
+                                {% endif %}
                                 <div class="ml30 mt10" style="width:600px;">
                                     <div class="inline-flex">
                                         <p class="fs19 mt10 fwblack ctitle">{{profile.display_name}}</p>
@@ -74,57 +109,86 @@
                                                 </g>
                                             </svg>
                                         </a>
+                                        {% if current_user.ID == profile.ID %}
+                                        <p class="fs13 fwlight underline-on-hover hand cg2 ml10 noselect" style="margin-top:14px;" onclick="document.getElementById('edit-name-popup').classList.remove('dnone');">{{word_list|getword:"edit"|ucfirst}}</p>
+                                        {% endif %}
                                     </div>
                                     <p class="fs15 cg2 lh20">u/{{profile.user_login}}</p>
-                                    <p class="fs15 cg2 lh20 mt20" id="desc-placeholder">{% autoescape off %}{{profile.description|edit_comm_desc}}{% endautoescape %}</p>
+                                    {% if current_user.ID == profile.ID %}
+                                    <p class="fs15 cg2 lh20 mt20" id="desc-placeholder"><span id="userdesc">{% autoescape off %}{{profile.description|edit_comm_desc}}{% endautoescape %}</span><span class="fs13 fwlight underline-on-hover hand cg2 ml10 noselect" style="margin-top:14px;" onclick="document.getElementById('edit-user-desc-popup').classList.remove('dnone');">{{word_list|getword:"edit"|ucfirst}}</span></p>
+                                    {% else %}
+                                        <p class="fs15 cg2 lh20 mt20" id="desc-placeholder">{% autoescape off %}{{profile.description|edit_comm_desc}}{% endautoescape %}</p>
+                                    {% endif %}
                                     <div class="full-width inline-flex mt20">
-                                        <p class="cb"><span class="fwbold">{{profile.followers|length}}</span>&nbsp;{{word_list|getword:"followers"}}</p>
-                                        <p class="cb ml20"><span class="fwbold">{{profile.followings|length}}</span>&nbsp;{{word_list|getword:"followings"}}</p>
+                                        <a href="/u/{{profile.user_login}}/followers"><p class="cb"><span class="fwbold" id="num_follower">{{profile.followers|length}}</span>&nbsp;{{word_list|getword:"followers"}}</p></a>
+                                        <a href="/u/{{profile.user_login}}/followings"><p class="cb ml20"><span class="fwbold" id="num_following">{{profile.followings|length}}</span>&nbsp;{{word_list|getword:"followings"}}</p></a>
                                         <p class="cb ml20"><span class="fwbold">{{profile.posts|length}}</span>&nbsp;{{word_list|getword:"posts"}}</p>
                                     </div>
                                     <div class="full-width inline-flex mt20">
-                                        <p class="btn hand" style="padding-left: 30px; padding-right: 30px; top:3.5px;">{{word_list|getword:"follow"|ucwords}}</p>
-                                        <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand' style='margin-top:-3.5px;margin-left:10px;transform: rotate(90deg);'>
-                                            <g>
-                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                                            </g>
-                                        </svg>
-                                        {% if profile.followers|length < 3 %}
-                                            <p class="fs13 cg2 lh30 ml20">{% autoescape off %}{{page_dict.followingsinfo}}{% endautoescape %}</p>
-                                        {% else %}
-                                            <div class="inline-flex" style="margin-left:30px;">
-                                                {% for f in profile.followers %}
-                                                    {% if forloop.counter < 4 %}
-                                                        {% if forloop.counter == 3 %}
-                                                            <a href="/u/{{f.follower.user_nicename}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
-                                                                <img class="sqrt30 rounded" src="{{f.follower.avatar_url}}">
-                                                            </a>
-                                                            {% if followers|length > 3  %}
-                                                                <div class="sqrt30 imgbw rounded absolute aligntl tac" style="background-color:rgba(0,0,0,0.7);left:38px;">
-                                                                    <svg width='20px' height='20px' viewBox='0 0 20 20' class='hand' style='margin-top:5px;transform: rotate(90deg);'>
-                                                                        <g>
-                                                                            <path style="fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                                                                            <path style="fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                                                                            <path style="fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                                                                        </g>
-                                                                    </svg>
-                                                                </div>
-                                                            {% endif %}
-                                                        {%else %}
-                                                            <a href="/u/{{f.follower.user_nicename}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
-                                                                <img class="sqrt30 rounded" src="{{f.follower.avatar_url}}">
-                                                            </a>
-                                                        {% endif %}
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </div>
+                                        {% if profile.ID != current_user.ID %}
+                                            {% if current_user.followings|isfollowing:profile %}
+                                                <p class="btn hand" style="padding-left:15px;padding-right:15px;background: var(--main-color); color:white; margin-top:3.5px;" onclick="return unfollow(this,'{{current_user.ID}}','{{profile.ID}}', '{{followtxt|ucwords}}', '{{current_user.ID}}','{{profile.ID}}');"><span class="p115">{{word_list|getword:"following"|ucwords}}</span></p>
+                                            {% else %}
+                                                <p class="btn hand" style="padding-left:15px;padding-right:15px;margin-top:3.5px;" onclick="return follow(this,'{{current_user.ID}}','{{profile.ID}}', '{{followingtxt|ucwords}}', '{{current_user.ID}}','{{profile.ID}}');"><span class="p115">{{word_list|getword:"follow"|ucwords}}</span></p>
+                                            {% endif %}
                                         {% endif %}
+                                        <div class="inline-flex">
+                                            {% if profile.ID != current_user.ID %}
+                                                <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand' style='margin-top:-3.5px;margin-left:10px;transform: rotate(90deg);' onclick="document.getElementById('profile-actions-submenu').classList.toggle('dnone');">
+                                                    <g>
+                                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                    </g>
+                                                </svg>
+                                                <div class="absolute full-shadow-border dnone bcw" style="top:40px;z-index:5;" id="profile-actions-submenu">
+                                                    <p class="hand p10 bb">{{word_list|getword:"send-a-message"|ucfirst}}</p>
+                                                    <p class="hand p10 bb">{{word_list|getword:"block"|ucfirst}}</p>
+                                                    <p class="hand p10">{{word_list|getword:"report"|ucfirst}}</p>
+                                                </div>
+                                            {% else %}
+                                                <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand' style='margin-top:-3.5px;margin-left:-10px;transform: rotate(90deg);' onclick="document.getElementById('profile-actions-submenu').classList.toggle('dnone');">
+                                                    <g>
+                                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                    </g>
+                                                </svg>
+                                            {% endif %}
+                                            {% if profile.followers|length < 3 %}
+                                                <p class="fs13 cg2 lh30 ml20">{% autoescape off %}{{page_dict.followingsinfo}}{% endautoescape %}</p>
+                                            {% else %}
+                                                <div class="inline-flex" style="margin-left:30px;">
+                                                    {% for f in profile.followers %}
+                                                        {% if forloop.counter < 4 %}
+                                                            {% if forloop.counter == 3 %}
+                                                                <a href="/u/{{f.follower.user_nicename}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
+                                                                    <img class="sqrt30 rounded" src="{{f.follower.avatar_url}}">
+                                                                </a>
+                                                                {% if followers|length > 3  %}
+                                                                    <div class="sqrt30 imgbw rounded absolute aligntl tac" style="background-color:rgba(0,0,0,0.7);left:38px;">
+                                                                        <svg width='20px' height='20px' viewBox='0 0 20 20' class='hand' style='margin-top:5px;transform: rotate(90deg);'>
+                                                                            <g>
+                                                                                <path style="fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                                                <path style="fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                                                <path style="fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                                            </g>
+                                                                        </svg>
+                                                                    </div>
+                                                                {% endif %}
+                                                            {%else %}
+                                                                <a href="/u/{{f.follower.user_nicename}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
+                                                                    <img class="sqrt30 rounded" src="{{f.follower.avatar_url}}">
+                                                                </a>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                     <div class="bsbb full-width p020 full-shadow-border box" style="width:calc(100% + 2px);margin-top: -4px;">
@@ -251,7 +315,7 @@
                                 {% elif filter == "all" %}
                                     {% include 'posts/posttemplates/link_template.html' with link=post %}
                                 {% endif %}
-                            {% elif post.post_type == "question" %}
+                            {% elif post.post_type == "questions" %}
                                 {% if filter == "question" %}
                                     {% include 'posts/posttemplates/post_template.html' with post=post %}
                                 {% elif filter == "all" %}
@@ -296,44 +360,8 @@
                 </div>
             </div>
             <div class="section-right fixed" id="section-right">
+                {% include 'profilesettings.html' with user=profile %}
                 {% if current_user.ID == profile.ID %}
-                    {% include 'profilesettings.html' with user=profile %}
-                    <div class="bsbb full-shadow-border section-right-top full-width" style="padding:10px 0;width:calc(100% - 60px);">
-                        <div class="bsbb full-width inline-block p020 mt5">
-                            <p class="fs19 fwblack ctitle left">{{word_list|getword:"trends-of-country-title"|ucwords}}</p>
-                            <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
-                                <g>
-                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
-                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
-                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
-                                </g>
-                            </svg>
-                        </div>
-                        <ul class="full-width mt7 bt">
-                            <li class="bsbb full-width bb right-list-item">
-                                <a href="" class="bsbb full-width p1020 inline-flex">
-                                    <div class="sqrt30 rounded p5 bcb lh30">
-                                        <svg  width="25px" height="16px" viewBox="0 0 25 16" version="1.1" class="hcentered" style="top:-7px; margin-left:2.5px;">
-                                            <g>
-                                                <path style="fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(90.980392%,94.901961%,97.647059%);stroke-opacity:1;stroke-miterlimit:4;" d="M 24.483781 8.99985 L 14.561281 18.923434 L 9.33425 13.698092 L 1.500031 21.53818 " transform="matrix(0.925926,0,0,0.941176,0.575926,-6.474353)"/>
-                                                <path style="fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(90.980392%,94.901961%,97.647059%);stroke-opacity:1;stroke-miterlimit:4;" d="M 25.498719 8.99985 L 31.767781 8.99985 L 31.767781 15.266939 " transform="matrix(0.925926,0,0,0.941176,-6.168519,-6.474353)"/>
-                                            </g>
-                                        </svg>
-                                    </div>
-                                    <div class="ml10">
-                                        <p class="lh20 fwblack">Akparti</p>
-                                        <div class="inline-flex lh20">
-                                            <img src="https://www.imf.org/external/pubs/ft/fandd/2020/06/images/frieden-1600.jpg" class="rounded sqr17" style="top:1.5px;">
-                                            <p class="cg2 lh20 ml5">c/politika ve daha fazlası</p>       
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
-                        <div class="bsbb p020 mt10">
-                            <a href="" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
-                        </div>
-                    </div>
                     <div  class="full-shadow-border section-right-bottom" style="padding:10px 0;width:calc(100% - 60px);">
                         <div class="bsbb full-width inline-block p020 mt5">
                             <p class="fs19 fwblack ctitle left">{{word_list|getword:"users-you-may-follow"|ucwords}}</p>
@@ -345,7 +373,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <ul class="full-width mt7 bt">
+                        <ul class="full-width bt" style="margin-top:12px;">
                             {% for user in users %}
                                 <li class="bsbb full-width bb right-list-item">
                                     <a href="" class="bsbb full-width p1020 inline-block">
@@ -385,6 +413,15 @@
                                         {% endif %}
                                     </a>
                                 </li>
+                            {% endfor %}
+                            {% for i in empty_medias %}
+                                {% if forloop.last%}
+                                    <li class="left" style="width:calc(100% / 3);height:100px; background-color:var(--main-color-alpha);">
+                                    </li>
+                                {% else %}
+                                    <li class="left" style="width:calc(100% / 3 - 1px);height:100px; border-right:1px solid var(--white); background-color:var(--main-color-alpha);">
+                                    </li>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                     </div>

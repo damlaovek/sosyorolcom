@@ -7,6 +7,14 @@ def getword(wordlist, db_key):
     return wordlist.get(var_name=db_key).translation
 
 @register.filter
+def isfollowing(followings, user):
+    result = followings.filter(following=user)
+    if result.count() > 0:
+        return True
+    else:
+        return False
+
+@register.filter
 def getlist(indexable, i):
     j = 0
     for obj in indexable:
