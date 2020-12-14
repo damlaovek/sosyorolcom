@@ -23,17 +23,19 @@
                     </div>
                 </div>
                 <a href='/u/{{post.author.user_login}}/{{post.hex_id}}/{{post.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{post.post_title}}</a>
-                {% if post.preview == 'not-found' %}
-                    <div class="full-width answer-more-container hand" id="post-more-container" onclick="document.getElementById('post-template{{post.ID|escapejs}}').style.display='block';this.remove();">
-                        <p class='answer-shorttext hand' id='post-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick='document.getElementById("photo-frame-{{post.ID}}").style.display="none";document.getElementById("post-shorttext{{post.ID}}").style.display="none";document.getElementById("post-template{{post.ID|escapejs}}").style.display="block";this.remove();'>({{post_template_dict.more}})</span></p>
-                    </div>
-                    <div class='answer-template' id='post-template{{post.ID}}'>{% autoescape off %}{{post.post_content}}{% endautoescape %}</div>
-                {% else %}
-                    <div class='full-width answer-more-container hand' id='post-more-container' onclick='document.getElementById("post-template{{post.ID|escapejs}}").style.display="block";this.remove();'>
-                        {% include 'posts/posttemplates/photo_college.html' %}
-                        <p class='answer-shorttext hand' id='post-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick="document.getElementById('photo-frame-{{post.ID}}').style.display='none';document.getElementById('post-shorttext{{post.ID}}').style.display='none';document.getElementById('post-template{{post.ID|escapejs}}').style.display='block';this.remove();">({{post_template_dict.more}})</span></p>
-                    </div>
-                    <div class='answer-template' id='post-template{{post.ID}}'>{% autoescape off %}{{post.post_content}}{% endautoescape %}</div>
+                {% if post.post_content != "" %}
+                    {% if post.preview == 'not-found' %}
+                        <div class="full-width answer-more-container hand" id="post-more-container" onclick="document.getElementById('post-template{{post.ID|escapejs}}').style.display='block';this.remove();">
+                            <p class='answer-shorttext hand' id='post-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick='document.getElementById("photo-frame-{{post.ID}}").style.display="none";document.getElementById("post-shorttext{{post.ID}}").style.display="none";document.getElementById("post-template{{post.ID|escapejs}}").style.display="block";this.remove();'>({{post_template_dict.more}})</span></p>
+                        </div>
+                        <div class='answer-template' id='post-template{{post.ID}}'>{% autoescape off %}{{post.post_content}}{% endautoescape %}</div>
+                    {% else %}
+                        <div class='full-width answer-more-container hand' id='post-more-container' onclick='document.getElementById("post-template{{post.ID|escapejs}}").style.display="block";this.remove();'>
+                            {% include 'posts/posttemplates/photo_college.html' %}
+                            <p class='answer-shorttext hand' id='post-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick="document.getElementById('photo-frame-{{post.ID}}').style.display='none';document.getElementById('post-shorttext{{post.ID}}').style.display='none';document.getElementById('post-template{{post.ID|escapejs}}').style.display='block';this.remove();">({{post_template_dict.more}})</span></p>
+                        </div>
+                        <div class='answer-template' id='post-template{{post.ID}}'>{% autoescape off %}{{post.post_content}}{% endautoescape %}</div>
+                    {% endif %}
                 {% endif %}
             </div>
             <div class='full-width' style='display:inline-block;margin-top:5px;'>

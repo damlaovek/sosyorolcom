@@ -2,9 +2,9 @@
 <div class='inline-flex p1020' style='width:calc(100% - 40px);'>
     <img src='{{current_user.avatar_url}}' style='width:40px;height:40px;border-radius:50%;object-fit:cover;'/>
     <div style='position:relative;width:calc(100% - 55px); margin-left:15px;align-items:stretch;align-self:flex-start;display:flex;flex-direction:row;'>
-        <textarea class='comment-editor' onblur='this.classList.remove("active");' onfocus='this.classList.add("active");' oninput='commentEditorChange({{post_id}}, {{parent_id}});' id='comment-editor{{post_id}}-{{parent_id}}' rows='1' placeholder='{{word_list|getword:"add-comment"|ucfirst}}...'></textarea>
+        <textarea class='comment-editor' onblur='this.classList.remove("active");' onfocus='this.classList.add("active");' oninput='commentEditorChange("{{post_id}}", "{{parent_id}}");' id='comment-editor{{post_id}}-{{parent_id}}' rows='1' placeholder='{{word_list|getword:"add-comment"|ucfirst}}...'></textarea>
         <div class='comment-send-btn' style='position:relative;opacity:0;'>{{word_list|getword:"send"|ucwords}}</div>
-        <input disabled class='fs15 bcb comment-send-btn fs15' id='comment-send-btn{{post_id}}-{{parent_id}}' type='submit' value='{{word_list|getword:"send"|ucfirst}}' onclick="return saveComment({{post_id}}, {{parent_id}})">
+        <input disabled class='fs15 bcb comment-send-btn fs15' id='comment-send-btn{{post_id}}-{{parent_id}}' type='submit' value='{{word_list|getword:"send"|ucfirst}}' onclick="return saveComment('{{post_id}}', '{{parent_id}}')">
     </div>
 </div>
 <script>

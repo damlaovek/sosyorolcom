@@ -305,7 +305,7 @@ def sign_dictionary(word_list):
     page_dict["notmatchingpasserror"] = word_list.filter(Q(var_name = 'not-matching-pass-error'))[0].translation
     return page_dict
 
-def  search_page_dict(word_list):
+def search_page_dict(word_list):
     page_dict = {}
     page_dict['all'] = fun.ucfirst(word_list.filter(Q(var_name = 'see-all'))[0].translation)
     page_dict["resultsforthissearch"] = word_list.filter(Q(var_name = 'results-for-this-search'))[0].translation
@@ -469,13 +469,8 @@ def setup_postmeta(post, word_list):
     post.communities = Community.objects.filter(term_id__in=community_ids)
     if post.communities.count() > 0:
         post.first_community = post.communities[0].name
-
-    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{post.author_id}')
-    if (os.path.exists(mypath)):
-        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(post.author_id) + "/" + onlyfiles[0]
-    else:
-        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        
+    avatar_url = UserMeta.objects.filter(user=post.author, meta_key="avatar_url")[0].meta_value
     post.author.set_avatar(avatar_url)
     post.time_diff = fun.humanizedate(post.post_date.replace(tzinfo=None), word_list)
 
@@ -540,7 +535,6 @@ def morefollowedlists(request):
         return render(request, 'lists/morefollowedlists.html', {'limit':limit, 'followedlists':followedlists})
 
 def morecommunities(request):
-    print("loadmoreleaderboardcommunities")
     try:
         offset = int(request.GET["offset"])
         limit = int(request.GET["limit"])
@@ -572,7 +566,6 @@ def morecommunities(request):
         else:
             communities = communities[offset:(offset + limit)]
     
-    print(hasMore)
     return render(request, 'communities/communitytemplates/leaderboard_template.html', {'communities':communities, 'filter':fltr, 'offset':offset, 'hasMore':hasMore})
 
 @csrf_exempt
@@ -602,6 +595,7 @@ def setup_current_user(current_uid):
     user_desc = UserMeta.objects.filter(user_id = current_uid, meta_key = 'description')[0]
     current_user.description = user_desc.meta_value
     current_user.posts = Post.objects.filter(post_author=current_uid, post_status="publish", post_type__in=["post","quiz","media","link","questions","answer"]).order_by('-post_date')
+    '''
     mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
     if (os.path.exists(mypath)):
         onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
@@ -609,23 +603,65 @@ def setup_current_user(current_uid):
     else:
         avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
     current_user.avatar_url = avatar_url
+    '''
+    current_user.avatar_url = UserMeta.objects.filter(user_id = current_uid, meta_key = 'avatar_url')[0].meta_value
+    birthday = UserMeta.objects.filter(user=current_user, meta_key="birthday")
+    if birthday.count() > 0:
+        dateobj = dt.datetime.strptime(birthday[0].meta_value, '%Y-%m-%d')
+        current_user.birthday["birthday"] = dateobj.strftime("%d.%m.%Y")
+        current_user.birthday["ID"] = birthday[0].umeta_id
     try:
         current_user.followers = UserRelation.objects.filter(following=current_user)
         current_user.followings = UserRelation.objects.filter(follower=current_user)
         for f in current_user.followers:
             try:
-                mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{f.follower.ID}')
-                if (os.path.exists(mypath)):
-                    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-                    avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(f.follower.ID) + "/" + onlyfiles[0]
-                else:
-                    avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+                avatar_url = UserMeta.objects.filter(user=f.follower, meta_key="avatar_url")[0].meta_value
                 f.follower.avatar_url = avatar_url
             except:
                 f.follower.avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
     except:
         pass
     return current_user
+
+def setup_notifications(current_uid, word_list):
+    notifications = Notification.objects.filter(to_u_id=current_uid).prefetch_related().order_by('-date')
+    notifs = dict()
+    new_notifs = []
+    old_notifs = []
+    for notification in notifications:
+        user = User.objects.get(ID=notification.from_u_id)
+        notification.from_u = setup_current_user(user.ID)
+        notification.date_diff = fun.humanizedate(notification.date.replace(tzinfo=None), word_list, to=dt.datetime.now())
+        if notification.notification_variable == "community-post": #done
+            community = Community.objects.filter(term_id=notification.related_obj)[0]
+            notification.notification = word_list.filter(var_name="notification-community-post")[0].translation
+            notification.notification = notification.notification.replace("{community}", "<span class='fwbold'>c/"+community.name+"</span>")
+        elif notification.notification_variable == "answer-question": #done
+            notification.notification = word_list.filter(var_name="notification-answer-question")[0].translation
+            notification.notification = notification.notification.replace("{user}", "<span class='fwbold'>u/"+user.user_login+"</span>")
+        elif notification.notification_variable == "comment-reply": #done
+            notification.notification = word_list.filter(var_name="notification-comment-reply")[0].translation
+            notification.notification = notification.notification.replace("{user}", "<span class='fwbold'>u/"+user.user_login+"</span>")
+        elif notification.notification_variable == "comment-on-post": #done
+            notification.notification = word_list.filter(var_name="notification-comment-on-post")[0].translation
+            notification.notification = notification.notification.replace("{user}", "<span class='fwbold'>u/"+user.user_login+"</span>")
+        elif notification.notification_variable == "new-post": #done
+            notification.notification = word_list.filter(var_name="notification-new-post")[0].translation
+            notification.notification = notification.notification.replace("{user}", "<span class='fwbold'>u/"+user.user_login+"</span>")
+        elif notification.notification_variable == "follow": #done
+            notification.notification = word_list.filter(var_name="notification-follow")[0].translation
+            notification.notification = notification.notification.replace("{user}", "<span class='fwbold'>u/"+user.user_login+"</span>")
+        elif notification.notification_variable == "birthday":
+            notification.notification = word_list.filter(var_name="notification-birthday")[0].translation
+            notification.notification = notification.notification.replace("{user}", "<span class='fwbold'>u/"+user.user_login+"</span>")
+
+        if notification.date.day == dt.datetime.today().day and notification.date.month == dt.datetime.today().month and notification.date.year == dt.datetime.today().year:
+            new_notifs.append(notification)
+        else:
+            old_notifs.append(notification)
+    notifs["new"] = new_notifs
+    notifs["earlier"] = old_notifs
+    return notifs
 
 def communitiesfiltered(request, **kwargs):
     if 'filter' in kwargs:
@@ -688,11 +724,8 @@ def loadmorecomments(request):
         post_id = int(request.GET["post_id"])
         parent_id = int(request.GET["parent_id"])
         padding = int(request.GET["padding"])
-        print(offset)
-        print(limit)
         comments = Comment.objects.filter(comment_post_ID=post_id, comment_parent=parent_id).order_by('-comment_date').prefetch_related()
         comments = comments[offset:(offset + limit)]
-        print(comments)
         current_uid = 8
         current_user = setup_current_user(current_uid)
         lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
@@ -702,7 +735,6 @@ def loadmorecomments(request):
             comment.child_comments = Comment.objects.none()
             comment.child_comments = getchildcomments(post_id, comment.comment_ID)
             getgrandchildcomments(post_id, comment.child_comments)
-        print(comments)
     except:
         return HttpResponse(json.dumps({}),content_type="application/json")
     return render(request, 'posts/comments/comment_list.html', {'comments':comments, 'padding':padding, 'word_list':word_list})
@@ -714,7 +746,6 @@ def loadmoreprofileposts(request):
         limit = int(request.POST["limit"])
         user_id = int(request.POST["user_id"])
         fltr = request.POST["filter"]
-        print(fltr)
         hasMore = "True"
         if fltr == "all" or flter == "":
             moreposts = Post.objects.filter(post_author=user_id, post_status="publish", post_type__in=["post","quiz","media","link","questions","answer"]).order_by('-post_date')
@@ -854,12 +885,29 @@ def uploadmedia(request):
     return JsonResponse(data)
 
 @csrf_exempt
+def changeprofilepicture(request):
+    from sosyorol.forms import MediaFileUploadForm
+    current_uid = 8
+    form = MediaFileUploadForm(data=request.POST, files=request.FILES)
+    if form.is_valid():
+        photo = form.save()
+        form = MediaFileUploadForm()
+        new_cred = UserMeta.objects.filter(user_id=current_uid, meta_key="avatar_url")[0]
+        new_cred.meta_value = photo.file.url
+        new_cred.save()
+        lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+        word_list = Languages.objects.filter(Q(lang_code = lang))
+        msg = fun.ucfirst(word_list.filter(var_name="picture-has-changed")[0].translation)
+        data = {'is_valid': True, 'name': photo.file.name, 'url': photo.file.url, 'msg': msg}
+    else:
+        data = {'is_valid': False}
+    return JsonResponse(data)
+
+@csrf_exempt
 def uploadmediagetcolor(request):
     from sosyorol.forms import MediaFileUploadForm
     from colorthief import ColorThief
-    print("uploadmediagetcolor")
     form = MediaFileUploadForm(data=request.POST, files=request.FILES)
-    print(form.errors)
     if form.is_valid():
         photo = form.save()
         form = MediaFileUploadForm()
@@ -869,11 +917,9 @@ def uploadmediagetcolor(request):
         data = {'is_valid': True, 'name': photo.file.name, 'url': photo.file.url, 'color': 'rgb('+str(r)+','+str(g)+','+str(b)+')'}
     else:
         data = {'is_valid': False}
-    print(data)
     return HttpResponse(json.dumps(data),content_type="application/json")
 
 def savenewlist(request):
-    print("savenewlist")
     photo_url = request.POST["photo_url"]
     filename, file_extension = os.path.splitext(photo_url)
     title = request.POST["title"]
@@ -896,7 +942,6 @@ def savenewlist(request):
 
 def follow_unfollow_list(request):
     redirect = request.POST["redirect"]
-    print(request.POST["redirect"])
     list_id = request.POST["list_id"]
     operation = request.POST["operation"]
     user_id = 8
@@ -957,7 +1002,6 @@ def savenewcommunity(request):
             new_community = Community(name=title, slug=title, description=desc, cover_color=color, is_public=is_public, nsfw=nsfw, cover_img=cover_img, profile_img=photo_large, profile_img_small=photo_small)
             new_community.save()
             new_community = Community.objects.get(name=title)
-            print(new_community.term_id)
             new_moderator = FollowedCommunities(term_id=new_community.term_id, user_id=creator, role="Moderator", date=dt.datetime.now())
             new_moderator.save()
             new_category = CommunityCategoryRelation(community_id=new_community.term_id, category_id=primary_cat, relation=0)
@@ -1050,11 +1094,25 @@ def savenewquiz(request):
     new_quiz_type = PostMeta(post_id=new_quiz.ID, meta_key="quiz_type", meta_value=quiz_type)
     new_quiz_type.save()
 
+    for follower in current_user.followers:
+        new_quiz.hex_id = hex(post.ID + 100000).replace("x", "s")
+        new_quiz.guid = arrange_post_slug(new_answer.post_title)
+        url = "/u/"+current_user.user_login+"/"+new_quiz.hex_id+"/"+new_quiz.guid
+        new_notification = Notification(date=dt.datetime.now(), url=url, notification_variable="new-post", 
+                                        seen=0, from_u_id=current_uid, to_u=follower.follower_id, related_obj=new_quiz.ID)
+        new_notification.save()
+
     for (k, v) in communities.items():
         term = Community.objects.filter(name=str(v))[0]
         term_tax = TermTaxonomy.objects.filter(term=term)[0]
         new_relation = TermRelationship(object_id=new_quiz.ID, term_taxonomy_id=term_tax.term_taxonomy_id, term_order=0)
         new_relation.save()
+        followers = FollowedCommunities.objects.filter(term=term)
+        for follower in followers:
+            if(follower.user != current_user):
+                new_notification = Notification(date=dt.datetime.now(), url="/c/"+term.slug, notification_variable="community-post", 
+                                                seen=0, from_u_id=-1, to_u=follower.user_id, related_obj=term.term_id)
+                new_notification.save()
 
     for (k, v) in flairs.items():
         tokens = str(v).replace("&nbsp;", "").split("--")
@@ -1137,11 +1195,25 @@ def savenewpost(request):
     new_quiz.save()
     new_quiz = Post.objects.filter(post_title=quiz_title).order_by('-post_date')[0]
 
+    for follower in current_user.followers:
+        new_quiz.hex_id = hex(post.ID + 100000).replace("x", "s")
+        new_quiz.guid = arrange_post_slug(new_answer.post_title)
+        url = "/u/"+current_user.user_login+"/"+new_quiz.hex_id+"/"+new_quiz.guid
+        new_notification = Notification(date=dt.datetime.now(), url=url, notification_variable="new-post", 
+                                        seen=0, from_u_id=current_uid, to_u=follower.follower_id, related_obj=new_quiz.ID)
+        new_notification.save()
+
     for (k, v) in communities.items():
         term = Community.objects.get(name=str(v))
         term_tax = TermTaxonomy.objects.get(term=term)
         new_relation = TermRelationship(object_id=new_quiz.ID, term_taxonomy_id=term_tax.term_taxonomy_id, term_order=0)
         new_relation.save()
+        followers = FollowedCommunities.objects.filter(term=term)
+        for follower in followers:
+            if(follower.user != current_user):
+                new_notification = Notification(date=dt.datetime.now(), url="/c/"+term.slug, notification_variable="community-post", 
+                                                seen=0, from_u_id=-1, to_u=follower.user_id, related_obj=term.term_id)
+                new_notification.save()
 
     for (k, v) in flairs.items():
         tokens = str(v).replace("&nbsp;", "").split("--")
@@ -1176,11 +1248,25 @@ def savenewmediapost(request):
     new_quiz.save()
     new_quiz = Post.objects.filter(post_title=quiz_title).order_by('-post_date')[0]
 
+    for follower in current_user.followers:
+        new_quiz.hex_id = hex(post.ID + 100000).replace("x", "s")
+        new_quiz.guid = arrange_post_slug(new_answer.post_title)
+        url = "/u/"+current_user.user_login+"/"+new_quiz.hex_id+"/"+new_quiz.guid
+        new_notification = Notification(date=dt.datetime.now(), url=url, notification_variable="new-post", 
+                                        seen=0, from_u_id=current_uid, to_u=follower.follower_id, related_obj=new_quiz.ID)
+        new_notification.save()
+
     for (k, v) in communities.items():
         term = Community.objects.filter(name=str(v))[0]
         term_tax = TermTaxonomy.objects.get(term=term)
         new_relation = TermRelationship(object_id=new_quiz.ID, term_taxonomy_id=term_tax.term_taxonomy_id, term_order=0)
         new_relation.save()
+        followers = FollowedCommunities.objects.filter(term=term)
+        for follower in followers:
+            if(follower.user != current_user):
+                new_notification = Notification(date=dt.datetime.now(), url="/c/"+term.slug, notification_variable="community-post", 
+                                                seen=0, from_u_id=-1, to_u=follower.user_id, related_obj=term.term_id)
+                new_notification.save()
 
     for (k, v) in flairs.items():
         tokens = str(v).replace("&nbsp;", "").split("--")
@@ -1218,11 +1304,25 @@ def savenewlink(request):
     new_quiz.save()
     new_quiz = Post.objects.filter(post_title=quiz_title).order_by('-post_date')[0]
 
+    for follower in current_user.followers:
+        new_quiz.hex_id = hex(post.ID + 100000).replace("x", "s")
+        new_quiz.guid = arrange_post_slug(new_answer.post_title)
+        url = "/u/"+current_user.user_login+"/"+new_quiz.hex_id+"/"+new_quiz.guid
+        new_notification = Notification(date=dt.datetime.now(), url=url, notification_variable="new-post", 
+                                        seen=0, from_u_id=current_uid, to_u=follower.follower_id, related_obj=new_quiz.ID)
+        new_notification.save()
+
     for (k, v) in communities.items():
         term = Community.objects.get(name=str(v))
         term_tax = TermTaxonomy.objects.get(term=term)
         new_relation = TermRelationship(object_id=new_quiz.ID, term_taxonomy_id=term_tax.term_taxonomy_id, term_order=0)
         new_relation.save()
+        followers = FollowedCommunities.objects.filter(term=term)
+        for follower in followers:
+            if(follower.user != current_user):
+                new_notification = Notification(date=dt.datetime.now(), url="/c/"+term.slug, notification_variable="community-post", 
+                                                seen=0, from_u_id=-1, to_u=follower.user_id, related_obj=term.term_id)
+                new_notification.save()
 
     for (k, v) in flairs.items():
         tokens = str(v).replace("&nbsp;", "").split("--")
@@ -1238,6 +1338,7 @@ def savenewlink(request):
     response_data = {}
     response_data['content'] = "success"                   
     return HttpResponse(json.dumps(response_data),content_type="application/json")
+
 @csrf_exempt
 def savenewquestion(request):
     import re
@@ -1257,15 +1358,29 @@ def savenewquestion(request):
         quiz_title += " - Sosyorol"
 
     current_user = setup_current_user(current_uid)
-    new_quiz = Post(post_title=quiz_title, post_content=quiz_desc, post_date=dt.datetime.now(), author=current_user, to_ping="", pinged="", post_content_filtered="", post_status="publish", post_type="question", post_excerpt=post_excerpt, post_parent=0)
+    new_quiz = Post(post_title=quiz_title, post_content=quiz_desc, post_author=current_uid, post_date=dt.datetime.now(), author=current_user, to_ping="", pinged="", post_content_filtered="", post_status="publish", post_type="questions", post_excerpt=post_excerpt, post_parent=0)
     new_quiz.save()
     new_quiz = Post.objects.filter(post_title=quiz_title).order_by('-post_date')[0]
 
+    for follower in current_user.followers:
+        new_quiz.hex_id = hex(new_quiz.ID + 100000).replace("x", "s")
+        new_quiz.guid = arrange_post_slug(new_quiz.post_title)
+        url = "/u/"+current_user.user_login+"/"+new_quiz.hex_id+"/"+new_quiz.guid
+        new_notification = Notification(date=dt.datetime.now(), url=url, notification_variable="new-post", 
+                                        seen=0, from_u_id=current_uid, to_u_id=follower.follower_id, related_obj=new_quiz.ID)
+        new_notification.save()
+
     for (k, v) in communities.items():
-        term = Community.objects.get(name=str(v))
+        term = Community.objects.filter(name=str(v))[0]
         term_tax = TermTaxonomy.objects.get(term=term)
         new_relation = TermRelationship(object_id=new_quiz.ID, term_taxonomy_id=term_tax.term_taxonomy_id, term_order=0)
         new_relation.save()
+        followers = FollowedCommunities.objects.filter(term=term)
+        for follower in followers:
+            if(follower.user != current_user):
+                new_notification = Notification(date=dt.datetime.now(), url="/c/"+term.slug, notification_variable="community-post", 
+                                                seen=0, from_u_id=-1, to_u_id=follower.user_id, related_obj=term.term_id)
+                new_notification.save()
 
     for (k, v) in flairs.items():
         tokens = str(v).replace("&nbsp;", "").split("--")
@@ -1306,11 +1421,25 @@ def savenewpoll(request):
     new_quiz.save()
     new_quiz = Post.objects.filter(post_title=quiz_title).order_by('-post_date')[0]
 
+    for follower in current_user.followers:
+        new_quiz.hex_id = hex(post.ID + 100000).replace("x", "s")
+        new_quiz.guid = arrange_post_slug(new_answer.post_title)
+        url = "/u/"+current_user.user_login+"/"+new_quiz.hex_id+"/"+new_quiz.guid
+        new_notification = Notification(date=dt.datetime.now(), url=url, notification_variable="new-post", 
+                                        seen=0, from_u_id=current_uid, to_u=follower.follower_id, related_obj=new_quiz.ID)
+        new_notification.save()
+
     for (k, v) in communities.items():
         term = Community.objects.filter(name=str(v))[0]
         term_tax = TermTaxonomy.objects.get(term=term)
         new_relation = TermRelationship(object_id=new_quiz.ID, term_taxonomy_id=term_tax.term_taxonomy_id, term_order=0)
         new_relation.save()
+        followers = FollowedCommunities.objects.filter(term=term)
+        for follower in followers:
+            if(follower.user != current_user):
+                new_notification = Notification(date=dt.datetime.now(), url="/c/"+term.slug, notification_variable="community-post", 
+                                                seen=0, from_u_id=-1, to_u=follower.user_id, related_obj=term.term_id)
+                new_notification.save()
 
     optionCounter = 1
     for (k, v) in options.items():
@@ -1340,10 +1469,20 @@ def savecomment(request):
     current_uid = 8
     current_user = setup_current_user(current_uid)
     comment = request.POST["comment"]
-    post_id = request.POST["post_id"]
-    parent_id = request.POST["parent_id"]
+    post_id = int(request.POST["post_id"])
+    parent_id = int(request.POST["parent_id"])
     new_comment = Comment(comment_approved=1, comment_author=current_user.display_name, comment_content=comment, comment_post_ID=post_id, comment_parent=parent_id, comment_author_email=current_user.user_email, comment_date=dt.datetime.now(), user_id=current_uid)
     new_comment.save()
+    if parent_id > 0:
+        comment = Comment.objects.get(comment_ID=parent_id)
+        if(current_uid != comment.user_id):
+            new_notification = Notification(notification_variable="comment-reply", seen=0, date=dt.datetime.now(), from_u_id=current_uid, to_u_id=comment.user_id, related_obj=new_comment.comment_ID, url="")
+            new_notification.save()
+    else:
+        post = Post.objects.get(ID=post_id)
+        if(current_uid != post.post_author):
+            new_notification = Notification(notification_variable="comment-on-post", seen=0, date=dt.datetime.now(), from_u_id=current_uid, to_u_id=post.post_author, related_obj=new_comment.comment_ID, url="")
+            new_notification.save()
     response_data = {}
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
     response_data['content'] = Languages.objects.filter(lang_code=lang, var_name="comment-saved-successfully")[0].translation
@@ -1358,6 +1497,12 @@ def savenewanswer(request):
     current_user = setup_current_user(current_uid)
     new_answer = Post(post_title=parent.post_title, post_content=answer, post_date=dt.datetime.now(), author=current_user, post_author=current_uid, to_ping="", pinged="", post_content_filtered="", post_status="publish", post_type="answer", post_excerpt=parent.post_excerpt, post_parent=parent_id)
     new_answer.save()
+    if(current_uid != parent.post_author):
+        new_answer.hex_id = hex(post.ID + 100000).replace("x", "s")
+        new_answer.guid = arrange_post_slug(new_answer.post_title)
+        url = "/u/"+current_user.user_login+"/"+new_answer.hex_id+"/"+new_answer.guid
+        new_notification = Notification(notification_variable="answer-question", seen=0, from_u_id=current_uid, to_u_id= parent.post_author, date=dt.datetime.now(), url=url)
+        new_notification.save()
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
     response_data = {}
     response_data['content'] = Languages.objects.filter(lang_code=lang, var_name="answer-saved-successfully")[0].translation
@@ -1415,6 +1560,37 @@ def languagecredential(request):
     except:
         return "error"
 
+def editfullname(request):
+    try:
+        current_uid = 8
+        fullname = request.GET["fullname"]
+        cred = User.objects.filter(ID=current_uid)[0]
+        cred.display_name = fullname
+        cred.save()
+        return "success"
+    except:
+        return "error"
+
+def editprofiledesc(request):
+    try:
+        current_uid = 8
+        profiledesc = request.GET["profiledesc"]
+        user_desc = UserMeta.objects.filter(user_id = current_uid, meta_key = 'description')[0]
+        user_desc.meta_value = profiledesc
+        user_desc.save()
+        return "success"
+    except:
+        return "error"
+
+def birthday(request):
+    try:
+        current_uid = 8
+        cred = UserMeta(user_id=current_uid, meta_key="birthday", meta_value=request.GET["birthday"])
+        cred.save()
+        return "success"
+    except:
+        return "error"
+
 @csrf_exempt
 def savenewusercredential(request):
     try:
@@ -1428,9 +1604,102 @@ def savenewusercredential(request):
             response_data['content'] = locationcredential(request)
         elif ctype == "language":
             response_data['content'] = languagecredential(request)
+        elif ctype == "fullname":
+            response_data['content'] = editfullname(request)
+        elif ctype == "profiledesc":
+            response_data['content'] = editprofiledesc(request)
+        elif ctype == "birthday":
+            response_data['content'] = birthday(request)
         return HttpResponse(json.dumps(response_data), content_type="application/json")
     except:
         return HttpResponse(json.dumps({}), content_type="application/json")
+
+@csrf_exempt
+def deleteusercredential(request):
+    try:
+        response_data = {}
+        ID = request.GET["ID"]
+        cred = UserMeta.objects.get(umeta_id=int(ID))
+        cred.delete()
+        response_data['content'] = "success"
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    except:
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+@csrf_exempt
+def editusercredential(request):
+    try:
+        response_data = {}
+        ID = request.GET["ID"]
+        cred = UserMeta.objects.get(umeta_id=int(ID))
+        if request.GET["type"] == "birthday":
+            cred.meta_value = request.GET["birthday"]
+        else:
+            cred.meta_value = json.dumps(request.GET)
+        cred.save()
+        response_data['content'] = "success"
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    except:
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+@csrf_exempt
+def followunfollowuser(request):
+    try:
+        response_data = {}
+        op = request.GET["op"]
+        followerId = int(request.GET["followerId"])
+        followingId = int(request.GET["followingId"])
+        if(op == "follow"):
+            new_rel = UserRelation(follower_id=followerId, following_id=followingId, date=dt.datetime.now())
+            new_rel.save()
+            follower = User.objects.get(ID=followerId)
+            new_notification = Notification(date=dt.datetime.now(), url="/u/"+follower.user_login, notification_variable="follow", seen=0, from_u_id=followerId, to_u_id=followingId)
+            new_notification.save()
+        elif(op == "unfollow"):
+            old_rel = UserRelation.objects.get(follower_id=followerId, following_id=followingId)
+            old_rel.delete()
+        response_data['content'] = "success"
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    except:
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+@csrf_exempt
+def removeprofilepicture(request):
+    try:
+        response_data = {}
+        current_uid = 8
+        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        cred = UserMeta.objects.filter(user_id=current_uid, meta_key="avatar_url")[0]
+        cred.meta_value = avatar_url
+        cred.save()
+        lang = UserMeta.objects.filter(user_id=current_uid, meta_key='language')[0].meta_value
+        word_list = Languages.objects.filter(Q(lang_code = lang))
+        msg = fun.ucfirst(word_list.filter(var_name="picture-has-changed")[0].translation)
+        response_data["msg"] = msg
+        response_data["url"] = avatar_url
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    except:
+        return HttpResponse(json.dumps({}), content_type="application/json")
+
+@csrf_exempt
+def updatenotification(request):
+    try:
+        nid = int(request.POST["ID"])
+        notif = Notification.objects.get(ID=nid)
+        notif.seen = 1
+        notif.save()
+    except:
+        pass
+    return HttpResponse(json.dumps({}), content_type="application/json")
+
+@csrf_exempt
+def updateallnotifications(request):
+    current_uid = 7
+    notifications = Notification.objects.filter(to_u_id=current_uid)
+    for n in notifications:
+        n.opened = 1
+        n.save()
+    return HttpResponse(json.dumps({}), content_type="application/json")
 
 '''---------------------------------------
   VIEWS              
@@ -1548,7 +1817,7 @@ def phonecodeverification(request):
 
 def home(request):
     start_start = time.time()
-    current_uid = 8
+    current_uid = 7
 
     start = time.time()
     current_user = setup_current_user(current_uid)
@@ -1651,7 +1920,6 @@ def home(request):
     post_ids = list({x.post_id: x for x in post_ids}.keys())
     quizzes = Post.objects.filter(Q(ID__in=post_ids)).order_by('-post_date')[:4].prefetch_related()
     for quiz in quizzes:
-        print(quiz.ID)
         setup_postmeta(quiz, word_list)
         setup_quizmeta(quiz, word_list)
     end = time.time() - start
@@ -1698,6 +1966,11 @@ def home(request):
     end = time.time() - start
     print(f"Setup comment editor in {end} s")
 
+    start = time.time()
+    notifications = setup_notifications(current_uid, word_list)
+    end = time.time() - start
+    print(f"Setup notifications in {end} s")
+
     end_end = time.time() - start_start
     print(f"Total: {end_end} s")
     return render(request, 'index.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
@@ -1707,7 +1980,8 @@ def home(request):
                                             'post_template_dict':post_template_dict, 'comment_editor':comment_editor,
                                             'links':links, 'answers':answers, 'questions':questions, 'quizzes':quizzes,
                                             'communities':communities, 'users':users, 'polls':polls,
-                                            'word_list':word_list, 'colorBox_quizzes':colorBox_quizzes, 'media_quizzes':media_quizzes, 'mediaposts':mediaposts
+                                            'word_list':word_list, 'colorBox_quizzes':colorBox_quizzes, 'media_quizzes':media_quizzes, 'mediaposts':mediaposts,
+                                            'notifications':notifications
                                             })
 
 def search(request, **kwargs):
@@ -1722,7 +1996,6 @@ def search(request, **kwargs):
     search_key = ""
     try:
         search_key = request.POST["search_key"]
-        print(search_key)
     except:
         try:
             search_key = request.GET.get("search_key")
@@ -1793,12 +2066,7 @@ def search(request, **kwargs):
         for user in user_results:
             user_desc = UserMeta.objects.filter(Q(user_id = user.ID)).filter(Q(meta_key = 'description'))[0]
             user.set_description(user_desc.meta_value)
-            mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{user.ID}')
-            if (os.path.exists(mypath)):
-                onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-                avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(user.ID) + "/" + onlyfiles[0]
-            else:
-                avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+            avatar_url = UserMeta.objects.filter(user=user, meta_key="avatar_url")[0].meta_value
             user.set_avatar(avatar_url)
 
     #Right
@@ -1807,12 +2075,7 @@ def search(request, **kwargs):
     for user in users:
         user_desc = UserMeta.objects.filter(Q(user_id = user.ID)).filter(Q(meta_key = 'description'))[0]
         user.set_description(user_desc.meta_value)
-        mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{user.ID}')
-        if (os.path.exists(mypath)):
-            onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-            avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(user.ID) + "/" + onlyfiles[0]
-        else:
-            avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        avatar_url = UserMeta.objects.filter(user=user, meta_key="avatar_url")[0].meta_value
         user.set_avatar(avatar_url)
     return render(request, "search.html", {'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'country_list':country_list,
@@ -1872,12 +2135,7 @@ def history(request, **kwargs):
     for user in user_history:
         user_desc = UserMeta.objects.filter(Q(user_id = user.visited_user.ID)).filter(Q(meta_key = 'description'))[0]
         user.visited_user.set_description(user_desc.meta_value)
-        mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{user.visited_user.ID}')
-        if (os.path.exists(mypath)):
-            onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-            avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(user.visited_user.ID) + "/" + onlyfiles[0]
-        else:
-            avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        avatar_url = UserMeta.objects.filter(user=user.visited_user, meta_key="avatar_url")[0].meta_value
         user.visited_user.set_avatar(avatar_url)
     
     history = sorted(chain(search_history, post_history, community_history, user_history), key=lambda instance: instance.date, reverse=True)
@@ -1911,21 +2169,13 @@ def history(request, **kwargs):
                         history_groups[dict_key] = [h]
                 else:
                     history_groups[dict_key] = [h]
-                    
-
-    print(history_groups)
 
     right_menu_dict = right_menu(word_list)
     users = User.objects.all()[:2]
     for user in users:
         user_desc = UserMeta.objects.filter(Q(user_id = user.ID)).filter(Q(meta_key = 'description'))[0]
         user.set_description(user_desc.meta_value)
-        mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{user.ID}')
-        if (os.path.exists(mypath)):
-            onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-            avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(user.ID) + "/" + onlyfiles[0]
-        else:
-            avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        avatar_url = UserMeta.objects.filter(user=user, meta_key="avatar_url")[0].meta_value
         user.set_avatar(avatar_url)
     return render(request, "history.html", {'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
@@ -1937,7 +2187,6 @@ def history(request, **kwargs):
 
 @csrf_exempt
 def lists(request):
-    print("lists")
     limit = 3
     current_uid = 8
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
@@ -1982,7 +2231,6 @@ def lists(request):
                                             })
 
 def newpost(request):
-    print("new post")
     try:
         post_type = request.GET['post']
     except:
@@ -2010,17 +2258,12 @@ def newpost(request):
                                             'newpost_actions_dict':newpost_actions_dict, 'drafts':drafts, 'word_list':word_list})
 
 def createlist(request):
-    print("hello create list")
     current_uid = 8
     current_user = User.objects.filter(Q(ID = current_uid))[0]
     user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
     current_user.set_description(user_desc.meta_value)
     mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
-    if (os.path.exists(mypath)):
-        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
-    else:
-        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+    avatar_url = UserMeta.objects.filter(user=current_user, meta_key="avatar_url")[0].meta_value
     current_user.set_avatar(avatar_url)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
@@ -2045,7 +2288,6 @@ def createlist(request):
                                             'tips':tips, 'create_list_dict':create_list_dict,'word_list':word_list})
 
 def listdetail(request, slug, **kwargs):
-    print("list detail")
     if slug == "undefined" or slug == "create":
         return createlist(request)
     if 'filter' in kwargs:
@@ -2080,12 +2322,7 @@ def listdetail(request, slug, **kwargs):
     current_user = User.objects.filter(Q(ID = current_uid))[0]
     user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
     current_user.set_description(user_desc.meta_value)
-    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
-    if (os.path.exists(mypath)):
-        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
-    else:
-        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+    avatar_url = UserMeta.objects.filter(user=current_user, meta_key="avatar_url")[0].meta_value
     current_user.set_avatar(avatar_url)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
@@ -2114,7 +2351,6 @@ def listdetail(request, slug, **kwargs):
                                             'filter':fltr,'word_list':word_list}))
 
 def listdetailfilter(request, slug, post_type):
-    print("listdetailfilter")
     lst = List.objects.get(url=slug)
     post_ids = ListPost.objects.filter(Q(list_id=lst.ID))
     lst.members = ListUser.objects.filter(Q(list_id=lst.ID, role="member"))
@@ -2123,12 +2359,7 @@ def listdetailfilter(request, slug, post_type):
     current_user = User.objects.filter(Q(ID = current_uid))[0]
     user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
     current_user.set_description(user_desc.meta_value)
-    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
-    if (os.path.exists(mypath)):
-        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
-    else:
-        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+    avatar_url = UserMeta.objects.filter(user=current_user, meta_key="avatar_url")[0].meta_value
     current_user.set_avatar(avatar_url)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
@@ -2186,11 +2417,7 @@ def aboutlist(request, slug):
     user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
     current_user.set_description(user_desc.meta_value)
     mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
-    if (os.path.exists(mypath)):
-        onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-        avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(current_uid) + "/" + onlyfiles[0]
-    else:
-        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+    avatar_url = UserMeta.objects.filter(user=current_user, meta_key="avatar_url")[0].meta_value
     current_user.set_avatar(avatar_url)
     followed = ListUser.objects.filter(Q(user_id=current_uid)).filter(Q(list_id=lst.ID))
     if len(followed) > 0:
@@ -2260,12 +2487,7 @@ def savedposts(request, **kwargs):
     for user in users:
         user_desc = UserMeta.objects.filter(Q(user_id = user.ID)).filter(Q(meta_key = 'description'))[0]
         user.set_description(user_desc.meta_value)
-        mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{user.ID}')
-        if (os.path.exists(mypath)):
-            onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-            avatar_url = "https://www.sosyorol.com/wp-content/uploads/avatars/" + str(user.ID) + "/" + onlyfiles[0]
-        else:
-            avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        avatar_url = UserMeta.objects.filter(user=user, meta_key="avatar_url")[0].meta_value
         user.set_avatar(avatar_url)
     return render(request, "savedposts.html", {'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'header_dict':header_dict, 'left_menu_dict':left_menu_dict,
@@ -2316,13 +2538,10 @@ def communities(request, **kwargs):
                                                             'random_communities1':random_communities1, 'random_communities2':random_communities2, 'filter':fltr})
 
 def communitydetail(request, slug,  **kwargs):
-    print("community detail")
     if slug == "lists":
         path = kwargs.get("filter")
         tokens = path.split("/")
         if (len(tokens) == 1):
-            print(kwargs)
-            print(path)
             return listdetail(request, path)
         else:
             return listdetailfilter(request, tokens[0], post_type=tokens[1])
@@ -2463,7 +2682,6 @@ def postdetail(request, username, post_id, slug):
                                                 })
     
 def answerdetail(request, parent_author_name, parent_post_id, parent_slug, author_name):
-    print("answer detail")
     pid = int(parent_post_id.replace("s", "x"), 16) - 100000
     author = User.objects.filter(user_login=author_name)[0]
     post = Post.objects.filter(post_parent=pid, post_author=author.ID, post_type="answer", post_status="publish")[0]
@@ -2497,6 +2715,8 @@ def userprofile(request, username,  **kwargs):
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
     word_list = Languages.objects.filter(Q(lang_code = lang))
+    followtxt = word_list.filter(var_name="follow")[0].translation
+    followingtxt = word_list.filter(var_name="following")[0].translation
     if 'filter' in kwargs:
         fltr = kwargs.get("filter")
     else:
@@ -2517,31 +2737,50 @@ def userprofile(request, username,  **kwargs):
         profile.posts = profile.posts.filter(Q(post_type="media"))
     index = 0
     for post in profile.posts:
-        setup_postmeta(post, word_list)
-        if post.post_type == "link":
-            post.photo_from_url = fun.get_photo_from_url(post.post_content)
-        elif post.post_type == "media":
-            setup_mediameta(post)
-        elif post.post_type == "quiz":
-            post.quiz_type = PostMeta.objects.filter(post_id=post.ID, meta_key="quiz_type")[0].meta_value
-            post.post_title = post.post_title.replace(" - Sosyorol", "")
-            if post.quiz_type == "media":
-                setup_media_quizmeta(post, word_list)
-            elif post.quiz_type == "colorBox":
-                setup_colorbox_quizmeta(post, word_list)
-            else:
-                setup_quizmeta(post, word_list)
+        if index <= 5:
+            setup_postmeta(post, word_list)
+            if post.post_type == "link":
+                post.photo_from_url = fun.get_photo_from_url(post.post_content)
+            elif post.post_type == "media":
+                setup_mediameta(post)
+            elif post.post_type == "quiz":
+                post.quiz_type = PostMeta.objects.filter(post_id=post.ID, meta_key="quiz_type")[0].meta_value
+                post.post_title = post.post_title.replace(" - Sosyorol", "")
+                if post.quiz_type == "media":
+                    setup_media_quizmeta(post, word_list)
+                elif post.quiz_type == "colorBox":
+                    setup_colorbox_quizmeta(post, word_list)
+                else:
+                    setup_quizmeta(post, word_list)
+        else:
+            break
         index += 1
     profile.posts = profile.posts[:5]
+    print(profile.posts)
     country_list = Languages.objects.filter(Q(var_name = 'lang'))
-    employments = UserMeta.objects.filter(user_id = current_uid, meta_key = 'employments').order_by('-umeta_id')
+    employments = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'employments').order_by('-umeta_id')
+    profile.employment_credentials = []
     if employments.count() > 0:
         current_employment = json.loads(employments[0].meta_value)
         position = current_employment["position"]
         company = current_employment["company"]
         profile.employments = word_list.filter(var_name="employment-string")[0].translation.replace("{position}", position).replace("{company}",company)
+        for employment in employments:
+            credential = dict()
+            credential["ID"] = employment.umeta_id
+            current_employment = json.loads(employment.meta_value)
+            position = current_employment["position"]
+            credential["position"] = position
+            credential["startDate"] = current_employment["startDate"]
+            credential["endDate"] = current_employment["endDate"]
+            company = current_employment["company"]
+            credential["company"] = company
+            cred = word_list.filter(var_name="employment-string")[0].translation.replace("{position}", position).replace("{company}",company)
+            credential["cred"] = cred
+            profile.employment_credentials.append(credential)
     
-    educations = UserMeta.objects.filter(user_id = current_uid, meta_key = 'educations').order_by('-umeta_id')
+    educations = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'educations').order_by('-umeta_id')
+    profile.education_credentials = []
     if educations.count() > 0:
         current_education = json.loads(educations[0].meta_value)
         school = current_education["school"]
@@ -2555,8 +2794,32 @@ def userprofile(request, username,  **kwargs):
             profile.educations = profile.educations + "<span class='cg fwlight'> " + word_list.filter(var_name="expected-graduation")[0].translation + ": "+graduation[0:4]+"</span>"
         else:
             profile.educations = profile.educations + "<span class='cg fwlight'> " + word_list.filter(var_name="graduated-at")[0].translation.replace("{year}", graduation[0:4])+"</span>"
+        for education in educations:
+            credential = dict()
+            credential["ID"] = education.umeta_id
+            current_education = json.loads(education.meta_value)
+            school = current_education["school"]
+            credential["school"] = school
+            major = current_education["major"]
+            credential["major"] = major
+            credential["minor"] = current_education["minor"]
+            degree = current_education["degree"]
+            credential["degree"] = degree
+            graduation = current_education["graduation"]
+            credential["graduation"] = graduation
+            cred = word_list.filter(var_name="education-string")[0].translation.replace("{degree}", degree).replace("{major}",major).replace("{school}", school)
+            datetime_object = dt.datetime.strptime(graduation, '%Y-%m')
+            now = dt.datetime.now()
+            if datetime_object > now:
+                cred = cred + "<span class='cg fwlight'> " + word_list.filter(var_name="expected-graduation")[0].translation + ": "+graduation[0:4]+"</span>"
+            else:
+                cred = cred + "<span class='cg fwlight'> " + word_list.filter(var_name="graduated-at")[0].translation.replace("{year}", graduation[0:4])+"</span>"
+            credential["cred"] = cred
+            profile.education_credentials.append(credential)
+
     
-    locations = UserMeta.objects.filter(user_id = current_uid, meta_key = 'locations').order_by('-umeta_id')
+    locations = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'locations').order_by('-umeta_id')
+    profile.location_credentials = []
     if locations.count() > 0:
         current_location = json.loads(locations[0].meta_value)
         location = current_location["location"]
@@ -2565,20 +2828,54 @@ def userprofile(request, username,  **kwargs):
         if endDate == "current":
             profile.locations = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
         else:
-            datetime_object = dt.datetime.strptime(graduation, '%Y-%m')
+            datetime_object = dt.datetime.strptime(endDate, '%Y-%m')
             now = dt.datetime.now()
             if datetime_object > now:
                 profile.locations = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
             else:
                 profile.locations = word_list.filter(var_name="lived-in")[0].translation.replace("{location}", location) + "<span class='cg fwlight'> " +startDate[0:4]+ "-" + endDate[0:4] + "</span>"
+        for location in locations:
+            credential = dict()
+            credential["ID"] = location.umeta_id
+            current_location = json.loads(location.meta_value)
+            location = current_location["location"]
+            credential["location"] = location
+            startDate = current_location["startDate"]
+            credential["startDate"] = startDate
+            endDate = current_location["endDate"]
+            credential["endDate"] = endDate
+            if endDate == "current":
+                cred = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+            else:
+                datetime_object = dt.datetime.strptime(endDate, '%Y-%m')
+                now = dt.datetime.now()
+                if datetime_object > now:
+                    cred = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+                else:
+                    cred = word_list.filter(var_name="lived-in")[0].translation.replace("{location}", location) + "<span class='cg fwlight'> " +startDate[0:4]+ "-" + endDate[0:4] + "</span>"
+            credential["cred"] = cred
+            profile.location_credentials.append(credential)
+
     
-    languages = UserMeta.objects.filter(user_id = current_uid, meta_key = 'languages').order_by('-umeta_id')
+    languages = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'languages').order_by('-umeta_id')
+    profile.language_credentials = []
     if languages.count() > 0:
         current_language = json.loads(languages[0].meta_value)
         language = current_language["language"]
         language_id = Languages.objects.filter(var_name__icontains="lang-ns-", translation=language)[0].var_name
         language = Languages.objects.filter(var_name=language_id, lang_code=lang)[0].translation
         profile.languages = word_list.filter(var_name="knows-lang-string")[0].translation.replace("{language}", language)
+        for l in languages:
+            credential = dict()
+            credential["ID"] = l.umeta_id
+            current_language = json.loads(l.meta_value)
+            language = current_language["language"]
+            credential["language"] = language
+            language_id = Languages.objects.filter(var_name__icontains="lang-ns-", translation=language)[0].var_name
+            language = Languages.objects.filter(var_name=language_id, lang_code=lang)[0].translation
+            cred = word_list.filter(var_name="knows-lang-string")[0].translation.replace("{language}", language)
+            credential["cred"] = cred
+            profile.language_credentials.append(credential)
     
     photos = PostMeta.objects.filter(meta_key="media_type", meta_value="image")
     photos = list({x.post_id: x for x in photos}.keys())
@@ -2586,16 +2883,508 @@ def userprofile(request, username,  **kwargs):
     for media in medias:
         setup_postmeta(media, word_list)
         setup_mediameta(media)
+    empty_medias = 6 - medias.count()
     return render(request, 'profile.html', {'current_user':current_user, 'lang':lang, 'dark':dark, 'word_list':word_list, 
-                                            'profile':profile, 'filter':fltr, 'country_list':country_list, 'medias':medias
+                                            'profile':profile, 'filter':fltr, 'country_list':country_list, 'medias':medias,
+                                            'empty_medias':range(empty_medias), 'followtxt':followtxt, 'followingtxt':followingtxt
                                             })
 
-def settings(request):
+def userfollowers(request, username):
     current_uid = 8
     current_user = setup_current_user(current_uid)
+    profile = setup_current_user(User.objects.filter(user_login=username)[0].ID)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
     word_list = Languages.objects.filter(Q(lang_code = lang))
-    return render(request, 'profilesettings.html', {'current_user':current_user, 'lang':lang, 'dark':dark, 'word_list':word_list})
+    followtxt = word_list.filter(var_name="follow")[0].translation
+    followingtxt = word_list.filter(var_name="following")[0].translation
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    employments = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'employments').order_by('-umeta_id')
+    profile.employment_credentials = []
+    if employments.count() > 0:
+        current_employment = json.loads(employments[0].meta_value)
+        position = current_employment["position"]
+        company = current_employment["company"]
+        profile.employments = word_list.filter(var_name="employment-string")[0].translation.replace("{position}", position).replace("{company}",company)
+        for employment in employments:
+            credential = dict()
+            credential["ID"] = employment.umeta_id
+            current_employment = json.loads(employment.meta_value)
+            position = current_employment["position"]
+            credential["position"] = position
+            credential["startDate"] = current_employment["startDate"]
+            credential["endDate"] = current_employment["endDate"]
+            company = current_employment["company"]
+            credential["company"] = company
+            cred = word_list.filter(var_name="employment-string")[0].translation.replace("{position}", position).replace("{company}",company)
+            credential["cred"] = cred
+            profile.employment_credentials.append(credential)
+    
+    educations = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'educations').order_by('-umeta_id')
+    profile.education_credentials = []
+    if educations.count() > 0:
+        current_education = json.loads(educations[0].meta_value)
+        school = current_education["school"]
+        major = current_education["major"]
+        degree = current_education["degree"]
+        graduation = current_education["graduation"]
+        profile.educations = word_list.filter(var_name="education-string")[0].translation.replace("{degree}", degree).replace("{major}",major).replace("{school}", school)
+        datetime_object = dt.datetime.strptime(graduation, '%Y-%m')
+        now = dt.datetime.now()
+        if datetime_object > now:
+            profile.educations = profile.educations + "<span class='cg fwlight'> " + word_list.filter(var_name="expected-graduation")[0].translation + ": "+graduation[0:4]+"</span>"
+        else:
+            profile.educations = profile.educations + "<span class='cg fwlight'> " + word_list.filter(var_name="graduated-at")[0].translation.replace("{year}", graduation[0:4])+"</span>"
+        for education in educations:
+            credential = dict()
+            credential["ID"] = education.umeta_id
+            current_education = json.loads(education.meta_value)
+            school = current_education["school"]
+            credential["school"] = school
+            major = current_education["major"]
+            credential["major"] = major
+            credential["minor"] = current_education["minor"]
+            degree = current_education["degree"]
+            credential["degree"] = degree
+            graduation = current_education["graduation"]
+            credential["graduation"] = graduation
+            cred = word_list.filter(var_name="education-string")[0].translation.replace("{degree}", degree).replace("{major}",major).replace("{school}", school)
+            datetime_object = dt.datetime.strptime(graduation, '%Y-%m')
+            now = dt.datetime.now()
+            if datetime_object > now:
+                cred = cred + "<span class='cg fwlight'> " + word_list.filter(var_name="expected-graduation")[0].translation + ": "+graduation[0:4]+"</span>"
+            else:
+                cred = cred + "<span class='cg fwlight'> " + word_list.filter(var_name="graduated-at")[0].translation.replace("{year}", graduation[0:4])+"</span>"
+            credential["cred"] = cred
+            profile.education_credentials.append(credential)
+
+    
+    locations = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'locations').order_by('-umeta_id')
+    profile.location_credentials = []
+    if locations.count() > 0:
+        current_location = json.loads(locations[0].meta_value)
+        location = current_location["location"]
+        startDate = current_location["startDate"]
+        endDate = current_location["endDate"]
+        if endDate == "current":
+            profile.locations = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+        else:
+            datetime_object = dt.datetime.strptime(endDate, '%Y-%m')
+            now = dt.datetime.now()
+            if datetime_object > now:
+                profile.locations = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+            else:
+                profile.locations = word_list.filter(var_name="lived-in")[0].translation.replace("{location}", location) + "<span class='cg fwlight'> " +startDate[0:4]+ "-" + endDate[0:4] + "</span>"
+        for location in locations:
+            credential = dict()
+            credential["ID"] = location.umeta_id
+            current_location = json.loads(location.meta_value)
+            location = current_location["location"]
+            credential["location"] = location
+            startDate = current_location["startDate"]
+            credential["startDate"] = startDate
+            endDate = current_location["endDate"]
+            credential["endDate"] = endDate
+            if endDate == "current":
+                cred = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+            else:
+                datetime_object = dt.datetime.strptime(endDate, '%Y-%m')
+                now = dt.datetime.now()
+                if datetime_object > now:
+                    cred = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+                else:
+                    cred = word_list.filter(var_name="lived-in")[0].translation.replace("{location}", location) + "<span class='cg fwlight'> " +startDate[0:4]+ "-" + endDate[0:4] + "</span>"
+            credential["cred"] = cred
+            profile.location_credentials.append(credential)
+
+    
+    languages = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'languages').order_by('-umeta_id')
+    profile.language_credentials = []
+    if languages.count() > 0:
+        current_language = json.loads(languages[0].meta_value)
+        language = current_language["language"]
+        language_id = Languages.objects.filter(var_name__icontains="lang-ns-", translation=language)[0].var_name
+        language = Languages.objects.filter(var_name=language_id, lang_code=lang)[0].translation
+        profile.languages = word_list.filter(var_name="knows-lang-string")[0].translation.replace("{language}", language)
+        for l in languages:
+            credential = dict()
+            credential["ID"] = l.umeta_id
+            current_language = json.loads(l.meta_value)
+            language = current_language["language"]
+            credential["language"] = language
+            language_id = Languages.objects.filter(var_name__icontains="lang-ns-", translation=language)[0].var_name
+            language = Languages.objects.filter(var_name=language_id, lang_code=lang)[0].translation
+            cred = word_list.filter(var_name="knows-lang-string")[0].translation.replace("{language}", language)
+            credential["cred"] = cred
+            profile.language_credentials.append(credential)
+    
+    photos = PostMeta.objects.filter(meta_key="media_type", meta_value="image")
+    photos = list({x.post_id: x for x in photos}.keys())
+    medias = Post.objects.filter(ID__in=photos, post_author=profile.ID, post_status="publish", post_type="media").order_by('-post_date')[:6]
+    for media in medias:
+        setup_postmeta(media, word_list)
+        setup_mediameta(media)
+    empty_medias = 6 - medias.count()
+    followers = UserRelation.objects.filter(following=profile)
+    for follower in followers:
+        try:
+            follower.follower = setup_current_user(follower.follower.ID)
+        except:
+            follower.delete()
+    followers = UserRelation.objects.filter(following=profile)
+    for follower in followers:
+        follower.follower = setup_current_user(follower.follower.ID)
+    return render(request, 'users/followers.html', {'current_user':current_user, 'lang':lang, 'dark':dark, 'word_list':word_list, 
+                                            'profile':profile, 'country_list':country_list, 'medias':medias,
+                                            'empty_medias':range(empty_medias), 'followers':followers, 'followtxt':followtxt, 'followingtxt':followingtxt
+                                            })
+
+def userfollowings(request, username):
+    current_uid = 8
+    current_user = setup_current_user(current_uid)
+    profile = setup_current_user(User.objects.filter(user_login=username)[0].ID)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    followtxt = word_list.filter(var_name="follow")[0].translation
+    followingtxt = word_list.filter(var_name="following")[0].translation
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    employments = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'employments').order_by('-umeta_id')
+    profile.employment_credentials = []
+    if employments.count() > 0:
+        current_employment = json.loads(employments[0].meta_value)
+        position = current_employment["position"]
+        company = current_employment["company"]
+        profile.employments = word_list.filter(var_name="employment-string")[0].translation.replace("{position}", position).replace("{company}",company)
+        for employment in employments:
+            credential = dict()
+            credential["ID"] = employment.umeta_id
+            current_employment = json.loads(employment.meta_value)
+            position = current_employment["position"]
+            credential["position"] = position
+            credential["startDate"] = current_employment["startDate"]
+            credential["endDate"] = current_employment["endDate"]
+            company = current_employment["company"]
+            credential["company"] = company
+            cred = word_list.filter(var_name="employment-string")[0].translation.replace("{position}", position).replace("{company}",company)
+            credential["cred"] = cred
+            profile.employment_credentials.append(credential)
+    
+    educations = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'educations').order_by('-umeta_id')
+    profile.education_credentials = []
+    if educations.count() > 0:
+        current_education = json.loads(educations[0].meta_value)
+        school = current_education["school"]
+        major = current_education["major"]
+        degree = current_education["degree"]
+        graduation = current_education["graduation"]
+        profile.educations = word_list.filter(var_name="education-string")[0].translation.replace("{degree}", degree).replace("{major}",major).replace("{school}", school)
+        datetime_object = dt.datetime.strptime(graduation, '%Y-%m')
+        now = dt.datetime.now()
+        if datetime_object > now:
+            profile.educations = profile.educations + "<span class='cg fwlight'> " + word_list.filter(var_name="expected-graduation")[0].translation + ": "+graduation[0:4]+"</span>"
+        else:
+            profile.educations = profile.educations + "<span class='cg fwlight'> " + word_list.filter(var_name="graduated-at")[0].translation.replace("{year}", graduation[0:4])+"</span>"
+        for education in educations:
+            credential = dict()
+            credential["ID"] = education.umeta_id
+            current_education = json.loads(education.meta_value)
+            school = current_education["school"]
+            credential["school"] = school
+            major = current_education["major"]
+            credential["major"] = major
+            credential["minor"] = current_education["minor"]
+            degree = current_education["degree"]
+            credential["degree"] = degree
+            graduation = current_education["graduation"]
+            credential["graduation"] = graduation
+            cred = word_list.filter(var_name="education-string")[0].translation.replace("{degree}", degree).replace("{major}",major).replace("{school}", school)
+            datetime_object = dt.datetime.strptime(graduation, '%Y-%m')
+            now = dt.datetime.now()
+            if datetime_object > now:
+                cred = cred + "<span class='cg fwlight'> " + word_list.filter(var_name="expected-graduation")[0].translation + ": "+graduation[0:4]+"</span>"
+            else:
+                cred = cred + "<span class='cg fwlight'> " + word_list.filter(var_name="graduated-at")[0].translation.replace("{year}", graduation[0:4])+"</span>"
+            credential["cred"] = cred
+            profile.education_credentials.append(credential)
+
+    
+    locations = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'locations').order_by('-umeta_id')
+    profile.location_credentials = []
+    if locations.count() > 0:
+        current_location = json.loads(locations[0].meta_value)
+        location = current_location["location"]
+        startDate = current_location["startDate"]
+        endDate = current_location["endDate"]
+        if endDate == "current":
+            profile.locations = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+        else:
+            datetime_object = dt.datetime.strptime(endDate, '%Y-%m')
+            now = dt.datetime.now()
+            if datetime_object > now:
+                profile.locations = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+            else:
+                profile.locations = word_list.filter(var_name="lived-in")[0].translation.replace("{location}", location) + "<span class='cg fwlight'> " +startDate[0:4]+ "-" + endDate[0:4] + "</span>"
+        for location in locations:
+            credential = dict()
+            credential["ID"] = location.umeta_id
+            current_location = json.loads(location.meta_value)
+            location = current_location["location"]
+            credential["location"] = location
+            startDate = current_location["startDate"]
+            credential["startDate"] = startDate
+            endDate = current_location["endDate"]
+            credential["endDate"] = endDate
+            if endDate == "current":
+                cred = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+            else:
+                datetime_object = dt.datetime.strptime(endDate, '%Y-%m')
+                now = dt.datetime.now()
+                if datetime_object > now:
+                    cred = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+                else:
+                    cred = word_list.filter(var_name="lived-in")[0].translation.replace("{location}", location) + "<span class='cg fwlight'> " +startDate[0:4]+ "-" + endDate[0:4] + "</span>"
+            credential["cred"] = cred
+            profile.location_credentials.append(credential)
+
+    
+    languages = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'languages').order_by('-umeta_id')
+    profile.language_credentials = []
+    if languages.count() > 0:
+        current_language = json.loads(languages[0].meta_value)
+        language = current_language["language"]
+        language_id = Languages.objects.filter(var_name__icontains="lang-ns-", translation=language)[0].var_name
+        language = Languages.objects.filter(var_name=language_id, lang_code=lang)[0].translation
+        profile.languages = word_list.filter(var_name="knows-lang-string")[0].translation.replace("{language}", language)
+        for l in languages:
+            credential = dict()
+            credential["ID"] = l.umeta_id
+            current_language = json.loads(l.meta_value)
+            language = current_language["language"]
+            credential["language"] = language
+            language_id = Languages.objects.filter(var_name__icontains="lang-ns-", translation=language)[0].var_name
+            language = Languages.objects.filter(var_name=language_id, lang_code=lang)[0].translation
+            cred = word_list.filter(var_name="knows-lang-string")[0].translation.replace("{language}", language)
+            credential["cred"] = cred
+            profile.language_credentials.append(credential)
+    
+    photos = PostMeta.objects.filter(meta_key="media_type", meta_value="image")
+    photos = list({x.post_id: x for x in photos}.keys())
+    medias = Post.objects.filter(ID__in=photos, post_author=profile.ID, post_status="publish", post_type="media").order_by('-post_date')[:6]
+    for media in medias:
+        setup_postmeta(media, word_list)
+        setup_mediameta(media)
+    empty_medias = 6 - medias.count()
+    followings = UserRelation.objects.filter(follower=profile)
+    for following in followings:
+        try:
+            following.following = setup_current_user(following.following.ID)
+        except:
+            following.delete()
+    followings = UserRelation.objects.filter(follower=profile)
+    for following in followings:
+        following.following = setup_current_user(following.following.ID)
+    return render(request, 'users/followings.html', {'current_user':current_user, 'lang':lang, 'dark':dark, 'word_list':word_list, 
+                                            'profile':profile, 'country_list':country_list, 'medias':medias,
+                                            'empty_medias':range(empty_medias), 'followings':followings, 'followtxt':followtxt, 'followingtxt':followingtxt
+                                            })
+
+def usersuggested(request, username):
+    current_uid = 8
+    current_user = setup_current_user(current_uid)
+    profile = setup_current_user(User.objects.filter(user_login=username)[0].ID)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    followtxt = word_list.filter(var_name="follow")[0].translation
+    followingtxt = word_list.filter(var_name="following")[0].translation
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    employments = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'employments').order_by('-umeta_id')
+    profile.employment_credentials = []
+    if employments.count() > 0:
+        current_employment = json.loads(employments[0].meta_value)
+        position = current_employment["position"]
+        company = current_employment["company"]
+        profile.employments = word_list.filter(var_name="employment-string")[0].translation.replace("{position}", position).replace("{company}",company)
+        for employment in employments:
+            credential = dict()
+            credential["ID"] = employment.umeta_id
+            current_employment = json.loads(employment.meta_value)
+            position = current_employment["position"]
+            credential["position"] = position
+            credential["startDate"] = current_employment["startDate"]
+            credential["endDate"] = current_employment["endDate"]
+            company = current_employment["company"]
+            credential["company"] = company
+            cred = word_list.filter(var_name="employment-string")[0].translation.replace("{position}", position).replace("{company}",company)
+            credential["cred"] = cred
+            profile.employment_credentials.append(credential)
+    
+    educations = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'educations').order_by('-umeta_id')
+    profile.education_credentials = []
+    if educations.count() > 0:
+        current_education = json.loads(educations[0].meta_value)
+        school = current_education["school"]
+        major = current_education["major"]
+        degree = current_education["degree"]
+        graduation = current_education["graduation"]
+        profile.educations = word_list.filter(var_name="education-string")[0].translation.replace("{degree}", degree).replace("{major}",major).replace("{school}", school)
+        datetime_object = dt.datetime.strptime(graduation, '%Y-%m')
+        now = dt.datetime.now()
+        if datetime_object > now:
+            profile.educations = profile.educations + "<span class='cg fwlight'> " + word_list.filter(var_name="expected-graduation")[0].translation + ": "+graduation[0:4]+"</span>"
+        else:
+            profile.educations = profile.educations + "<span class='cg fwlight'> " + word_list.filter(var_name="graduated-at")[0].translation.replace("{year}", graduation[0:4])+"</span>"
+        for education in educations:
+            credential = dict()
+            credential["ID"] = education.umeta_id
+            current_education = json.loads(education.meta_value)
+            school = current_education["school"]
+            credential["school"] = school
+            major = current_education["major"]
+            credential["major"] = major
+            credential["minor"] = current_education["minor"]
+            degree = current_education["degree"]
+            credential["degree"] = degree
+            graduation = current_education["graduation"]
+            credential["graduation"] = graduation
+            cred = word_list.filter(var_name="education-string")[0].translation.replace("{degree}", degree).replace("{major}",major).replace("{school}", school)
+            datetime_object = dt.datetime.strptime(graduation, '%Y-%m')
+            now = dt.datetime.now()
+            if datetime_object > now:
+                cred = cred + "<span class='cg fwlight'> " + word_list.filter(var_name="expected-graduation")[0].translation + ": "+graduation[0:4]+"</span>"
+            else:
+                cred = cred + "<span class='cg fwlight'> " + word_list.filter(var_name="graduated-at")[0].translation.replace("{year}", graduation[0:4])+"</span>"
+            credential["cred"] = cred
+            profile.education_credentials.append(credential)
+
+    
+    locations = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'locations').order_by('-umeta_id')
+    profile.location_credentials = []
+    if locations.count() > 0:
+        current_location = json.loads(locations[0].meta_value)
+        location = current_location["location"]
+        startDate = current_location["startDate"]
+        endDate = current_location["endDate"]
+        if endDate == "current":
+            profile.locations = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+        else:
+            datetime_object = dt.datetime.strptime(endDate, '%Y-%m')
+            now = dt.datetime.now()
+            if datetime_object > now:
+                profile.locations = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+            else:
+                profile.locations = word_list.filter(var_name="lived-in")[0].translation.replace("{location}", location) + "<span class='cg fwlight'> " +startDate[0:4]+ "-" + endDate[0:4] + "</span>"
+        for location in locations:
+            credential = dict()
+            credential["ID"] = location.umeta_id
+            current_location = json.loads(location.meta_value)
+            location = current_location["location"]
+            credential["location"] = location
+            startDate = current_location["startDate"]
+            credential["startDate"] = startDate
+            endDate = current_location["endDate"]
+            credential["endDate"] = endDate
+            if endDate == "current":
+                cred = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+            else:
+                datetime_object = dt.datetime.strptime(endDate, '%Y-%m')
+                now = dt.datetime.now()
+                if datetime_object > now:
+                    cred = word_list.filter(var_name="lives-in")[0].translation.replace("{location}", location)
+                else:
+                    cred = word_list.filter(var_name="lived-in")[0].translation.replace("{location}", location) + "<span class='cg fwlight'> " +startDate[0:4]+ "-" + endDate[0:4] + "</span>"
+            credential["cred"] = cred
+            profile.location_credentials.append(credential)
+
+    
+    languages = UserMeta.objects.filter(user_id = profile.ID, meta_key = 'languages').order_by('-umeta_id')
+    profile.language_credentials = []
+    if languages.count() > 0:
+        current_language = json.loads(languages[0].meta_value)
+        language = current_language["language"]
+        language_id = Languages.objects.filter(var_name__icontains="lang-ns-", translation=language)[0].var_name
+        language = Languages.objects.filter(var_name=language_id, lang_code=lang)[0].translation
+        profile.languages = word_list.filter(var_name="knows-lang-string")[0].translation.replace("{language}", language)
+        for l in languages:
+            credential = dict()
+            credential["ID"] = l.umeta_id
+            current_language = json.loads(l.meta_value)
+            language = current_language["language"]
+            credential["language"] = language
+            language_id = Languages.objects.filter(var_name__icontains="lang-ns-", translation=language)[0].var_name
+            language = Languages.objects.filter(var_name=language_id, lang_code=lang)[0].translation
+            cred = word_list.filter(var_name="knows-lang-string")[0].translation.replace("{language}", language)
+            credential["cred"] = cred
+            profile.language_credentials.append(credential)
+    
+    photos = PostMeta.objects.filter(meta_key="media_type", meta_value="image")
+    photos = list({x.post_id: x for x in photos}.keys())
+    medias = Post.objects.filter(ID__in=photos, post_author=profile.ID, post_status="publish", post_type="media").order_by('-post_date')[:6]
+    for media in medias:
+        setup_postmeta(media, word_list)
+        setup_mediameta(media)
+    empty_medias = 6 - medias.count()
+    suggesteds = []
+    visitor_followings_ids = list({x.following_id: x for x in current_user.followings}.keys())
+    if profile.ID != current_uid:
+        common_followings = UserRelation.objects.filter(following_id__in=visitor_followings_ids, follower=profile)
+        common_followings_ids = list({x.following_id: x for x in common_followings}.keys())
+        common_followers = UserRelation.objects.filter(follower_id__in=visitor_followings_ids, following=profile)
+        common_followers_ids = list({x.follower_id: x for x in common_followers}.keys())
+        common_ids = common_followings_ids + common_followers_ids
+        common_ids = list(dict.fromkeys(common_ids))
+        follower_relations = UserRelation.objects.filter(follower_id__in=common_ids)
+        follower_relations_ids = list({x.following_id: x for x in follower_relations}.keys())
+        following_relations = UserRelation.objects.filter(following_id__in=common_ids)
+        following_relations_ids = list({x.follower_id: x for x in following_relations}.keys())
+        relations_ids = follower_relations_ids + following_relations_ids
+        relations_ids = list(dict.fromkeys(relations_ids))
+        suggested_followers = UserRelation.objects.filter(follower_id__in=relations_ids, following=profile)
+        suggested_followers_ids = list({x.follower_id: x for x in suggested_followers}.keys())
+        suggested_followings = UserRelation.objects.filter(following_id__in=relations_ids, follower=profile)
+        suggested_followings_ids = list({x.following_id: x for x in suggested_followings}.keys())
+        suggested_ids = suggested_followers_ids + suggested_followings_ids
+        suggested_ids = list(dict.fromkeys(suggested_ids))
+        for sid in suggested_ids:
+            isFollowed = UserRelation.objects.filter(following_id=sid, follower=current_user)
+            if isFollowed.count() == 0 and sid != current_uid:
+                user = setup_current_user(sid)
+                suggesteds.append(user)
+    suggestion_dict = dict()
+    for vid in visitor_followings_ids:
+        followings = UserRelation.objects.filter(follower_id=vid)
+        followings_ids = list({x.following_id: x for x in followings}.keys())
+        for fid in followings_ids:
+            if fid in suggestion_dict:
+                suggestion_dict[fid] = suggestion_dict[fid] + 1
+            else:
+                suggestion_dict[fid] = 1
+    #suggestion_dict = {k: v for k, v in suggestion_dict.items() if v >= 2}
+    for (k, _) in suggestion_dict.items():
+        isFollowed = UserRelation.objects.filter(following_id=k, follower=current_user)
+        if isFollowed.count() == 0 and k != current_uid and k != profile.ID:
+            try:
+                user = setup_current_user(k)
+                if user not in suggesteds:
+                    suggesteds.append(user)
+            except:
+                pass
+    for suggested in suggesteds:
+        relative_users = UserRelation.objects.filter(following=suggested, follower_id__in=visitor_followings_ids)
+        relative_usernames = list({"u/"+x.follower.user_login: x for x in relative_users}.keys())
+        and_string = word_list.filter(var_name="and")[0].translation
+        people_string = ""
+        if len(relative_usernames) == 1:
+            people_string = relative_usernames[0]
+        elif len(relative_usernames) == 2:
+            people_string = relative_usernames[0] + " " + and_string + " " + relative_usernames[1]
+        else:
+            people_string = ", ".join(relative_usernames[0:2]) + " " + and_string + " " + str(len(relative_usernames) - 2) + " " + word_list.filter(var_name="more-users")[0].translation
+        suggested.relatives = word_list.filter(var_name="relative_followers_string")[0].translation.replace("{user}", people_string)
+    return render(request, 'users/suggested.html', {'current_user':current_user, 'lang':lang, 'dark':dark, 'word_list':word_list, 
+                                            'profile':profile, 'country_list':country_list, 'medias':medias,
+                                            'empty_medias':range(empty_medias), 'suggesteds': suggesteds, 'followtxt':followtxt, 'followingtxt':followingtxt
+                                            })
 
 

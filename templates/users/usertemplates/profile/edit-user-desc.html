@@ -1,0 +1,58 @@
+{% load index %}
+<div class="absolute bcba dnone popup-container" id="edit-user-desc-popup">
+    <div class="popup box full-shadow-border p20">
+        <p class="title fs19">{{word_list|getword:"edit-description"|ucwords}}</p>
+        <svg style="position:absolute;top:20px;right:20px;cursor:pointer;padding:5px;width:15px;height:15px;z-index:9999;" class="icon hand" onclick="document.getElementById('edit-user-desc-popup').classList.toggle('dnone');" viewBox="0 0 15 15" version="1.1">
+            <g id="surface1">
+                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0.132812 14.878906 C 0.222656 14.964844 0.335938 15.011719 0.453125 15.011719 C 0.570312 15.011719 0.683594 14.964844 0.773438 14.878906 L 7.503906 8.144531 L 14.238281 14.878906 C 14.324219 14.964844 14.441406 15.011719 14.558594 15.011719 C 14.675781 15.011719 14.789062 14.964844 14.878906 14.878906 C 15.054688 14.703125 15.054688 14.414062 14.878906 14.238281 L 8.144531 7.503906 L 14.878906 0.773438 C 15.054688 0.597656 15.054688 0.308594 14.878906 0.132812 C 14.703125 -0.0429688 14.414062 -0.0429688 14.238281 0.132812 L 7.503906 6.863281 L 0.773438 0.132812 C 0.597656 -0.0429688 0.308594 -0.0429688 0.132812 0.132812 C -0.0429688 0.308594 -0.0429688 0.597656 0.132812 0.773438 L 6.863281 7.503906 L 0.132812 14.238281 C -0.0429688 14.414062 -0.0429688 14.703125 0.132812 14.878906 Z M 0.132812 14.878906 "/>
+            </g>
+        </svg>
+        <div class="full-width inline-block bt mt10">
+            <form class="bsbb full-width p10">
+                <div class="full-width inline-flex">
+                    <label for="profiledesc" class="lh40" style="width:35%;">{{word_list|getword:"description"|ucfirst}}:</label><br>
+                    <textarea rows="5" class="bsbb p10 border br4 full-width textarea" name="profiledesc" id="profiledesc" onkeyup="validateProfileDesc();">{% autoescape off %}{{profile.description|edit_comm_desc}}{% endautoescape %}</textarea>
+                </div>
+                <div class="mt20 full-width inline-block">
+                    <input disabled type="submit" id="save-profiledesc" class="btn p10 right fs15 lh20 noselect" style="border-radius:4px;height:30px;width:calc(25% - 35px); border:none; text-align:center; color:var(--main-color); font-weight:700;opacity:0.8" value="{{word_list|getword:'save'|ucfirst}}" onclick="return saveProfileDesc()"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+function validateProfileDesc(){
+    var profiledesc = document.getElementById("profiledesc");
+    if(profiledesc.value == ""){
+        document.getElementById("save-profiledesc").disabled = true;
+        document.getElementById("save-profiledesc").style.opacity = "0.8";
+        document.getElementById("save-profiledesc").style.cursor = "default";
+        return false
+    }
+    document.getElementById("save-profiledesc").disabled = false;
+    document.getElementById("save-profiledesc").style.opacity = "1";
+    document.getElementById("save-profiledesc").style.cursor = "pointer";
+    return true;
+}
+function saveProfileDesc(){
+    var profiledesc = document.getElementById("profiledesc").value;
+    if(validateProfileDesc()){
+        var data = {}
+        data = {
+            "profiledesc": profiledesc,
+            "type": "profiledesc",
+        }
+        jQuery.ajax({
+            type: "GET",
+            url:"{% url 'savenewusercredential' %}",
+            data: data,
+            success: function(response) {
+                displayAlert(response.content);
+                document.getElementById("edit-user-desc-popup").classList.add("dnone");
+                document.getElementById("userdesc").innerText = profiledesc;
+            }
+        });
+    }
+    return false;
+}
+</script>

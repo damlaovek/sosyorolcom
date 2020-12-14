@@ -1,0 +1,15 @@
+{% load index %}
+<div class="full-width full-shadow-border box">
+    <ul class="full-width">
+        {% for user in users %}
+            <li class="bsbb full-width p10 inline-block">
+                <img src="{{user.avatar_url}}" class="sqr60 left"/>
+                <div class="ml20">
+                    <p class="fs19 mt10 fwblack ctitle">{{user.display_name}}</p>
+                    <p class="fs15 cg2 lh20">u/{{user.user_login}}</p>
+                    <p class="fs15 cg2 lh20 mt20" id="desc-placeholder">{% autoescape off %}{{user.description|edit_comm_desc}}{% endautoescape %}</p>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

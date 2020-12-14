@@ -1,0 +1,58 @@
+{% load index %}
+<div class="absolute bcba dnone popup-container" id="edit-name-popup">
+    <div class="popup box full-shadow-border p20">
+        <p class="title fs19">{{word_list|getword:"edit-name"|ucwords}}</p>
+        <svg style="position:absolute;top:20px;right:20px;cursor:pointer;padding:5px;width:15px;height:15px;z-index:9999;" class="icon hand" onclick="document.getElementById('edit-name-popup').classList.toggle('dnone');" viewBox="0 0 15 15" version="1.1">
+            <g id="surface1">
+                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0.132812 14.878906 C 0.222656 14.964844 0.335938 15.011719 0.453125 15.011719 C 0.570312 15.011719 0.683594 14.964844 0.773438 14.878906 L 7.503906 8.144531 L 14.238281 14.878906 C 14.324219 14.964844 14.441406 15.011719 14.558594 15.011719 C 14.675781 15.011719 14.789062 14.964844 14.878906 14.878906 C 15.054688 14.703125 15.054688 14.414062 14.878906 14.238281 L 8.144531 7.503906 L 14.878906 0.773438 C 15.054688 0.597656 15.054688 0.308594 14.878906 0.132812 C 14.703125 -0.0429688 14.414062 -0.0429688 14.238281 0.132812 L 7.503906 6.863281 L 0.773438 0.132812 C 0.597656 -0.0429688 0.308594 -0.0429688 0.132812 0.132812 C -0.0429688 0.308594 -0.0429688 0.597656 0.132812 0.773438 L 6.863281 7.503906 L 0.132812 14.238281 C -0.0429688 14.414062 -0.0429688 14.703125 0.132812 14.878906 Z M 0.132812 14.878906 "/>
+            </g>
+        </svg>
+        <div class="full-width inline-block bt mt10">
+            <form class="bsbb full-width p10">
+                <div class="full-width inline-flex">
+                    <label for="fullname" class="lh40" style="width:35%;">{{word_list|getword:"name"|ucfirst}} {{word_list|getword:"surname"|ucfirst}}:</label><input type="text" class="bsbb p10 border br4 half-width" name="fullname" id="fullname" placeholder="" onkeyup="validateFullname();" value="{{profile.display_name}}">
+                </div>
+                <div class="mt20 full-width inline-block">
+                    <input disabled type="submit" id="save-name" class="btn p10 right fs15 lh20 noselect" style="border-radius:4px;height:30px;width:calc(25% - 35px); border:none; text-align:center; color:var(--main-color); font-weight:700;opacity:0.8" value="{{word_list|getword:'save'|ucfirst}}" onclick="return saveFullname()"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+function validateFullname(){
+    var fullname = document.getElementById("fullname");
+    if(fullname.value == ""){
+        document.getElementById("save-name").disabled = true;
+        document.getElementById("save-name").style.opacity = "0.8";
+        document.getElementById("save-name").style.cursor = "default";
+        return false
+    }
+    document.getElementById("save-name").disabled = false;
+    document.getElementById("save-name").style.opacity = "1";
+    document.getElementById("save-name").style.cursor = "pointer";
+    return true;
+}
+function saveFullname(){
+    var fullname = document.getElementById("fullname").value;
+    if(validateFullname()){
+        var data = {}
+        data = {
+            "fullname": fullname,
+            "type": "fullname",
+        }
+        jQuery.ajax({
+            type: "GET",
+            url:"{% url 'savenewusercredential' %}",
+            data: data,
+            success: function(response) {
+                displayAlert(response.content);
+                document.getElementById("edit-name-popup").classList.add("dnone");
+                var j = jQuery.noConflict();
+                j("#profile-section-middle").load(window.location.href + " #profile-section-middle" );
+            }
+        });
+    }
+    return false;
+}
+</script>

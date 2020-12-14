@@ -1,5 +1,6 @@
 {% load index %}
 <div class="absolute bcba dnone popup-container" id="employment-popup">
+    <input type="hidden" name="edit-employment-cred" id="edit-employment-cred" value="false">
     <div class="popup box full-shadow-border p20">
         <p class="title fs19">{{word_list|getword:"edit-credentials"|ucfirst}}</p>
         <p class="cg2 p100 bb">{{word_list|getword:"edit-credentials-info"}}</p>
@@ -96,6 +97,7 @@
 
     function saveEmployment(){
         var saveBtn = document.getElementById("save-employment");
+        var ID = document.getElementById("edit-employment-cred").value;
         if(validateEmployment()){
             var position = document.getElementById("position").value;
             var company = document.getElementById("company").value;
@@ -107,21 +109,34 @@
             }
             var data = {}
             data = {
+                "ID": ID,
                 "type": "employment",
                 "position": position,
                 "company": company,
                 "startDate": startDate,
                 "endDate": endDate,
             }
-            jQuery.ajax({
-                type: "GET",
-                url:"{% url 'savenewusercredential' %}",
-                data: data,
-                success: function(response) {
-                    displayAlert(response.content);
-                    document.getElementById("employment-popup").classList.add("dnone");
-                }
-            });
+            if(ID == "false"){
+                jQuery.ajax({
+                    type: "GET",
+                    url:"{% url 'savenewusercredential' %}",
+                    data: data,
+                    success: function(response) {
+                        displayAlert(response.content);
+                        document.getElementById("employment-popup").classList.add("dnone");
+                    }
+                });
+            }else{
+                jQuery.ajax({
+                    type: "GET",
+                    url:"{% url 'editusercredential' %}",
+                    data: data,
+                    success: function(response) {
+                        displayAlert(response.content);
+                        document.getElementById("employment-popup").classList.add("dnone");
+                    }
+                });
+            }
         }
         return false;
     }

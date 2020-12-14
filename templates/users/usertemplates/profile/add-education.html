@@ -1,5 +1,6 @@
 {% load index %}
 <div class="absolute bcba dnone popup-container" id="education-popup">
+    <input type="hidden" name="edit-education-cred" id="edit-education-cred" value="false">
     <div class="popup box full-shadow-border p20">
         <p class="title fs19">{{word_list|getword:"edit-credentials"|ucfirst}}</p>
         <p class="cg2 p100 bb">{{word_list|getword:"edit-credentials-info"}}</p>
@@ -20,10 +21,10 @@
             </div>
             <form class="bsbb full-width p10">
                 <div class="full-width inline-flex">
-                    <label for="school" class="lh40" style="width:35%;">{{word_list|getword:"school"|ucfirst}}:</label><input type="text" class="bsbb p10 border br4 half-width" name="school" id="school" placeholder="Stanford University" onchange="validateEducation();">
+                    <label for="school" class="lh40" style="width:35%;">{{word_list|getword:"school"|ucfirst}}:</label><input type="text" class="bsbb p10 border br4 half-width" name="school" id="school" placeholder="" onchange="validateEducation();">
                 </div>
                 <div class="full-width mt10 inline-flex">
-                    <label for="major" class="lh40" style="width:35%;">{{word_list|getword:"major"|ucfirst}}:</label><input type="text" class="bsbb  half-width p10 border br4" name="major" id="major" placeholder="Computer Science" onchange="validateEducation();">
+                    <label for="major" class="lh40" style="width:35%;">{{word_list|getword:"major"|ucfirst}}:</label><input type="text" class="bsbb  half-width p10 border br4" name="major" id="major" placeholder="" onchange="validateEducation();">
                 </div>
                 <div class="full-width mt10 inline-flex">
                     <label for="minor" class="lh40" style="width:35%;">{{word_list|getword:"minor"|ucfirst}}:</label><input type="text" class="bsbb  half-width p10 border br4" name="minor" id="minor" placeholder="Biology" onchange="validateEducation();">
@@ -62,6 +63,7 @@
 
     function saveEducation(){
         var saveBtn = document.getElementById("save-education");
+        var ID = document.getElementById("edit-education-cred").value;
         if(validateEducation()){
             var school = document.getElementById("school").value;
             var major = document.getElementById("major").value;
@@ -70,6 +72,7 @@
             var degree = document.getElementById("degree").value;
             var data = {}
             data = {
+                "ID": ID,
                 "type": "education",
                 "school": school,
                 "major": major,
@@ -77,15 +80,27 @@
                 "graduation": graduation,
                 "degree": degree
             }
-            jQuery.ajax({
-                type: "GET",
-                url:"{% url 'savenewusercredential' %}",
-                data: data,
-                success: function(response) {
-                    displayAlert(response.content);
-                    document.getElementById("education-popup").classList.add("dnone");
-                }
-            });
+            if(ID == "false"){
+                jQuery.ajax({
+                    type: "GET",
+                    url:"{% url 'savenewusercredential' %}",
+                    data: data,
+                    success: function(response) {
+                        displayAlert(response.content);
+                        document.getElementById("education-popup").classList.add("dnone");
+                    }
+                });
+            }else{
+                jQuery.ajax({
+                    type: "GET",
+                    url:"{% url 'editusercredential' %}",
+                    data: data,
+                    success: function(response) {
+                        displayAlert(response.content);
+                        document.getElementById("education-popup").classList.add("dnone");
+                    }
+                });
+            }
         }
         return false;
     }
