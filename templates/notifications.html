@@ -1,0 +1,63 @@
+{% load static %}
+{% load index %}
+{% include 'includes/general/head.html' %}
+        <title>Sosyorol - Sosyal İçerik Platformu</title>
+        <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
+        <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
+        <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
+        <script src="{% static 'js/new/autosize.min.js' %}"></script>
+        <script src="{% static 'js/new/user-list.min.js' %}"></script>
+        <script src="{% static 'js/index.js' %}"></script>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script>
+
+        <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyA9jeHII9FVkhOQfCM_NyoifnN8eIN6EFM",
+            authDomain: "sosyorol-b6ab6.firebaseapp.com",
+            databaseURL: "https://sosyorol-b6ab6.firebaseio.com",
+            projectId: "sosyorol-b6ab6",
+            storageBucket: "sosyorol-b6ab6.appspot.com",
+            messagingSenderId: "565098272319",
+            appId: "1:565098272319:web:5105dd611ce14cf98c8a8a",
+            measurementId: "G-18ZNPD8JH4"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+        </script>
+    </head>
+    <body class="{{darkmode}}">
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
+        <div class="full-width inline-flex">
+            {% include 'includes/general/notification-filters.html' %}
+            <div class="section-middle" style="margin-top:58px;">
+                <div class="hcentered" style="max-width: 893px;">
+                    <div class="bsbb full-width p2040">
+                        <div class="bsbb full-width p20 br4" style="display:table;border:2px dashed var(--gray2);height:650px;">
+                            <div class="full-width tac" style="display:table-cell;vertical-align:middle;">
+                                <svg class="centered" width="85px" height="85px" viewBox="0 0 85 85" style="margin:auto;">
+                                    <g>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 43.160156 74.863281 C 39.902344 74.863281 36.738281 74.878906 33.703125 74.878906 C 33.691406 75.078125 33.683594 75.277344 33.683594 75.480469 C 33.683594 80.714844 37.925781 84.957031 43.160156 84.957031 C 48.394531 84.957031 52.636719 80.714844 52.636719 75.480469 C 52.636719 75.277344 52.628906 75.078125 52.617188 74.878906 C 49.582031 74.878906 46.417969 74.863281 43.160156 74.863281 Z M 43.160156 74.863281 "/>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 72.65625 50.390625 C 74.078125 49.820312 75.101562 48.199219 75.101562 46.292969 C 75.101562 43.902344 73.5 41.964844 71.523438 41.964844 L 69.324219 41.964844 C 69.121094 38.035156 69.265625 33.308594 69.265625 33.308594 C 69.265625 20.75 60.625 9.71875 48.964844 6.671875 C 49.164062 6.132812 49.28125 5.554688 49.28125 4.945312 C 49.277344 2.214844 47.066406 0 44.335938 0 L 40.625 0 C 37.894531 0 35.679688 2.214844 35.679688 4.945312 C 35.679688 5.554688 35.796875 6.132812 35.996094 6.671875 C 24.335938 9.71875 15.695312 20.75 15.695312 33.308594 C 15.695312 33.308594 15.835938 38.035156 15.636719 41.964844 L 13.4375 41.964844 C 11.460938 41.964844 9.855469 43.902344 9.855469 46.289062 C 9.855469 48.199219 10.882812 49.816406 12.300781 50.390625 C 7.6875 55.757812 2.230469 58.457031 2.230469 64.214844 C 2.230469 73.296875 20.25 72.527344 42.480469 72.527344 C 64.707031 72.527344 82.726562 73.296875 82.726562 64.214844 C 82.726562 58.457031 77.273438 55.757812 72.65625 50.390625 Z M 38.226562 13.46875 C 35.347656 14.148438 32.609375 15.601562 30.191406 17.578125 C 24.597656 22.15625 22.433594 28.800781 22.953125 35.90625 C 23.085938 37.695312 20.304688 37.683594 20.171875 35.90625 C 19.617188 28.289062 22.035156 20.675781 28.070312 15.738281 C 30.769531 13.527344 34.054688 11.59375 37.488281 10.789062 C 39.234375 10.378906 39.972656 13.058594 38.226562 13.46875 Z M 38.226562 13.46875 "/>
+                                    </g>
+                                </svg>
+                                <p class="fs19 ctitle mt10 fwbold">{{word_list|getword:"select-a-notification-to-open"}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% include 'includes/general/notifications-menu.html' %}
+        </div>
+        <script type="text/javascript" src="{% static 'js/search.js' %}"></script>
+    </body>
+</html>

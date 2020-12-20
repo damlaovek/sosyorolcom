@@ -85,7 +85,7 @@
         background-color: darkkhaki;
     }*/
 </style>
-<div class="full-width" id="rich-texteditor">
+<div class="full-width rich-texteditor" id="rich-texteditor">
     <div style="background-color:var(--grayish);border-top-left-radius:4px;border-top-right-radius:4px;padding:6px 5px 4px 5px;" class="bsbb full-width inline-flex">
         <button style="background-color:var(--grayish);" data-edit="bold"><i id='boldbtn' class="fa fa-bold icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
         <button style="background-color:var(--grayish);" data-edit="italic"><i class="fa fa-italic icon cg2 texteditorBtn" style="width:15px;height:15px;font-size:14px;"></i></button>
@@ -114,7 +114,7 @@
             </div>
         </div>
     </div>
-    <div contenteditable id="editor"></div>
+    <div class="editor" contenteditable id="editor"></div>
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=es6,Array.prototype.includes,CustomEvent,Object.entries,Object.values,URL"></script>
     <script src="https://unpkg.com/plyr@3"></script>
     <script type="text/javascript">

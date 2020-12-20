@@ -1,0 +1,383 @@
+{% load index %}
+{% load static %}
+{% include 'includes/general/head.html' %}
+        <title>Sosyorol - Sosyal İçerik Platformu</title>
+        <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
+        <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
+        <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
+        <script src="{% static 'js/new/autosize.min.js' %}"></script>
+        <script src="{% static 'js/new/user-list.min.js' %}"></script>
+        <script src="{% static 'js/index.js' %}"></script>
+        <script src="{% static 'js/sosyorol.min.js' %}"></script>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script>
+
+        <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyA9jeHII9FVkhOQfCM_NyoifnN8eIN6EFM",
+            authDomain: "sosyorol-b6ab6.firebaseapp.com",
+            databaseURL: "https://sosyorol-b6ab6.firebaseio.com",
+            projectId: "sosyorol-b6ab6",
+            storageBucket: "sosyorol-b6ab6.appspot.com",
+            messagingSenderId: "565098272319",
+            appId: "1:565098272319:web:5105dd611ce14cf98c8a8a",
+            measurementId: "G-18ZNPD8JH4"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+        </script>
+    </head>
+    <body class="{{darkmode}}">
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
+        {% include 'select-user-popup.html' %}
+        <div class="full-width inline-flex">
+            <div class="fixed section-left" id="section-left" style="overflow-x: hidden;">
+                <ul class="nav">
+                    <form method="GET" action="/search" class="relative" style="margin:0;width:calc(100% + 80px);margin-left:-22px;margin-top:-58px;z-index:99;filter:drop-shadow(0 1px 6px rgba(0, 0, 0, .161));" id="search_form">
+                        {% csrf_token %}
+                        <input type="text" name="search_key" id="search" class="bsbb full-width p20" style="padding-top:58px;padding-left:32px;padding-right:70px;" placeholder="Search in Sosyorol"  autocomplete='off'>
+                        <svg class="absolute aligntr svg-icon" style="top: 38px; right:40px;" viewBox="0 0 15 15">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 14.667969 13.039062 L 11.578125 9.945312 C 12.320312 8.867188 12.695312 7.667969 12.695312 6.347656 C 12.695312 5.488281 12.527344 4.664062 12.195312 3.882812 C 11.859375 3.097656 11.410156 2.421875 10.84375 1.851562 C 10.273438 1.285156 9.597656 0.835938 8.8125 0.5 C 8.027344 0.167969 7.207031 0 6.347656 0 C 5.488281 0 4.664062 0.167969 3.882812 0.5 C 3.097656 0.835938 2.421875 1.285156 1.851562 1.851562 C 1.285156 2.421875 0.832031 3.097656 0.5 3.882812 C 0.167969 4.667969 0 5.488281 0 6.347656 C 0 7.207031 0.167969 8.027344 0.5 8.8125 C 0.832031 9.597656 1.285156 10.273438 1.851562 10.839844 C 2.421875 11.410156 3.097656 11.859375 3.882812 12.195312 C 4.664062 12.527344 5.488281 12.695312 6.347656 12.695312 C 7.667969 12.695312 8.867188 12.320312 9.945312 11.578125 L 13.039062 14.660156 C 13.253906 14.886719 13.523438 15.003906 13.847656 15.003906 C 14.160156 15.003906 14.433594 14.886719 14.660156 14.660156 C 14.886719 14.433594 15.003906 14.160156 15.003906 13.847656 C 15.003906 13.53125 14.890625 13.257812 14.667969 13.039062 Z M 9.199219 9.199219 C 8.410156 9.992188 7.460938 10.386719 6.347656 10.386719 C 5.234375 10.386719 4.285156 9.992188 3.492188 9.199219 C 2.703125 8.410156 2.308594 7.460938 2.308594 6.347656 C 2.308594 5.234375 2.703125 4.285156 3.492188 3.492188 C 4.285156 2.703125 5.234375 2.308594 6.347656 2.308594 C 7.460938 2.308594 8.410156 2.703125 9.199219 3.492188 C 9.992188 4.285156 10.386719 5.234375 10.386719 6.347656 C 10.386719 7.460938 9.992188 8.410156 9.199219 9.199219 Z M 9.199219 9.199219 "/>
+                            </g>
+                        </svg>
+                        <input type="submit" 
+                                    style="position: absolute; left: -9999px; width: 1px; height: 1px;"
+                                    tabindex="-1"/>
+                    </form><br>
+                    <div class="absolute full-width aligntl" style="width:calc(100% + 40px);top:62px; background-color:var(--white); z-index:100;">
+                        <ul id="search_results_container" class="full-width p020 full-shadow2" style="width:calc(100% - 40px); background-color: var(--white); z-index:100;">
+                        </ul>
+                    </div>
+                    <style>
+                        .segctrl-btn.active{background-color: var(--white); border-radius: 8px;}
+                        .left-list-item-link.active .left-list-item{background-color: var(--main-color);}
+                        .left-list-item-link.active p{color:white;}
+                    </style>
+                    <div class="full-width bb" style="width:calc(100% + 70px);left:-25px;top:-16px;background-color:">
+                        <div class="bsbb w20 inline-block m10 border p2 br10" style="background-color: #e8e8e8;">
+                            <div class="half-width p100 cg2 tac left hand segctrl-btn" onclick="shortcutsSelected()">Kısayollar</div>
+                            <div class="half-width p100 cg2 tac right hand segctrl-btn active" onclick="othersSelected()">{{title}}</div>
+                        </div>
+                    </div>
+                    <div class="full-width dnone" id="shortcuts" style="width:calc(100% + 20px);">
+                        <a href="/" class="left-list-item-link">
+                            <div class="full-width hand">
+                                <li class="inline-flex left-list-item">
+                                    <p class="non-draggable rounded background-image" id="home-icon"></p>
+                                    <p class="fs19 title" id="home-text" style="color:var(--title-color);">{{word_list|getword:"feed"|ucfirst}}</p>
+                                </li>
+                            </div>
+                        </a>
+                        <div id="divider" style="margin:0;width:calc(100% + 70px);left:-25px;z-index:99;margin-bottom:20px;"></div>
+                        <div class="full-width" style="margin-top:0; top:0;padding-top:0;">
+                            <div class="full-width">
+                                <a href="/feed/lists" class="full-width">
+                                    <div class="full-width hand left-list-item-link">
+                                        <li class="left-list-item">
+                                            <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                                <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                                    <g>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 16.667969 0 L 3.332031 0 C 1.496094 0 0 1.496094 0 3.332031 L 0 16.667969 C 0 18.503906 1.496094 20 3.332031 20 L 16.667969 20 C 18.503906 20 20 18.503906 20 16.667969 L 20 3.332031 C 20 1.496094 18.503906 0 16.667969 0 Z M 18.332031 16.667969 C 18.332031 17.585938 17.585938 18.332031 16.667969 18.332031 L 3.332031 18.332031 C 2.414062 18.332031 1.667969 17.585938 1.667969 16.667969 L 1.667969 3.332031 C 1.667969 2.414062 2.414062 1.667969 3.332031 1.667969 L 16.667969 1.667969 C 17.585938 1.667969 18.332031 2.414062 18.332031 3.332031 Z M 18.332031 16.667969 "/>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 6.164062 6.667969 C 6.164062 7.355469 5.605469 7.917969 4.914062 7.917969 C 4.222656 7.917969 3.664062 7.355469 3.664062 6.667969 C 3.664062 5.976562 4.222656 5.417969 4.914062 5.417969 C 5.605469 5.417969 6.164062 5.976562 6.164062 6.667969 Z M 6.164062 6.667969 "/>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 15.503906 5.832031 L 8.664062 5.832031 C 8.203125 5.832031 7.828125 6.207031 7.828125 6.667969 C 7.828125 7.125 8.203125 7.5 8.664062 7.5 L 15.503906 7.5 C 15.964844 7.5 16.335938 7.125 16.335938 6.667969 C 16.335938 6.207031 15.964844 5.832031 15.503906 5.832031 Z M 15.503906 5.832031 "/>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 6.164062 10 C 6.164062 10.691406 5.605469 11.25 4.914062 11.25 C 4.222656 11.25 3.664062 10.691406 3.664062 10 C 3.664062 9.308594 4.222656 8.75 4.914062 8.75 C 5.605469 8.75 6.164062 9.308594 6.164062 10 Z M 6.164062 10 "/>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 15.503906 9.167969 L 8.664062 9.167969 C 8.203125 9.167969 7.828125 9.539062 7.828125 10 C 7.828125 10.460938 8.203125 10.832031 8.664062 10.832031 L 15.503906 10.832031 C 15.964844 10.832031 16.335938 10.460938 16.335938 10 C 16.335938 9.539062 15.964844 9.167969 15.503906 9.167969 Z M 15.503906 9.167969 "/>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 6.164062 13.332031 C 6.164062 14.023438 5.605469 14.582031 4.914062 14.582031 C 4.222656 14.582031 3.664062 14.023438 3.664062 13.332031 C 3.664062 12.644531 4.222656 12.082031 4.914062 12.082031 C 5.605469 12.082031 6.164062 12.644531 6.164062 13.332031 Z M 6.164062 13.332031 "/>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 15.503906 12.5 L 8.664062 12.5 C 8.203125 12.5 7.828125 12.875 7.828125 13.332031 C 7.828125 13.792969 8.203125 14.167969 8.664062 14.167969 L 15.503906 14.167969 C 15.964844 14.167969 16.335938 13.792969 16.335938 13.332031 C 16.335938 12.875 15.964844 12.5 15.503906 12.5 Z M 15.503906 12.5 "/>
+                                                    </g>
+                                                </svg>
+                                            </div>
+                                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"lists"|ucfirst}}</p>
+                                        </li>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="full-width">
+                                <a href="/feed/history" class="full-width">
+                                    <div class="full-width hand left-list-item-link">
+                                        <li class="left-list-item">
+                                            <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                                <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                                    <defs>
+                                                        <filter id="alpha" filterUnits="objectBoundingBox" x="0%" y="0%" width="100%" height="100%">
+                                                            <feColorMatrix type="matrix" in="SourceGraphic" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/>
+                                                        </filter>
+                                                        <mask id="mask0">
+                                                            <g filter="url(#alpha)">
+                                                                <rect x="0" y="0" width="20" height="20" style="fill:white;fill-opacity:0.901961;stroke:none;"/>
+                                                            </g>
+                                                        </mask>
+                                                        <clipPath id="clip1">
+                                                            <rect width="20" height="20"/>
+                                                        </clipPath>
+                                                        <g id="surface6" clip-path="url(#clip1)">
+                                                            <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 10.5 0.5 C 7 0.5 3.898438 2.398438 2.300781 5.300781 L 0 3 L 0 9.5 L 6.5 9.5 L 3.699219 6.699219 C 5 4.199219 7.5 2.5 10.5 2.5 C 14.601562 2.5 18 5.898438 18 10 C 18 14.101562 14.601562 17.5 10.5 17.5 C 7.199219 17.5 4.5 15.398438 3.398438 12.5 L 1.300781 12.5 C 2.398438 16.5 6.101562 19.5 10.5 19.5 C 15.800781 19.5 20 15.199219 20 10 C 20 4.800781 15.699219 0.5 10.5 0.5 Z M 9 5.5 L 9 10.601562 L 13.699219 13.398438 L 14.5 12.101562 L 10.5 9.699219 L 10.5 5.5 Z M 9 5.5 "/>
+                                                        </g>
+                                                    </defs>
+                                                    <g>
+                                                        <use xlink:href="#surface6" mask="url(#mask0)"/>
+                                                    </g>
+                                                </svg>
+                                            </div>
+                                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"visithistory"|ucfirst}}</p>
+                                        </li>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="full-width">
+                                <a href="/feed/saved" class="full-width">
+                                    <div class="full-width hand left-list-item-link">
+                                        <li class="left-list-item">
+                                            <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                                <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                                    <g>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 15.832031 0 L 4.230469 0 C 3.285156 0 2.453125 0.777344 2.453125 1.699219 L 2.453125 18.863281 C 2.453125 19.171875 2.539062 19.429688 2.679688 19.628906 C 2.84375 19.863281 3.109375 20 3.394531 20 C 3.664062 20 3.953125 19.878906 4.21875 19.652344 L 9.410156 15.246094 C 9.570312 15.109375 9.800781 15.03125 10.039062 15.03125 C 10.277344 15.03125 10.507812 15.109375 10.667969 15.246094 L 15.84375 19.652344 C 16.109375 19.878906 16.378906 20 16.644531 20 C 17.101562 20 17.546875 19.648438 17.546875 18.863281 L 17.546875 1.699219 C 17.546875 0.777344 16.777344 0 15.832031 0 Z M 15.832031 0 "/>
+                                                    </g>
+                                                </svg>
+                                            </div>
+                                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"savedposts"|ucfirst}}</p>
+                                        </li>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="full-width" id="others" style="width:calc(100% + 20px);">
+                        <div class="full-width">
+                            <a href="/questions" class="full-width">
+                                <div class="full-width hand">
+                                    <li class="left-list-item bcb">
+                                        <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                            <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                                <g>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 17.078125 7.851562 L 17.039062 7.789062 C 17.042969 7.664062 17.042969 7.539062 17.039062 7.40625 L 17.042969 7.316406 L 16.878906 6.386719 C 16.878906 4.753906 15.8125 0.207031 13.089844 0.59375 C 13.089844 0.59375 10.296875 -0.933594 6.871094 0.910156 C 3.550781 2.261719 3.082031 4.753906 3.082031 6.386719 L 3.082031 7.617188 C 3.074219 7.640625 3.070312 7.660156 3.0625 7.675781 C 2.957031 7.984375 2.945312 8.007812 3.382812 10.320312 C 3.273438 10.355469 3.171875 10.425781 3.097656 10.523438 C 2.722656 11.019531 3.046875 12.324219 3.148438 12.671875 C 3.242188 13.289062 3.480469 13.640625 3.699219 13.839844 C 4.179688 17.289062 7.144531 20 9.75 20 C 12.796875 20 15.679688 17.011719 16.1875 13.84375 C 16.402344 13.648438 16.640625 13.300781 16.730469 12.710938 C 16.839844 12.324219 17.167969 11.015625 16.792969 10.519531 C 16.746094 10.460938 16.691406 10.414062 16.632812 10.375 C 16.792969 9.8125 17.007812 8.894531 17.039062 7.871094 C 17.050781 7.863281 17.066406 7.859375 17.078125 7.851562 Z M 9.789062 14.53125 C 9.015625 14.53125 8.492188 13.964844 8.492188 13.207031 C 8.492188 12.4375 9.03125 11.886719 9.789062 11.886719 C 10.574219 11.886719 11.082031 12.4375 11.097656 13.207031 C 11.097656 13.964844 10.570312 14.53125 9.789062 14.53125 Z M 11.546875 9.121094 C 11.007812 9.71875 10.789062 10.285156 10.804688 10.9375 L 10.804688 11.203125 L 8.871094 11.203125 L 8.859375 10.824219 C 8.8125 10.082031 9.058594 9.324219 9.714844 8.539062 C 10.179688 7.988281 10.558594 7.523438 10.558594 7.027344 C 10.558594 6.519531 10.222656 6.183594 9.496094 6.15625 C 9.019531 6.15625 8.4375 6.328125 8.058594 6.59375 L 7.5625 5.003906 C 8.085938 4.699219 8.960938 4.410156 9.988281 4.410156 C 11.910156 4.410156 12.78125 5.472656 12.78125 6.675781 C 12.785156 7.785156 12.097656 8.511719 11.546875 9.121094 Z M 11.546875 9.121094 "/>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                        <p class="ellipsis followed-community-name fs19 cw" style="padding:0 15px;font-weight:var(--bold);line-height:40px;color:white;">{{word_list|getword:"questions-for-you"|ucfirst}}</p>
+                                    </li>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="full-width">
+                            <a href="/answer/requests" class="full-width">
+                                <div class="full-width hand left-list-item-link">
+                                    <li class="left-list-item">
+                                        <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                            <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                                <g>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 18.117188 4.875 C 17.875 4.660156 17.527344 4.589844 17.222656 4.695312 C 17.21875 4.695312 16.742188 4.859375 16.039062 4.859375 C 14.507812 4.859375 12.355469 4.113281 10.820312 0.539062 C 10.683594 0.21875 10.375 0.0078125 10.027344 0 C 9.65625 -0.0078125 9.355469 0.183594 9.203125 0.492188 C 7.402344 4.101562 5.300781 4.859375 3.855469 4.859375 C 3.222656 4.859375 2.8125 4.707031 2.8125 4.707031 C 2.5 4.585938 2.148438 4.644531 1.898438 4.863281 C 1.644531 5.078125 1.535156 5.417969 1.613281 5.746094 C 2.175781 8.125 5.242188 20 10 20 C 14.757812 20 17.820312 8.125 18.386719 5.746094 C 18.464844 5.425781 18.359375 5.09375 18.117188 4.875 Z M 10 18.214844 C 7.726562 18.214844 5.082031 11.832031 3.683594 6.644531 C 5.078125 6.6875 7.695312 6.242188 9.957031 2.773438 C 11.933594 6.101562 14.546875 6.644531 16.039062 6.644531 C 16.136719 6.644531 16.230469 6.644531 16.320312 6.636719 C 14.921875 11.828125 12.277344 18.214844 10 18.214844 Z M 10 18.214844 "/>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 9.660156 13.164062 C 8.996094 13.164062 8.519531 13.652344 8.519531 14.332031 C 8.519531 15 8.980469 15.5 9.660156 15.5 C 10.355469 15.5 10.816406 15 10.816406 14.332031 C 10.804688 13.652344 10.355469 13.164062 9.660156 13.164062 Z M 9.660156 13.164062 "/>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 9.839844 6.566406 C 8.929688 6.566406 8.15625 6.824219 7.695312 7.09375 L 8.132812 8.492188 C 8.464844 8.261719 8.980469 8.105469 9.402344 8.105469 C 10.042969 8.132812 10.339844 8.429688 10.339844 8.878906 C 10.339844 9.316406 10.003906 9.726562 9.59375 10.210938 C 9.015625 10.90625 8.800781 11.574219 8.839844 12.226562 L 8.851562 12.5625 L 10.558594 12.5625 L 10.558594 12.332031 C 10.546875 11.753906 10.738281 11.253906 11.214844 10.726562 C 11.699219 10.1875 12.304688 9.546875 12.304688 8.570312 C 12.304688 7.503906 11.535156 6.566406 9.839844 6.566406 Z M 9.839844 6.566406 "/>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"answer-requests"|ucfirst}}</p>
+                                    </li>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="full-width">
+                            <a href="/answer/answer_later" class="full-width">
+                                <div class="full-width hand left-list-item-link">
+                                    <li class="left-list-item">
+                                        <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                            <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                                <g>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 17.007812 14.152344 L 18.625 14.152344 L 18.625 15.691406 L 17.007812 15.691406 Z M 17.007812 14.152344 "/>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 19.902344 11.074219 C 19.828125 10.886719 19.707031 10.714844 19.546875 10.554688 C 19.386719 10.398438 19.179688 10.269531 18.921875 10.167969 C 18.660156 10.066406 18.34375 10.015625 17.964844 10.015625 C 17.582031 10.015625 17.257812 10.074219 16.992188 10.191406 C 16.722656 10.304688 16.503906 10.457031 16.335938 10.644531 C 16.164062 10.832031 16.039062 11.042969 15.953125 11.277344 C 15.871094 11.511719 15.824219 11.75 15.808594 11.996094 L 17.429688 11.996094 C 17.414062 11.824219 17.445312 11.671875 17.523438 11.539062 C 17.601562 11.402344 17.730469 11.335938 17.917969 11.335938 C 18.21875 11.335938 18.367188 11.464844 18.367188 11.730469 C 18.367188 11.820312 18.34375 11.894531 18.292969 11.957031 C 18.238281 12.019531 18.175781 12.070312 18.101562 12.117188 C 18.027344 12.160156 17.949219 12.199219 17.863281 12.234375 C 17.78125 12.273438 17.710938 12.304688 17.648438 12.335938 C 17.496094 12.417969 17.382812 12.523438 17.304688 12.648438 C 17.226562 12.773438 17.171875 12.898438 17.140625 13.027344 C 17.109375 13.15625 17.09375 13.285156 17.09375 13.40625 C 17.09375 13.527344 17.097656 13.625 17.105469 13.703125 L 18.539062 13.703125 C 18.539062 13.617188 18.546875 13.539062 18.558594 13.46875 C 18.570312 13.402344 18.59375 13.34375 18.625 13.292969 C 18.65625 13.238281 18.699219 13.191406 18.757812 13.144531 C 18.816406 13.097656 18.886719 13.050781 18.972656 13.003906 C 19.101562 12.9375 19.230469 12.871094 19.355469 12.804688 C 19.480469 12.742188 19.589844 12.660156 19.691406 12.5625 C 19.792969 12.464844 19.875 12.339844 19.9375 12.191406 C 20 12.046875 20.03125 11.851562 20.03125 11.613281 C 20.019531 11.441406 19.976562 11.265625 19.902344 11.074219 Z M 19.902344 11.074219 "/>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 18.570312 7.6875 C 18.695312 7.6875 18.820312 7.699219 18.945312 7.707031 C 18.960938 7.582031 18.976562 7.457031 18.984375 7.332031 C 18.859375 5.070312 17.25 3.460938 14.988281 3.339844 C 13.660156 3.269531 12.554688 3.945312 11.84375 4.9375 C 11.136719 4.003906 10.035156 3.410156 8.699219 3.339844 C 6.445312 3.21875 4.820312 5.253906 4.707031 7.332031 C 4.695312 7.601562 4.710938 7.855469 4.753906 8.105469 C 4.613281 8.085938 4.46875 8.070312 4.320312 8.0625 C 1.882812 7.933594 0.125 10.132812 0.00390625 12.378906 C -0.117188 14.675781 1.824219 16.363281 3.921875 16.65625 L 3.921875 16.695312 L 14.625 16.695312 C 13.742188 15.738281 13.199219 14.464844 13.199219 13.058594 C 13.199219 10.09375 15.605469 7.6875 18.570312 7.6875 Z M 18.570312 7.6875 "/>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"answer-drafts"|ucfirst}}</p>
+                                    </li>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </ul>
+                <div id="divider" style="width: calc(100% + 55px);left:-35px;"></div>
+                <div class="section-left-options inline-block">
+                    <div class="lang-container" onclick="selectLanguage()">
+                        <svg width="13pt" height="13pt" viewBox="0 0 13 13">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 12.472656 8.527344 C 12.703125 7.863281 12.828125 7.152344 12.828125 6.414062 C 12.828125 5.675781 12.703125 4.964844 12.472656 4.304688 C 12.464844 4.28125 12.457031 4.265625 12.453125 4.246094 C 11.558594 1.773438 9.191406 0 6.414062 0 C 3.636719 0 1.269531 1.773438 0.378906 4.246094 C 0.371094 4.265625 0.363281 4.28125 0.359375 4.304688 C 0.128906 4.964844 0 5.675781 0 6.414062 C 0 7.152344 0.128906 7.863281 0.359375 8.527344 C 0.363281 8.546875 0.371094 8.5625 0.378906 8.582031 C 1.269531 11.054688 3.636719 12.828125 6.414062 12.828125 C 9.191406 12.828125 11.558594 11.054688 12.453125 8.582031 C 12.457031 8.5625 12.464844 8.546875 12.472656 8.527344 Z M 6.414062 11.910156 C 6.171875 11.910156 5.777344 11.464844 5.445312 10.480469 C 5.289062 10.003906 5.160156 9.453125 5.066406 8.859375 L 7.761719 8.859375 C 7.667969 9.453125 7.539062 10.003906 7.382812 10.480469 C 7.050781 11.464844 6.660156 11.910156 6.414062 11.910156 Z M 4.957031 7.941406 C 4.910156 7.449219 4.886719 6.9375 4.886719 6.414062 C 4.886719 5.890625 4.910156 5.378906 4.957031 4.886719 L 7.871094 4.886719 C 7.917969 5.378906 7.941406 5.890625 7.941406 6.414062 C 7.941406 6.9375 7.917969 7.449219 7.871094 7.941406 Z M 0.917969 6.414062 C 0.917969 5.886719 0.996094 5.371094 1.136719 4.886719 L 4.035156 4.886719 C 3.992188 5.390625 3.96875 5.902344 3.96875 6.414062 C 3.96875 6.925781 3.992188 7.441406 4.035156 7.941406 L 1.136719 7.941406 C 0.996094 7.457031 0.917969 6.941406 0.917969 6.414062 Z M 6.414062 0.917969 C 6.660156 0.917969 7.050781 1.363281 7.382812 2.347656 C 7.539062 2.828125 7.667969 3.375 7.761719 3.96875 L 5.066406 3.96875 C 5.160156 3.375 5.289062 2.828125 5.445312 2.347656 C 5.777344 1.363281 6.171875 0.917969 6.414062 0.917969 Z M 8.792969 4.886719 L 11.691406 4.886719 C 11.832031 5.371094 11.910156 5.886719 11.910156 6.414062 C 11.910156 6.941406 11.832031 7.457031 11.691406 7.941406 L 8.792969 7.941406 C 8.835938 7.441406 8.859375 6.925781 8.859375 6.414062 C 8.859375 5.902344 8.835938 5.390625 8.792969 4.886719 Z M 11.335938 3.96875 L 8.691406 3.96875 C 8.527344 2.84375 8.246094 1.832031 7.851562 1.109375 C 9.378906 1.523438 10.640625 2.578125 11.335938 3.96875 Z M 4.976562 1.109375 C 4.582031 1.832031 4.304688 2.84375 4.140625 3.96875 L 1.492188 3.96875 C 2.1875 2.578125 3.449219 1.523438 4.976562 1.109375 Z M 1.492188 8.859375 L 4.140625 8.859375 C 4.304688 9.984375 4.582031 11 4.976562 11.71875 C 3.449219 11.304688 2.1875 10.25 1.492188 8.859375 Z M 7.851562 11.71875 C 8.246094 11 8.527344 9.984375 8.691406 8.859375 L 11.335938 8.859375 C 10.640625 10.25 9.378906 11.304688 7.851562 11.71875 Z M 7.851562 11.71875 "/>
+                            </g>
+                        </svg>
+                        <p id="lang-text">{{word_list|getword:"lang"|ucfirst}}</p>
+                    </div>
+                    {% if dark == "dark"  %}
+                        <div class="switch__container left">
+                            <input id="switch-shadow" class="switch switch--shadow" type="checkbox" checked>
+                            <label for="switch-shadow"></label>
+                        </div>
+                        <p id="mode-text">{{word_list|getword:"dark-mode"|ucfirst}}</p>
+                    {% else %}
+                        <div class="switch__container left">
+                            <input id="switch-shadow" class="switch switch--shadow" type="checkbox">
+                            <label for="switch-shadow"></label>
+                        </div>
+                        <p id="mode-text">{{word_list|getword:"light-mode"|ucfirst}}</p>
+                    {% endif %}
+                </div>
+                <div class="corporate-footer">
+                    <div class="full-width inline-block">
+                        <a href="#" class="left">{{word_list|getword:"about"|ucfirst}}</a>
+                        <a href="#" class="left m010">{{word_list|getword:"careers"|ucfirst}}</a>
+                        <a href="#"  class="left">{{word_list|getword:"terms"|ucfirst}}</a>
+                        <a href="#" class="left m010">{{word_list|getword:"advertise"|ucfirst}}</a>
+                        <a href="#" class="left">{{word_list|getword:"help"|ucfirst}}</a>
+                    </div>
+                    <p class="copyright">&copy; 2020 Sosyorol, Inc.</p>
+                </div>
+            </div>
+            <div class="section-middle" style="margin-top:58px;">
+                <div class="hcentered" style="max-width: 893px;">
+                    <div class="filter-options">
+                        <div class="full-width" style="width:calc(100% + 2px);">
+                            <div class="box full-width">
+                                <div class="inline-flex wrapper-title">
+                                    <div style="width:15px;height:15px;overflow:hidden;"> 
+                                        <svg width="15px" height="15px" viewBox="0 0 20 20" style="top:-2.5px;">
+                                            <g>
+                                                <path style="stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 9.84375 0 C 13.339844 0 16.785156 1.613281 16.785156 5.464844 C 16.785156 9.019531 12.714844 10.386719 11.839844 11.671875 C 11.179688 12.628906 11.402344 13.972656 9.597656 13.972656 C 8.421875 13.972656 7.847656 13.015625 7.847656 12.140625 C 7.847656 8.882812 12.628906 8.148438 12.628906 5.46875 C 12.628906 3.992188 11.648438 3.117188 10.007812 3.117188 C 6.507812 3.117188 7.875 6.722656 5.222656 6.722656 C 4.265625 6.722656 3.445312 6.148438 3.445312 5.058594 C 3.445312 2.375 6.503906 0 9.84375 0 Z M 9.707031 15.746094 C 10.933594 15.746094 11.949219 16.757812 11.949219 17.988281 C 11.949219 19.21875 10.9375 20.230469 9.707031 20.230469 C 8.476562 20.230469 7.464844 19.222656 7.464844 17.988281 C 7.464844 16.757812 8.476562 15.746094 9.707031 15.746094 Z M 9.707031 15.746094 "/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    <p class="fs15 fwbold lh24" style="top:-0.5px;">{{word_list|getword:"answer-the-questions"|ucwords}}</p>
+                                </div>
+                                <ul class="full-width">
+                                    {% for post in questions %}
+                                        <li class="bsbb full-width p20 bcw bt">
+                                            <div class="full-width">
+                                                <div class='sqr20 icon absolute hand aligntr bringfront' style="top:-10px;">
+                                                    <svg width='20px' height='20px' viewBox='0 0 20 20' class="rotate90">
+                                                        <g>
+                                                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                        </g>
+                                                    </svg>
+                                                </div>
+                                                <div style="width:80%;">
+                                                    <p class="cg2 fs13 mb10">{{word_list|getword:"question"|ucfirst}}<span class="fs10 m04"> &#10625; </span><a href="/c/{{post.first_community}}" class="fs13 underline-on-hover cg2">{{post.first_community}}</a></p>
+                                                    <a href="/u/{{post.author.user_login}}/{{post.hex_id}}/{{post.guid}}" class="title lh20 underline-on-hover">{{post.post_title}}</a>
+                                                    {% if post.answers|length > 0 %}
+                                                        <p class="cg2 m100 fs13 fwbold">{{post.answers|length}}&nbsp;{{word_list|getword:"answers"|ucfirst}}</p>
+                                                    {% else %}
+                                                        <a href="/u/{{post.author.user_login}}/{{post.hex_id}}/{{post.guid}}"><p class="cg2 m100 hand underline-on-hover  fs13 fwbold">{{word_list|getword:"be-first-to-answer"|ucfirst}}</p></a>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="full-width inline-block aligntr mt10">
+                                                    <a href="/u/{{post.author.user_login}}/{{post.hex_id}}/{{post.guid}}" class="left"><div class='icon3 inline-flex border'>
+                                                        <svg width='20px' height='20px' viewBox='0 0 15 14'>
+                                                            <g>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 14 L 4.046875 13.609375 L 0.417969 10.222656 Z M 0 14 "/>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 9 2.214844 L 12.628906 5.597656 L 4.742188 12.957031 L 1.117188 9.574219 Z M 14.5 3.851562 C 15.164062 3.230469 15.167969 2.226562 14.5 1.605469 L 13.28125 0.464844 C 12.617188 -0.15625 11.539062 -0.15625 10.875 0.464844 L 9.691406 1.570312 L 13.320312 4.953125 Z M 14.5 3.851562 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"answer"|ucfirst}}</p>
+                                                    </div></a>
+                                                    {% if post.isfollowed == 1 %}
+                                                    <div class='icon3 left ml10 inline-flex border active' onclick="followUnfollowPost(this, '{{post.ID}}')">
+                                                        <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                                            <g>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 17.011719 12.445312 L 17.011719 8.410156 C 17 5.300781 14.863281 2.324219 11.671875 1.570312 C 11.671875 1.570312 11.566406 0 10 0 C 8.40625 0 8.328125 1.523438 8.328125 1.523438 C 5.136719 2.277344 3.027344 5.300781 3.007812 8.410156 L 3.007812 12.316406 C 3.007812 14.226562 1.753906 14.554688 0.265625 16.109375 L 19.734375 16.109375 C 18.246094 14.554688 17.011719 14.355469 17.011719 12.445312 Z M 10 20 C 11.710938 20 13.140625 18.636719 13.523438 16.886719 L 6.476562 16.886719 C 6.859375 18.636719 8.289062 20 10 20 Z M 10 20 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"following"|ucfirst}}</p>
+                                                    {% else %}
+                                                    <div class='icon3 left ml10 inline-flex border' onclick="followUnfollowPost(this, '{{post.ID}}')">
+                                                        <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                                            <g>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 17.011719 12.445312 L 17.011719 8.410156 C 17 5.300781 14.863281 2.324219 11.671875 1.570312 C 11.671875 1.570312 11.566406 0 10 0 C 8.40625 0 8.328125 1.523438 8.328125 1.523438 C 5.136719 2.277344 3.027344 5.300781 3.007812 8.410156 L 3.007812 12.316406 C 3.007812 14.226562 1.753906 14.554688 0.265625 16.109375 L 19.734375 16.109375 C 18.246094 14.554688 17.011719 14.355469 17.011719 12.445312 Z M 10 20 C 11.710938 20 13.140625 18.636719 13.523438 16.886719 L 6.476562 16.886719 C 6.859375 18.636719 8.289062 20 10 20 Z M 10 20 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"follow"|ucfirst}}</p>
+                                                    {% endif %}
+                                                    </div>
+                                                    <div class='icon3 left ml10 inline-flex border' onclick="document.getElementById('select-user-popup').classList.remove('dnone');document.getElementById('selected_question').value='{{post.ID}}';">
+                                                        <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                                            <g>
+                                                                <path style="stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 18.554688 L 19.980469 9.992188 L 0 1.425781 L 0 8.085938 L 14.273438 9.992188 L 0 11.894531 Z M 0 18.554688 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"send"|ucfirst}}</p>
+                                                    </div>
+                                                    <div class='icon3 right inline-flex border' onclick="document.getElementById('share-menu-{{post.ID}}').classList.toggle('dnone');">
+                                                        <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                                            <g>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 19.773438 6.992188 L 14.0625 1.28125 C 13.921875 1.140625 13.753906 1.070312 13.5625 1.070312 C 13.367188 1.070312 13.199219 1.140625 13.058594 1.28125 C 12.917969 1.425781 12.847656 1.589844 12.847656 1.785156 L 12.847656 4.640625 L 10.351562 4.640625 C 5.046875 4.640625 1.796875 6.136719 0.589844 9.132812 C 0.195312 10.128906 0 11.367188 0 12.847656 C 0 14.082031 0.472656 15.757812 1.417969 17.878906 C 1.4375 17.929688 1.476562 18.019531 1.535156 18.144531 C 1.589844 18.273438 1.640625 18.382812 1.683594 18.480469 C 1.730469 18.578125 1.777344 18.65625 1.828125 18.726562 C 1.917969 18.851562 2.023438 18.914062 2.140625 18.914062 C 2.253906 18.914062 2.339844 18.878906 2.402344 18.804688 C 2.464844 18.730469 2.5 18.636719 2.5 18.523438 C 2.5 18.457031 2.488281 18.359375 2.46875 18.230469 C 2.453125 18.097656 2.441406 18.011719 2.441406 17.96875 C 2.40625 17.460938 2.386719 17.003906 2.386719 16.59375 C 2.386719 15.84375 2.453125 15.171875 2.582031 14.578125 C 2.710938 13.980469 2.890625 13.46875 3.121094 13.03125 C 3.351562 12.597656 3.652344 12.222656 4.015625 11.90625 C 4.378906 11.589844 4.769531 11.332031 5.191406 11.128906 C 5.613281 10.929688 6.105469 10.773438 6.675781 10.65625 C 7.242188 10.542969 7.816406 10.460938 8.390625 10.417969 C 8.96875 10.371094 9.621094 10.351562 10.351562 10.351562 L 12.847656 10.351562 L 12.847656 13.207031 C 12.847656 13.398438 12.917969 13.566406 13.058594 13.707031 C 13.199219 13.847656 13.367188 13.917969 13.5625 13.917969 C 13.753906 13.917969 13.921875 13.847656 14.0625 13.707031 L 19.773438 7.996094 C 19.914062 7.855469 19.984375 7.6875 19.984375 7.496094 C 19.984375 7.300781 19.914062 7.132812 19.773438 6.992188 Z M 19.773438 6.992188 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"share"|ucfirst}}</p>
+                                                    </div>
+                                                    <div id="share-menu-{{post.ID}}" class="full-shadow-border absolute aligntr bcw dnone" style="top:42px; z-index: 5;">
+                                                        <a href="https://www.facebook.com/sharer/sharer.php?u=www.sosyorol.com/u/{{post.author.user_login}}/{{post.hex_id}}/{{post.guid}}" target="_blank"><p class="p10 cg2 fs15 hand item-hover">{{word_list|getword:"share-on-facebook"}}</p></a>
+                                                        <a href="https://twitter.com/intent/tweet?text={{post.post_title}}&amp;url=www.sosyorol.com/u/{{post.author.user_login}}/{{post.hex_id}}/{{post.guid}}&amp;via=Sosyorol" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-twitter"}}</p></a>
+                                                        <a href="whatsapp://send?text={{post.post_title}} www.sosyorol.com/u/{{post.author.user_login}}/{{post.hex_id}}/{{post.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-whatsapp"}}</p></a>
+                                                        <a href="mailto:''?Subject={{post.post_title}}&body={{post.post_title}}%20%3A%0D%0A%20www.sosyorol.com/u/{{post.author.user_login}}/{{post.hex_id}}/{{post.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"send-email"}}</p></a>
+                                                        <p class="p10 cg2 bt fs15 hand item-hover" onclick="document.getElementById('share-menu-{{post.ID}}').classList.add('dnone');copyLink('www.sosyorol.com/u/{{post.author.user_login}}/{{post.hex_id}}/{{post.guid}}', '{{word_list|getword:"link-copied"|ucfirst}}');">{{word_list|getword:"copy-link"|ucfirst}}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section-right fixed" id="section-right">
+            </div>
+        </div>
+        <script type="text/javascript" src="{% static 'js/search.js' %}"></script>
+        <script>
+            function shortcutsSelected(){
+                document.getElementsByClassName("segctrl-btn")[0].classList.add('active');
+                document.getElementsByClassName("segctrl-btn")[1].classList.remove('active');
+                document.getElementById("shortcuts").classList.remove("dnone");
+                document.getElementById("others").classList.add("dnone");
+            }
+            function othersSelected(){
+                document.getElementsByClassName("segctrl-btn")[0].classList.remove('active');
+                document.getElementsByClassName("segctrl-btn")[1].classList.add('active');
+                document.getElementById("shortcuts").classList.add("dnone");
+                document.getElementById("others").classList.remove("dnone");
+            }
+            function followUnfollowPost(elem, postid){
+                var op = "follow";
+                if(elem.classList.contains("active")){
+                    op = "unfollow";
+                }
+                jQuery.ajax({
+                    type: "POST",
+                    url:"{% url 'followpost' %}",
+                    data: {op: op, post_id:postid },
+                    success: function(response) {
+                        displayAlert(response.msg);
+                        if(elem.classList.contains("active")){
+                            elem.getElementsByTagName("p")[0].innerHTML = "&nbsp;{{word_list|getword:'follow'|ucfirst}}";
+                        }else{
+                            elem.getElementsByTagName("p")[0].innerHTML = "&nbsp;{{word_list|getword:'following'|ucfirst}}";
+                        }
+                        elem.classList.toggle("active");
+                    }
+                });
+                return false;
+            }
+        </script>
+    </body>
+</html>

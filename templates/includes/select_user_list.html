@@ -1,0 +1,17 @@
+<style>
+    .item-bb{border-bottom:1px solid var(--border);}
+    .item-bb:last-child{border-bottom:none;}
+</style>
+{% if user_list|length > 0 %}
+    <ul class="bsbb {{bc}} border" style="height:305px; overflow-y: scroll;">
+        {% for user in user_list %}
+            <li class="bsbb fs14 lh20 text hand p10 noselect inline-flex full-width item-hover item-bb" id="user_{{user.ID}}" onclick="selectUser(this, '{{container}}');">
+                <img src="{{user.avatar_url}}" class="non-draggable rounded sqr40" data-no-lazy="1"/>
+                <p class="ellipsis lh40" style="padding:0 15px;">u/{{user.user_login}}</p>
+                <div class="absolute aligntr m10 bsbb borderred rounded full-shadow bcr hand dnone" style="z-index: 6;" id="user_{{user.ID}}_remove" onclick="removeSelectedUser('user_{{user.ID}}', '{{container}}')">
+                    <p class="full cw sqrt30 rounded tac hand lh30">&#10005;</p>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

@@ -1,5 +1,5 @@
 {% load index %}
-<div class='inline-flex p1020' style='width:calc(100% - 40px);'>
+<div class='inline-flex p1020 bt' style='width:calc(100% - 40px);padding-top:20px;'>
     <img src='{{current_user.avatar_url}}' style='width:40px;height:40px;border-radius:50%;object-fit:cover;'/>
     <div style='position:relative;width:calc(100% - 55px); margin-left:15px;align-items:stretch;align-self:flex-start;display:flex;flex-direction:row;'>
         <textarea class='comment-editor' onblur='this.classList.remove("active");' onfocus='this.classList.add("active");' oninput='commentEditorChange("{{post_id}}", "{{parent_id}}");' id='comment-editor{{post_id}}-{{parent_id}}' rows='1' placeholder='{{word_list|getword:"add-comment"|ucfirst}}...'></textarea>

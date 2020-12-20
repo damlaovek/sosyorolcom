@@ -1,0 +1,567 @@
+{% load index %}
+{% load static %}
+{% include 'includes/general/head.html' %}
+        <title>Sosyorol - Sosyal İçerik Platformu</title>
+        <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
+        <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
+        <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
+        <script src="{% static 'js/new/autosize.min.js' %}"></script>
+        <script src="{% static 'js/new/user-list.min.js' %}"></script>
+        <script src="{% static 'js/index.js' %}"></script>
+        <script src="{% static 'js/sosyorol.min.js' %}"></script>
+        <script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/jquery.textfill.js'></script>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script>
+
+        <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyA9jeHII9FVkhOQfCM_NyoifnN8eIN6EFM",
+            authDomain: "sosyorol-b6ab6.firebaseapp.com",
+            databaseURL: "https://sosyorol-b6ab6.firebaseio.com",
+            projectId: "sosyorol-b6ab6",
+            storageBucket: "sosyorol-b6ab6.appspot.com",
+            messagingSenderId: "565098272319",
+            appId: "1:565098272319:web:5105dd611ce14cf98c8a8a",
+            measurementId: "G-18ZNPD8JH4"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+        </script>
+        <style>
+            .menu-wrapper{width:calc(100% + 40px);margin-left:-20px;}
+            .colorBox-question-oc:nth-child(2n){margin-left: 20px; margin-right: 20px;}
+            .media-question-oc:nth-child(2n){margin-left: 20px; margin-right: 20px;}
+        </style>
+    </head>
+    <body class="{{darkmode}}">
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
+        {% include 'select-user-popup.html' %}
+        <div class="full-width inline-flex">
+            <div class="fixed section-left" id="section-left" style="overflow-x: hidden;">
+                <ul class="nav">
+                    <form method="GET" action="/search" class="relative" style="margin:0;width:calc(100% + 80px);margin-left:-22px;margin-top:-58px;z-index:99;filter:drop-shadow(0 1px 6px rgba(0, 0, 0, .161));" id="search_form">
+                        {% csrf_token %}
+                        <input type="text" name="search_key" id="search" class="bsbb full-width p20" style="padding-top:58px;padding-left:32px;padding-right:70px;" placeholder="Search in Sosyorol"  autocomplete='off'>
+                        <svg class="absolute aligntr svg-icon" style="top: 38px; right:40px;" viewBox="0 0 15 15">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 14.667969 13.039062 L 11.578125 9.945312 C 12.320312 8.867188 12.695312 7.667969 12.695312 6.347656 C 12.695312 5.488281 12.527344 4.664062 12.195312 3.882812 C 11.859375 3.097656 11.410156 2.421875 10.84375 1.851562 C 10.273438 1.285156 9.597656 0.835938 8.8125 0.5 C 8.027344 0.167969 7.207031 0 6.347656 0 C 5.488281 0 4.664062 0.167969 3.882812 0.5 C 3.097656 0.835938 2.421875 1.285156 1.851562 1.851562 C 1.285156 2.421875 0.832031 3.097656 0.5 3.882812 C 0.167969 4.667969 0 5.488281 0 6.347656 C 0 7.207031 0.167969 8.027344 0.5 8.8125 C 0.832031 9.597656 1.285156 10.273438 1.851562 10.839844 C 2.421875 11.410156 3.097656 11.859375 3.882812 12.195312 C 4.664062 12.527344 5.488281 12.695312 6.347656 12.695312 C 7.667969 12.695312 8.867188 12.320312 9.945312 11.578125 L 13.039062 14.660156 C 13.253906 14.886719 13.523438 15.003906 13.847656 15.003906 C 14.160156 15.003906 14.433594 14.886719 14.660156 14.660156 C 14.886719 14.433594 15.003906 14.160156 15.003906 13.847656 C 15.003906 13.53125 14.890625 13.257812 14.667969 13.039062 Z M 9.199219 9.199219 C 8.410156 9.992188 7.460938 10.386719 6.347656 10.386719 C 5.234375 10.386719 4.285156 9.992188 3.492188 9.199219 C 2.703125 8.410156 2.308594 7.460938 2.308594 6.347656 C 2.308594 5.234375 2.703125 4.285156 3.492188 3.492188 C 4.285156 2.703125 5.234375 2.308594 6.347656 2.308594 C 7.460938 2.308594 8.410156 2.703125 9.199219 3.492188 C 9.992188 4.285156 10.386719 5.234375 10.386719 6.347656 C 10.386719 7.460938 9.992188 8.410156 9.199219 9.199219 Z M 9.199219 9.199219 "/>
+                            </g>
+                        </svg>
+                        <input type="submit" 
+                                    style="position: absolute; left: -9999px; width: 1px; height: 1px;"
+                                    tabindex="-1"/>
+                    </form><br>
+                    <div class="absolute full-width aligntl" style="width:calc(100% + 40px);top:62px; background-color:var(--white); z-index:100;">
+                        <ul id="search_results_container" class="full-width p020 full-shadow2" style="width:calc(100% - 40px); background-color: var(--white); z-index:100;">
+                        </ul>
+                    </div>
+                    <style>
+                        .segctrl-btn.active{background-color: var(--white); border-radius: 8px;}
+                        .left-list-item-link.active .left-list-item{background-color: var(--main-color);}
+                        .left-list-item-link.active p{color:white;}
+                    </style>
+                    <div class="full-width bb" style="width:calc(100% + 70px);left:-25px;top:-16px;background-color:">
+                        <div class="bsbb w20 inline-block m10 border p2 br10" style="background-color: #e8e8e8;">
+                            <div class="half-width p100 cg2 tac left hand segctrl-btn" onclick="shortcutsSelected()">Kısayollar</div>
+                            <div class="half-width p100 cg2 tac right hand segctrl-btn active" onclick="othersSelected()">{{title}}</div>
+                        </div>
+                    </div>
+                    <div class="full-width dnone" id="shortcuts" style="width:calc(100% + 20px);">
+                        <a href="/" class="left-list-item-link">
+                            <div class="full-width hand">
+                                <li class="inline-flex left-list-item">
+                                    <p class="non-draggable rounded background-image" id="home-icon"></p>
+                                    <p class="fs19 title" id="home-text" style="color:var(--title-color);">{{word_list|getword:"feed"|ucfirst}}</p>
+                                </li>
+                            </div>
+                        </a>
+                        <div id="divider" style="margin:0;width:calc(100% + 70px);left:-25px;z-index:99;margin-bottom:20px;"></div>
+                        <div class="full-width" style="margin-top:0; top:0;padding-top:0;">
+                            <div class="full-width">
+                                <a href="/feed/lists" class="full-width">
+                                    <div class="full-width hand left-list-item-link">
+                                        <li class="left-list-item">
+                                            <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                                <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                                    <g>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 16.667969 0 L 3.332031 0 C 1.496094 0 0 1.496094 0 3.332031 L 0 16.667969 C 0 18.503906 1.496094 20 3.332031 20 L 16.667969 20 C 18.503906 20 20 18.503906 20 16.667969 L 20 3.332031 C 20 1.496094 18.503906 0 16.667969 0 Z M 18.332031 16.667969 C 18.332031 17.585938 17.585938 18.332031 16.667969 18.332031 L 3.332031 18.332031 C 2.414062 18.332031 1.667969 17.585938 1.667969 16.667969 L 1.667969 3.332031 C 1.667969 2.414062 2.414062 1.667969 3.332031 1.667969 L 16.667969 1.667969 C 17.585938 1.667969 18.332031 2.414062 18.332031 3.332031 Z M 18.332031 16.667969 "/>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 6.164062 6.667969 C 6.164062 7.355469 5.605469 7.917969 4.914062 7.917969 C 4.222656 7.917969 3.664062 7.355469 3.664062 6.667969 C 3.664062 5.976562 4.222656 5.417969 4.914062 5.417969 C 5.605469 5.417969 6.164062 5.976562 6.164062 6.667969 Z M 6.164062 6.667969 "/>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 15.503906 5.832031 L 8.664062 5.832031 C 8.203125 5.832031 7.828125 6.207031 7.828125 6.667969 C 7.828125 7.125 8.203125 7.5 8.664062 7.5 L 15.503906 7.5 C 15.964844 7.5 16.335938 7.125 16.335938 6.667969 C 16.335938 6.207031 15.964844 5.832031 15.503906 5.832031 Z M 15.503906 5.832031 "/>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 6.164062 10 C 6.164062 10.691406 5.605469 11.25 4.914062 11.25 C 4.222656 11.25 3.664062 10.691406 3.664062 10 C 3.664062 9.308594 4.222656 8.75 4.914062 8.75 C 5.605469 8.75 6.164062 9.308594 6.164062 10 Z M 6.164062 10 "/>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 15.503906 9.167969 L 8.664062 9.167969 C 8.203125 9.167969 7.828125 9.539062 7.828125 10 C 7.828125 10.460938 8.203125 10.832031 8.664062 10.832031 L 15.503906 10.832031 C 15.964844 10.832031 16.335938 10.460938 16.335938 10 C 16.335938 9.539062 15.964844 9.167969 15.503906 9.167969 Z M 15.503906 9.167969 "/>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 6.164062 13.332031 C 6.164062 14.023438 5.605469 14.582031 4.914062 14.582031 C 4.222656 14.582031 3.664062 14.023438 3.664062 13.332031 C 3.664062 12.644531 4.222656 12.082031 4.914062 12.082031 C 5.605469 12.082031 6.164062 12.644531 6.164062 13.332031 Z M 6.164062 13.332031 "/>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 15.503906 12.5 L 8.664062 12.5 C 8.203125 12.5 7.828125 12.875 7.828125 13.332031 C 7.828125 13.792969 8.203125 14.167969 8.664062 14.167969 L 15.503906 14.167969 C 15.964844 14.167969 16.335938 13.792969 16.335938 13.332031 C 16.335938 12.875 15.964844 12.5 15.503906 12.5 Z M 15.503906 12.5 "/>
+                                                    </g>
+                                                </svg>
+                                            </div>
+                                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"lists"|ucfirst}}</p>
+                                        </li>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="full-width">
+                                <a href="/feed/history" class="full-width">
+                                    <div class="full-width hand left-list-item-link">
+                                        <li class="left-list-item">
+                                            <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                                <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                                    <defs>
+                                                        <filter id="alpha" filterUnits="objectBoundingBox" x="0%" y="0%" width="100%" height="100%">
+                                                            <feColorMatrix type="matrix" in="SourceGraphic" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/>
+                                                        </filter>
+                                                        <mask id="mask0">
+                                                            <g filter="url(#alpha)">
+                                                                <rect x="0" y="0" width="20" height="20" style="fill:white;fill-opacity:0.901961;stroke:none;"/>
+                                                            </g>
+                                                        </mask>
+                                                        <clipPath id="clip1">
+                                                            <rect width="20" height="20"/>
+                                                        </clipPath>
+                                                        <g id="surface6" clip-path="url(#clip1)">
+                                                            <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 10.5 0.5 C 7 0.5 3.898438 2.398438 2.300781 5.300781 L 0 3 L 0 9.5 L 6.5 9.5 L 3.699219 6.699219 C 5 4.199219 7.5 2.5 10.5 2.5 C 14.601562 2.5 18 5.898438 18 10 C 18 14.101562 14.601562 17.5 10.5 17.5 C 7.199219 17.5 4.5 15.398438 3.398438 12.5 L 1.300781 12.5 C 2.398438 16.5 6.101562 19.5 10.5 19.5 C 15.800781 19.5 20 15.199219 20 10 C 20 4.800781 15.699219 0.5 10.5 0.5 Z M 9 5.5 L 9 10.601562 L 13.699219 13.398438 L 14.5 12.101562 L 10.5 9.699219 L 10.5 5.5 Z M 9 5.5 "/>
+                                                        </g>
+                                                    </defs>
+                                                    <g>
+                                                        <use xlink:href="#surface6" mask="url(#mask0)"/>
+                                                    </g>
+                                                </svg>
+                                            </div>
+                                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"visithistory"|ucfirst}}</p>
+                                        </li>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="full-width">
+                                <a href="/feed/saved" class="full-width">
+                                    <div class="full-width hand left-list-item-link">
+                                        <li class="left-list-item">
+                                            <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                                <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                                    <g>
+                                                        <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 15.832031 0 L 4.230469 0 C 3.285156 0 2.453125 0.777344 2.453125 1.699219 L 2.453125 18.863281 C 2.453125 19.171875 2.539062 19.429688 2.679688 19.628906 C 2.84375 19.863281 3.109375 20 3.394531 20 C 3.664062 20 3.953125 19.878906 4.21875 19.652344 L 9.410156 15.246094 C 9.570312 15.109375 9.800781 15.03125 10.039062 15.03125 C 10.277344 15.03125 10.507812 15.109375 10.667969 15.246094 L 15.84375 19.652344 C 16.109375 19.878906 16.378906 20 16.644531 20 C 17.101562 20 17.546875 19.648438 17.546875 18.863281 L 17.546875 1.699219 C 17.546875 0.777344 16.777344 0 15.832031 0 Z M 15.832031 0 "/>
+                                                    </g>
+                                                </svg>
+                                            </div>
+                                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"savedposts"|ucfirst}}</p>
+                                        </li>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="full-width" id="others" style="width:calc(100% + 20px);">
+                        <div class="full-width">
+                            <a href="/quizzes" class="full-width">
+                                <div class="full-width hand left-list-item-link">
+                                    <li class="left-list-item">
+                                        <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                            <svg width="15pt" height="15pt" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                                <g>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 7.886719 0 L 1.105469 0 C 0.515625 0 0.0351562 0.480469 0.0351562 1.074219 L 0.0351562 7.851562 C 0.0351562 8.445312 0.515625 8.925781 1.105469 8.925781 L 7.886719 8.925781 C 8.476562 8.925781 8.960938 8.445312 8.960938 7.851562 L 8.960938 1.074219 C 8.960938 0.480469 8.476562 0 7.886719 0 Z M 7.886719 0 "/>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 18.894531 0 L 12.113281 0 C 11.523438 0 11.039062 0.480469 11.039062 1.074219 L 11.039062 7.851562 C 11.039062 8.445312 11.523438 8.925781 12.113281 8.925781 L 18.894531 8.925781 C 19.484375 8.925781 19.964844 8.445312 19.964844 7.851562 L 19.964844 1.074219 C 19.964844 0.480469 19.484375 0 18.894531 0 Z M 18.894531 0 "/>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 7.886719 11.074219 L 1.105469 11.074219 C 0.515625 11.074219 0.0351562 11.554688 0.0351562 12.148438 L 0.0351562 18.925781 C 0.0351562 19.519531 0.515625 20 1.105469 20 L 7.886719 20 C 8.476562 20 8.960938 19.519531 8.960938 18.925781 L 8.960938 12.148438 C 8.960938 11.554688 8.476562 11.074219 7.886719 11.074219 Z M 7.886719 11.074219 "/>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 18.894531 11.074219 L 12.113281 11.074219 C 11.523438 11.074219 11.039062 11.554688 11.039062 12.148438 L 11.039062 18.925781 C 11.039062 19.519531 11.523438 20 12.113281 20 L 18.894531 20 C 19.484375 20 19.964844 19.519531 19.964844 18.925781 L 19.964844 12.148438 C 19.964844 11.554688 19.484375 11.074219 18.894531 11.074219 Z M 18.894531 11.074219 "/>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                        <p class="ellipsis followed-community-name fs19 cw" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"quizzes-for-you"|ucfirst}}</p>
+                                    </li>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="full-width">
+                            <a href="/quiz/requests" class="full-width">
+                                <div class="full-width hand">
+                                    <li class="left-list-item bcb">
+                                        <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                            <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:5px; margin-top:5px;">
+                                                <g>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 13.90625 2.15625 C 13.886719 0.960938 12.917969 0 11.71875 0 L 8.394531 0 C 7.195312 0 6.222656 0.960938 6.207031 2.15625 L 3.332031 2.15625 L 3.332031 20 L 16.667969 20 L 16.667969 2.15625 Z M 8.394531 1.078125 L 11.71875 1.078125 C 12.332031 1.078125 12.828125 1.574219 12.828125 2.1875 C 12.828125 2.800781 12.332031 3.300781 11.71875 3.300781 L 8.394531 3.300781 C 7.78125 3.300781 7.28125 2.800781 7.28125 2.1875 C 7.28125 1.574219 7.78125 1.078125 8.394531 1.078125 Z M 10 17.171875 L 5.554688 17.171875 L 5.554688 16.09375 L 10 16.09375 Z M 10 13.804688 L 5.554688 13.804688 L 5.554688 12.726562 L 10 12.726562 Z M 10 10.503906 L 5.554688 10.503906 L 5.554688 9.425781 L 10 9.425781 Z M 10 7.136719 L 5.554688 7.136719 L 5.554688 6.0625 L 10 6.0625 Z M 12.949219 17.914062 L 11.632812 16.824219 L 12.320312 15.992188 L 12.84375 16.429688 L 13.664062 15.527344 L 14.460938 16.253906 Z M 12.949219 14.546875 L 11.632812 13.457031 L 12.320312 12.625 L 12.84375 13.0625 L 13.664062 12.164062 L 14.460938 12.886719 Z M 12.949219 11.246094 L 11.632812 10.15625 L 12.320312 9.328125 L 12.84375 9.761719 L 13.664062 8.863281 L 14.460938 9.589844 Z M 12.949219 7.878906 L 11.632812 6.789062 L 12.320312 5.960938 L 12.84375 6.394531 L 13.664062 5.496094 L 14.460938 6.222656 Z M 12.949219 7.878906 "/>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;color:white;">{{word_list|getword:"quiz-requests"|ucfirst}}</p>
+                                    </li>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </ul>
+                <div id="divider" style="width: calc(100% + 55px);left:-35px;"></div>
+                <div class="section-left-options inline-block">
+                    <div class="lang-container" onclick="selectLanguage()">
+                        <svg width="13pt" height="13pt" viewBox="0 0 13 13">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 12.472656 8.527344 C 12.703125 7.863281 12.828125 7.152344 12.828125 6.414062 C 12.828125 5.675781 12.703125 4.964844 12.472656 4.304688 C 12.464844 4.28125 12.457031 4.265625 12.453125 4.246094 C 11.558594 1.773438 9.191406 0 6.414062 0 C 3.636719 0 1.269531 1.773438 0.378906 4.246094 C 0.371094 4.265625 0.363281 4.28125 0.359375 4.304688 C 0.128906 4.964844 0 5.675781 0 6.414062 C 0 7.152344 0.128906 7.863281 0.359375 8.527344 C 0.363281 8.546875 0.371094 8.5625 0.378906 8.582031 C 1.269531 11.054688 3.636719 12.828125 6.414062 12.828125 C 9.191406 12.828125 11.558594 11.054688 12.453125 8.582031 C 12.457031 8.5625 12.464844 8.546875 12.472656 8.527344 Z M 6.414062 11.910156 C 6.171875 11.910156 5.777344 11.464844 5.445312 10.480469 C 5.289062 10.003906 5.160156 9.453125 5.066406 8.859375 L 7.761719 8.859375 C 7.667969 9.453125 7.539062 10.003906 7.382812 10.480469 C 7.050781 11.464844 6.660156 11.910156 6.414062 11.910156 Z M 4.957031 7.941406 C 4.910156 7.449219 4.886719 6.9375 4.886719 6.414062 C 4.886719 5.890625 4.910156 5.378906 4.957031 4.886719 L 7.871094 4.886719 C 7.917969 5.378906 7.941406 5.890625 7.941406 6.414062 C 7.941406 6.9375 7.917969 7.449219 7.871094 7.941406 Z M 0.917969 6.414062 C 0.917969 5.886719 0.996094 5.371094 1.136719 4.886719 L 4.035156 4.886719 C 3.992188 5.390625 3.96875 5.902344 3.96875 6.414062 C 3.96875 6.925781 3.992188 7.441406 4.035156 7.941406 L 1.136719 7.941406 C 0.996094 7.457031 0.917969 6.941406 0.917969 6.414062 Z M 6.414062 0.917969 C 6.660156 0.917969 7.050781 1.363281 7.382812 2.347656 C 7.539062 2.828125 7.667969 3.375 7.761719 3.96875 L 5.066406 3.96875 C 5.160156 3.375 5.289062 2.828125 5.445312 2.347656 C 5.777344 1.363281 6.171875 0.917969 6.414062 0.917969 Z M 8.792969 4.886719 L 11.691406 4.886719 C 11.832031 5.371094 11.910156 5.886719 11.910156 6.414062 C 11.910156 6.941406 11.832031 7.457031 11.691406 7.941406 L 8.792969 7.941406 C 8.835938 7.441406 8.859375 6.925781 8.859375 6.414062 C 8.859375 5.902344 8.835938 5.390625 8.792969 4.886719 Z M 11.335938 3.96875 L 8.691406 3.96875 C 8.527344 2.84375 8.246094 1.832031 7.851562 1.109375 C 9.378906 1.523438 10.640625 2.578125 11.335938 3.96875 Z M 4.976562 1.109375 C 4.582031 1.832031 4.304688 2.84375 4.140625 3.96875 L 1.492188 3.96875 C 2.1875 2.578125 3.449219 1.523438 4.976562 1.109375 Z M 1.492188 8.859375 L 4.140625 8.859375 C 4.304688 9.984375 4.582031 11 4.976562 11.71875 C 3.449219 11.304688 2.1875 10.25 1.492188 8.859375 Z M 7.851562 11.71875 C 8.246094 11 8.527344 9.984375 8.691406 8.859375 L 11.335938 8.859375 C 10.640625 10.25 9.378906 11.304688 7.851562 11.71875 Z M 7.851562 11.71875 "/>
+                            </g>
+                        </svg>
+                        <p id="lang-text">{{word_list|getword:"lang"|ucfirst}}</p>
+                    </div>
+                    {% if dark == "dark"  %}
+                        <div class="switch__container left">
+                            <input id="switch-shadow" class="switch switch--shadow" type="checkbox" checked>
+                            <label for="switch-shadow"></label>
+                        </div>
+                        <p id="mode-text">{{word_list|getword:"dark-mode"|ucfirst}}</p>
+                    {% else %}
+                        <div class="switch__container left">
+                            <input id="switch-shadow" class="switch switch--shadow" type="checkbox">
+                            <label for="switch-shadow"></label>
+                        </div>
+                        <p id="mode-text">{{word_list|getword:"light-mode"|ucfirst}}</p>
+                    {% endif %}
+                </div>
+                <div class="corporate-footer">
+                    <div class="full-width inline-block">
+                        <a href="#" class="left">{{word_list|getword:"about"|ucfirst}}</a>
+                        <a href="#" class="left m010">{{word_list|getword:"careers"|ucfirst}}</a>
+                        <a href="#"  class="left">{{word_list|getword:"terms"|ucfirst}}</a>
+                        <a href="#" class="left m010">{{word_list|getword:"advertise"|ucfirst}}</a>
+                        <a href="#" class="left">{{word_list|getword:"help"|ucfirst}}</a>
+                    </div>
+                    <p class="copyright">&copy; 2020 Sosyorol, Inc.</p>
+                </div>
+            </div>
+            <div class="section-middle" style="margin-top:58px;">
+                <div class="hcentered" style="max-width: 893px;">
+                    <div class="filter-options">
+                        <div class="full-width" style="width:calc(100% + 2px);">
+                            <ul class="full-width">
+                                {% for quiz in quizzes %}
+                                    {% if quiz.post.quiz_type == "colorBox" %}
+                                    <div class='full-width'>
+                                        <div class='full-width box answer-template-oc'>
+                                            <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
+                                                <div style='width:calc(100% - 20px);' class='p010'>
+                                                    <div class='sqr20 icon absolute hand aligntr bringfront' onclick="showMoreOptions(this, {{quiz.post.ID}})">
+                                                        <svg width='20px' height='20px' viewBox='0 0 20 20' class="rotate90">
+                                                            <g>
+                                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{quiz.ID}}">
+                                                        <li class="hand" onclick="savePost(this, {{quiz.post.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
+                                                    </ul>
+                                                    <div  class='full-width inline-flex' style='margin-bottom:10px;'>
+                                                        <img src='{{quiz.post.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
+                                                        <div style='margin-left:10px;width:calc(100% - 50px);'>
+                                                            <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{quiz.post.author.display_name}}</a><br>
+                                                            <a href='/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{quiz.post.time_diff}} {{post_template_dict.ago}}</a>
+                                                        </div>
+                                                    </div>
+                                                    <a href='/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{quiz.post.post_title}}</a>
+                                                    
+                                                    <div class="menu-wrapper border mt10" id="menu-wrapper4{{number}}" style="border-top:1px solid var(--border-color);height:210px">
+                                                        <div id="menu4{{number}}" class="menu" onscroll="menuScroll('left-paddle4{{number}}','right-paddle4{{number}}','menu4{{number}}',1)">
+                                                            {% for question in quiz.post.quiz_questions %}
+                                                                <div class="colorBox-question-oc">
+                                                                    <div class="p10 colorBox-question noselect" style="background-color: var(--question-color-{{question.question_color}});height:150px; line-height:150px;width:210px;">
+                                                                        <span class="bsbb cw fwbold tac inline-block vam fs19" style="line-height: normal;">{{question.question_text}}</span>
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                        <div class='arrow-btn paddle hidden left-paddle'  id="left-paddle4{{number}}" onclick="scrollToRight('menu4{{number}}')">
+                                                            <svg width="20pt" height="20pt" viewBox="0 0 30 30">
+                                                                <g>
+                                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 4.785156 10.714844 L 13.78125 19.703125 C 14.175781 20.097656 14.8125 20.097656 15.210938 19.703125 C 15.605469 19.3125 15.605469 18.671875 15.210938 18.277344 L 6.929688 10 L 15.207031 1.722656 C 15.605469 1.328125 15.605469 0.691406 15.207031 0.296875 C 14.8125 -0.0976562 14.175781 -0.0976562 13.777344 0.296875 L 4.785156 9.285156 C 4.398438 9.675781 4.398438 10.324219 4.785156 10.714844 Z M 4.785156 10.714844 "/>
+                                                                </g>
+                                                            </svg>
+                                                        </div>
+                                                        {% if quiz.post.quiz_questions|length > 3 %}
+                                                        <div class='arrow-btn paddle right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
+                                                        {% else %}
+                                                        <div class='arrow-btn paddle hidden right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
+                                                        {% endif %}
+                                                            <svg width="20pt" height="20pt" viewBox="0 0 30 30">
+                                                                <g>
+                                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 15.214844 9.285156 L 6.21875 0.296875 C 5.824219 -0.0976562 5.1875 -0.0976562 4.789062 0.296875 C 4.394531 0.6875 4.394531 1.328125 4.789062 1.722656 L 13.070312 10 L 4.789062 18.277344 C 4.394531 18.671875 4.394531 19.308594 4.789062 19.703125 C 5.1875 20.097656 5.824219 20.097656 6.21875 19.703125 L 15.214844 10.714844 C 15.601562 10.324219 15.601562 9.675781 15.214844 9.285156 Z M 15.214844 9.285156 "/>
+                                                                </g>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="bsbb p010 full-width inline-block aligntr mt20">
+                                                    <a href="/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}" class="left"><div class='icon3 inline-flex border'>
+                                                        <svg width='20px' height='20px' viewBox='0 0 15 14'>
+                                                            <g>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 14 L 4.046875 13.609375 L 0.417969 10.222656 Z M 0 14 "/>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 9 2.214844 L 12.628906 5.597656 L 4.742188 12.957031 L 1.117188 9.574219 Z M 14.5 3.851562 C 15.164062 3.230469 15.167969 2.226562 14.5 1.605469 L 13.28125 0.464844 C 12.617188 -0.15625 11.539062 -0.15625 10.875 0.464844 L 9.691406 1.570312 L 13.320312 4.953125 Z M 14.5 3.851562 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"solve-quiz"|ucfirst}}</p>
+                                                    </div></a>
+                                                    <div class='icon3 left ml10 inline-flex border' onclick="document.getElementById('select-user-popup').classList.remove('dnone');document.getElementById('selected_question').value='{{quiz.post.ID}}';">
+                                                        <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                                            <g>
+                                                                <path style="stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 18.554688 L 19.980469 9.992188 L 0 1.425781 L 0 8.085938 L 14.273438 9.992188 L 0 11.894531 Z M 0 18.554688 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"send"|ucfirst}}</p>
+                                                    </div>
+                                                    <div class='icon3 right inline-flex border' onclick="document.getElementById('share-menu-{{quiz.post.ID}}').classList.toggle('dnone');">
+                                                        <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                                            <g>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 19.773438 6.992188 L 14.0625 1.28125 C 13.921875 1.140625 13.753906 1.070312 13.5625 1.070312 C 13.367188 1.070312 13.199219 1.140625 13.058594 1.28125 C 12.917969 1.425781 12.847656 1.589844 12.847656 1.785156 L 12.847656 4.640625 L 10.351562 4.640625 C 5.046875 4.640625 1.796875 6.136719 0.589844 9.132812 C 0.195312 10.128906 0 11.367188 0 12.847656 C 0 14.082031 0.472656 15.757812 1.417969 17.878906 C 1.4375 17.929688 1.476562 18.019531 1.535156 18.144531 C 1.589844 18.273438 1.640625 18.382812 1.683594 18.480469 C 1.730469 18.578125 1.777344 18.65625 1.828125 18.726562 C 1.917969 18.851562 2.023438 18.914062 2.140625 18.914062 C 2.253906 18.914062 2.339844 18.878906 2.402344 18.804688 C 2.464844 18.730469 2.5 18.636719 2.5 18.523438 C 2.5 18.457031 2.488281 18.359375 2.46875 18.230469 C 2.453125 18.097656 2.441406 18.011719 2.441406 17.96875 C 2.40625 17.460938 2.386719 17.003906 2.386719 16.59375 C 2.386719 15.84375 2.453125 15.171875 2.582031 14.578125 C 2.710938 13.980469 2.890625 13.46875 3.121094 13.03125 C 3.351562 12.597656 3.652344 12.222656 4.015625 11.90625 C 4.378906 11.589844 4.769531 11.332031 5.191406 11.128906 C 5.613281 10.929688 6.105469 10.773438 6.675781 10.65625 C 7.242188 10.542969 7.816406 10.460938 8.390625 10.417969 C 8.96875 10.371094 9.621094 10.351562 10.351562 10.351562 L 12.847656 10.351562 L 12.847656 13.207031 C 12.847656 13.398438 12.917969 13.566406 13.058594 13.707031 C 13.199219 13.847656 13.367188 13.917969 13.5625 13.917969 C 13.753906 13.917969 13.921875 13.847656 14.0625 13.707031 L 19.773438 7.996094 C 19.914062 7.855469 19.984375 7.6875 19.984375 7.496094 C 19.984375 7.300781 19.914062 7.132812 19.773438 6.992188 Z M 19.773438 6.992188 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"share"|ucfirst}}</p>
+                                                    </div>
+                                                    <div id="share-menu-{{quiz.post.ID}}" class="full-shadow-border absolute aligntr bcw dnone" style="top:42px; z-index: 5;">
+                                                        <a href="https://www.facebook.com/sharer/sharer.php?u=www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}" target="_blank"><p class="p10 cg2 fs15 hand item-hover">{{word_list|getword:"share-on-facebook"}}</p></a>
+                                                        <a href="https://twitter.com/intent/tweet?text={{quiz.post.post_title}}&amp;url=www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}&amp;via=Sosyorol" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-twitter"}}</p></a>
+                                                        <a href="whatsapp://send?text={{quiz.post.post_title}} www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-whatsapp"}}</p></a>
+                                                        <a href="mailto:''?Subject={{quiz.post.post_title}}&body={{quiz.post.post_title}}%20%3A%0D%0A%20www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"send-email"}}</p></a>
+                                                        <p class="p10 cg2 bt fs15 hand item-hover" onclick="document.getElementById('share-menu-{{quiz.post.ID}}').classList.add('dnone');copyLink('www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}', '{{word_list|getword:"link-copied"|ucfirst}}');">{{word_list|getword:"copy-link"|ucfirst}}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% elif quiz.post.quiz_type == "media" %}
+                                    <div class='full-width'>
+                                        <div class='full-width box answer-template-oc'>
+                                            <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
+                                                <div style='width:calc(100% - 20px);' class='p010'>
+                                                    <div class='sqr20 icon absolute hand aligntr bringfront' onclick="showMoreOptions(this, {{quiz.post.ID}})">
+                                                        <svg width='20px' height='20px' viewBox='0 0 20 20' class="rotate90">
+                                                            <g>
+                                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{quiz.ID}}">
+                                                        <li class="hand" onclick="savePost(this, {{quiz.post.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
+                                                    </ul>
+                                                    <div  class='full-width inline-flex' style='margin-bottom:10px;'>
+                                                        <img src='{{quiz.post.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
+                                                        <div style='margin-left:10px;width:calc(100% - 50px);'>
+                                                            <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{quiz.post.author.display_name}}</a><br>
+                                                            <a href='/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{quiz.post.time_diff}} {{post_template_dict.ago}}</a>
+                                                        </div>
+                                                    </div>
+                                                    <a href='/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{quiz.post.post_title}}</a>
+                                                    
+                                                    <div class="menu-wrapper border mt10" id="menu-wrapper4{{number}}" style="border-top:1px solid var(--border-color);height:auto;">
+                                                        <div id="menu4{{number}}" class="menu" onscroll="menuScroll('left-paddle4{{number}}','right-paddle4{{number}}','menu4{{number}}',1)">
+                                                            {% for question in quiz.post.quiz_questions %}
+                                                                <div class="media-question-oc">
+                                                                    <div class="p10 border noselect" style="width:208px; height:calc(100% - 20px);">
+                                                                        <p class="lh20">{{forloop.counter}}. {{question.question_text}}</p>
+                                                                        <img class="full-width mt10" src="{{question.question_img}}" style="height: 150px;">
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                        <div class='arrow-btn paddle hidden left-paddle'  id="left-paddle4{{number}}" onclick="scrollToRight('menu4{{number}}')">
+                                                            <svg width="20pt" height="20pt" viewBox="0 0 30 30">
+                                                                <g>
+                                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 4.785156 10.714844 L 13.78125 19.703125 C 14.175781 20.097656 14.8125 20.097656 15.210938 19.703125 C 15.605469 19.3125 15.605469 18.671875 15.210938 18.277344 L 6.929688 10 L 15.207031 1.722656 C 15.605469 1.328125 15.605469 0.691406 15.207031 0.296875 C 14.8125 -0.0976562 14.175781 -0.0976562 13.777344 0.296875 L 4.785156 9.285156 C 4.398438 9.675781 4.398438 10.324219 4.785156 10.714844 Z M 4.785156 10.714844 "/>
+                                                                </g>
+                                                            </svg>
+                                                        </div>
+                                                        {% if quiz.post.quiz_questions|length > 3 %}
+                                                        <div class='arrow-btn paddle right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
+                                                        {% else %}
+                                                        <div class='arrow-btn paddle hidden right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
+                                                        {% endif %}
+                                                            <svg width="20pt" height="20pt" viewBox="0 0 30 30">
+                                                                <g>
+                                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 15.214844 9.285156 L 6.21875 0.296875 C 5.824219 -0.0976562 5.1875 -0.0976562 4.789062 0.296875 C 4.394531 0.6875 4.394531 1.328125 4.789062 1.722656 L 13.070312 10 L 4.789062 18.277344 C 4.394531 18.671875 4.394531 19.308594 4.789062 19.703125 C 5.1875 20.097656 5.824219 20.097656 6.21875 19.703125 L 15.214844 10.714844 C 15.601562 10.324219 15.601562 9.675781 15.214844 9.285156 Z M 15.214844 9.285156 "/>
+                                                                </g>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="bsbb p010 full-width inline-block aligntr mt20">
+                                                    <a href="/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}" class="left"><div class='icon3 inline-flex border'>
+                                                        <svg width='20px' height='20px' viewBox='0 0 15 14'>
+                                                            <g>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 14 L 4.046875 13.609375 L 0.417969 10.222656 Z M 0 14 "/>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 9 2.214844 L 12.628906 5.597656 L 4.742188 12.957031 L 1.117188 9.574219 Z M 14.5 3.851562 C 15.164062 3.230469 15.167969 2.226562 14.5 1.605469 L 13.28125 0.464844 C 12.617188 -0.15625 11.539062 -0.15625 10.875 0.464844 L 9.691406 1.570312 L 13.320312 4.953125 Z M 14.5 3.851562 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"solve-quiz"|ucfirst}}</p>
+                                                    </div></a>
+                                                    <div class='icon3 left ml10 inline-flex border' onclick="document.getElementById('select-user-popup').classList.remove('dnone');document.getElementById('selected_question').value='{{quiz.post.ID}}';">
+                                                        <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                                            <g>
+                                                                <path style="stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 18.554688 L 19.980469 9.992188 L 0 1.425781 L 0 8.085938 L 14.273438 9.992188 L 0 11.894531 Z M 0 18.554688 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"send"|ucfirst}}</p>
+                                                    </div>
+                                                    <div class='icon3 right inline-flex border' onclick="document.getElementById('share-menu-{{quiz.post.ID}}').classList.toggle('dnone');">
+                                                        <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                                            <g>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 19.773438 6.992188 L 14.0625 1.28125 C 13.921875 1.140625 13.753906 1.070312 13.5625 1.070312 C 13.367188 1.070312 13.199219 1.140625 13.058594 1.28125 C 12.917969 1.425781 12.847656 1.589844 12.847656 1.785156 L 12.847656 4.640625 L 10.351562 4.640625 C 5.046875 4.640625 1.796875 6.136719 0.589844 9.132812 C 0.195312 10.128906 0 11.367188 0 12.847656 C 0 14.082031 0.472656 15.757812 1.417969 17.878906 C 1.4375 17.929688 1.476562 18.019531 1.535156 18.144531 C 1.589844 18.273438 1.640625 18.382812 1.683594 18.480469 C 1.730469 18.578125 1.777344 18.65625 1.828125 18.726562 C 1.917969 18.851562 2.023438 18.914062 2.140625 18.914062 C 2.253906 18.914062 2.339844 18.878906 2.402344 18.804688 C 2.464844 18.730469 2.5 18.636719 2.5 18.523438 C 2.5 18.457031 2.488281 18.359375 2.46875 18.230469 C 2.453125 18.097656 2.441406 18.011719 2.441406 17.96875 C 2.40625 17.460938 2.386719 17.003906 2.386719 16.59375 C 2.386719 15.84375 2.453125 15.171875 2.582031 14.578125 C 2.710938 13.980469 2.890625 13.46875 3.121094 13.03125 C 3.351562 12.597656 3.652344 12.222656 4.015625 11.90625 C 4.378906 11.589844 4.769531 11.332031 5.191406 11.128906 C 5.613281 10.929688 6.105469 10.773438 6.675781 10.65625 C 7.242188 10.542969 7.816406 10.460938 8.390625 10.417969 C 8.96875 10.371094 9.621094 10.351562 10.351562 10.351562 L 12.847656 10.351562 L 12.847656 13.207031 C 12.847656 13.398438 12.917969 13.566406 13.058594 13.707031 C 13.199219 13.847656 13.367188 13.917969 13.5625 13.917969 C 13.753906 13.917969 13.921875 13.847656 14.0625 13.707031 L 19.773438 7.996094 C 19.914062 7.855469 19.984375 7.6875 19.984375 7.496094 C 19.984375 7.300781 19.914062 7.132812 19.773438 6.992188 Z M 19.773438 6.992188 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"share"|ucfirst}}</p>
+                                                    </div>
+                                                    <div id="share-menu-{{quiz.post.ID}}" class="full-shadow-border absolute aligntr bcw dnone" style="top:42px; z-index: 5;">
+                                                        <a href="https://www.facebook.com/sharer/sharer.php?u=www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}" target="_blank"><p class="p10 cg2 fs15 hand item-hover">{{word_list|getword:"share-on-facebook"}}</p></a>
+                                                        <a href="https://twitter.com/intent/tweet?text={{quiz.post.post_title}}&amp;url=www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}&amp;via=Sosyorol" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-twitter"}}</p></a>
+                                                        <a href="whatsapp://send?text={{quiz.post.post_title}} www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-whatsapp"}}</p></a>
+                                                        <a href="mailto:''?Subject={{quiz.post.post_title}}&body={{quiz.post.post_title}}%20%3A%0D%0A%20www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"send-email"}}</p></a>
+                                                        <p class="p10 cg2 bt fs15 hand item-hover" onclick="document.getElementById('share-menu-{{quiz.post.ID}}').classList.add('dnone');copyLink('www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}', '{{word_list|getword:"link-copied"|ucfirst}}');">{{word_list|getword:"copy-link"|ucfirst}}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class='full-width'>
+                                        <div class='full-width box answer-template-oc'>
+                                            <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
+                                                <div style='width:calc(100% - 20px);' class='p010'>
+                                                    <div class='sqr20 icon absolute hand aligntr bringfront' onclick="showMoreOptions(this, {{quiz.post.ID}})">
+                                                        <svg width='20px' height='20px' viewBox='0 0 20 20' class="rotate90">
+                                                            <g>
+                                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{quiz.post.ID}}">
+                                                        <li class="hand" onclick="savePost(this, {{quiz.post.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
+                                                    </ul>
+                                                    <div  class='full-width inline-flex' style='margin-bottom:10px;'>
+                                                        <img src='{{quiz.post.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
+                                                        <div style='margin-left:10px;width:calc(100% - 50px);'>
+                                                            <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{quiz.post.author.display_name}}</a><br>
+                                                            <a href='/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{quiz.post.time_diff}} {{post_template_dict.ago}}</a>
+                                                        </div>
+                                                    </div>
+                                                    <a href='/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{quiz.post.post_title}}</a>
+                                                    <ul class="full-width border mt10">
+                                                        {% for question in quiz.post.quiz_questions %}
+                                                            {% if forloop.counter < 5 %}
+                                                                {% if forloop.counter == 1 %}
+                                                                    <a href='/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}'><li class="p1020 cg2 hand">{{forloop.counter}}. {{question.question_text}}</li></a>
+                                                                {% else %}
+                                                                    <a href='/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}'><li class="p1020 bt cg2 hand">{{forloop.counter}}. {{question.question_text}}</li></a>
+                                                                {% endif %}
+                                                            {% else %}
+                                                                <a href='/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}' class="quiz_question{{number}} dnone"><li class="p1020 bt cg2 hand">{{forloop.counter}}. {{question.question_text}}</li></a>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                    {% if quiz.post.quiz_questions|length > 4 %}
+                                                    <div class="full-width hand p100 bcgrayish tac border" style="border-top:none;" onclick="showAllQuestions(this, {{number}});">{{post_template_dict.more}}</div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="bsbb p010 full-width inline-block aligntr mt20">
+                                                    <a href="/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}" class="left"><div class='icon3 inline-flex border'>
+                                                        <svg width='20px' height='20px' viewBox='0 0 15 14'>
+                                                            <g>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 14 L 4.046875 13.609375 L 0.417969 10.222656 Z M 0 14 "/>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 9 2.214844 L 12.628906 5.597656 L 4.742188 12.957031 L 1.117188 9.574219 Z M 14.5 3.851562 C 15.164062 3.230469 15.167969 2.226562 14.5 1.605469 L 13.28125 0.464844 C 12.617188 -0.15625 11.539062 -0.15625 10.875 0.464844 L 9.691406 1.570312 L 13.320312 4.953125 Z M 14.5 3.851562 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"solve-quiz"|ucfirst}}</p>
+                                                    </div></a>
+                                                    <div class='icon3 left ml10 inline-flex border' onclick="document.getElementById('select-user-popup').classList.remove('dnone');document.getElementById('selected_question').value='{{quiz.post.ID}}';">
+                                                        <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                                            <g>
+                                                                <path style="stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 18.554688 L 19.980469 9.992188 L 0 1.425781 L 0 8.085938 L 14.273438 9.992188 L 0 11.894531 Z M 0 18.554688 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"send"|ucfirst}}</p>
+                                                    </div>
+                                                    <div class='icon3 right inline-flex border' onclick="document.getElementById('share-menu-{{quiz.post.ID}}').classList.toggle('dnone');">
+                                                        <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                                            <g>
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 19.773438 6.992188 L 14.0625 1.28125 C 13.921875 1.140625 13.753906 1.070312 13.5625 1.070312 C 13.367188 1.070312 13.199219 1.140625 13.058594 1.28125 C 12.917969 1.425781 12.847656 1.589844 12.847656 1.785156 L 12.847656 4.640625 L 10.351562 4.640625 C 5.046875 4.640625 1.796875 6.136719 0.589844 9.132812 C 0.195312 10.128906 0 11.367188 0 12.847656 C 0 14.082031 0.472656 15.757812 1.417969 17.878906 C 1.4375 17.929688 1.476562 18.019531 1.535156 18.144531 C 1.589844 18.273438 1.640625 18.382812 1.683594 18.480469 C 1.730469 18.578125 1.777344 18.65625 1.828125 18.726562 C 1.917969 18.851562 2.023438 18.914062 2.140625 18.914062 C 2.253906 18.914062 2.339844 18.878906 2.402344 18.804688 C 2.464844 18.730469 2.5 18.636719 2.5 18.523438 C 2.5 18.457031 2.488281 18.359375 2.46875 18.230469 C 2.453125 18.097656 2.441406 18.011719 2.441406 17.96875 C 2.40625 17.460938 2.386719 17.003906 2.386719 16.59375 C 2.386719 15.84375 2.453125 15.171875 2.582031 14.578125 C 2.710938 13.980469 2.890625 13.46875 3.121094 13.03125 C 3.351562 12.597656 3.652344 12.222656 4.015625 11.90625 C 4.378906 11.589844 4.769531 11.332031 5.191406 11.128906 C 5.613281 10.929688 6.105469 10.773438 6.675781 10.65625 C 7.242188 10.542969 7.816406 10.460938 8.390625 10.417969 C 8.96875 10.371094 9.621094 10.351562 10.351562 10.351562 L 12.847656 10.351562 L 12.847656 13.207031 C 12.847656 13.398438 12.917969 13.566406 13.058594 13.707031 C 13.199219 13.847656 13.367188 13.917969 13.5625 13.917969 C 13.753906 13.917969 13.921875 13.847656 14.0625 13.707031 L 19.773438 7.996094 C 19.914062 7.855469 19.984375 7.6875 19.984375 7.496094 C 19.984375 7.300781 19.914062 7.132812 19.773438 6.992188 Z M 19.773438 6.992188 "/>
+                                                            </g>
+                                                        </svg>
+                                                        <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"share"|ucfirst}}</p>
+                                                    </div>
+                                                    <div id="share-menu-{{quiz.post.ID}}" class="full-shadow-border absolute aligntr bcw dnone" style="top:42px; z-index: 5;">
+                                                        <a href="https://www.facebook.com/sharer/sharer.php?u=www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}" target="_blank"><p class="p10 cg2 fs15 hand item-hover">{{word_list|getword:"share-on-facebook"}}</p></a>
+                                                        <a href="https://twitter.com/intent/tweet?text={{quiz.post.post_title}}&amp;url=www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}&amp;via=Sosyorol" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-twitter"}}</p></a>
+                                                        <a href="whatsapp://send?text={{quiz.post.post_title}} www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-whatsapp"}}</p></a>
+                                                        <a href="mailto:''?Subject={{quiz.post.post_title}}&body={{quiz.post.post_title}}%20%3A%0D%0A%20www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"send-email"}}</p></a>
+                                                        <p class="p10 cg2 bt fs15 hand item-hover" onclick="document.getElementById('share-menu-{{quiz.post.ID}}').classList.add('dnone');copyLink('www.sosyorol.com/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}', '{{word_list|getword:"link-copied"|ucfirst}}');">{{word_list|getword:"copy-link"|ucfirst}}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section-right fixed" id="section-right">
+            </div>
+        </div>
+        <script type="text/javascript" src="{% static 'js/search.js' %}"></script>
+        <script>
+            function shortcutsSelected(){
+                document.getElementsByClassName("segctrl-btn")[0].classList.add('active');
+                document.getElementsByClassName("segctrl-btn")[1].classList.remove('active');
+                document.getElementById("shortcuts").classList.remove("dnone");
+                document.getElementById("others").classList.add("dnone");
+            }
+            function othersSelected(){
+                document.getElementsByClassName("segctrl-btn")[0].classList.remove('active');
+                document.getElementsByClassName("segctrl-btn")[1].classList.add('active');
+                document.getElementById("shortcuts").classList.add("dnone");
+                document.getElementById("others").classList.remove("dnone");
+            }
+            var j = jQuery.noConflict();
+            function showMoreOptions(elem, postID){
+                if (elem.classList.contains("active")){
+                    elem.classList.remove("active");
+                    document.getElementById("moreoptions"+postID).classList.add("dnone");
+                }else{
+                    elem.classList.add("active");
+                    document.getElementById("moreoptions"+postID).classList.remove("dnone");
+                }
+            }
+            function savePost(elem, postID, userID, csrf){
+                j.ajax({
+                    url:"{% url 'save-the-post' %}",
+                    type : "POST", // http method
+                    data : { redirect: window.location.href, csrfmiddlewaretoken: csrf, post_id : postID, operation : "save", user_id : userID}, // data sent with the post request
+                    // handle a successful response
+                    success : function(json) {
+                        // log the returned json to the console
+                        console.log("success"); // another sanity check
+                    }
+                });
+            }
+            jQuery(function($){
+                j('.colorBox-question').textfill({
+                    maxFontPixels: 40,
+                    minFontPixels: 15
+                });
+            });
+            function showAllQuestions(elem, number){
+                var elems = document.getElementsByClassName("quiz_question"+number);
+                for (var i = 0; i < elems.length; i++) {
+                    elems[i].classList.remove("dnone");
+                }
+                elem.remove();
+            }
+        </script>
+    </body>
+</html>

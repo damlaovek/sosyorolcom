@@ -1,0 +1,170 @@
+{% load index %}
+{% load static %}
+<div class="absolute bcba dnone popup-container" id="select-user-popup">
+    <input type="hidden" name="selected_question" id="selected_question" value="">
+    <div class="popup box full-shadow-border p20">
+        <p class="title fs19">{{word_list|getword:"select-users-to-request-answer"|ucfirst}}</p>
+        <svg style="position:absolute;top:20px;right:20px;cursor:pointer;padding:5px;width:15px;height:15px;z-index:9999;" class="icon hand" onclick="document.getElementById('select-user-popup').classList.toggle('dnone');" viewBox="0 0 15 15" version="1.1">
+            <g id="surface1">
+                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0.132812 14.878906 C 0.222656 14.964844 0.335938 15.011719 0.453125 15.011719 C 0.570312 15.011719 0.683594 14.964844 0.773438 14.878906 L 7.503906 8.144531 L 14.238281 14.878906 C 14.324219 14.964844 14.441406 15.011719 14.558594 15.011719 C 14.675781 15.011719 14.789062 14.964844 14.878906 14.878906 C 15.054688 14.703125 15.054688 14.414062 14.878906 14.238281 L 8.144531 7.503906 L 14.878906 0.773438 C 15.054688 0.597656 15.054688 0.308594 14.878906 0.132812 C 14.703125 -0.0429688 14.414062 -0.0429688 14.238281 0.132812 L 7.503906 6.863281 L 0.773438 0.132812 C 0.597656 -0.0429688 0.308594 -0.0429688 0.132812 0.132812 C -0.0429688 0.308594 -0.0429688 0.597656 0.132812 0.773438 L 6.863281 7.503906 L 0.132812 14.238281 C -0.0429688 14.414062 -0.0429688 14.703125 0.132812 14.878906 Z M 0.132812 14.878906 "/>
+            </g>
+        </svg>
+        <form class="bsbb full-width p200">
+            {% csrf_token %}
+            <div class="full-width inline-block">
+                <div class="half-width left mr10" style="width:calc(50% - 10px);">
+                    <input type="text" name="user_search" id="user_search" class="bsbb full-width p10 br4 textarea text border" placeholder="{{word_list|getword:'search-for-users'|ucfirst}}"  autocomplete='off'>
+                    <div id="users_to_select" class="mt10">
+                        {% include 'includes/select_user_list.html' with container="users_to_select" %}
+                    </div>
+                    <div class="absolute aligntl full-width dnone" style="top:40px;" id="search_user_results">
+                    </div>
+                </div>
+                <div class="bsbb half-width right p200 ml10" style="width:calc(50% - 10px);">
+                    <p class="fwbold cg2">{{word_list|getword:"selected-users"|ucwords}}<span id="num_selected_users" class="fwbold"></span>:</p>
+                    <div id="empty-selected-users" class="mt10">
+                        <div class="p020 bcgrayish border br10 tac table" style="height: 305px;">
+                            <div class="tablecell" style="vertical-align: middle;">
+                                <svg width="30px" height="30px" viewBox="0 0 30 30" class="hcentered">
+                                    <g>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10.183594 30.050781 L 26.964844 30.050781 C 26.964844 30.050781 22.09375 26.140625 22.195312 21.847656 C 22.257812 19.457031 26.964844 16.414062 26.941406 9.773438 C 26.925781 6.433594 23.6875 0.878906 18.183594 0.1875 C 12.683594 -0.503906 8.566406 0.707031 6.765625 4.097656 C 4.964844 7.488281 4.828125 10.464844 4.964844 11.019531 C 5.105469 11.574219 5.695312 12.609375 5.695312 12.609375 C 5.695312 12.609375 2.925781 16.867188 3.097656 17.558594 C 3.273438 18.25 5.171875 18.625 5.171875 18.625 C 5.171875 18.625 5.34375 19.105469 4.996094 20.039062 C 4.648438 20.976562 5.640625 22.058594 5.9375 22.4375 C 6.230469 22.816406 5.519531 23.992188 5.761719 24.652344 C 6.003906 25.308594 7.148438 26.105469 8.460938 25.933594 C 9.777344 25.757812 11.464844 25.449219 12.050781 25.34375 C 13.375 28.457031 10.183594 30.050781 10.183594 30.050781 Z M 17.355469 19.910156 C 16.09375 19.910156 15.238281 18.984375 15.238281 17.746094 C 15.238281 16.484375 16.117188 15.585938 17.355469 15.585938 C 18.636719 15.585938 19.46875 16.488281 19.492188 17.746094 C 19.492188 18.980469 18.636719 19.910156 17.355469 19.910156 Z M 17.683594 3.363281 C 20.824219 3.363281 22.25 5.097656 22.25 7.070312 C 22.25 8.878906 21.132812 10.066406 20.230469 11.066406 C 19.351562 12.039062 18.992188 12.96875 19.015625 14.035156 L 19.015625 14.464844 L 15.855469 14.464844 L 15.832031 13.847656 C 15.761719 12.632812 16.164062 11.398438 17.234375 10.113281 C 17.996094 9.210938 18.613281 8.449219 18.613281 7.644531 C 18.613281 6.808594 18.066406 6.265625 16.878906 6.21875 C 16.09375 6.21875 15.144531 6.503906 14.523438 6.929688 L 13.71875 4.339844 C 14.574219 3.839844 15.996094 3.363281 17.683594 3.363281 Z M 17.683594 3.363281 "/>
+                                    </g>
+                                </svg>
+                                <p class="cg2 full-width tac mt10">{{word_list|getword:"select-users-to-request-answer"|ucfirst}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="selected-users" class="mt10 dnone">
+                        <ul class="bsbb box border" style="height:305px; overflow-y: scroll;">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt20 full-width inline-block">
+                <input disabled type="submit" id="send-answer-request" class="btn p10 right fs15 lh20 noselect" style="border-radius:4px;height:30px;width:calc(25% - 35px); border:none; text-align:center; color:var(--main-color); font-weight:700;opacity:0.8" value="{{word_list|getword:'send'|ucfirst}}" onclick="return sendAnswerRequest()"/>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    const userSearchBar = document.querySelector("#user_search");
+    const userSearchResultsContainer = document.querySelector("#search_user_results");
+    const selectedUsersContainer = document.querySelector("#selected-users");
+    isUserSearching = false;
+
+    userSearchBar.addEventListener("keyup", function(e) {
+        if (e.target.value.trim().length > 0){
+            getUserSearchResults(e.target.value);
+        }else{
+            userSearchResultsContainer.innerHTML = "";
+            userSearchResultsContainer.classList.add("dnone");
+        }
+    });
+    const getUserSearchResults = searchTerm => {
+        if(!isUserSearching){
+            isUserSearching = true;
+            searchTerm = searchTerm.toLowerCase();
+            selectedUsers = "";
+            var users = document.getElementById("selected-users").getElementsByTagName("ul")[0].getElementsByTagName("li");
+            for(var i = 0; i<users.length; i++){
+                if(i == 0){
+                    selectedUsers = selectedUsers + users[i].id.split("_")[1];
+                }else{
+                    selectedUsers = selectedUsers + ", " + users[i].id.split("_")[1];
+                }
+            }
+            j.ajax({
+                type: "POST",
+                url: "/get_searched_users",
+                data: {search: searchTerm, container: "search_user_results", selectedUsers: selectedUsers },
+                success: function(response) {
+                    userSearchResultsContainer.innerHTML = response;
+                    if(userSearchResultsContainer.classList.contains("dnone")){
+                        userSearchResultsContainer.classList.remove("dnone");
+                    }
+                    isUserSearching = false;
+                }
+            });
+        }
+    };
+
+    function selectUser(elem, container){
+        if(!document.getElementById("empty-selected-users").classList.contains("dnone")){
+            document.getElementById("empty-selected-users").classList.add("dnone");
+        }
+        if(document.getElementById("selected-users").classList.contains("dnone")){
+            document.getElementById("selected-users").classList.remove("dnone");
+        }
+        document.getElementById(container).getElementsByTagName("ul")[0].removeChild(elem);
+        document.getElementById("selected-users").getElementsByTagName("ul")[0].appendChild(elem);
+        elem.getElementsByTagName("div")[0].classList.remove("dnone");
+        elem.onclick = function(){removeSelectedUser(elem.id, container)};
+        var num_selected = document.getElementById("selected-users").getElementsByTagName("ul")[0].getElementsByTagName("li").length;
+        if(num_selected > 0){
+            document.getElementById("send-answer-request").disabled = false;
+            document.getElementById("send-answer-request").style.opacity = "1";
+            document.getElementById("send-answer-request").style.cursor = "pointer";
+            document.getElementById("num_selected_users").innerHTML = "&nbsp;("+num_selected+")";
+        }
+        if(document.getElementById(container).getElementsByTagName("ul")[0].getElementsByTagName("li").length == 0){
+            document.getElementById(container).classList.add("dnone");
+        }
+    }
+    function removeSelectedUser(id, container){
+        var li = document.getElementById(id);
+        var remove = document.getElementById(id+"_remove");
+        remove.classList.add("dnone");
+        document.getElementById("selected-users").getElementsByTagName("ul")[0].removeChild(li);
+        var list = document.getElementById("users_to_select").getElementsByTagName("ul")[0];
+        if(list.getElementsByTagName("li").length > 0){
+            list.insertBefore(li, list.getElementsByTagName("li")[0]);
+        }else{
+            list.appendChild(li);
+        }
+        li.onclick = function() { selectUser(li, "users_to_select"); }
+        var num_selected = document.getElementById("selected-users").getElementsByTagName("ul")[0].getElementsByTagName("li").length;
+        document.getElementById("num_selected_users").innerHTML = "&nbsp;("+num_selected+")";
+        if(num_selected == 0){
+            document.getElementById("num_selected_users").innerHTML = "";
+            document.getElementById("empty-selected-users").classList.remove("dnone");
+            document.getElementById("selected-users").classList.add("dnone");
+            document.getElementById("send-answer-request").disabled = true;
+            document.getElementById("send-answer-request").style.opacity = "0.8";
+            document.getElementById("send-answer-request").style.cursor = "default";
+        }
+        if(document.getElementById("users_to_select").classList.contains("dnone")){
+            document.getElementById(container).classList.remove("dnone");
+        }
+        if (!e) var e = window.event;
+        e.cancelBubble = true;
+        if (e.stopPropagation) e.stopPropagation();
+    }
+
+    function sendAnswerRequest(){
+        post_id = document.getElementById("selected_question").value;
+        selectedUsers = "";
+        var users = document.getElementById("selected-users").getElementsByTagName("ul")[0].getElementsByTagName("li");
+        for(var i = 0; i<users.length; i++){
+            if(i == 0){
+                selectedUsers = selectedUsers + users[i].id.split("_")[1];
+            }else{
+                selectedUsers = selectedUsers + ", " + users[i].id.split("_")[1];
+            }
+        }
+        var data = {}
+        data = {
+            "post_id": post_id,
+            "selectedUsers": selectedUsers,
+        }
+        jQuery.ajax({
+            type: "POST",
+            url:"{% url 'requestanswer' %}",
+            data: data,
+            success: function(response) {
+                displayAlert(response.msg);
+                document.getElementById("select-user-popup").classList.add("dnone");
+            }
+        });
+        return false;
+    }
+</script>

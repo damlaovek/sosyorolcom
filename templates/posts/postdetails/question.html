@@ -109,7 +109,7 @@
                 </div>
             </div>
         </div>
-        <div class="bt bb">
+        <div>
             {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=poll.ID %}
         </div>
         {% if comments|length > 0 %}
@@ -124,6 +124,7 @@
         {% endif %}
     </div>
 </div>
+{% if question.isanswered is False %}
 <div class="bsbb box p20 title fs18" style="margin:0 auto 20px auto;">
     <p class="fs19 fwbold">{{word_list|getword:"answer"|ucwords}}</p>
     <div class="bsbb full-width box m200">
@@ -133,6 +134,7 @@
         <input disabled type="submit" id="cp-sendBtn" class="btn p10 right fs15 lh20 noselect" style="border-radius:4px;height:30px;width:calc(25% - 35px); border:none; text-align:center; color:var(--main-color); font-weight:700;" value="{{word_list|getword:'answer'|ucwords}}" onclick="return saveAnswer()"/>
     </div>
 </div>
+{% endif %}
 {% for answer in post.answers %}
     {% include 'posts/posttemplates/answer_template.html' %}
 {% endfor %}

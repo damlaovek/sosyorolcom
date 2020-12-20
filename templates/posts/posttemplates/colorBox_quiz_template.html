@@ -18,7 +18,7 @@
                 <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{quiz.ID}}">
                     <li class="hand" onclick="savePost(this, {{quiz.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
                 </ul>
-                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{post_template_dict.quiz}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{post_template_dict.recommendedfy}}</span></p>
+                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{word_list|getword:"quiz"|ucfirst}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{word_list|getword:"recommended-for-you"}}</span></p>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
                     <img src='{{quiz.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
@@ -60,7 +60,7 @@
             </div>
             <div class='full-width' style='display:inline-block;margin-top:5px;'>
                 {% if quiz.user_rate == "like" %}
-                    <div class='icon left answer-hint' onclick="upvote({{quiz.ID}}, '{{csrf_token}}');" data-title='{{post_template_dict.upvote}}'>
+                    <div class='icon left answer-hint' onclick="upvote({{quiz.ID}}, '{{csrf_token}}');" data-title='{{word_list|getword:"upvote"|ucfirst}}'>
                         <svg width='20px' height='20px' id='upvote{{quiz.ID}}' class='upvote active' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
                             <g id='surface1'>
                                 <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
@@ -68,7 +68,7 @@
                         </svg>
                     </div>
                 {% else %}
-                    <div class='icon left answer-hint' onclick="upvote({{quiz.ID}}, '{{csrf_token}}');" data-title='{{post_template_dict.upvote}}'>
+                    <div class='icon left answer-hint' onclick="upvote({{quiz.ID}}, '{{csrf_token}}');" data-title='{{word_list|getword:"upvote"|ucfirst}}'>
                         <svg width='20px' height='20px' id='upvote{{quiz.ID}}' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
                             <g id='surface1'>
                                 <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
@@ -102,7 +102,7 @@
                         </svg>
                     </div>
                 {% endif %}
-                <div class='icon left answer-hint' data-title='{{post_template_dict.repost}}'>
+                <div class='icon left answer-hint' data-title='{{word_list|getword:"repost"|ucfirst}}'>
                     <svg width='20px' height='20px' viewBox='0 0 20 20'>
                         <g id='surface1'>
                             <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 15.800781 2.445312 L 16.769531 2.324219 C 17.203125 2.269531 17.511719 1.875 17.460938 1.4375 C 17.410156 1.035156 17.082031 0.707031 16.574219 0.746094 L 13.660156 1.109375 C 13.226562 1.164062 12.917969 1.558594 12.96875 1.992188 L 13.328125 4.945312 C 13.382812 5.378906 13.777344 5.691406 14.210938 5.636719 C 14.644531 5.582031 14.957031 5.1875 14.902344 4.75 L 14.769531 3.652344 C 17.507812 5.683594 18.644531 9.207031 17.59375 12.46875 C 16.542969 15.730469 13.457031 17.96875 10.046875 17.976562 C 9.542969 17.976562 9.222656 18.3125 9.210938 18.75 C 9.203125 19.1875 9.515625 19.5625 10.046875 19.5625 C 14.140625 19.5625 17.847656 16.871094 19.105469 12.953125 C 20.355469 9.082031 19.027344 4.890625 15.800781 2.445312 Z M 15.800781 2.445312 '/>
@@ -123,10 +123,17 @@
                         </svg>
                     </div>
                 <p class='vote noselect'>{{comments.count}}</p>
-                <div class='icon right answer-hint' data-title='{{post_template_dict.share}}'>
+                <div class='icon right answer-hint' data-title='{{word_list|getword:"share"|ucfirst}}'>
                     <svg width='20px' height='20px' viewBox='0 0 20 20'>
                         <g>
                             <path style='stroke-width:0.5;stroke:var(--gray2);fill-rule:nonzero;fill-opacity:1;' d='M 0.664062 18.40625 C 0.671875 18.40625 0.675781 18.40625 0.683594 18.40625 C 1 18.394531 1.199219 18.148438 1.226562 17.832031 C 1.25 17.601562 1.871094 11.992188 10.625 12 L 10.644531 15.585938 C 10.644531 15.828125 10.785156 16.046875 11.003906 16.148438 C 11.21875 16.253906 11.480469 16.222656 11.667969 16.066406 L 19.773438 9.351562 C 19.917969 9.234375 20 9.054688 20 8.871094 C 20 8.683594 19.914062 8.503906 19.769531 8.386719 L 11.664062 1.734375 C 11.480469 1.582031 11.21875 1.554688 11.003906 1.65625 C 10.785156 1.757812 10.644531 1.976562 10.644531 2.21875 L 10.628906 5.726562 C 6.996094 5.84375 4.183594 7.011719 2.359375 9.144531 C -0.609375 12.617188 0.0546875 17.664062 0.0820312 17.875 C 0.128906 18.179688 0.355469 18.40625 0.664062 18.40625 Z M 11.269531 10.738281 C 5.015625 10.742188 2.625 12.855469 1.261719 14.71875 C 1.460938 13.222656 2.042969 11.425781 3.3125 9.953125 C 4.996094 7.996094 7.714844 6.96875 11.269531 6.96875 C 11.617188 6.96875 11.894531 6.6875 11.894531 6.34375 L 11.894531 3.535156 L 18.390625 8.875 L 11.894531 14.261719 L 11.894531 11.363281 C 11.894531 11.195312 11.828125 11.039062 11.710938 10.921875 C 11.59375 10.804688 11.4375 10.738281 11.269531 10.738281 Z M 11.269531 10.738281'/>
+                        </g>
+                    </svg>
+                </div>
+                <div class='icon right answer-hint' data-title='{{word_list|getword:"send"|ucfirst}}' onclick="document.getElementById('select-user-popup').classList.remove('dnone');document.getElementById('selected_question').value='{{quiz.ID}}';">
+                    <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                        <g>
+                            <path style="stroke-width:1.5;stroke:var(--gray2);fill:transparent;fill-rule:nonzero;fill-opacity:1;" d="M 0 18.554688 L 19.980469 9.992188 L 0 1.425781 L 0 8.085938 L 14.273438 9.992188 L 0 11.894531 Z M 0 18.554688 "/>
                         </g>
                     </svg>
                 </div>

@@ -85,7 +85,21 @@ urlpatterns = [
     path('changeprofilepicture/', sv.changeprofilepicture, name="changeprofilepicture"),
     path('removeprofilepicture/', sv.removeprofilepicture, name="removeprofilepicture"),
     path('updatenotification', sv.updatenotification, name="updatenotification"),
-    path('updateallnotifications/', sv.updateallnotifications, name="updateallnotifications")
+    path('updateallnotifications/', sv.updateallnotifications, name="updateallnotifications"),
+    path('notifications/', sv.notifications, name="notifications"),
+    path('notifications/<path:filter>', sv.notifications, name="notifications"),
+    path('questions', sv.questions, name='questions'),
+    path('followpost', sv.followpost, name='followpost'),
+    path('get_searched_users', sv.get_searched_users, name='get_searched_users'),
+    path('requestanswer', sv.requestanswer, name='requestanswer'),
+    path('answer/requests', sv.answerrequests, name='answerrequests'),
+    path('answer/answer_later', sv.answerdrafts, name='answerdrafts'),
+    path('saveanswerdraft', sv.saveanswerdraft, name='saveanswerdraft'),
+    path('publishdraftanswer', sv.publishdraftanswer, name='publishdraftanswer'),
+    path('deleteanswerdraft', sv.deleteanswerdraft, name='deleteanswerdraft'),
+    path('quizzes', sv.quizzes, name='quizzes'),
+    path('polls', sv.polls, name='polls'),
+    path('quiz/requests', sv.quizrequests, name='quizrequests'),
 ]
 
 if settings.DEBUG:

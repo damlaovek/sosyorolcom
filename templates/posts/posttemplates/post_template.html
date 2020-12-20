@@ -1,3 +1,4 @@
+{% load index %}
 <div class='full-width'>
     <div class='full-width box answer-template-oc'>
         <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
@@ -26,13 +27,12 @@
                 {% if post.post_content != "" %}
                     {% if post.preview == 'not-found' %}
                         <div class="full-width answer-more-container hand" id="post-more-container" onclick="document.getElementById('post-template{{post.ID|escapejs}}').style.display='block';this.remove();">
-                            <p class='answer-shorttext hand' id='post-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick='document.getElementById("photo-frame-{{post.ID}}").style.display="none";document.getElementById("post-shorttext{{post.ID}}").style.display="none";document.getElementById("post-template{{post.ID|escapejs}}").style.display="block";this.remove();'>({{post_template_dict.more}})</span></p>
+                            <p class='answer-shorttext hand' id='post-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick='document.getElementById("photo-frame-{{post.ID}}").style.display="none";document.getElementById("post-shorttext{{post.ID}}").style.display="none";document.getElementById("post-template{{post.ID|escapejs}}").style.display="block";this.remove();'>({{word_list|getword:"more"|ucfirst}})</span></p>
                         </div>
                         <div class='answer-template' id='post-template{{post.ID}}'>{% autoescape off %}{{post.post_content}}{% endautoescape %}</div>
                     {% else %}
                         <div class='full-width answer-more-container hand' id='post-more-container' onclick='document.getElementById("post-template{{post.ID|escapejs}}").style.display="block";this.remove();'>
-                            {% include 'posts/posttemplates/photo_college.html' %}
-                            <p class='answer-shorttext hand' id='post-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick="document.getElementById('photo-frame-{{post.ID}}').style.display='none';document.getElementById('post-shorttext{{post.ID}}').style.display='none';document.getElementById('post-template{{post.ID|escapejs}}').style.display='block';this.remove();">({{post_template_dict.more}})</span></p>
+                            <p class='answer-shorttext hand' id='post-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick="document.getElementById('photo-frame-{{post.ID}}').style.display='none';document.getElementById('post-shorttext{{post.ID}}').style.display='none';document.getElementById('post-template{{post.ID|escapejs}}').style.display='block';this.remove();">({{word_list|getword:"more"|ucfirst}})</span></p>
                         </div>
                         <div class='answer-template' id='post-template{{post.ID}}'>{% autoescape off %}{{post.post_content}}{% endautoescape %}</div>
                     {% endif %}

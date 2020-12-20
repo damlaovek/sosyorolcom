@@ -72,6 +72,7 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     hex_id = ""
     post_date = models.DateTimeField()
+    post_modified = models.DateTimeField()
     post_content = models.TextField()
     post_title = models.TextField()
     post_excerpt = models.TextField()
@@ -110,6 +111,8 @@ class Post(models.Model):
     media_url = ""
     answers = models.QuerySet()
     quiz_type = ""
+    isanswered = False
+    isfollowed = 0
     class Meta:
         db_table = "wpmu_posts"
 
@@ -158,6 +161,26 @@ class SavedPosts(models.Model):
     saved_at = models.DateTimeField()
     class Meta:
         db_table = "saved_posts"
+
+class FollowedPosts(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateTimeField()
+    following = models.IntegerField()
+    class Meta:
+        db_table = "followed_posts"
+
+class PostRequest(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post_type = models.TextField()
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender")
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="receiver")
+    date = models.DateTimeField()
+    answered = models.IntegerField()
+    class Meta:
+        db_table = "post_requests"
 
 # Comment related models.
 class Comment(models.Model):
@@ -254,7 +277,6 @@ class FollowedCommunities(models.Model):
     role = models.TextField()
     class Meta:
         db_table = "term_members"
-
 
 class CommunityMeta(models.Model):
     meta_id = models.BigIntegerField(primary_key = True)
