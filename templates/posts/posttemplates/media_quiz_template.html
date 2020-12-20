@@ -18,7 +18,7 @@
                 <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{quiz.ID}}">
                     <li class="hand" onclick="savePost(this, {{quiz.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
                 </ul>
-                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{post_template_dict.quiz}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{post_template_dict.recommendedfy}}</span></p>
+                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{word_list|getword:"quiz"|ucfirst}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{word_list|getword:"recommended-for-you"}}</span></p>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
                     <img src='{{quiz.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>

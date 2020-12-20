@@ -1,3 +1,4 @@
+{% load index %}
 <div class="box full-width">
     <div class="inline-flex wrapper-title">
         <div style="width:15px;height:15px;overflow:hidden;"> 
@@ -15,7 +16,7 @@
             <li class="bsbb full-width p20 bcw bt">
                 <div class="full-width inline-block">
                     <div class="half-width left">
-                        <p class="cg2 fs13 mb10">{{post_template_dict.question}}<span class="fs10 m04"> &#10625; </span><a href="/c/{{post.first_community}}" class="fs13 underline-on-hover cg2">{{post.first_community}}</a></p>
+                        <p class="cg2 fs13 mb10">{{word_list|getword:"question"|ucfirst}}<span class="fs10 m04"> &#10625; </span><a href="/c/{{post.first_community}}" class="fs13 underline-on-hover cg2">{{post.first_community}}</a></p>
                         <a href="#" class="title">{{post.post_title}}</a>
                     </div>
                     <div class="absolute half-width inline-block aligntr" style="top:calc(50% - 20px);">

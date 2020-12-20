@@ -359,75 +359,79 @@
                     </div>
                 </div>
             </div>
-            <div class="section-right fixed" id="section-right">
-                {% include 'profilesettings.html' with user=profile %}
-                {% if current_user.ID == profile.ID %}
-                    <div  class="full-shadow-border section-right-bottom" style="padding:10px 0;width:calc(100% - 60px);">
-                        <div class="bsbb full-width inline-block p020 mt5">
-                            <p class="fs19 fwblack ctitle left">{{word_list|getword:"users-you-may-follow"|ucwords}}</p>
-                            <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
-                                <g>
-                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
-                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
-                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
-                                </g>
-                            </svg>
+            {% if ref == "notif" %}
+                {% include 'includes/general/notifications-menu.html' %}
+            {% else %}
+                <div class="section-right fixed" id="section-right">
+                    {% include 'profilesettings.html' with user=profile %}
+                    {% if current_user.ID == profile.ID %}
+                        <div  class="full-shadow-border section-right-bottom" style="padding:10px 0;width:calc(100% - 60px);">
+                            <div class="bsbb full-width inline-block p020 mt5">
+                                <p class="fs19 fwblack ctitle left">{{word_list|getword:"users-you-may-follow"|ucwords}}</p>
+                                <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
+                                    <g>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                                    </g>
+                                </svg>
+                            </div>
+                            <ul class="full-width bt" style="margin-top:12px;">
+                                {% for user in users %}
+                                    <li class="bsbb full-width bb right-list-item">
+                                        <a href="" class="bsbb full-width p1020 inline-block">
+                                            <img class="sqr40 rounded lh30 left" src="{{user.avatar_url}}"/>
+                                            <div class="ml10 left">
+                                                <p class="lh20 fwblack ctitle">{{user.display_name}}</p>
+                                                <p class="cg2 lh20">u/{{user.user_login}}</p>
+                                            </div>
+                                            <div class="right" style="top:5.5px;">
+                                                <p class="btn"><span class="p115">{{word_list|getword:"follow"|ucfirst}}</span></p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <div class="bsbb p020 mt10">
+                                <a href="" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
+                            </div>
                         </div>
-                        <ul class="full-width bt" style="margin-top:12px;">
-                            {% for user in users %}
-                                <li class="bsbb full-width bb right-list-item">
-                                    <a href="" class="bsbb full-width p1020 inline-block">
-                                        <img class="sqr40 rounded lh30 left" src="{{user.avatar_url}}"/>
-                                        <div class="ml10 left">
-                                            <p class="lh20 fwblack ctitle">{{user.display_name}}</p>
-                                            <p class="cg2 lh20">u/{{user.user_login}}</p>
-                                        </div>
-                                        <div class="right" style="top:5.5px;">
-                                            <p class="btn"><span class="p115">{{word_list|getword:"follow"|ucfirst}}</span></p>
-                                        </div>
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                        <div class="bsbb p020 mt10">
-                            <a href="" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
-                        </div>
-                    </div>
-                    <div class="full-shadow-border section-right-bottom" style="padding:0;width:calc(100% - 60px);">
-                        <ul class="full-width inline-block">
-                            {% for media in medias %}
-                                <li class="left" style="width:calc(100% / 3);height:100px;">
-                                    <a class="full" href="/u/{{media.author.user_login}}/{{media.hex_id}}/{{media.guid}}">
-                                        {% if media.media_type == "image" %}
-                                            {% if forloop.counter == 1 %}
-                                                <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-top-left-radius: 5px;"/>
-                                            {% elif forloop.counter == 3 %}
-                                                <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-top-right-radius: 5px;"/>
-                                            {% elif forloop.counter == 4 %}
-                                                <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-bottom-left-radius: 5px;"/>
-                                            {% elif forloop.counter == 6 %}
-                                                <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-bottom-right-radius: 5px;"/>
-                                            {% else %}
-                                                <img src="{{media.media_url}}" class="full" style="object-fit: cover;"/>
+                        <div class="full-shadow-border section-right-bottom" style="padding:0;width:calc(100% - 60px);">
+                            <ul class="full-width inline-block">
+                                {% for media in medias %}
+                                    <li class="left" style="width:calc(100% / 3);height:100px;">
+                                        <a class="full" href="/u/{{media.author.user_login}}/{{media.hex_id}}/{{media.guid}}">
+                                            {% if media.media_type == "image" %}
+                                                {% if forloop.counter == 1 %}
+                                                    <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-top-left-radius: 5px;"/>
+                                                {% elif forloop.counter == 3 %}
+                                                    <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-top-right-radius: 5px;"/>
+                                                {% elif forloop.counter == 4 %}
+                                                    <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-bottom-left-radius: 5px;"/>
+                                                {% elif forloop.counter == 6 %}
+                                                    <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-bottom-right-radius: 5px;"/>
+                                                {% else %}
+                                                    <img src="{{media.media_url}}" class="full" style="object-fit: cover;"/>
+                                                {% endif %}
                                             {% endif %}
-                                        {% endif %}
-                                    </a>
-                                </li>
-                            {% endfor %}
-                            {% for i in empty_medias %}
-                                {% if forloop.last%}
-                                    <li class="left" style="width:calc(100% / 3);height:100px; background-color:var(--main-color-alpha);">
+                                        </a>
                                     </li>
-                                {% else %}
-                                    <li class="left" style="width:calc(100% / 3 - 1px);height:100px; border-right:1px solid var(--white); background-color:var(--main-color-alpha);">
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% else %}
-                {% endif %}
-            </div>
+                                {% endfor %}
+                                {% for i in empty_medias %}
+                                    {% if forloop.last%}
+                                        <li class="left" style="width:calc(100% / 3);height:100px; background-color:var(--main-color-alpha);">
+                                        </li>
+                                    {% else %}
+                                        <li class="left" style="width:calc(100% / 3 - 1px);height:100px; border-right:1px solid var(--white); background-color:var(--main-color-alpha);">
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% else %}
+                    {% endif %}
+                </div>
+            {% endif %}
         </div>
         <script>
             var offset = 0;

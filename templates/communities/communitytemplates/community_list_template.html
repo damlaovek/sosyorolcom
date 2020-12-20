@@ -1,7 +1,7 @@
 {% load static %}
 {% load index %}
 <div class='community-template'>
-    <a href='' title='{{community.name}}' class='community-template-link'>
+    <a href='c/{{community.slug}}' title='{{community.name}}' class='community-template-link'>
         <div class='full-shadow-border box' id='community-template-link-box'>
             <div style='width:178px;height:60px; background-color:var(--main-color);border-top-left-radius:4px;border-top-right-radius:4px;'>
                 {% if community.profile_img == '' %}

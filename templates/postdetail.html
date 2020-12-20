@@ -71,9 +71,13 @@
                     </div>
                 </div>
             </div>
+            {% if ref == "notif" %}
+                {% include 'includes/general/notifications-menu.html' %}
+            {% else %}
             <div class="section-right fixed" id="section-right">
 
             </div>
+            {% endif %}
         </div>
     </body>
 </html>

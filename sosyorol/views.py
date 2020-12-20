@@ -21,6 +21,8 @@ from django.views.generic.list import ListView
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATICFILES_DIR = os.path.join(BASE_DIR, 'static')
 
+current_uid = 8
+
 '''---------------------------------------
   FIREBASE              
 -----------------------------------------'''
@@ -344,9 +346,14 @@ def arrange_post_slug(title):
     title = title.replace(' ','_')
     return title
 
+def isquestionanswered(question, user_id):
+    answer = Post.objects.filter(post_title=question.post_title, post_status="publish", post_parent=question.ID, post_author=user_id, post_type="answer")
+    if answer.count() > 0:
+        return True
+    return False
+
 def setup_quizmeta(post, word_list):
     import re
-    current_uid = 8
     post.quiz_questions = []
     num_questions = int(PostMeta.objects.filter(post_id=post.ID, meta_key="question_number")[0].meta_value)
     for i in range(1, num_questions + 1):
@@ -406,7 +413,6 @@ def setup_media_quizmeta(post, word_list):
         post.quiz_questions.append(question)
 
 def setup_pollmeta(post, word_list):
-    current_uid = 8
     post.poll_duration = PostMeta.objects.filter(post_id=post.ID, meta_key="poll_duration")[0].meta_value
     post.number_options = int(PostMeta.objects.filter(post_id=post.ID, meta_key="number_options")[0].meta_value)
     options_keys = []
@@ -453,7 +459,6 @@ def setup_mediameta(post):
 
 def setup_postmeta(post, word_list):
     import re
-    current_uid = 8
     post.hex_id = hex(post.ID + 100000).replace("x", "s")
     post.post_title = post.post_title.replace(" - Sosyorol", "")
     post.guid = arrange_post_slug(post.post_title)
@@ -521,7 +526,6 @@ def morefollowedlists(request):
         offset = 0
         limit = 3
     limit += 1
-    current_uid = 8
     list_ids = ListUser.objects.filter(Q(user_id=current_uid)).order_by('-date')
     list_ids = list({x.list_id: x for x in list_ids}.keys())
     followedlists = List.objects.filter(Q(ID__in=list_ids)).order_by('-created_at')
@@ -592,8 +596,11 @@ def getcommunityflairs(request):
         
 def setup_current_user(current_uid):
     current_user = User.objects.get(ID = current_uid)
-    user_desc = UserMeta.objects.filter(user_id = current_uid, meta_key = 'description')[0]
-    current_user.description = user_desc.meta_value
+    try:
+        user_desc = UserMeta.objects.filter(user_id = current_uid, meta_key = 'description')[0]
+        current_user.description = user_desc.meta_value
+    except:
+        pass
     current_user.posts = Post.objects.filter(post_author=current_uid, post_status="publish", post_type__in=["post","quiz","media","link","questions","answer"]).order_by('-post_date')
     '''
     mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
@@ -623,15 +630,36 @@ def setup_current_user(current_uid):
         pass
     return current_user
 
-def setup_notifications(current_uid, word_list):
+def setup_notifications(current_uid, word_list, **kwargs):
     notifications = Notification.objects.filter(to_u_id=current_uid).prefetch_related().order_by('-date')
+    if 'filter' in kwargs:
+        fltr = kwargs.get("filter").split("_")[0]
+    else:
+        fltr = "all"
+    
+    if fltr == "birthday":
+        notifications = notifications.filter(notification_variable__in=["birthday", "birthday-old"])
+    elif fltr == "follow":
+        notifications = notifications.filter(notification_variable="follow")
+    elif fltr == "community":
+        notifications = notifications.filter(notification_variable="community-post")
+    elif fltr == "comment":
+        notifications = notifications.filter(notification_variable__in=["comment-reply","comment-on-post"])
+    elif fltr == "answer":
+        notifications = notifications.filter(notification_variable="answer-question")
+    elif fltr == "post":
+        notifications = notifications.filter(notification_variable="new-post")
+
     notifs = dict()
     new_notifs = []
     old_notifs = []
+    num_unopened = 0
     for notification in notifications:
         user = User.objects.get(ID=notification.from_u_id)
         notification.from_u = setup_current_user(user.ID)
         notification.date_diff = fun.humanizedate(notification.date.replace(tzinfo=None), word_list, to=dt.datetime.now())
+        if(notification.opened == 0):
+            num_unopened += 1
         if notification.notification_variable == "community-post": #done
             community = Community.objects.filter(term_id=notification.related_obj)[0]
             notification.notification = word_list.filter(var_name="notification-community-post")[0].translation
@@ -661,7 +689,7 @@ def setup_notifications(current_uid, word_list):
             old_notifs.append(notification)
     notifs["new"] = new_notifs
     notifs["earlier"] = old_notifs
-    return notifs
+    return notifs, num_unopened
 
 def communitiesfiltered(request, **kwargs):
     if 'filter' in kwargs:
@@ -683,7 +711,6 @@ def communitiesfiltered(request, **kwargs):
 
 def addanotherquizresult(request):
     nmr = str(int(request.GET["number"]) + 1)
-    current_uid = 8
     current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
@@ -692,7 +719,6 @@ def addanotherquizresult(request):
 
 def addanotherquizquestion(request):
     nmr = str(int(request.GET["number"]) + 1)
-    current_uid = 8
     current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
@@ -726,7 +752,6 @@ def loadmorecomments(request):
         padding = int(request.GET["padding"])
         comments = Comment.objects.filter(comment_post_ID=post_id, comment_parent=parent_id).order_by('-comment_date').prefetch_related()
         comments = comments[offset:(offset + limit)]
-        current_uid = 8
         current_user = setup_current_user(current_uid)
         lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
         word_list = Languages.objects.filter(Q(lang_code = lang))
@@ -767,7 +792,6 @@ def loadmoreprofileposts(request):
                 hasMore = "False"
             else:
                 moreposts = moreposts[offset:(offset + limit)]
-        current_uid = 8
         current_user = setup_current_user(current_uid)
         lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
         word_list = Languages.objects.filter(Q(lang_code = lang))
@@ -887,7 +911,6 @@ def uploadmedia(request):
 @csrf_exempt
 def changeprofilepicture(request):
     from sosyorol.forms import MediaFileUploadForm
-    current_uid = 8
     form = MediaFileUploadForm(data=request.POST, files=request.FILES)
     if form.is_valid():
         photo = form.save()
@@ -1046,13 +1069,12 @@ def get_search_results(request):
         results = User.objects.filter(Q(display_name__icontains=search_key))[:diff]
         for result in results:
             result = setup_current_user(result.ID)
-            response_data[result.user_nicename] = "user!:!" + result.avatar_url + "!:!" + result.display_name
+            response_data[result.user_nicename] = "user!:!" + result.avatar_url + "!:!" + result.user_login
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 @csrf_exempt
 def getlanguages(request):
     search_key = request.GET["search"]
-    current_uid = 8
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
     response_data = {}
     results = Languages.objects.filter(lang_code=lang, var_name__icontains="lang-ns-", translation__icontains=search_key)
@@ -1063,7 +1085,6 @@ def getlanguages(request):
 @csrf_exempt
 def savenewquiz(request):
     import re
-    current_uid = 8
     quiz_title = request.POST["quiz_title"]
     quiz_desc = request.POST["quiz_desc"]
     results = json.loads(request.POST['results'])
@@ -1176,7 +1197,6 @@ def savenewquiz(request):
 @csrf_exempt
 def savenewpost(request):
     import re
-    current_uid = 8
     quiz_title = request.POST["post_title"]
     quiz_desc = request.POST["post_content"]
     communities = json.loads(request.POST['communities'])
@@ -1229,7 +1249,6 @@ def savenewpost(request):
 
 @csrf_exempt
 def savenewmediapost(request):
-    current_uid = 8
     quiz_title = request.POST["post_title"]
     media_type = request.POST["media_type"]
     if media_type != "video":
@@ -1288,7 +1307,6 @@ def savenewmediapost(request):
 
 @csrf_exempt
 def savenewlink(request):
-    current_uid = 8
     quiz_title = request.POST["post_title"]
     post_url = request.POST["post_url"]
     communities = json.loads(request.POST['communities'])
@@ -1342,7 +1360,6 @@ def savenewlink(request):
 @csrf_exempt
 def savenewquestion(request):
     import re
-    current_uid = 8
     quiz_title = request.POST["post_title"]
     post_url = request.POST["post_url"]
     communities = json.loads(request.POST['communities'])
@@ -1400,7 +1417,6 @@ def savenewquestion(request):
 @csrf_exempt
 def savenewpoll(request):
     import re
-    current_uid = 8
     quiz_title = request.POST["post_title"]
     communities = json.loads(request.POST['communities'])
     flairs = json.loads(request.POST['flairs'])
@@ -1466,7 +1482,6 @@ def savenewpoll(request):
 
 @csrf_exempt
 def savecomment(request):
-    current_uid = 8
     current_user = setup_current_user(current_uid)
     comment = request.POST["comment"]
     post_id = int(request.POST["post_id"])
@@ -1490,15 +1505,16 @@ def savecomment(request):
 
 @csrf_exempt
 def savenewanswer(request):
-    current_uid = 8
     answer = request.POST["answer"]
     parent_id = int(request.POST["parent"])
     parent = Post.objects.filter(ID=parent_id)[0]
     current_user = setup_current_user(current_uid)
-    new_answer = Post(post_title=parent.post_title, post_content=answer, post_date=dt.datetime.now(), author=current_user, post_author=current_uid, to_ping="", pinged="", post_content_filtered="", post_status="publish", post_type="answer", post_excerpt=parent.post_excerpt, post_parent=parent_id)
-    new_answer.save()
+    new_answer = Post.objects.create(post_title=parent.post_title, post_content=answer, post_date=dt.datetime.now(), author=current_user, post_author=current_uid, to_ping="", pinged="", post_content_filtered="", post_status="publish", post_type="answer", post_excerpt=parent.post_excerpt, post_parent=parent_id)
+    #new_answer.save()
+    new_answer = Post.objects.filter(post_title=parent.post_title, post_content=answer, post_date=dt.datetime.now(), author=current_user, post_author=current_uid, to_ping="", pinged="", post_content_filtered="", post_status="publish", post_type="answer", post_excerpt=parent.post_excerpt, post_parent=parent_id)[0]
     if(current_uid != parent.post_author):
-        new_answer.hex_id = hex(post.ID + 100000).replace("x", "s")
+        print(new_answer.ID)
+        new_answer.hex_id = hex(new_answer.ID + 100000).replace("x", "s")
         new_answer.guid = arrange_post_slug(new_answer.post_title)
         url = "/u/"+current_user.user_login+"/"+new_answer.hex_id+"/"+new_answer.guid
         new_notification = Notification(notification_variable="answer-question", seen=0, from_u_id=current_uid, to_u_id= parent.post_author, date=dt.datetime.now(), url=url)
@@ -1517,7 +1533,6 @@ def getquizresult(request):
         result_obj = dict()
         result_obj["content"] = PostMeta.objects.filter(post_id=post_id, meta_key="test_sonuc_"+str(selectedResult)+"_result_text")[0].meta_value
         result_obj["img"] = PostMeta.objects.filter(post_id=post_id, meta_key="test_sonuc_"+str(selectedResult)+"_result_img")[0].meta_value
-        current_uid = 8
         lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
         word_list = Languages.objects.filter(Q(lang_code = lang))
     except:
@@ -1526,7 +1541,6 @@ def getquizresult(request):
 
 def emloymentcredential(request):
     try:
-        current_uid = 8
         cred = UserMeta(user_id=current_uid, meta_key="employments", meta_value=json.dumps(request.GET))
         cred.save()
         return "success"
@@ -1535,7 +1549,6 @@ def emloymentcredential(request):
 
 def educationcredential(request):
     try:
-        current_uid = 8
         cred = UserMeta(user_id=current_uid, meta_key="educations", meta_value=json.dumps(request.GET))
         cred.save()
         return "success"
@@ -1544,7 +1557,6 @@ def educationcredential(request):
 
 def locationcredential(request):
     try:
-        current_uid = 8
         cred = UserMeta(user_id=current_uid, meta_key="locations", meta_value=json.dumps(request.GET))
         cred.save()
         return "success"
@@ -1553,7 +1565,6 @@ def locationcredential(request):
 
 def languagecredential(request):
     try:
-        current_uid = 8
         cred = UserMeta(user_id=current_uid, meta_key="languages", meta_value=json.dumps(request.GET))
         cred.save()
         return "success"
@@ -1562,7 +1573,6 @@ def languagecredential(request):
 
 def editfullname(request):
     try:
-        current_uid = 8
         fullname = request.GET["fullname"]
         cred = User.objects.filter(ID=current_uid)[0]
         cred.display_name = fullname
@@ -1573,7 +1583,6 @@ def editfullname(request):
 
 def editprofiledesc(request):
     try:
-        current_uid = 8
         profiledesc = request.GET["profiledesc"]
         user_desc = UserMeta.objects.filter(user_id = current_uid, meta_key = 'description')[0]
         user_desc.meta_value = profiledesc
@@ -1583,8 +1592,7 @@ def editprofiledesc(request):
         return "error"
 
 def birthday(request):
-    try:
-        current_uid = 8
+    try:        
         cred = UserMeta(user_id=current_uid, meta_key="birthday", meta_value=request.GET["birthday"])
         cred.save()
         return "success"
@@ -1667,7 +1675,6 @@ def followunfollowuser(request):
 def removeprofilepicture(request):
     try:
         response_data = {}
-        current_uid = 8
         avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
         cred = UserMeta.objects.filter(user_id=current_uid, meta_key="avatar_url")[0]
         cred.meta_value = avatar_url
@@ -1694,12 +1701,134 @@ def updatenotification(request):
 
 @csrf_exempt
 def updateallnotifications(request):
-    current_uid = 7
     notifications = Notification.objects.filter(to_u_id=current_uid)
     for n in notifications:
         n.opened = 1
         n.save()
     return HttpResponse(json.dumps({}), content_type="application/json")
+
+@csrf_exempt
+def followpost(request):
+    response_data = {}
+    try:
+        post_id = request.POST["post_id"]
+        operation = request.POST["op"]
+        lang = UserMeta.objects.filter(user_id=current_uid, meta_key='language')[0].meta_value
+        word_list = Languages.objects.filter(Q(lang_code = lang))
+        if(operation == "follow"):
+            new_follow = FollowedPosts.objects.filter(post_id=int(post_id), user_id=current_uid, following=0)
+            if new_follow.count() > 0:
+                new_follow = new_follow[0]
+                new_follow.following = 1
+                new_follow.save()
+            else:
+                new_follow = FollowedPosts(post_id=int(post_id), user_id=current_uid, date=dt.datetime.now(), following=1)
+                new_follow.save()
+            response_data["msg"] = word_list.filter(var_name="question-notifs-turned-on")[0].translation
+        elif(operation == "unfollow"):
+            follow = FollowedPosts.objects.filter(post_id=int(post_id), user_id=current_uid, following=1)[0]
+            follow.following = 0
+            follow.save()
+            response_data["msg"] = word_list.filter(var_name="question-notifs-turned-off")[0].translation
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    except:
+        response_data["msg"] = "error"
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
+def get_searched_users(request):
+    search_key = request.POST["search"]
+    container = request.POST["container"]
+    selectedUsers = request.POST["selectedUsers"]
+    selected = selectedUsers.split(", ")
+    bc = "bcgrayish"
+    print(selected)
+    if len(selected) > 0:
+        selected = [int(i) for i in selected if i != '']
+    followings = UserRelation.objects.filter(follower_id=current_uid)
+    followings_ids = list({x.following.ID: x for x in followings}.keys())
+    selected = selected + followings_ids
+    selected.append(current_uid)
+    print(selected)
+    results = User.objects.filter(Q(display_name__icontains=search_key)|Q(user_login__icontains=search_key)).exclude(ID__in=selected)[:15]
+    user_list = []
+    for result in results:
+        result = setup_current_user(result.ID)
+        user_list.append(result)    
+    return render(request, 'includes/select_user_list.html', {'user_list':user_list, 'container':container, 'bc':bc})
+
+@csrf_exempt
+def requestanswer(request):
+    response_data = {}
+    try:
+        selectedUsers = request.POST["selectedUsers"]
+        post_id = int(request.POST["post_id"])
+        selected = selectedUsers.split(", ")
+        if len(selected) > 0:
+            selected = [int(i) for i in selected if i != '']
+        for ID in selected:
+            new_request = PostRequest(sender_id=current_uid, receiver_id=ID, post_id=post_id, date=dt.datetime.now(), answered=0, post_type="answer")
+            new_request.save()
+        lang = UserMeta.objects.filter(user_id=current_uid, meta_key='language')[0].meta_value
+        word_list = Languages.objects.filter(Q(lang_code = lang))
+        response_data["msg"] = fun.ucfirst(word_list.filter(var_name="request-sent")[0].translation)
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    except:
+        response_data["msg"] = "error"
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
+def saveanswerdraft(request):
+    response_data = {}
+    try:
+        post_id = int(request.POST["post_id"])
+        post_content = request.POST["post_content"]
+        answer = Post.objects.filter(ID=post_id)[0]
+        answer.post_content = post_content
+        answer.post_modified = dt.datetime.now()
+        answer.save()
+        lang = UserMeta.objects.filter(user_id=current_uid, meta_key='language')[0].meta_value
+        word_list = Languages.objects.filter(Q(lang_code = lang))
+        response_data["msg"] = word_list.filter(var_name="answer-draft-saved")[0].translation
+    except:
+        response_data["msg"] = "error"
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
+def publishdraftanswer(request):
+    response_data = {}
+    try:
+        post_id = int(request.POST["post_id"])
+        post_content = request.POST["post_content"]
+        answer = Post.objects.filter(ID=post_id)[0]
+        answer.post_content = post_content
+        answer.post_modified = dt.datetime.now()
+        answer.post_status = "publish"
+        answer.save()
+        request = PostRequest.objects.filter(receiver_id=current_uid, post=answer.post_parent)
+        if request.count() > 0:
+            request[0].answered = 1
+            request[0].save()
+        lang = UserMeta.objects.filter(user_id=current_uid, meta_key='language')[0].meta_value
+        word_list = Languages.objects.filter(Q(lang_code = lang))
+        response_data["msg"] = word_list.filter(var_name="answer-published")[0].translation
+    except:
+        response_data["msg"] = "error"
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
+def deleteanswerdraft(request):
+    response_data = {}
+    try:
+        post_id = int(request.POST["post_id"])
+        answer = Post.objects.filter(ID=post_id)[0]
+        answer.delete()
+        lang = UserMeta.objects.filter(user_id=current_uid, meta_key='language')[0].meta_value
+        word_list = Languages.objects.filter(Q(lang_code = lang))
+        response_data["msg"] = word_list.filter(var_name="answer-deleted")[0].translation
+    except:
+        response_data["msg"] = "error"
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 '''---------------------------------------
   VIEWS              
@@ -1816,8 +1945,8 @@ def phonecodeverification(request):
     return render(request, "phoneverification.html", {'lang':lang, 'dark':dark, 'country_list':country_list, 'page_dict':page_dict, 'phone':phone, 'username':username, 'firstname':firstname, 'lastname': lastname })
 
 def home(request):
+    page = "home"
     start_start = time.time()
-    current_uid = 7
 
     start = time.time()
     current_user = setup_current_user(current_uid)
@@ -1967,7 +2096,7 @@ def home(request):
     print(f"Setup comment editor in {end} s")
 
     start = time.time()
-    notifications = setup_notifications(current_uid, word_list)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
     end = time.time() - start
     print(f"Setup notifications in {end} s")
 
@@ -1981,11 +2110,10 @@ def home(request):
                                             'links':links, 'answers':answers, 'questions':questions, 'quizzes':quizzes,
                                             'communities':communities, 'users':users, 'polls':polls,
                                             'word_list':word_list, 'colorBox_quizzes':colorBox_quizzes, 'media_quizzes':media_quizzes, 'mediaposts':mediaposts,
-                                            'notifications':notifications
+                                            'notifications':notifications, 'num_notifications':num_notifications, 'page':page
                                             })
 
 def search(request, **kwargs):
-    current_uid = 8
     current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
@@ -2090,7 +2218,6 @@ def search(request, **kwargs):
 def history(request, **kwargs):
     import locale
     import re
-    current_uid = 8
 
     if 'filter' in kwargs:
         fltr = kwargs.get("filter").split("_")[0]
@@ -2188,7 +2315,6 @@ def history(request, **kwargs):
 @csrf_exempt
 def lists(request):
     limit = 3
-    current_uid = 8
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
     current_user = setup_current_user(current_uid)
@@ -2235,7 +2361,6 @@ def newpost(request):
         post_type = request.GET['post']
     except:
         post_type = "post"
-    current_uid = 8
     current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
@@ -2258,7 +2383,6 @@ def newpost(request):
                                             'newpost_actions_dict':newpost_actions_dict, 'drafts':drafts, 'word_list':word_list})
 
 def createlist(request):
-    current_uid = 8
     current_user = User.objects.filter(Q(ID = current_uid))[0]
     user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
     current_user.set_description(user_desc.meta_value)
@@ -2318,7 +2442,6 @@ def listdetail(request, slug, **kwargs):
     post_ids = ListPost.objects.filter(Q(list_id=lst.ID))
     lst.members = ListUser.objects.filter(Q(list_id=lst.ID, role="member"))
     lst.followers = ListUser.objects.filter(Q(list_id=lst.ID, role="follower"))
-    current_uid = 8
     current_user = User.objects.filter(Q(ID = current_uid))[0]
     user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
     current_user.set_description(user_desc.meta_value)
@@ -2355,7 +2478,6 @@ def listdetailfilter(request, slug, post_type):
     post_ids = ListPost.objects.filter(Q(list_id=lst.ID))
     lst.members = ListUser.objects.filter(Q(list_id=lst.ID, role="member"))
     lst.followers = ListUser.objects.filter(Q(list_id=lst.ID, role="follower"))
-    current_uid = 8
     current_user = User.objects.filter(Q(ID = current_uid))[0]
     user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
     current_user.set_description(user_desc.meta_value)
@@ -2412,7 +2534,6 @@ def aboutlist(request, slug):
     post_ids = list({x.post_id: x for x in post_ids}.keys())
     lst.posts = Post.objects.filter(Q(ID__in=post_ids)).order_by('-post_date')
     lst.creator_uname = User.objects.filter(Q(ID = lst.creator))[0].user_login
-    current_uid = 8
     current_user = User.objects.filter(Q(ID = current_uid))[0]
     user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
     current_user.set_description(user_desc.meta_value)
@@ -2437,7 +2558,6 @@ def aboutlist(request, slug):
                                             'list_info_dict':list_info_dict})
 
 def savedposts(request, **kwargs):
-    current_uid = 8
     if 'filter' in kwargs:
         fltr = kwargs.get("filter")
     else:
@@ -2502,6 +2622,7 @@ def savedpostsfilter(request, post_type):
     return savedposts(request, filter=post_type)
 
 def communities(request, **kwargs):
+    page = "communities"
     if 'filter' in kwargs:
         fltr = kwargs.get("filter")
     else:
@@ -2512,7 +2633,6 @@ def communities(request, **kwargs):
             return communitiesfiltered(request, filter=fltr)
     except:
         pass
-    current_uid = 8
     current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
@@ -2535,7 +2655,8 @@ def communities(request, **kwargs):
                                                             'country_list':country_list, 'select_language':select_language,
                                                             'categories':categories, 'communities':communities, 
                                                             'random_cat1':random_cat1, 'random_cat2':random_cat2,
-                                                            'random_communities1':random_communities1, 'random_communities2':random_communities2, 'filter':fltr})
+                                                            'random_communities1':random_communities1, 'random_communities2':random_communities2, 
+                                                            'filter':fltr, 'page':page })
 
 def communitydetail(request, slug,  **kwargs):
     if slug == "lists":
@@ -2577,7 +2698,6 @@ def communitydetail(request, slug,  **kwargs):
 
     community.flairs = Flairs.objects.filter(term_id=community.term_id).filter(flair_type="post")
 
-    current_uid = 8
     current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
@@ -2621,7 +2741,6 @@ def communitydetail(request, slug,  **kwargs):
                                                                 })
 
 def newcommunity(request):
-    current_uid = 8
     current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
@@ -2638,9 +2757,13 @@ def newcommunity(request):
                                             'new_community_tips_dict':new_community_tips_dict, 'word_list':word_list})
 
 def postdetail(request, username, post_id, slug):
+    ref = ""
+    try:
+        ref = request.GET["ref"]
+    except:
+        pass
     pid = int(post_id.replace("s", "x"), 16) - 100000
     post = Post.objects.filter(ID=pid)[0]
-    current_uid = 8
     current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
@@ -2653,6 +2776,7 @@ def postdetail(request, username, post_id, slug):
     elif post.post_type == "link":
         post.photo_from_url = fun.get_photo_from_url(post.post_content)
     elif post.post_type == "questions":
+        post.isanswered = isquestionanswered(post, current_uid)
         post.answers = Post.objects.filter(post_type="answer", post_status="publish", post_parent=post.ID)
         for answer in post.answers:
             setup_postmeta(answer, word_list)
@@ -2676,9 +2800,11 @@ def postdetail(request, username, post_id, slug):
         comment.child_comments = Comment.objects.none()
         comment.child_comments = getchildcomments(post.ID, comment.comment_ID)
         getgrandchildcomments(post.ID, comment.child_comments)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
     return render(request, 'postdetail.html', {'post':post, 'lang':lang, 'dark':dark, 
                                                 'current_user': current_user, 'word_list':word_list,
-                                                'followed_communities':followed_communities, 'comments':post.comments, 'comment_length':comment_length
+                                                'followed_communities':followed_communities, 'comments':post.comments, 'comment_length':comment_length,
+                                                'ref':ref, 'notifications':notifications, 'num_notifications':num_notifications
                                                 })
     
 def answerdetail(request, parent_author_name, parent_post_id, parent_slug, author_name):
@@ -2688,7 +2814,6 @@ def answerdetail(request, parent_author_name, parent_post_id, parent_slug, autho
     post.parent = Post.objects.filter(ID=pid)[0]
     post.parent.guid = arrange_post_slug(post.parent.post_title)
     post.parent.hex_id = hex(post.parent.ID + 100000).replace("x", "s")
-    current_uid = 8
     current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
@@ -2709,7 +2834,11 @@ def answerdetail(request, parent_author_name, parent_post_id, parent_slug, autho
                                                 })
 
 def userprofile(request, username,  **kwargs):
-    current_uid = 8
+    ref = ""
+    try:
+        ref = request.GET["ref"]
+    except:
+        pass
     current_user = setup_current_user(current_uid)
     profile = setup_current_user(User.objects.filter(user_login=username)[0].ID)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
@@ -2884,13 +3013,14 @@ def userprofile(request, username,  **kwargs):
         setup_postmeta(media, word_list)
         setup_mediameta(media)
     empty_medias = 6 - medias.count()
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
     return render(request, 'profile.html', {'current_user':current_user, 'lang':lang, 'dark':dark, 'word_list':word_list, 
                                             'profile':profile, 'filter':fltr, 'country_list':country_list, 'medias':medias,
-                                            'empty_medias':range(empty_medias), 'followtxt':followtxt, 'followingtxt':followingtxt
+                                            'empty_medias':range(empty_medias), 'followtxt':followtxt, 'followingtxt':followingtxt,
+                                            'ref':ref, 'notifications':notifications, 'num_notifications':num_notifications
                                             })
 
 def userfollowers(request, username):
-    current_uid = 8
     current_user = setup_current_user(current_uid)
     profile = setup_current_user(User.objects.filter(user_login=username)[0].ID)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
@@ -3040,7 +3170,6 @@ def userfollowers(request, username):
                                             })
 
 def userfollowings(request, username):
-    current_uid = 8
     current_user = setup_current_user(current_uid)
     profile = setup_current_user(User.objects.filter(user_login=username)[0].ID)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
@@ -3190,7 +3319,6 @@ def userfollowings(request, username):
                                             })
 
 def usersuggested(request, username):
-    current_uid = 8
     current_user = setup_current_user(current_uid)
     profile = setup_current_user(User.objects.filter(user_login=username)[0].ID)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
@@ -3387,4 +3515,201 @@ def usersuggested(request, username):
                                             'empty_medias':range(empty_medias), 'suggesteds': suggesteds, 'followtxt':followtxt, 'followingtxt':followingtxt
                                             })
 
+def notifications(request, **kwargs):
+    if 'filter' in kwargs:
+        fltr = kwargs.get("filter").split("_")[0]
+    else:
+        fltr = "all"
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    notifications, _ = setup_notifications(current_uid, word_list, filter=fltr)
+    return render(request, 'notifications.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'filter':fltr
+                                            })
 
+def questions(request, **kwargs):
+    import random
+    page = "questions"
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    title = fun.ucfirst(word_list.filter(var_name="questions")[0].translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    followed_communities = FollowedCommunities.objects.filter(user=current_user)
+    question_ids = []
+    user_list = []
+    for user in current_user.followings:
+        user = setup_current_user(user.following_id)
+        user_list.append(user)
+    random.shuffle(user_list)
+    for comm in followed_communities:
+        community = comm.term
+        taxonomy = TermTaxonomy.objects.filter(term_id=community.term_id)[0].term_taxonomy_id
+        post_ids = TermRelationship.objects.filter(Q(term_taxonomy_id=taxonomy))
+        post_ids = list({x.object_id: x for x in post_ids}.keys())
+        question_ids += post_ids
+    questions = Post.objects.filter(ID__in=question_ids, post_type="questions").order_by('-post_date')
+    for question in questions:
+        isfollowed = FollowedPosts.objects.filter(post=question, user=current_user, following=1)
+        if isfollowed.count() > 0:
+            question.isfollowed = 1
+        question.answers = Post.objects.filter(post_type="answer", post_status="publish", post_parent=question.ID)
+        setup_postmeta(question, word_list)
+    return render(request, 'questions.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'page':page, 'questions': questions, 'user_list':user_list, 'title': title
+                                            })
+
+def answerrequests(request):
+    import random
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    title = fun.ucfirst(word_list.filter(var_name="questions")[0].translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    followed_communities = FollowedCommunities.objects.filter(user=current_user)
+    user_list = []
+    for user in current_user.followings:
+        user = setup_current_user(user.following_id)
+        user_list.append(user)
+    random.shuffle(user_list)
+    questions = PostRequest.objects.filter(receiver_id=current_uid, answered=0, post_type="answer").order_by("-date")
+    for question in questions:
+        question.sender = setup_current_user(question.sender_id)
+        isfollowed = FollowedPosts.objects.filter(post=question.post, user=current_user, following=1)
+        if isfollowed.count() > 0:
+            question.post.isfollowed = 1
+        question.post.answers = Post.objects.filter(post_type="answer", post_status="publish", post_parent=question.post.ID)
+        setup_postmeta(question.post, word_list)
+    return render(request, 'answerrequests.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'questions': questions, 'user_list':user_list, 'title': title
+                                            })
+
+def answerdrafts(request):
+    import random
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    title = fun.ucfirst(word_list.filter(var_name="questions")[0].translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    followed_communities = FollowedCommunities.objects.filter(user=current_user)
+    question_ids = []
+    user_list = []
+    for user in current_user.followings:
+        user = setup_current_user(user.following_id)
+        user_list.append(user)
+    random.shuffle(user_list)
+    questions = Post.objects.filter(post_author=current_uid, post_type="answer", post_status="draft").order_by('-post_date')
+    for question in questions:
+        isfollowed = FollowedPosts.objects.filter(post=question, user=current_user, following=1)
+        if isfollowed.count() > 0:
+            question.isfollowed = 1
+        question.answers = Post.objects.filter(post_type="answer", post_status="publish", post_parent=question.ID)
+        setup_postmeta(question, word_list)
+    return render(request, 'answerdrafts.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'questions': questions, 'user_list':user_list, 'title': title
+                                            })
+
+def quizzes(request):
+    import random
+    page = "quizzes"
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    title = fun.ucfirst(word_list.get(var_name = 'quizzes').translation)
+    categories = CommunityCategories.objects.all()
+    user_list = []
+    for user in current_user.followings:
+        user = setup_current_user(user.following_id)
+        user_list.append(user)
+    random.shuffle(user_list)
+    quizzes = Post.objects.filter(post_type="quiz", post_status="publish").order_by("-post_date")
+    for post in quizzes:
+        setup_postmeta(post, word_list)
+        post.quiz_type = PostMeta.objects.filter(post_id=post.ID, meta_key="quiz_type")[0].meta_value
+        post.post_title = post.post_title.replace(" - Sosyorol", "")
+        if post.quiz_type == "media":
+            setup_media_quizmeta(post, word_list)
+        elif post.quiz_type == "colorBox":
+            setup_colorbox_quizmeta(post, word_list)
+        else:
+            setup_quizmeta(post, word_list)
+    return render(request, 'quizzes.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'page':page, 'title':title, 'categories':categories, 'quizzes':quizzes, 'user_list':user_list
+                                            })
+
+def polls(request):
+    page = "polls"
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    categories = CommunityCategories.objects.all()
+    return render(request, 'polls.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'page':page, 'categories':categories
+                                            })
+
+def quizrequests(request):
+    import random
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    title = fun.ucfirst(word_list.get(var_name = 'quizzes').translation)
+    categories = CommunityCategories.objects.all()
+    user_list = []
+    for user in current_user.followings:
+        user = setup_current_user(user.following_id)
+        user_list.append(user)
+    random.shuffle(user_list)
+    quizzes = PostRequest.objects.filter(receiver_id=current_uid, answered=0, post_type="quiz").order_by("-date")
+    for quiz in quizzes:
+        quiz.sender = setup_current_user(quiz.sender_id)
+        setup_postmeta(quiz.post, word_list)
+        print(quiz.post.ID)
+        quiz.post.quiz_type = PostMeta.objects.filter(post_id=quiz.post.ID, meta_key="quiz_type")[0].meta_value
+        quiz.post.post_title = quiz.post.post_title.replace(" - Sosyorol", "")
+        if quiz.post.quiz_type == "media":
+            setup_media_quizmeta(quiz.post, word_list)
+        elif quiz.post.quiz_type == "colorBox":
+            setup_colorbox_quizmeta(quiz.post, word_list)
+        else:
+            setup_quizmeta(quiz.post, word_list)
+    return render(request, 'quizrequests.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'title':title, 'categories':categories, 'quizzes':quizzes, 'user_list':user_list
+                                            })

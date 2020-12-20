@@ -362,5 +362,49 @@ def get_birthdays():
             new_data.save()
         except:
             pass
+
+def updatecommunityslugs():
+    communities = sm.Community.objects.all()
+    for c in communities:
+        slug = c.slug
+        slug = slug.replace("ı", "i")
+        slug = slug.replace("ğ", "g")
+        slug = slug.replace("ş", "s")
+        slug = slug.replace("ç", "c")
+        slug = slug.replace("ö", "o")
+        slug = slug.replace("ü", "u")
+        c.slug = slug
+        c.save()
         
+def updatecategories():
+    comm = sm.CommunityCategoryRelation.objects.get(community_id=118)
+    comm.category_id = 18
+    comm.save()
+    comm = sm.CommunityCategoryRelation.objects.get(community_id=3067)
+    comm.category_id = 119
+    comm.save()
+    comm = sm.CommunityCategoryRelation.objects.get(community_id=12071)
+    comm.category_id = 119
+    comm.save()
+    comm = sm.CommunityCategoryRelation.objects.get(community_id=6195)
+    comm.category_id = 8647
+    comm.save()
+    comm = sm.CommunityCategoryRelation.objects.get(community_id=3536)
+    comm.category_id = 22
+    comm.save()
+    comm = sm.CommunityCategoryRelation.objects.get(community_id=6303)
+    comm.category_id = 14
+    comm.save()
+    comm = sm.CommunityCategoryRelation.objects.get(community_id=8681)
+    comm.category_id = 8
+    comm.save()
+    comm = sm.CommunityCategoryRelation.objects.get(community_id=10857)
+    comm.category_id = 8
+    comm.save()
+    comm = sm.CommunityCategoryRelation.objects.get(community_id=8814)
+    comm.category_id = 51
+    comm.save()
+    comm = sm.CommunityCategoryRelation.objects.get(community_id=11122)
+    comm.category_id = 10818
+    comm.save()
         

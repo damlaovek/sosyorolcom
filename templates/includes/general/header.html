@@ -34,23 +34,43 @@
     <div class="header-elems-container">
         <div class="horizontally-centered-auto-width">
             <a class="horizontally-centered-auto-width-item" href="/">
+                {% if page == "home" %}
                 <div class="header-elems selected">{{word_list|getword:"home"|toupper}}</div>
+                {% else %}
+                <div class="header-elems">{{word_list|getword:"home"|toupper}}</div>
+                {% endif %}
                 <div class="header-elems-border"></div>
             </a>
-            <a class="horizontally-centered-auto-width-item" href="#">
+            <a class="horizontally-centered-auto-width-item" href="/quizzes">
+                {% if page == "quizzes" %}
+                <div class="header-elems selected">{{word_list|getword:"quizzes"|toupper}}</div>
+                {% else %}
                 <div class="header-elems">{{word_list|getword:"quizzes"|toupper}}</div>
+                {% endif %}
                 <div class="header-elems-border"></div>
             </a>
-            <a class="horizontally-centered-auto-width-item" href="#">
+            <a href="/questions" class="horizontally-centered-auto-width-item">
+                {% if page == "questions" %}
+                <div class="header-elems selected">{{word_list|getword:"questions"|toupper}}</div>
+                {% else %}
                 <div class="header-elems">{{word_list|getword:"questions"|toupper}}</div>
+                {% endif %}
                 <div class="header-elems-border"></div>
             </a>
-            <a class="horizontally-centered-auto-width-item" href="#">
+            <a class="horizontally-centered-auto-width-item" href="/polls">
+                {% if page == "polls" %}
+                <div class="header-elems selected">{{word_list|getword:"polls"|toupper}}</div>
+                {% else %}
                 <div class="header-elems">{{word_list|getword:"polls"|toupper}}</div>
+                {% endif %}
                 <div class="header-elems-border"></div>
             </a>
             <a class="horizontally-centered-auto-width-item" href="/communities/leaderboard/">
+                {% if page == "communities" %}
+                <div class="header-elems selected">{{word_list|getword:"communities"|toupper}}</div>
+                {% else %}
                 <div class="header-elems">{{word_list|getword:"communities"|toupper}}</div>
+                {% endif %}
                 <div class="header-elems-border"></div>
             </a>
         </div>
@@ -88,7 +108,7 @@
                 </div>
     		</a>
     	</div>
-    	<div class="header-icon" data-title="{{word_list|getword:'notifications'|ucwords}}">
+    	<div class="header-icon" id="header-icon-notifications" data-title="{{word_list|getword:'notifications'|ucwords}}">
             <a href="" id="notificationsbtn" class="right" onclick="return openCloseNotifications({% url 'updateallnotifications' %});">
                 <div class="header-icon-background full-shadow-border">
                     <svg class="svg-icon" viewBox="0 0 15 15">
@@ -97,7 +117,11 @@
                         </g>
                     </svg>
                 </div>
-                <div class="absolute aligntr sqr20 bcb rounded mt10 lh20 tac cw" style="right:-10px;" id="num-unseen-notifications">3</div>
+                {% if num_notifications > 0 %}
+                    <div class="absolute aligntr sqr20 bcb rounded mt10 lh20 tac cw" style="right:-10px;" id="num-unseen-notifications">{{num_notifications}}</div>
+                {% else %}
+                    <div class="absolute aligntr sqr20 bcb rounded mt10 lh20 tac cw dnone" style="right:-10px;" id="num-unseen-notifications">{{num_notifications}}</div>
+                {% endif %}
             </a>
     	</div>
     	<div class="header-icon" data-title="{{word_list|getword:'create-post'|ucwords}}">
@@ -115,7 +139,7 @@
     <div class="absolute aligntr bcw dnone br10 full-shadow" style="width:371px;z-index:99999;margin-top: 58px;height:calc(100vh - 108px);" id="notifications-c">
         <div class="bsbb full-width p20 inline-block">
             <p class="title fs19 left">{{word_list|getword:'notifications'|ucwords}}</p>
-            <div class='sqr20 icon absolute hand aligntr bringfront m10' onclick="showMoreOptions(this, {{answer.ID}})">
+            <div class='sqr20 icon absolute hand aligntr bringfront m10' onclick="document.getElementById('notif-options-menu').classList.toggle('dnone');">
                 <svg width='20px' height='20px' viewBox='0 0 20 20' class="rotate90">
                     <g>
                         <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
@@ -124,7 +148,24 @@
                     </g>
                 </svg>
             </div>
+            <div id="notif-options-menu" class="full-shadow-border absolute aligntr bcw dnone" style="top:50px; right:10px; z-index: 5;">
+                <a href="/notifications"><p class="p10 cg2 hand fs15">{{word_list|getword:"open-notifications"|ucfirst}}</p></a>
+                <p class="p10 cg2 bt hand fs15" onclick="updateNotification(this, 'all')">{{word_list|getword:"mark-all-seen"|ucfirst}}</p>
+            </div>           
         </div>
+        {% if notifications.new|length == 0 and notifications.earlier|length == 0 %}
+            <div class="bsbb m020 p20 w40 tac border bcgrayish br10">
+                <div class="sqr60 rounded bcgrayish center full-shadow-border" style="margin:auto;">
+                    <svg class="svg-icon" viewBox="0 0 40 40">
+                        <g>
+                            <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 20.359375 35.3125 C 18.820312 35.3125 17.328125 35.320312 15.898438 35.320312 C 15.890625 35.414062 15.886719 35.507812 15.886719 35.605469 C 15.886719 38.074219 17.890625 40.074219 20.359375 40.074219 C 22.828125 40.074219 24.828125 38.074219 24.828125 35.605469 C 24.828125 35.507812 24.824219 35.414062 24.820312 35.320312 C 23.386719 35.320312 21.894531 35.3125 20.359375 35.3125 Z M 20.359375 35.3125 "/>
+                            <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 34.273438 23.769531 C 34.941406 23.5 35.425781 22.734375 35.425781 21.835938 C 35.425781 20.707031 34.667969 19.792969 33.738281 19.792969 L 32.699219 19.792969 C 32.605469 17.941406 32.671875 15.710938 32.671875 15.710938 C 32.671875 9.789062 28.597656 4.585938 23.097656 3.148438 C 23.191406 2.894531 23.246094 2.621094 23.246094 2.332031 C 23.242188 1.042969 22.199219 0 20.914062 0 L 19.164062 0 C 17.875 0 16.828125 1.042969 16.828125 2.332031 C 16.828125 2.621094 16.886719 2.894531 16.980469 3.148438 C 11.480469 4.585938 7.402344 9.789062 7.402344 15.710938 C 7.402344 15.710938 7.46875 17.941406 7.375 19.792969 L 6.339844 19.792969 C 5.40625 19.792969 4.648438 20.707031 4.648438 21.835938 C 4.648438 22.734375 5.132812 23.5 5.800781 23.769531 C 3.625 26.300781 1.050781 27.574219 1.050781 30.289062 C 1.050781 34.574219 9.550781 34.210938 20.039062 34.210938 C 30.523438 34.210938 39.023438 34.574219 39.023438 30.289062 C 39.023438 27.574219 36.449219 26.300781 34.273438 23.769531 Z M 18.03125 6.351562 C 16.671875 6.671875 15.382812 7.359375 14.242188 8.292969 C 11.601562 10.449219 10.582031 13.585938 10.828125 16.9375 C 10.890625 17.78125 9.578125 17.773438 9.515625 16.9375 C 9.253906 13.34375 10.394531 9.753906 13.242188 7.421875 C 14.515625 6.378906 16.0625 5.46875 17.683594 5.089844 C 18.507812 4.894531 18.855469 6.160156 18.03125 6.351562 Z M 18.03125 6.351562 "/>
+                        </g>
+                    </svg>
+                </div>
+                <p class="cg2 full-width tac mt10 fwbold">{{word_list|getword:"no-notifications-yet"|ucfirst}}.</p>
+            </div>
+        {% endif %}
         {% if notifications.new|length > 0 %}
             <p class="fwbold cg2 p1020">{{word_list|getword:"new"|ucfirst}}</p>
             <ul class="full-width">

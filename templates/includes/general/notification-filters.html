@@ -1,0 +1,157 @@
+{% load index %}
+<div class="fixed section-left" id="section-left" style="overflow-x: hidden;">
+    <ul class="nav">
+        <form method="GET" action="/search" class="relative" style="margin:0;width:calc(100% + 80px);margin-left:-22px;margin-top:-58px;z-index:99;filter:drop-shadow(0 1px 6px rgba(0, 0, 0, .161));" id="search_form">
+            {% csrf_token %}
+            <input type="text" name="search_key" id="search" class="bsbb full-width p20" style="padding-top:58px;padding-left:32px;padding-right:70px;" placeholder="Search in Sosyorol"  autocomplete='off'>
+            <svg class="absolute aligntr svg-icon" style="top: 38px; right:40px;" viewBox="0 0 15 15">
+                <g>
+                    <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 14.667969 13.039062 L 11.578125 9.945312 C 12.320312 8.867188 12.695312 7.667969 12.695312 6.347656 C 12.695312 5.488281 12.527344 4.664062 12.195312 3.882812 C 11.859375 3.097656 11.410156 2.421875 10.84375 1.851562 C 10.273438 1.285156 9.597656 0.835938 8.8125 0.5 C 8.027344 0.167969 7.207031 0 6.347656 0 C 5.488281 0 4.664062 0.167969 3.882812 0.5 C 3.097656 0.835938 2.421875 1.285156 1.851562 1.851562 C 1.285156 2.421875 0.832031 3.097656 0.5 3.882812 C 0.167969 4.667969 0 5.488281 0 6.347656 C 0 7.207031 0.167969 8.027344 0.5 8.8125 C 0.832031 9.597656 1.285156 10.273438 1.851562 10.839844 C 2.421875 11.410156 3.097656 11.859375 3.882812 12.195312 C 4.664062 12.527344 5.488281 12.695312 6.347656 12.695312 C 7.667969 12.695312 8.867188 12.320312 9.945312 11.578125 L 13.039062 14.660156 C 13.253906 14.886719 13.523438 15.003906 13.847656 15.003906 C 14.160156 15.003906 14.433594 14.886719 14.660156 14.660156 C 14.886719 14.433594 15.003906 14.160156 15.003906 13.847656 C 15.003906 13.53125 14.890625 13.257812 14.667969 13.039062 Z M 9.199219 9.199219 C 8.410156 9.992188 7.460938 10.386719 6.347656 10.386719 C 5.234375 10.386719 4.285156 9.992188 3.492188 9.199219 C 2.703125 8.410156 2.308594 7.460938 2.308594 6.347656 C 2.308594 5.234375 2.703125 4.285156 3.492188 3.492188 C 4.285156 2.703125 5.234375 2.308594 6.347656 2.308594 C 7.460938 2.308594 8.410156 2.703125 9.199219 3.492188 C 9.992188 4.285156 10.386719 5.234375 10.386719 6.347656 C 10.386719 7.460938 9.992188 8.410156 9.199219 9.199219 Z M 9.199219 9.199219 "/>
+                </g>
+            </svg>
+            <input type="submit" 
+                        style="position: absolute; left: -9999px; width: 1px; height: 1px;"
+                        tabindex="-1"/>
+        </form><br>
+        <div class="absolute full-width aligntl" style="width:calc(100% + 40px);top:62px; background-color:var(--white); z-index:100;">
+            <ul id="search_results_container" class="full-width p020 full-shadow2" style="width:calc(100% - 40px); background-color: var(--white); z-index:100;">
+            </ul>
+        </div>
+        <div class="bsbb full-width p0 mt10 mb20" style="left:12px;width:calc(100% + 12px);">
+            <div class="bsbb full-width inline-block p100 bb">
+                <p class="fs19 fwblack ctitle left">{{word_list|getword:"notification-type"|ucwords}}</p>
+                <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
+                    <g>
+                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                    </g>
+                </svg>
+            </div>
+            {% if filter == "all" or filter == '' %}
+                <a href="/notifications/" class="bsbb full-width p100 inline-block">
+                    <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                    <p class="lh28 ml30 p010 cb fwbold">{{word_list|getword:"all"|ucfirst}}</p>
+                </a>
+            {% else %}
+                <a href="/notifications/" class="bsbb full-width p100 inline-block">
+                    <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                    <p class="lh28 ml30 cg2 p010">{{word_list|getword:"all"|ucfirst}}</p>
+                </a>
+            {% endif %}
+            {% if filter == "birthday" %}
+                <a href="/notifications/birthday" class="bsbb full-width p100 inline-block">
+                    <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                    <p class="lh28 ml30 p010 cb fwbold">{{word_list|getword:"birth-day"|ucfirst}}</p>
+                </a>
+            {% else %}
+                <a href="/notifications/birthday" class="bsbb full-width p100 inline-block">
+                    <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                    <p class="lh28 ml30 cg2 p010">{{word_list|getword:"birth-day"|ucfirst}}</p>
+                </a>
+            {% endif %}
+            {% if filter == "comment" %}
+                <a href="/notifications/comment" class="bsbb full-width p100 inline-block">
+                    <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                    <p class="lh28 ml30 p010 cb fwbold">{{word_list|getword:"comment"|ucfirst}}</p>
+                </a>
+            {% else %}
+                <a href="/notifications/comment" class="bsbb full-width p100 inline-block">
+                    <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                    <p class="lh28 ml30 cg2 p010">{{word_list|getword:"comment"|ucfirst}}</p>
+                </a>
+            {% endif %}
+            {% if filter == "answer" %}
+                <a href="/notifications/answer" class="bsbb full-width p100 inline-block">
+                    <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                    <p class="lh28 ml30 p010 cb fwbold">{{word_list|getword:"answer-noun"|ucfirst}}</p>
+                </a>
+            {% else %}
+                <a href="/notifications/answer" class="bsbb full-width p100 inline-block">
+                    <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                    <p class="lh28 ml30 cg2 p010">{{word_list|getword:"answer-noun"|ucfirst}}</p>
+                </a>
+            {% endif %}
+            {% if filter == "community" %}
+                <a href="/notifications/community" class="bsbb full-width p100 inline-block">
+                    <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                    <p class="lh28 ml30 p010 cb fwbold">{{word_list|getword:"community"|ucfirst}}</p>
+                </a>
+            {% else %}
+                <a href="/notifications/community" class="bsbb full-width p100 inline-block">
+                    <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                    <p class="lh28 ml30 cg2 p010">{{word_list|getword:"community"|ucfirst}}</p>
+                </a>
+            {% endif %}
+            {% if filter == "follow" %}
+                <a href="/notifications/follow" class="bsbb full-width p100 inline-block">
+                    <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                    <p class="lh28 ml30 p010 cb fwbold">{{word_list|getword:"followers"|ucfirst}}</p>
+                </a>
+            {% else %}
+                <a href="/notifications/follow" class="bsbb full-width p100 inline-block">
+                    <div class="checkbox left rounded" onclick="this.classList.toggle('checked');">
+                        <div class="checkbox-inner sqr10 rounded"></div>
+                    </div>
+                    <p class="lh28 ml30 cg2 p010">{{word_list|getword:"followers"|ucfirst}}</p>
+                </a>
+            {% endif %}
+        </div>
+    </ul>
+    <div id="divider"></div>
+    <div class="section-left-options inline-block">
+        <div class="lang-container" onclick="selectLanguage()">
+            <svg width="13pt" height="13pt" viewBox="0 0 13 13">
+                <g>
+                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 12.472656 8.527344 C 12.703125 7.863281 12.828125 7.152344 12.828125 6.414062 C 12.828125 5.675781 12.703125 4.964844 12.472656 4.304688 C 12.464844 4.28125 12.457031 4.265625 12.453125 4.246094 C 11.558594 1.773438 9.191406 0 6.414062 0 C 3.636719 0 1.269531 1.773438 0.378906 4.246094 C 0.371094 4.265625 0.363281 4.28125 0.359375 4.304688 C 0.128906 4.964844 0 5.675781 0 6.414062 C 0 7.152344 0.128906 7.863281 0.359375 8.527344 C 0.363281 8.546875 0.371094 8.5625 0.378906 8.582031 C 1.269531 11.054688 3.636719 12.828125 6.414062 12.828125 C 9.191406 12.828125 11.558594 11.054688 12.453125 8.582031 C 12.457031 8.5625 12.464844 8.546875 12.472656 8.527344 Z M 6.414062 11.910156 C 6.171875 11.910156 5.777344 11.464844 5.445312 10.480469 C 5.289062 10.003906 5.160156 9.453125 5.066406 8.859375 L 7.761719 8.859375 C 7.667969 9.453125 7.539062 10.003906 7.382812 10.480469 C 7.050781 11.464844 6.660156 11.910156 6.414062 11.910156 Z M 4.957031 7.941406 C 4.910156 7.449219 4.886719 6.9375 4.886719 6.414062 C 4.886719 5.890625 4.910156 5.378906 4.957031 4.886719 L 7.871094 4.886719 C 7.917969 5.378906 7.941406 5.890625 7.941406 6.414062 C 7.941406 6.9375 7.917969 7.449219 7.871094 7.941406 Z M 0.917969 6.414062 C 0.917969 5.886719 0.996094 5.371094 1.136719 4.886719 L 4.035156 4.886719 C 3.992188 5.390625 3.96875 5.902344 3.96875 6.414062 C 3.96875 6.925781 3.992188 7.441406 4.035156 7.941406 L 1.136719 7.941406 C 0.996094 7.457031 0.917969 6.941406 0.917969 6.414062 Z M 6.414062 0.917969 C 6.660156 0.917969 7.050781 1.363281 7.382812 2.347656 C 7.539062 2.828125 7.667969 3.375 7.761719 3.96875 L 5.066406 3.96875 C 5.160156 3.375 5.289062 2.828125 5.445312 2.347656 C 5.777344 1.363281 6.171875 0.917969 6.414062 0.917969 Z M 8.792969 4.886719 L 11.691406 4.886719 C 11.832031 5.371094 11.910156 5.886719 11.910156 6.414062 C 11.910156 6.941406 11.832031 7.457031 11.691406 7.941406 L 8.792969 7.941406 C 8.835938 7.441406 8.859375 6.925781 8.859375 6.414062 C 8.859375 5.902344 8.835938 5.390625 8.792969 4.886719 Z M 11.335938 3.96875 L 8.691406 3.96875 C 8.527344 2.84375 8.246094 1.832031 7.851562 1.109375 C 9.378906 1.523438 10.640625 2.578125 11.335938 3.96875 Z M 4.976562 1.109375 C 4.582031 1.832031 4.304688 2.84375 4.140625 3.96875 L 1.492188 3.96875 C 2.1875 2.578125 3.449219 1.523438 4.976562 1.109375 Z M 1.492188 8.859375 L 4.140625 8.859375 C 4.304688 9.984375 4.582031 11 4.976562 11.71875 C 3.449219 11.304688 2.1875 10.25 1.492188 8.859375 Z M 7.851562 11.71875 C 8.246094 11 8.527344 9.984375 8.691406 8.859375 L 11.335938 8.859375 C 10.640625 10.25 9.378906 11.304688 7.851562 11.71875 Z M 7.851562 11.71875 "/>
+                </g>
+            </svg>
+            <p id="lang-text">{{word_list|getword:"lang"|ucfirst}}</p>
+        </div>
+        {% if dark == "dark"  %}
+            <div class="switch__container left">
+                <input id="switch-shadow" class="switch switch--shadow" type="checkbox" checked>
+                <label for="switch-shadow"></label>
+            </div>
+            <p id="mode-text">{{word_list|getword:"dark-mode"|ucfirst}}</p>
+        {% else %}
+            <div class="switch__container left">
+                <input id="switch-shadow" class="switch switch--shadow" type="checkbox">
+                <label for="switch-shadow"></label>
+            </div>
+            <p id="mode-text">{{word_list|getword:"light-mode"|ucfirst}}</p>
+        {% endif %}
+    </div>
+    <div class="corporate-footer">
+        <div class="full-width inline-block">
+            <a href="#" class="left">{{word_list|getword:"about"|ucfirst}}</a>
+            <a href="#" class="left m010">{{word_list|getword:"careers"|ucfirst}}</a>
+            <a href="#"  class="left">{{word_list|getword:"terms"|ucfirst}}</a>
+            <a href="#" class="left m010">{{word_list|getword:"advertise"|ucfirst}}</a>
+            <a href="#" class="left">{{word_list|getword:"help"|ucfirst}}</a>
+        </div>
+        <p class="copyright">&copy; 2020 Sosyorol, Inc.</p>
+    </div>
+</div>
