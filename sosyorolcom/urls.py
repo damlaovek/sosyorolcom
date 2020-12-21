@@ -98,8 +98,10 @@ urlpatterns = [
     path('publishdraftanswer', sv.publishdraftanswer, name='publishdraftanswer'),
     path('deleteanswerdraft', sv.deleteanswerdraft, name='deleteanswerdraft'),
     path('quizzes', sv.quizzes, name='quizzes'),
-    path('polls', sv.polls, name='polls'),
+    path('quizzes/<path:filter>', sv.quizzesfiltered, name='filteredquizzes'),
     path('quiz/requests', sv.quizrequests, name='quizrequests'),
+    path('polls', sv.polls, name='polls'),
+    path('polls/<path:filter>', sv.pollsfiltered, name='filteredpolls'),
 ]
 
 if settings.DEBUG:

@@ -215,10 +215,10 @@
 
             {% for item in menu_list %}
                 {% if forloop.counter < 8 %}
-                    {% if filter == item.name|tolower %}
+                    {% if filter == item.slug|tolower %}
                     <div class="full-width">
-                        <a href="/communities/leaderboard/{{item.name|tolower}}" class="full-width" data-target="{{item.name|tolower}}">
-                            <div class="full-width hand left-list-item-link active" id="{{item.name|tolower}}">
+                        <a href="/communities/leaderboard/{{item.slug|tolower}}" class="full-width" data-target="{{item.slug|tolower}}">
+                            <div class="full-width hand left-list-item-link active" id="{{item.slug|tolower}}">
                                 <li class="left-list-item">
                                     <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
                                     <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
@@ -228,8 +228,8 @@
                     </div>
                     {% else %}
                     <div class="full-width">
-                        <a href="/communities/leaderboard/{{item.name|tolower}}" class="full-width" data-target="{{item.name|tolower}}">
-                            <div class="full-width hand left-list-item-link" id="{{item.name|tolower}}">
+                        <a href="/communities/leaderboard/{{item.slug|tolower}}" class="full-width" data-target="{{item.slug|tolower}}">
+                            <div class="full-width hand left-list-item-link" id="{{item.slug|tolower}}">
                                 <li class="left-list-item">
                                     <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
                                     <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
@@ -249,10 +249,10 @@
                             </li>
                         </div>
                     {% endif %}
-                    {% if filter == item.name|tolower %}
+                    {% if filter == item.slug|tolower %}
                         <div class="full-width category dnone">
-                            <a href="/communities/leaderboard/{{item.name|tolower}}" class="full-width" data-target="{{item.name|tolower}}">
-                                <div class="full-width hand left-list-item-link active" id="{{item.name|tolower}}">
+                            <a href="/communities/leaderboard/{{item.slug|tolower}}" class="full-width" data-target="{{item.slug|tolower}}">
+                                <div class="full-width hand left-list-item-link active" id="{{item.slug|tolower}}">
                                     <li class="left-list-item">
                                         <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
                                         <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
@@ -262,8 +262,8 @@
                         </div>
                     {% else %}
                         <div class="full-width category dnone">
-                            <a href="/communities/leaderboard/{{item.name|tolower}}" class="full-width" data-target="{{item.name|tolower}}">
-                                <div class="full-width hand left-list-item-link" id="{{item.name|tolower}}">
+                            <a href="/communities/leaderboard/{{item.slug|tolower}}" class="full-width" data-target="{{item.slug|tolower}}">
+                                <div class="full-width hand left-list-item-link" id="{{item.slug|tolower}}">
                                     <li class="left-list-item">
                                         <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
                                         <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>

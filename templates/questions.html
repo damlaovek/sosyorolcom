@@ -271,7 +271,7 @@
                                                     </svg>
                                                 </div>
                                                 <div style="width:80%;">
-                                                    <p class="cg2 fs13 mb10">{{word_list|getword:"question"|ucfirst}}<span class="fs10 m04"> &#10625; </span><a href="/c/{{post.first_community}}" class="fs13 underline-on-hover cg2">{{post.first_community}}</a></p>
+                                                    <p class="cg2 fs13 mb10">{{word_list|getword:"question"|ucfirst}}<span class="fs10 m04"> &#10625; </span><a href="/c/{{post.first_community}}" class="fs13 underline-on-hover cg2">c/{{post.first_community}}</a></p>
                                                     <a href="/u/{{post.author.user_login}}/{{post.hex_id}}/{{post.guid}}" class="title lh20 underline-on-hover">{{post.post_title}}</a>
                                                     {% if post.answers|length > 0 %}
                                                         <p class="cg2 m100 fs13 fwbold">{{post.answers|length}}&nbsp;{{word_list|getword:"answers"|ucfirst}}</p>

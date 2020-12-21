@@ -257,11 +257,8 @@ def find_category_of_community():
         category = find_category(c, category_ids)
         print(f"Category for {c.term_id} is {category}")
         if category > 0:
-            try:
-                new_instance = sm.CommunityCategoryRelation(community_id=c.term_id, category_id=category)
-                new_instance.save()
-            except:
-                pass
+            new_instance = sm.CommunityCategoryRelation(community_id=c.term_id, category_id=category, relation=0)
+            new_instance.save()
     return
 
 def generate_descriptions():
@@ -375,36 +372,4 @@ def updatecommunityslugs():
         slug = slug.replace("ü", "u")
         c.slug = slug
         c.save()
-        
-def updatecategories():
-    comm = sm.CommunityCategoryRelation.objects.get(community_id=118)
-    comm.category_id = 18
-    comm.save()
-    comm = sm.CommunityCategoryRelation.objects.get(community_id=3067)
-    comm.category_id = 119
-    comm.save()
-    comm = sm.CommunityCategoryRelation.objects.get(community_id=12071)
-    comm.category_id = 119
-    comm.save()
-    comm = sm.CommunityCategoryRelation.objects.get(community_id=6195)
-    comm.category_id = 8647
-    comm.save()
-    comm = sm.CommunityCategoryRelation.objects.get(community_id=3536)
-    comm.category_id = 22
-    comm.save()
-    comm = sm.CommunityCategoryRelation.objects.get(community_id=6303)
-    comm.category_id = 14
-    comm.save()
-    comm = sm.CommunityCategoryRelation.objects.get(community_id=8681)
-    comm.category_id = 8
-    comm.save()
-    comm = sm.CommunityCategoryRelation.objects.get(community_id=10857)
-    comm.category_id = 8
-    comm.save()
-    comm = sm.CommunityCategoryRelation.objects.get(community_id=8814)
-    comm.category_id = 51
-    comm.save()
-    comm = sm.CommunityCategoryRelation.objects.get(community_id=11122)
-    comm.category_id = 10818
-    comm.save()
         

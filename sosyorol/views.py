@@ -705,9 +705,73 @@ def communitiesfiltered(request, **kwargs):
     if fltr == "all":
         community_list = Community.objects.all()[0:20]
     else:
-        selected_category = CommunityCategories.objects.get(name=fun.localized_upper(fltr))
+        selected_category = CommunityCategories.objects.get(slug=fun.localized_upper(fltr))
         community_list = CommunityCategoryRelation.objects.filter(category=selected_category)[:20]
     return render(request, 'communities/communitytemplates/leaderboard.html', {'communities':community_list, 'filter':fltr})
+
+def quizzesfiltered(request, **kwargs):
+    if 'filter' in kwargs:
+        fltr = kwargs.get("filter")
+    else:
+        fltr = "all"
+    try:
+        fromcompage = request.GET["fromcompage"]
+        if fromcompage != "yes":
+            return quizzes(request, filter=fltr)
+    except:
+        return quizzes(request, filter=fltr)
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    quiz_list = Post.objects.filter(post_status="publish", post_type="quiz").order_by("-post_date")
+    if fltr != "all":
+        selected_category = CommunityCategories.objects.get(slug=fun.localized_upper(fltr))
+        community_list = CommunityCategoryRelation.objects.filter(category=selected_category)
+        community_ids = list({x.community_id: x for x in community_list}.keys())
+        taxonomies = TermTaxonomy.objects.filter(term_id__in=community_ids)
+        taxonomy_ids = list({x.term_taxonomy_id: x for x in taxonomies}.keys())
+        post_ids = TermRelationship.objects.filter(term_taxonomy_id__in=taxonomy_ids)
+        post_ids = list({x.object_id: x for x in post_ids}.keys())
+        quiz_list = quiz_list.filter(ID__in=post_ids)
+    for post in quiz_list:
+        setup_postmeta(post, word_list)
+        post.quiz_type = PostMeta.objects.filter(post_id=post.ID, meta_key="quiz_type")[0].meta_value
+        post.post_title = post.post_title.replace(" - Sosyorol", "")
+        if post.quiz_type == "media":
+            setup_media_quizmeta(post, word_list)
+        elif post.quiz_type == "colorBox":
+            setup_colorbox_quizmeta(post, word_list)
+        else:
+            setup_quizmeta(post, word_list)
+    return render(request, 'quiz_list.html', {'quizzes':quiz_list, 'filter':fltr, 'word_list':word_list})
+
+def pollsfiltered(request, **kwargs):
+    if 'filter' in kwargs:
+        fltr = kwargs.get("filter")
+    else:
+        fltr = "all"
+    try:
+        fromcompage = request.GET["fromcompage"]
+        if fromcompage != "yes":
+            return polls(request, filter=fltr)
+    except:
+        return quizzes(request, filter=fltr)
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    poll_list = Post.objects.filter(post_status="publish", post_type="poll").order_by("-post_date")
+    if fltr != "all":
+        selected_category = CommunityCategories.objects.get(slug=fun.localized_upper(fltr))
+        community_list = CommunityCategoryRelation.objects.filter(category=selected_category)
+        community_ids = list({x.community_id: x for x in community_list}.keys())
+        taxonomies = TermTaxonomy.objects.filter(term_id__in=community_ids)
+        taxonomy_ids = list({x.term_taxonomy_id: x for x in taxonomies}.keys())
+        post_ids = TermRelationship.objects.filter(term_taxonomy_id__in=taxonomy_ids)
+        post_ids = list({x.object_id: x for x in post_ids}.keys())
+        poll_list = poll_list.filter(ID__in=post_ids)
+    for post in poll_list:
+        setup_postmeta(post, word_list)
+    return render(request, 'poll_list.html', {'polls':poll_list, 'filter':fltr, 'word_list':word_list})
 
 def addanotherquizresult(request):
     nmr = str(int(request.GET["number"]) + 1)
@@ -2646,7 +2710,7 @@ def communities(request, **kwargs):
     if fltr == "all":
         communities = Community.objects.all()[0:20]
     else:
-        selected_category = CommunityCategories.objects.get(name=fun.localized_upper(fltr))
+        selected_category = CommunityCategories.objects.get(slug=fun.localized_upper(fltr))
         communities = CommunityCategoryRelation.objects.filter(category=selected_category)[:20]
     random_communities1 = CommunityCategoryRelation.objects.filter(category=random_cat1)[:5]
     random_communities2 = CommunityCategoryRelation.objects.filter(category=random_cat2)[:5]
@@ -3629,9 +3693,19 @@ def answerdrafts(request):
                                             'questions': questions, 'user_list':user_list, 'title': title
                                             })
 
-def quizzes(request):
+def quizzes(request, **kwargs):
     import random
     page = "quizzes"
+    if 'filter' in kwargs:
+        fltr = kwargs.get("filter")
+    else:
+        fltr = "all"
+    try:
+        fromcompage = request.GET["fromcompage"]
+        if fromcompage == "yes":
+            return quizzesfiltered(request, filter=fltr)
+    except:
+        pass
     current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
@@ -3647,6 +3721,15 @@ def quizzes(request):
         user_list.append(user)
     random.shuffle(user_list)
     quizzes = Post.objects.filter(post_type="quiz", post_status="publish").order_by("-post_date")
+    if fltr != "all":
+        selected_category = CommunityCategories.objects.get(slug=fun.localized_upper(fltr))
+        community_list = CommunityCategoryRelation.objects.filter(category=selected_category)
+        community_ids = list({x.community_id: x for x in community_list}.keys())
+        taxonomies = TermTaxonomy.objects.filter(term_id__in=community_ids)
+        taxonomy_ids = list({x.term_taxonomy_id: x for x in taxonomies}.keys())
+        post_ids = TermRelationship.objects.filter(term_taxonomy_id__in=taxonomy_ids)
+        post_ids = list({x.object_id: x for x in post_ids}.keys())
+        quizzes = quizzes.filter(ID__in=post_ids)
     for post in quizzes:
         setup_postmeta(post, word_list)
         post.quiz_type = PostMeta.objects.filter(post_id=post.ID, meta_key="quiz_type")[0].meta_value
@@ -3660,11 +3743,24 @@ def quizzes(request):
     return render(request, 'quizzes.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'country_list':country_list, 'select_language':select_language,
                                             'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
-                                            'page':page, 'title':title, 'categories':categories, 'quizzes':quizzes, 'user_list':user_list
+                                            'page':page, 'title':title, 'categories':categories, 'quizzes':quizzes, 'user_list':user_list,
+                                            'filter':fltr
                                             })
 
-def polls(request):
+def polls(request, **kwargs):
+    #fun.find_category_of_community()
+    import random
     page = "polls"
+    if 'filter' in kwargs:
+        fltr = kwargs.get("filter")
+    else:
+        fltr = "all"
+    try:
+        fromcompage = request.GET["fromcompage"]
+        if fromcompage == "yes":
+            return pollsfiltered(request, filter=fltr)
+    except:
+        pass
     current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
@@ -3672,11 +3768,30 @@ def polls(request):
     country_list = Languages.objects.filter(Q(var_name = 'lang'))
     select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
     notifications, num_notifications = setup_notifications(current_uid, word_list)
+    title = fun.ucfirst(word_list.get(var_name = 'quizzes').translation)
     categories = CommunityCategories.objects.all()
+    user_list = []
+    for user in current_user.followings:
+        user = setup_current_user(user.following_id)
+        user_list.append(user)
+    random.shuffle(user_list)
+    polls = Post.objects.filter(post_type="poll", post_status="publish").order_by("-post_date")
+    if fltr != "all":
+        selected_category = CommunityCategories.objects.get(slug=fun.localized_upper(fltr))
+        community_list = CommunityCategoryRelation.objects.filter(category=selected_category)
+        community_ids = list({x.community_id: x for x in community_list}.keys())
+        taxonomies = TermTaxonomy.objects.filter(term_id__in=community_ids)
+        taxonomy_ids = list({x.term_taxonomy_id: x for x in taxonomies}.keys())
+        post_ids = TermRelationship.objects.filter(term_taxonomy_id__in=taxonomy_ids)
+        post_ids = list({x.object_id: x for x in post_ids}.keys())
+        polls = polls.filter(ID__in=post_ids)
+    for post in polls:
+        setup_postmeta(post, word_list)
     return render(request, 'polls.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'country_list':country_list, 'select_language':select_language,
                                             'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
-                                            'page':page, 'categories':categories
+                                            'page':page, 'title':title, 'categories':categories, 'polls':polls, 'user_list':user_list,
+                                            'filter':fltr
                                             })
 
 def quizrequests(request):
@@ -3699,7 +3814,6 @@ def quizrequests(request):
     for quiz in quizzes:
         quiz.sender = setup_current_user(quiz.sender_id)
         setup_postmeta(quiz.post, word_list)
-        print(quiz.post.ID)
         quiz.post.quiz_type = PostMeta.objects.filter(post_id=quiz.post.ID, meta_key="quiz_type")[0].meta_value
         quiz.post.post_title = quiz.post.post_title.replace(" - Sosyorol", "")
         if quiz.post.quiz_type == "media":

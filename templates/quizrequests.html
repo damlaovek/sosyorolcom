@@ -262,34 +262,35 @@
                                                         </div>
                                                     </div>
                                                     <a href='/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{quiz.post.post_title}}</a>
-                                                    
-                                                    <div class="menu-wrapper border mt10" id="menu-wrapper4{{number}}" style="border-top:1px solid var(--border-color);height:210px">
-                                                        <div id="menu4{{number}}" class="menu" onscroll="menuScroll('left-paddle4{{number}}','right-paddle4{{number}}','menu4{{number}}',1)">
-                                                            {% for question in quiz.post.quiz_questions %}
-                                                                <div class="colorBox-question-oc">
-                                                                    <div class="p10 colorBox-question noselect" style="background-color: var(--question-color-{{question.question_color}});height:150px; line-height:150px;width:210px;">
-                                                                        <span class="bsbb cw fwbold tac inline-block vam fs19" style="line-height: normal;">{{question.question_text}}</span>
+                                                    <div class="bsbb p020 full-width">
+                                                        <div class="menu-wrapper border mt10" id="menu-wrapper4{{number}}" style="border-top:1px solid var(--border-color);height:210px">
+                                                            <div id="menu4{{number}}" class="menu" onscroll="menuScroll('left-paddle4{{number}}','right-paddle4{{number}}','menu4{{number}}',1)">
+                                                                {% for question in quiz.post.quiz_questions %}
+                                                                    <div class="colorBox-question-oc">
+                                                                        <div class="p10 colorBox-question noselect" style="background-color: var(--question-color-{{question.question_color}});height:150px; line-height:150px;width:210px;">
+                                                                            <span class="bsbb cw fwbold tac inline-block vam fs19" style="line-height: normal;">{{question.question_text}}</span>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                            {% endfor %}
-                                                        </div>
-                                                        <div class='arrow-btn paddle hidden left-paddle'  id="left-paddle4{{number}}" onclick="scrollToRight('menu4{{number}}')">
-                                                            <svg width="20pt" height="20pt" viewBox="0 0 30 30">
-                                                                <g>
-                                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 4.785156 10.714844 L 13.78125 19.703125 C 14.175781 20.097656 14.8125 20.097656 15.210938 19.703125 C 15.605469 19.3125 15.605469 18.671875 15.210938 18.277344 L 6.929688 10 L 15.207031 1.722656 C 15.605469 1.328125 15.605469 0.691406 15.207031 0.296875 C 14.8125 -0.0976562 14.175781 -0.0976562 13.777344 0.296875 L 4.785156 9.285156 C 4.398438 9.675781 4.398438 10.324219 4.785156 10.714844 Z M 4.785156 10.714844 "/>
-                                                                </g>
-                                                            </svg>
-                                                        </div>
-                                                        {% if quiz.post.quiz_questions|length > 3 %}
-                                                        <div class='arrow-btn paddle right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
-                                                        {% else %}
-                                                        <div class='arrow-btn paddle hidden right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
-                                                        {% endif %}
-                                                            <svg width="20pt" height="20pt" viewBox="0 0 30 30">
-                                                                <g>
-                                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 15.214844 9.285156 L 6.21875 0.296875 C 5.824219 -0.0976562 5.1875 -0.0976562 4.789062 0.296875 C 4.394531 0.6875 4.394531 1.328125 4.789062 1.722656 L 13.070312 10 L 4.789062 18.277344 C 4.394531 18.671875 4.394531 19.308594 4.789062 19.703125 C 5.1875 20.097656 5.824219 20.097656 6.21875 19.703125 L 15.214844 10.714844 C 15.601562 10.324219 15.601562 9.675781 15.214844 9.285156 Z M 15.214844 9.285156 "/>
-                                                                </g>
-                                                            </svg>
+                                                                {% endfor %}
+                                                            </div>
+                                                            <div class='arrow-btn paddle hidden left-paddle'  id="left-paddle4{{number}}" onclick="scrollToRight('menu4{{number}}')">
+                                                                <svg width="20pt" height="20pt" viewBox="0 0 30 30">
+                                                                    <g>
+                                                                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 4.785156 10.714844 L 13.78125 19.703125 C 14.175781 20.097656 14.8125 20.097656 15.210938 19.703125 C 15.605469 19.3125 15.605469 18.671875 15.210938 18.277344 L 6.929688 10 L 15.207031 1.722656 C 15.605469 1.328125 15.605469 0.691406 15.207031 0.296875 C 14.8125 -0.0976562 14.175781 -0.0976562 13.777344 0.296875 L 4.785156 9.285156 C 4.398438 9.675781 4.398438 10.324219 4.785156 10.714844 Z M 4.785156 10.714844 "/>
+                                                                    </g>
+                                                                </svg>
+                                                            </div>
+                                                            {% if quiz.post.quiz_questions|length > 3 %}
+                                                            <div class='arrow-btn paddle right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
+                                                            {% else %}
+                                                            <div class='arrow-btn paddle hidden right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
+                                                            {% endif %}
+                                                                <svg width="20pt" height="20pt" viewBox="0 0 30 30">
+                                                                    <g>
+                                                                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 15.214844 9.285156 L 6.21875 0.296875 C 5.824219 -0.0976562 5.1875 -0.0976562 4.789062 0.296875 C 4.394531 0.6875 4.394531 1.328125 4.789062 1.722656 L 13.070312 10 L 4.789062 18.277344 C 4.394531 18.671875 4.394531 19.308594 4.789062 19.703125 C 5.1875 20.097656 5.824219 20.097656 6.21875 19.703125 L 15.214844 10.714844 C 15.601562 10.324219 15.601562 9.675781 15.214844 9.285156 Z M 15.214844 9.285156 "/>
+                                                                    </g>
+                                                                </svg>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -355,35 +356,36 @@
                                                         </div>
                                                     </div>
                                                     <a href='/u/{{quiz.post.author.user_login}}/{{quiz.post.hex_id}}/{{quiz.post.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{quiz.post.post_title}}</a>
-                                                    
-                                                    <div class="menu-wrapper border mt10" id="menu-wrapper4{{number}}" style="border-top:1px solid var(--border-color);height:auto;">
-                                                        <div id="menu4{{number}}" class="menu" onscroll="menuScroll('left-paddle4{{number}}','right-paddle4{{number}}','menu4{{number}}',1)">
-                                                            {% for question in quiz.post.quiz_questions %}
-                                                                <div class="media-question-oc">
-                                                                    <div class="p10 border noselect" style="width:208px; height:calc(100% - 20px);">
-                                                                        <p class="lh20">{{forloop.counter}}. {{question.question_text}}</p>
-                                                                        <img class="full-width mt10" src="{{question.question_img}}" style="height: 150px;">
+                                                    <div class="bsbb p020 full-width">
+                                                        <div class="menu-wrapper border mt10" id="menu-wrapper4{{number}}" style="border-top:1px solid var(--border-color);height:auto;">
+                                                            <div id="menu4{{number}}" class="menu" onscroll="menuScroll('left-paddle4{{number}}','right-paddle4{{number}}','menu4{{number}}',1)">
+                                                                {% for question in quiz.post.quiz_questions %}
+                                                                    <div class="media-question-oc">
+                                                                        <div class="p10 border noselect" style="width:208px; height:calc(100% - 20px);">
+                                                                            <p class="lh20">{{forloop.counter}}. {{question.question_text}}</p>
+                                                                            <img class="full-width mt10" src="{{question.question_img}}" style="height: 150px;">
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                            {% endfor %}
-                                                        </div>
-                                                        <div class='arrow-btn paddle hidden left-paddle'  id="left-paddle4{{number}}" onclick="scrollToRight('menu4{{number}}')">
-                                                            <svg width="20pt" height="20pt" viewBox="0 0 30 30">
-                                                                <g>
-                                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 4.785156 10.714844 L 13.78125 19.703125 C 14.175781 20.097656 14.8125 20.097656 15.210938 19.703125 C 15.605469 19.3125 15.605469 18.671875 15.210938 18.277344 L 6.929688 10 L 15.207031 1.722656 C 15.605469 1.328125 15.605469 0.691406 15.207031 0.296875 C 14.8125 -0.0976562 14.175781 -0.0976562 13.777344 0.296875 L 4.785156 9.285156 C 4.398438 9.675781 4.398438 10.324219 4.785156 10.714844 Z M 4.785156 10.714844 "/>
-                                                                </g>
-                                                            </svg>
-                                                        </div>
-                                                        {% if quiz.post.quiz_questions|length > 3 %}
-                                                        <div class='arrow-btn paddle right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
-                                                        {% else %}
-                                                        <div class='arrow-btn paddle hidden right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
-                                                        {% endif %}
-                                                            <svg width="20pt" height="20pt" viewBox="0 0 30 30">
-                                                                <g>
-                                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 15.214844 9.285156 L 6.21875 0.296875 C 5.824219 -0.0976562 5.1875 -0.0976562 4.789062 0.296875 C 4.394531 0.6875 4.394531 1.328125 4.789062 1.722656 L 13.070312 10 L 4.789062 18.277344 C 4.394531 18.671875 4.394531 19.308594 4.789062 19.703125 C 5.1875 20.097656 5.824219 20.097656 6.21875 19.703125 L 15.214844 10.714844 C 15.601562 10.324219 15.601562 9.675781 15.214844 9.285156 Z M 15.214844 9.285156 "/>
-                                                                </g>
-                                                            </svg>
+                                                                {% endfor %}
+                                                            </div>
+                                                            <div class='arrow-btn paddle hidden left-paddle'  id="left-paddle4{{number}}" onclick="scrollToRight('menu4{{number}}')">
+                                                                <svg width="20pt" height="20pt" viewBox="0 0 30 30">
+                                                                    <g>
+                                                                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 4.785156 10.714844 L 13.78125 19.703125 C 14.175781 20.097656 14.8125 20.097656 15.210938 19.703125 C 15.605469 19.3125 15.605469 18.671875 15.210938 18.277344 L 6.929688 10 L 15.207031 1.722656 C 15.605469 1.328125 15.605469 0.691406 15.207031 0.296875 C 14.8125 -0.0976562 14.175781 -0.0976562 13.777344 0.296875 L 4.785156 9.285156 C 4.398438 9.675781 4.398438 10.324219 4.785156 10.714844 Z M 4.785156 10.714844 "/>
+                                                                    </g>
+                                                                </svg>
+                                                            </div>
+                                                            {% if quiz.post.quiz_questions|length > 3 %}
+                                                            <div class='arrow-btn paddle right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
+                                                            {% else %}
+                                                            <div class='arrow-btn paddle hidden right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
+                                                            {% endif %}
+                                                                <svg width="20pt" height="20pt" viewBox="0 0 30 30">
+                                                                    <g>
+                                                                        <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 15.214844 9.285156 L 6.21875 0.296875 C 5.824219 -0.0976562 5.1875 -0.0976562 4.789062 0.296875 C 4.394531 0.6875 4.394531 1.328125 4.789062 1.722656 L 13.070312 10 L 4.789062 18.277344 C 4.394531 18.671875 4.394531 19.308594 4.789062 19.703125 C 5.1875 20.097656 5.824219 20.097656 6.21875 19.703125 L 15.214844 10.714844 C 15.601562 10.324219 15.601562 9.675781 15.214844 9.285156 Z M 15.214844 9.285156 "/>
+                                                                    </g>
+                                                                </svg>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

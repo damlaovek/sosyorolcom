@@ -1,0 +1,281 @@
+{% load index %}
+{% for quiz in quizzes %}
+    {% if quiz.quiz_type == "colorBox" %}
+        <div class='full-width'>
+            <div class='full-width box answer-template-oc'>
+                <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
+                    <div style='width:calc(100% - 20px);' class='p010'>
+                        <div class='sqr20 icon absolute hand aligntr bringfront' onclick="showMoreOptions(this, {{quiz.ID}})">
+                            <svg width='20px' height='20px' viewBox='0 0 20 20' class="rotate90">
+                                <g>
+                                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{quiz.ID}}">
+                            <li class="hand" onclick="savePost(this, {{quiz.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
+                        </ul>
+                        <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{word_list|getword:"quiz"|ucfirst}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{word_list|getword:"recommended-for-you"}}</span></p>
+                        <div  class='full-width inline-flex' style='margin-bottom:10px;'>
+                            <img src='{{quiz.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
+                            <div style='margin-left:10px;width:calc(100% - 50px);'>
+                                <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{quiz.author.display_name}}</a><br>
+                                <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{quiz.time_diff}} {{post_template_dict.ago}}</a>
+                            </div>
+                        </div>
+                        <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{quiz.post_title}}</a>
+                        <div class="bsbb p020 full-width">
+                            <div class="menu-wrapper border mt10" id="menu-wrapper4{{number}}" style="border-top:1px solid var(--border-color);height:210px">
+                                <div id="menu4{{number}}" class="menu" onscroll="menuScroll('left-paddle4{{number}}','right-paddle4{{number}}','menu4{{number}}',1)">
+                                    {% for question in quiz.quiz_questions %}
+                                        <div class="colorBox-question-oc">
+                                            <div class="p10 colorBox-question noselect" style="background-color: var(--question-color-{{question.question_color}});height:150px; line-height:150px;width:210px;">
+                                                <span class="bsbb cw fwbold tac inline-block vam fs19" style="line-height: normal;">{{question.question_text}}</span>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class='arrow-btn paddle hidden left-paddle'  id="left-paddle4{{number}}" onclick="scrollToRight('menu4{{number}}')">
+                                    <svg width="20pt" height="20pt" viewBox="0 0 30 30">
+                                        <g>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 4.785156 10.714844 L 13.78125 19.703125 C 14.175781 20.097656 14.8125 20.097656 15.210938 19.703125 C 15.605469 19.3125 15.605469 18.671875 15.210938 18.277344 L 6.929688 10 L 15.207031 1.722656 C 15.605469 1.328125 15.605469 0.691406 15.207031 0.296875 C 14.8125 -0.0976562 14.175781 -0.0976562 13.777344 0.296875 L 4.785156 9.285156 C 4.398438 9.675781 4.398438 10.324219 4.785156 10.714844 Z M 4.785156 10.714844 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                                {% if quiz.quiz_questions|length > 3 %}
+                                <div class='arrow-btn paddle right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
+                                {% else %}
+                                <div class='arrow-btn paddle hidden right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
+                                {% endif %}
+                                    <svg width="20pt" height="20pt" viewBox="0 0 30 30">
+                                        <g>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 15.214844 9.285156 L 6.21875 0.296875 C 5.824219 -0.0976562 5.1875 -0.0976562 4.789062 0.296875 C 4.394531 0.6875 4.394531 1.328125 4.789062 1.722656 L 13.070312 10 L 4.789062 18.277344 C 4.394531 18.671875 4.394531 19.308594 4.789062 19.703125 C 5.1875 20.097656 5.824219 20.097656 6.21875 19.703125 L 15.214844 10.714844 C 15.601562 10.324219 15.601562 9.675781 15.214844 9.285156 Z M 15.214844 9.285156 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bsbb p010 full-width inline-block aligntr mt20">
+                        <a href="/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}" class="left">
+                            <div class='icon3 inline-flex border'>
+                                <svg width='20px' height='20px' viewBox='0 0 15 14'>
+                                    <g>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 14 L 4.046875 13.609375 L 0.417969 10.222656 Z M 0 14 "/>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 9 2.214844 L 12.628906 5.597656 L 4.742188 12.957031 L 1.117188 9.574219 Z M 14.5 3.851562 C 15.164062 3.230469 15.167969 2.226562 14.5 1.605469 L 13.28125 0.464844 C 12.617188 -0.15625 11.539062 -0.15625 10.875 0.464844 L 9.691406 1.570312 L 13.320312 4.953125 Z M 14.5 3.851562 "/>
+                                    </g>
+                                </svg>
+                                <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"solve-quiz"|ucfirst}}</p>
+                            </div>
+                        </a>
+                        <div class='icon3 left ml10 inline-flex border' onclick="document.getElementById('select-user-popup').classList.remove('dnone');document.getElementById('selected_question').value='{{quiz.ID}}';">
+                            <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                <g>
+                                    <path style="stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 18.554688 L 19.980469 9.992188 L 0 1.425781 L 0 8.085938 L 14.273438 9.992188 L 0 11.894531 Z M 0 18.554688 "/>
+                                </g>
+                            </svg>
+                            <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"send"|ucfirst}}</p>
+                        </div>
+                        <div class='icon3 right inline-flex border' onclick="document.getElementById('share-menu-{{quiz.ID}}').classList.toggle('dnone');">
+                            <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                <g>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 19.773438 6.992188 L 14.0625 1.28125 C 13.921875 1.140625 13.753906 1.070312 13.5625 1.070312 C 13.367188 1.070312 13.199219 1.140625 13.058594 1.28125 C 12.917969 1.425781 12.847656 1.589844 12.847656 1.785156 L 12.847656 4.640625 L 10.351562 4.640625 C 5.046875 4.640625 1.796875 6.136719 0.589844 9.132812 C 0.195312 10.128906 0 11.367188 0 12.847656 C 0 14.082031 0.472656 15.757812 1.417969 17.878906 C 1.4375 17.929688 1.476562 18.019531 1.535156 18.144531 C 1.589844 18.273438 1.640625 18.382812 1.683594 18.480469 C 1.730469 18.578125 1.777344 18.65625 1.828125 18.726562 C 1.917969 18.851562 2.023438 18.914062 2.140625 18.914062 C 2.253906 18.914062 2.339844 18.878906 2.402344 18.804688 C 2.464844 18.730469 2.5 18.636719 2.5 18.523438 C 2.5 18.457031 2.488281 18.359375 2.46875 18.230469 C 2.453125 18.097656 2.441406 18.011719 2.441406 17.96875 C 2.40625 17.460938 2.386719 17.003906 2.386719 16.59375 C 2.386719 15.84375 2.453125 15.171875 2.582031 14.578125 C 2.710938 13.980469 2.890625 13.46875 3.121094 13.03125 C 3.351562 12.597656 3.652344 12.222656 4.015625 11.90625 C 4.378906 11.589844 4.769531 11.332031 5.191406 11.128906 C 5.613281 10.929688 6.105469 10.773438 6.675781 10.65625 C 7.242188 10.542969 7.816406 10.460938 8.390625 10.417969 C 8.96875 10.371094 9.621094 10.351562 10.351562 10.351562 L 12.847656 10.351562 L 12.847656 13.207031 C 12.847656 13.398438 12.917969 13.566406 13.058594 13.707031 C 13.199219 13.847656 13.367188 13.917969 13.5625 13.917969 C 13.753906 13.917969 13.921875 13.847656 14.0625 13.707031 L 19.773438 7.996094 C 19.914062 7.855469 19.984375 7.6875 19.984375 7.496094 C 19.984375 7.300781 19.914062 7.132812 19.773438 6.992188 Z M 19.773438 6.992188 "/>
+                                </g>
+                            </svg>
+                            <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"share"|ucfirst}}</p>
+                        </div>
+                        <div id="share-menu-{{quiz.ID}}" class="full-shadow-border absolute aligntr bcw dnone" style="top:42px; z-index: 5;">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}" target="_blank"><p class="p10 cg2 fs15 hand item-hover">{{word_list|getword:"share-on-facebook"}}</p></a>
+                            <a href="https://twitter.com/intent/tweet?text={{quiz.post_title}}&amp;url=www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}&amp;via=Sosyorol" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-twitter"}}</p></a>
+                            <a href="whatsapp://send?text={{quiz.post_title}} www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-whatsapp"}}</p></a>
+                            <a href="mailto:''?Subject={{quiz.post_title}}&body={{quiz.post_title}}%20%3A%0D%0A%20www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"send-email"}}</p></a>
+                            <p class="p10 cg2 bt fs15 hand item-hover" onclick="document.getElementById('share-menu-{{quiz.ID}}').classList.add('dnone');copyLink('www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}', '{{word_list|getword:"link-copied"|ucfirst}}');">{{word_list|getword:"copy-link"|ucfirst}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% elif quiz.quiz_type == "media" %}
+        <div class='full-width'>
+            <div class='full-width box answer-template-oc'>
+                <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
+                    <div style='width:calc(100% - 20px);' class='p010'>
+                        <div class='sqr20 icon absolute hand aligntr bringfront' onclick="showMoreOptions(this, {{quiz.ID}})">
+                            <svg width='20px' height='20px' viewBox='0 0 20 20' class="rotate90">
+                                <g>
+                                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{quiz.ID}}">
+                            <li class="hand" onclick="savePost(this, {{quiz.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
+                        </ul>
+                        <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{word_list|getword:"quiz"|ucfirst}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{word_list|getword:"recommended-for-you"}}</span></p>
+                        <div  class='full-width inline-flex' style='margin-bottom:10px;'>
+                            <img src='{{quiz.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
+                            <div style='margin-left:10px;width:calc(100% - 50px);'>
+                                <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{quiz.author.display_name}}</a><br>
+                                <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{quiz.time_diff}} {{post_template_dict.ago}}</a>
+                            </div>
+                        </div>
+                        <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{quiz.post_title}}</a>
+                        <div class="bsbb p020 full-width">
+                            <div class="menu-wrapper border mt10" id="menu-wrapper4{{number}}" style="border-top:1px solid var(--border-color);height:auto;">
+                                <div id="menu4{{number}}" class="menu" onscroll="menuScroll('left-paddle4{{number}}','right-paddle4{{number}}','menu4{{number}}',1)">
+                                    {% for question in quiz.quiz_questions %}
+                                        <div class="media-question-oc">
+                                            <div class="p10 border noselect" style="width:208px; height:calc(100% - 20px);">
+                                                <p class="lh20">{{forloop.counter}}. {{question.question_text}}</p>
+                                                <img class="full-width mt10" src="{{question.question_img}}" style="height: 150px;">
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class='arrow-btn paddle hidden left-paddle'  id="left-paddle4{{number}}" onclick="scrollToRight('menu4{{number}}')">
+                                    <svg width="20pt" height="20pt" viewBox="0 0 30 30">
+                                        <g>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 4.785156 10.714844 L 13.78125 19.703125 C 14.175781 20.097656 14.8125 20.097656 15.210938 19.703125 C 15.605469 19.3125 15.605469 18.671875 15.210938 18.277344 L 6.929688 10 L 15.207031 1.722656 C 15.605469 1.328125 15.605469 0.691406 15.207031 0.296875 C 14.8125 -0.0976562 14.175781 -0.0976562 13.777344 0.296875 L 4.785156 9.285156 C 4.398438 9.675781 4.398438 10.324219 4.785156 10.714844 Z M 4.785156 10.714844 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                                {% if quiz.quiz_questions|length > 3 %}
+                                <div class='arrow-btn paddle right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
+                                {% else %}
+                                <div class='arrow-btn paddle hidden right-paddle' id="right-paddle4{{number}}" onclick="scrollToLeft('menu4{{number}}')">
+                                {% endif %}
+                                    <svg width="20pt" height="20pt" viewBox="0 0 30 30">
+                                        <g>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 15.214844 9.285156 L 6.21875 0.296875 C 5.824219 -0.0976562 5.1875 -0.0976562 4.789062 0.296875 C 4.394531 0.6875 4.394531 1.328125 4.789062 1.722656 L 13.070312 10 L 4.789062 18.277344 C 4.394531 18.671875 4.394531 19.308594 4.789062 19.703125 C 5.1875 20.097656 5.824219 20.097656 6.21875 19.703125 L 15.214844 10.714844 C 15.601562 10.324219 15.601562 9.675781 15.214844 9.285156 Z M 15.214844 9.285156 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bsbb p010 full-width inline-block aligntr mt20">
+                        <a href="/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}" class="left">
+                            <div class='icon3 inline-flex border'>
+                                <svg width='20px' height='20px' viewBox='0 0 15 14'>
+                                    <g>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 14 L 4.046875 13.609375 L 0.417969 10.222656 Z M 0 14 "/>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 9 2.214844 L 12.628906 5.597656 L 4.742188 12.957031 L 1.117188 9.574219 Z M 14.5 3.851562 C 15.164062 3.230469 15.167969 2.226562 14.5 1.605469 L 13.28125 0.464844 C 12.617188 -0.15625 11.539062 -0.15625 10.875 0.464844 L 9.691406 1.570312 L 13.320312 4.953125 Z M 14.5 3.851562 "/>
+                                    </g>
+                                </svg>
+                                <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"solve-quiz"|ucfirst}}</p>
+                            </div>
+                        </a>
+                        <div class='icon3 left ml10 inline-flex border' onclick="document.getElementById('select-user-popup').classList.remove('dnone');document.getElementById('selected_question').value='{{quiz.ID}}';">
+                            <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                <g>
+                                    <path style="stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 18.554688 L 19.980469 9.992188 L 0 1.425781 L 0 8.085938 L 14.273438 9.992188 L 0 11.894531 Z M 0 18.554688 "/>
+                                </g>
+                            </svg>
+                            <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"send"|ucfirst}}</p>
+                        </div>
+                        <div class='icon3 right inline-flex border' onclick="document.getElementById('share-menu-{{quiz.ID}}').classList.toggle('dnone');">
+                            <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                <g>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 19.773438 6.992188 L 14.0625 1.28125 C 13.921875 1.140625 13.753906 1.070312 13.5625 1.070312 C 13.367188 1.070312 13.199219 1.140625 13.058594 1.28125 C 12.917969 1.425781 12.847656 1.589844 12.847656 1.785156 L 12.847656 4.640625 L 10.351562 4.640625 C 5.046875 4.640625 1.796875 6.136719 0.589844 9.132812 C 0.195312 10.128906 0 11.367188 0 12.847656 C 0 14.082031 0.472656 15.757812 1.417969 17.878906 C 1.4375 17.929688 1.476562 18.019531 1.535156 18.144531 C 1.589844 18.273438 1.640625 18.382812 1.683594 18.480469 C 1.730469 18.578125 1.777344 18.65625 1.828125 18.726562 C 1.917969 18.851562 2.023438 18.914062 2.140625 18.914062 C 2.253906 18.914062 2.339844 18.878906 2.402344 18.804688 C 2.464844 18.730469 2.5 18.636719 2.5 18.523438 C 2.5 18.457031 2.488281 18.359375 2.46875 18.230469 C 2.453125 18.097656 2.441406 18.011719 2.441406 17.96875 C 2.40625 17.460938 2.386719 17.003906 2.386719 16.59375 C 2.386719 15.84375 2.453125 15.171875 2.582031 14.578125 C 2.710938 13.980469 2.890625 13.46875 3.121094 13.03125 C 3.351562 12.597656 3.652344 12.222656 4.015625 11.90625 C 4.378906 11.589844 4.769531 11.332031 5.191406 11.128906 C 5.613281 10.929688 6.105469 10.773438 6.675781 10.65625 C 7.242188 10.542969 7.816406 10.460938 8.390625 10.417969 C 8.96875 10.371094 9.621094 10.351562 10.351562 10.351562 L 12.847656 10.351562 L 12.847656 13.207031 C 12.847656 13.398438 12.917969 13.566406 13.058594 13.707031 C 13.199219 13.847656 13.367188 13.917969 13.5625 13.917969 C 13.753906 13.917969 13.921875 13.847656 14.0625 13.707031 L 19.773438 7.996094 C 19.914062 7.855469 19.984375 7.6875 19.984375 7.496094 C 19.984375 7.300781 19.914062 7.132812 19.773438 6.992188 Z M 19.773438 6.992188 "/>
+                                </g>
+                            </svg>
+                            <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"share"|ucfirst}}</p>
+                        </div>
+                        <div id="share-menu-{{quiz.ID}}" class="full-shadow-border absolute aligntr bcw dnone" style="top:42px; z-index: 5;">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}" target="_blank"><p class="p10 cg2 fs15 hand item-hover">{{word_list|getword:"share-on-facebook"}}</p></a>
+                            <a href="https://twitter.com/intent/tweet?text={{quiz.post_title}}&amp;url=www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}&amp;via=Sosyorol" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-twitter"}}</p></a>
+                            <a href="whatsapp://send?text={{quiz.post_title}} www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-whatsapp"}}</p></a>
+                            <a href="mailto:''?Subject={{quiz.post_title}}&body={{quiz.post_title}}%20%3A%0D%0A%20www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"send-email"}}</p></a>
+                            <p class="p10 cg2 bt fs15 hand item-hover" onclick="document.getElementById('share-menu-{{quiz.ID}}').classList.add('dnone');copyLink('www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}', '{{word_list|getword:"link-copied"|ucfirst}}');">{{word_list|getword:"copy-link"|ucfirst}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class='full-width'>
+            <div class='full-width box answer-template-oc'>
+                <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
+                    <div style='width:calc(100% - 20px);' class='p010'>
+                        <div class='sqr20 icon absolute hand aligntr bringfront' onclick="showMoreOptions(this, {{quiz.ID}})">
+                            <svg width='20px' height='20px' viewBox='0 0 20 20' class="rotate90">
+                                <g>
+                                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{quiz.ID}}">
+                            <li class="hand" onclick="savePost(this, {{quiz.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
+                        </ul>
+                        <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{word_list|getword:"quiz"|ucfirst}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{word_list|getword:"recommended-for-you"}}</span></p>
+                        <div  class='full-width inline-flex' style='margin-bottom:10px;'>
+                            <img src='{{quiz.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
+                            <div style='margin-left:10px;width:calc(100% - 50px);'>
+                                <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{quiz.author.display_name}}</a><br>
+                                <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{quiz.time_diff}} {{post_template_dict.ago}}</a>
+                            </div>
+                        </div>
+                        <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}' class='underline-on-hover' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{quiz.post_title}}</a>
+                        <ul class="full-width border mt10">
+                            {% for question in quiz.quiz_questions %}
+                                {% if forloop.counter < 5 %}
+                                    {% if forloop.counter == 1 %}
+                                        <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}'><li class="p1020 cg2 hand">{{forloop.counter}}. {{question.question_text}}</li></a>
+                                    {% else %}
+                                        <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}'><li class="p1020 bt cg2 hand">{{forloop.counter}}. {{question.question_text}}</li></a>
+                                    {% endif %}
+                                {% else %}
+                                        <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}' class="quiz_question{{number}} dnone"><li class="p1020 bt cg2 hand">{{forloop.counter}}. {{question.question_text}}</li></a>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        {% if quiz.quiz_questions|length > 4 %}
+                            <div class="full-width hand p100 bcgrayish tac border" style="border-top:none;" onclick="showAllQuestions(this, {{number}});">{{post_template_dict.more}}</div>
+                        {% endif %}
+                    </div>
+                    <div class="bsbb p010 full-width inline-block aligntr mt20">
+                        <a href="/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}" class="left">
+                            <div class='icon3 inline-flex border'>
+                                <svg width='20px' height='20px' viewBox='0 0 15 14'>
+                                    <g>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 14 L 4.046875 13.609375 L 0.417969 10.222656 Z M 0 14 "/>
+                                        <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 9 2.214844 L 12.628906 5.597656 L 4.742188 12.957031 L 1.117188 9.574219 Z M 14.5 3.851562 C 15.164062 3.230469 15.167969 2.226562 14.5 1.605469 L 13.28125 0.464844 C 12.617188 -0.15625 11.539062 -0.15625 10.875 0.464844 L 9.691406 1.570312 L 13.320312 4.953125 Z M 14.5 3.851562 "/>
+                                    </g>
+                                </svg>
+                                <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"solve-quiz"|ucfirst}}</p>
+                            </div>
+                        </a>
+                        <div class='icon3 left ml10 inline-flex border' onclick="document.getElementById('select-user-popup').classList.remove('dnone');document.getElementById('selected_question').value='{{quiz.ID}}';">
+                            <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                <g>
+                                    <path style="stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0 18.554688 L 19.980469 9.992188 L 0 1.425781 L 0 8.085938 L 14.273438 9.992188 L 0 11.894531 Z M 0 18.554688 "/>
+                                </g>
+                            </svg>
+                            <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"send"|ucfirst}}</p>
+                        </div>
+                        <div class='icon3 right inline-flex border' onclick="document.getElementById('share-menu-{{quiz.ID}}').classList.toggle('dnone');">
+                            <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                <g>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 19.773438 6.992188 L 14.0625 1.28125 C 13.921875 1.140625 13.753906 1.070312 13.5625 1.070312 C 13.367188 1.070312 13.199219 1.140625 13.058594 1.28125 C 12.917969 1.425781 12.847656 1.589844 12.847656 1.785156 L 12.847656 4.640625 L 10.351562 4.640625 C 5.046875 4.640625 1.796875 6.136719 0.589844 9.132812 C 0.195312 10.128906 0 11.367188 0 12.847656 C 0 14.082031 0.472656 15.757812 1.417969 17.878906 C 1.4375 17.929688 1.476562 18.019531 1.535156 18.144531 C 1.589844 18.273438 1.640625 18.382812 1.683594 18.480469 C 1.730469 18.578125 1.777344 18.65625 1.828125 18.726562 C 1.917969 18.851562 2.023438 18.914062 2.140625 18.914062 C 2.253906 18.914062 2.339844 18.878906 2.402344 18.804688 C 2.464844 18.730469 2.5 18.636719 2.5 18.523438 C 2.5 18.457031 2.488281 18.359375 2.46875 18.230469 C 2.453125 18.097656 2.441406 18.011719 2.441406 17.96875 C 2.40625 17.460938 2.386719 17.003906 2.386719 16.59375 C 2.386719 15.84375 2.453125 15.171875 2.582031 14.578125 C 2.710938 13.980469 2.890625 13.46875 3.121094 13.03125 C 3.351562 12.597656 3.652344 12.222656 4.015625 11.90625 C 4.378906 11.589844 4.769531 11.332031 5.191406 11.128906 C 5.613281 10.929688 6.105469 10.773438 6.675781 10.65625 C 7.242188 10.542969 7.816406 10.460938 8.390625 10.417969 C 8.96875 10.371094 9.621094 10.351562 10.351562 10.351562 L 12.847656 10.351562 L 12.847656 13.207031 C 12.847656 13.398438 12.917969 13.566406 13.058594 13.707031 C 13.199219 13.847656 13.367188 13.917969 13.5625 13.917969 C 13.753906 13.917969 13.921875 13.847656 14.0625 13.707031 L 19.773438 7.996094 C 19.914062 7.855469 19.984375 7.6875 19.984375 7.496094 C 19.984375 7.300781 19.914062 7.132812 19.773438 6.992188 Z M 19.773438 6.992188 "/>
+                                </g>
+                            </svg>
+                            <p class="noselect cg2 lh20">&nbsp;{{word_list|getword:"share"|ucfirst}}</p>
+                        </div>
+                        <div id="share-menu-{{quiz.ID}}" class="full-shadow-border absolute aligntr bcw dnone" style="top:42px; z-index: 5;">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}" target="_blank"><p class="p10 cg2 fs15 hand item-hover">{{word_list|getword:"share-on-facebook"}}</p></a>
+                            <a href="https://twitter.com/intent/tweet?text={{quiz.post_title}}&amp;url=www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}&amp;via=Sosyorol" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-twitter"}}</p></a>
+                            <a href="whatsapp://send?text={{quiz.post_title}} www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-whatsapp"}}</p></a>
+                            <a href="mailto:''?Subject={{quiz.post_title}}&body={{quiz.post_title}}%20%3A%0D%0A%20www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"send-email"}}</p></a>
+                            <p class="p10 cg2 bt fs15 hand item-hover" onclick="document.getElementById('share-menu-{{quiz.ID}}').classList.add('dnone');copyLink('www.sosyorol.com/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}', '{{word_list|getword:"link-copied"|ucfirst}}');">{{word_list|getword:"copy-link"|ucfirst}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}
