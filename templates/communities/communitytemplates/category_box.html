@@ -2,14 +2,19 @@
 {% load static %}
 <style>
     .question-template-box-oc{height:135px;width:258px;background:var(--grayish);padding:0;}
+    .category-ic.active{border:4px solid var(--main-color);}
 </style>
-<div class='question-template-box item'>
-    <div class='full-shadow2 question-template-box-oc'>
-        <div class='full'>
+{% if filter == category.slug|tolower %}
+<div class='question-template-box item active' id="{{category.slug|tolower}}">
+{% else %}
+<div class='question-template-box item' id="{{category.slug|tolower}}">
+{% endif %}
+    <a href="/{{url}}/{{category.slug|tolower}}" data-target="{{category.slug|tolower}}"><div class='full-shadow2 question-template-box-oc'>
+        <div class='bsbb full category-ic' id="category-ic-{{category.slug|tolower}}">
             <div class="filter-div">
                 <p class="bsbb absolute full-width p10 fwbold bringfront" style="bottom:0px;left:0;color:white;">{{category.name|ucwords}}</p>
                 <img src="{% static 'assets/img/categories/' %}{{category.term_id}}.jpg" class="full">
             </div>
         </div>
-    </div>
+    </div></a>
 </div>

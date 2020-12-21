@@ -22,7 +22,7 @@
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
                     <img src='{{quiz.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
-                        <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{quiz.author.display_name}}</a><br>
+                        <a href='/u/{{quiz.author.user_login}}' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{quiz.author.display_name}}</a><br>
                         <a href='/u/{{quiz.author.user_login}}/{{quiz.hex_id}}/{{quiz.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{quiz.time_diff}} {{post_template_dict.ago}}</a>
                     </div>
                 </div>

@@ -19,7 +19,7 @@
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
                     <img src='{{link.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
-                        <a href='https://www.sosyorol.com/user/' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{link.author.display_name}}</a><br>
+                        <a href='/u/{{link.author.user_login}}' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{link.author.display_name}}</a><br>
                         <a href='/u/{{link.author.user_login}}/{{link.hex_id}}/{{link.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{link.time_diff}} {{post_template_dict.ago}}</a>
                     </div>
                 </div>

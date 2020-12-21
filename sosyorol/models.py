@@ -242,6 +242,7 @@ class PostFlair(models.Model):
 class CommunityCategories(models.Model):
     term_id = models.BigIntegerField(primary_key = True)
     name = models.TextField()
+    slug = models.TextField()
     class Meta:
         db_table = "community_categories"
 
