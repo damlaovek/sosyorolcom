@@ -8,7 +8,7 @@
             <li class="bsbb fs14 lh20 text hand p10 noselect inline-flex full-width item-hover item-bb" id="user_{{user.ID}}" onclick="selectUser(this, '{{container}}');">
                 <img src="{{user.avatar_url}}" class="non-draggable rounded sqr40" data-no-lazy="1"/>
                 <p class="ellipsis lh40" style="padding:0 15px;">u/{{user.user_login}}</p>
-                <div class="absolute aligntr m10 bsbb borderred rounded full-shadow bcr hand dnone" style="z-index: 6;" id="user_{{user.ID}}_remove" onclick="removeSelectedUser('user_{{user.ID}}', '{{container}}')">
+                <div class="absolute aligntr m10 bsbb borderred rounded full-shadow bcr hand dnone" style="z-index: 6;top:5px;" id="user_{{user.ID}}_remove" onclick="removeSelectedUser('user_{{user.ID}}', '{{container}}')">
                     <p class="full cw sqrt30 rounded tac hand lh30">&#10005;</p>
                 </div>
             </li>

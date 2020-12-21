@@ -50,6 +50,8 @@ function saveProfileDesc(){
                 displayAlert(response.content);
                 document.getElementById("edit-user-desc-popup").classList.add("dnone");
                 document.getElementById("userdesc").innerText = profiledesc;
+                document.getElementById("userdesc").classList.remove("dnone");
+                document.getElementById("edituserdescbtn").innerText = "{{word_list|getword:'edit'|ucfirst}}";
             }
         });
     }

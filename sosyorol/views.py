@@ -21,7 +21,7 @@ from django.views.generic.list import ListView
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATICFILES_DIR = os.path.join(BASE_DIR, 'static')
 
-current_uid = 8
+current_uid = 7
 
 '''---------------------------------------
   FIREBASE              
@@ -1648,9 +1648,13 @@ def editfullname(request):
 def editprofiledesc(request):
     try:
         profiledesc = request.GET["profiledesc"]
-        user_desc = UserMeta.objects.filter(user_id = current_uid, meta_key = 'description')[0]
-        user_desc.meta_value = profiledesc
-        user_desc.save()
+        try:
+            user_desc = UserMeta.objects.filter(user_id = current_uid, meta_key = 'description')[0]
+            user_desc.meta_value = profiledesc
+            user_desc.save()
+        except:
+            user_desc = UserMeta(user_id = current_uid, meta_key = 'description', meta_value=profiledesc)
+            user_desc.save()
         return "success"
     except:
         return "error"
@@ -1828,10 +1832,11 @@ def requestanswer(request):
         selectedUsers = request.POST["selectedUsers"]
         post_id = int(request.POST["post_id"])
         selected = selectedUsers.split(", ")
+        post = Post.objects.get(ID=post_id)
         if len(selected) > 0:
             selected = [int(i) for i in selected if i != '']
         for ID in selected:
-            new_request = PostRequest(sender_id=current_uid, receiver_id=ID, post_id=post_id, date=dt.datetime.now(), answered=0, post_type="answer")
+            new_request = PostRequest(sender_id=current_uid, receiver_id=ID, post_id=post_id, date=dt.datetime.now(), answered=0, post_type=post.post_type)
             new_request.save()
         lang = UserMeta.objects.filter(user_id=current_uid, meta_key='language')[0].meta_value
         word_list = Languages.objects.filter(Q(lang_code = lang))
@@ -3748,7 +3753,6 @@ def quizzes(request, **kwargs):
                                             })
 
 def polls(request, **kwargs):
-    #fun.find_category_of_community()
     import random
     page = "polls"
     if 'filter' in kwargs:
@@ -3826,4 +3830,30 @@ def quizrequests(request):
                                             'country_list':country_list, 'select_language':select_language,
                                             'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
                                             'title':title, 'categories':categories, 'quizzes':quizzes, 'user_list':user_list
+                                            })
+
+def pollrequests(request):
+    import random
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    title = fun.ucfirst(word_list.get(var_name = 'polls').translation)
+    categories = CommunityCategories.objects.all()
+    user_list = []
+    for user in current_user.followings:
+        user = setup_current_user(user.following_id)
+        user_list.append(user)
+    random.shuffle(user_list)
+    polls = PostRequest.objects.filter(receiver_id=current_uid, answered=0, post_type="poll").order_by("-date")
+    for poll in polls:
+        poll.sender = setup_current_user(poll.sender_id)
+        setup_postmeta(poll.post, word_list)
+    return render(request, 'pollrequests.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'title':title, 'categories':categories, 'polls':polls, 'user_list':user_list
                                             })

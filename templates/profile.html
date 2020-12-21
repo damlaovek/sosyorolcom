@@ -115,7 +115,11 @@
                                     </div>
                                     <p class="fs15 cg2 lh20">u/{{profile.user_login}}</p>
                                     {% if current_user.ID == profile.ID %}
-                                    <p class="fs15 cg2 lh20 mt20" id="desc-placeholder"><span id="userdesc">{% autoescape off %}{{profile.description|edit_comm_desc}}{% endautoescape %}</span><span class="fs13 fwlight underline-on-hover hand cg2 ml10 noselect" style="margin-top:14px;" onclick="document.getElementById('edit-user-desc-popup').classList.remove('dnone');">{{word_list|getword:"edit"|ucfirst}}</span></p>
+                                        {% if profile.description == "" %}
+                                        <p class="fs15 cg2 lh20 mt20" id="desc-placeholder"><span id="userdesc" class="mr10 dnone">{% autoescape off %}{{profile.description|edit_comm_desc}}{% endautoescape %}</span><span class="fs13 fwlight underline-on-hover hand cg2 noselect" style="margin-top:14px;" onclick="document.getElementById('edit-user-desc-popup').classList.remove('dnone');" id="edituserdescbtn">{{word_list|getword:"add-bio"|ucfirst}}</span></p>
+                                        {% else %}
+                                        <p class="fs15 cg2 lh20 mt20" id="desc-placeholder"><span id="userdesc">{% autoescape off %}{{profile.description|edit_comm_desc}}{% endautoescape %}</span><span class="fs13 fwlight underline-on-hover hand cg2 ml10 noselect" style="margin-top:14px;" onclick="document.getElementById('edit-user-desc-popup').classList.remove('dnone');" id="edituserdescbtn">{{word_list|getword:"edit"|ucfirst}}</span></p>
+                                        {% endif %}
                                     {% else %}
                                         <p class="fs15 cg2 lh20 mt20" id="desc-placeholder">{% autoescape off %}{{profile.description|edit_comm_desc}}{% endautoescape %}</p>
                                     {% endif %}

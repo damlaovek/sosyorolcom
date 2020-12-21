@@ -17,13 +17,13 @@
                     <li class="hand" onclick="savePost(this, {{answer.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
                 </ul>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
-                    <img src='{{answer.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
+                    <img src='{{answer.author.avatar_url}}' class='sqr40 rounded' style="object-fit: cover;"/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
                         <a href='/u/{{answer.author.user_login}}' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{answer.author.display_name}}</a><br>
                         <a href='/u/{{answer.parent.author.user_login}}/{{answer.parent.hex_id}}/{{answer.parent.guid}}/answer/{{answer.author.user_login}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{answer.time_diff}} {{post_template_dict.ago}}</a>
                     </div>
                 </div>
-                <a href='/u/{{answer.parent.author.user_login}}/{{answer.parent.hex_id}}/{{answer.parent.guid}}/answer/{{answer.author.user_login}}' class='underline-on-hover full-width' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{answer.post_title}}</a>
+                <h1 class='full-width' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{answer.post_title}}</h1>
                 <div class='answer-template' id='answer-template{{answer.ID}}' style="display:block;">{% autoescape off %}{{answer.post_content}}{% endautoescape %}</div>
             </div>
             <div class='full-width' style='display:inline-block;margin-top:5px;'>
