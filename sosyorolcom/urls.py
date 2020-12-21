@@ -102,6 +102,7 @@ urlpatterns = [
     path('quiz/requests', sv.quizrequests, name='quizrequests'),
     path('polls', sv.polls, name='polls'),
     path('polls/<path:filter>', sv.pollsfiltered, name='filteredpolls'),
+    path('poll/requests', sv.pollrequests, name='pollrequests'),
 ]
 
 if settings.DEBUG:

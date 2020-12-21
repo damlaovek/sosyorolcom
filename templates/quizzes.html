@@ -44,7 +44,7 @@
     <body class="{{darkmode}}">
         {% include 'includes/general/header.html' %}
         {% include 'includes/general/lang_popup.html' %}
-        {% include 'select-user-popup.html' %}
+        {% include 'select-user-popup.html' with popup_title=word_list|getword:"select-users-to-request-quiz"|ucfirst %}
         <input type="hidden" name="filter" id="filter" value="{{filter}}">
         <div class="full-width inline-flex">
             <div class="fixed section-left" id="section-left" style="overflow-x: hidden;">
