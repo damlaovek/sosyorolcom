@@ -75,7 +75,18 @@
                 {% include 'includes/general/notifications-menu.html' %}
             {% else %}
             <div class="section-right fixed" id="section-right">
-
+                {% if post.post_type == "media" %}
+                {% elif post.post_type == "poll"  %}
+                {% elif post.post_type == "questions"  %}
+                    {% include 'posts/similarposts/questions.html' %}
+                {% elif post.post_type == "link"  %}
+                {% elif post.post_type == "post"  %}
+                {% elif post.post_type == "quiz"  %}
+                    {% if post.quiz_type == "media" %}
+                    {% elif post.quiz_type == "colorBox" %}
+                    {% else %}
+                    {% endif %}
+                {% endif %}
             </div>
             {% endif %}
         </div>

@@ -182,6 +182,14 @@ class PostRequest(models.Model):
     class Meta:
         db_table = "post_requests"
 
+class SimilarPosts(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    post1 = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post1")
+    post2 = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post2")
+    similarity = models.FloatField()
+    class Meta:
+        db_table = "post_similarities"
+
 # Comment related models.
 class Comment(models.Model):
     comment_ID = models.BigIntegerField(primary_key = True)

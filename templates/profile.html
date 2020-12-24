@@ -167,7 +167,7 @@
                                                         {% if forloop.counter < 4 %}
                                                             {% if forloop.counter == 3 %}
                                                                 <a href="/u/{{f.follower.user_nicename}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
-                                                                    <img class="sqrt30 rounded" src="{{f.follower.avatar_url}}">
+                                                                    <img class="sqrt30 rounded" src="{{f.follower.avatar_url}}" style="object-fit:cover;">
                                                                 </a>
                                                                 {% if followers|length > 3  %}
                                                                     <div class="sqrt30 imgbw rounded absolute aligntl tac" style="background-color:rgba(0,0,0,0.7);left:38px;">
@@ -180,9 +180,9 @@
                                                                         </svg>
                                                                     </div>
                                                                 {% endif %}
-                                                            {%else %}
+                                                            {% else %}
                                                                 <a href="/u/{{f.follower.user_nicename}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
-                                                                    <img class="sqrt30 rounded" src="{{f.follower.avatar_url}}">
+                                                                    <img class="sqrt30 rounded" src="{{f.follower.avatar_url}}" style="object-fit:cover;">
                                                                 </a>
                                                             {% endif %}
                                                         {% endif %}
@@ -454,26 +454,28 @@
                         if(isLoading){
                             return;
                         }else{
-                            isLoading = true;
-                            document.getElementById("loader").classList.remove("dnone");
-                            var filter = document.getElementById("filter").value;
-                            j.ajax({
-                                url:"{% url 'loadmoreprofileposts' %}",
-                                type : "POST", // http method
-                                data : { limit: limit, offset: offset + limit, filter: filter, user_id: "{{profile.ID}}"}, // data sent with the post request
-                                // handle a successful response
-                                success : function(json) {
-                                    // log the returned json to the console
-                                    console.log(json); // another sanity check
-                                    document.getElementById("posts").innerHTML += json;
-                                    if (document.getElementById("has-more-"+offset).value == false || document.getElementById("has-more-"+offset).value == "False"){
-                                        hasMore = false;
+                            if(hasMore){
+                                isLoading = true;
+                                document.getElementById("loader").classList.remove("dnone");
+                                var filter = document.getElementById("filter").value;
+                                j.ajax({
+                                    url:"{% url 'loadmoreprofileposts' %}",
+                                    type : "POST", // http method
+                                    data : { limit: limit, offset: offset + limit, filter: filter, user_id: "{{profile.ID}}"}, // data sent with the post request
+                                    // handle a successful response
+                                    success : function(json) {
+                                        // log the returned json to the console
+                                        console.log(json); // another sanity check
+                                        document.getElementById("posts").innerHTML += json;
+                                        if (document.getElementById("has-more-"+offset).value == false || document.getElementById("has-more-"+offset).value == "False"){
+                                            hasMore = false;
+                                        }
+                                        offset += limit;
+                                        isLoading = false;
+                                        document.getElementById("loader").classList.add("dnone");
                                     }
-                                    offset += limit;
-                                    isLoading = false;
-                                    document.getElementById("loader").classList.add("dnone");
-                                }
-                            });
+                                });   
+                            }
                         }
                     }
                 }

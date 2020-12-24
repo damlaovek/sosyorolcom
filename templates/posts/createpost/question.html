@@ -97,7 +97,7 @@
         if(selectedCommsContainer.classList.contains("dnone")){
             selectedCommsContainer.classList.remove("dnone");
         }
-        var liId = selectedCommsList.length + 1;
+        var liId = selectedCommsList.getElementsByTagName("li").length + 1;
         var imgUrl = elem.getElementsByTagName('img')[0].src;
         var bc = elem.getElementsByTagName('img')[0].style.backgroundColor;
         var commName = elem.getElementsByTagName('p')[0].innerHTML;

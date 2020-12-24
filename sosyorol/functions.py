@@ -16,6 +16,12 @@ import firebase_admin
 from firebase_admin import auth, credentials, exceptions
 import base64
 import pandas as pd
+import string
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import CountVectorizer
+import nltk
+from nltk.corpus import stopwords
+stopwords = stopwords.words('turkish')
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATICFILES_DIR = os.path.join(BASE_DIR, 'static')
@@ -372,4 +378,33 @@ def updatecommunityslugs():
         slug = slug.replace("ü", "u")
         c.slug = slug
         c.save()
+
+def clean_string(text):
+    text = ''.join([word for word in text if word not in string.punctuation])
+    text = text.lower()
+    text = ' '.join([word for word in text.split() if word not in stopwords])
+    return text
+
+def cosine_sim_vectors(vec1, vec2):
+    vec1 = vec1.reshape(1, -1)
+    vec2 = vec2.reshape(1, -1)
+    return cosine_similarity(vec1, vec2)[0][0]
+
+def computePostDistances():
+    posts = sm.Post.objects.filter(post_status="publish", post_type__in=["post", "quiz", "poll", "answer", "questions", "link", "media"]).order_by("ID")
+    for post in posts:
+        others = sm.Post.objects.filter(ID__gte=post.ID).order_by("ID")
+        for other in others:
+            if post.ID != other.ID:
+                sentences = [post.post_title, other.post_title]
+                cleaned = list(map(clean_string, sentences))
+                vectorizer = CountVectorizer().fit_transform(cleaned)
+                vectors = vectorizer.toarray()
+                similarity = cosine_sim_vectors(vectors[0], vectors[1])
+                try:
+                    print(f"Similarity btw {post.ID} and {other.ID} is {similarity}")
+                    new_sim = sm.SimilarPosts(post1=post, post2=other, similarity=similarity)
+                    new_sim.save()
+                except:
+                    pass
         
