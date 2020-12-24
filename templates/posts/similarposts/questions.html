@@ -1,0 +1,18 @@
+{% load index %}
+<div  class="full-shadow-border section-right-bottom" style="padding:10px 0;width:calc(100% - 60px);">
+    <div class="bsbb full-width inline-block p020 mt5">
+        <p class="fs19 fwblack ctitle left">{{word_list|getword:"similar-questions"|ucwords}}</p>
+        <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
+            <g>
+                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+            </g>
+        </svg>
+    </div>
+    <ul class="full-width mt7 bt">
+        {% for post in similar_posts %}
+            
+        {% endfor %}
+    </ul>
+</div>

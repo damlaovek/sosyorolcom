@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 <div class="full-width inline-block">
-                    <a href='/u/{{post.author.user_login}}/{{post.hex_id}}/{{post.guid}}' class='underline-on-hover left lh30' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{post.post_title}}</a>
+                    <h1 class='left lh30' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{post.post_title}}</h1>
                     {% for flair in post.flairs %}
                         {% if flair.flair.term_id == -1 %}
                             <div class="noselect left p010 lh30 br15 flair active ml10" id="flair">{{flair.flair.flair}}</div>

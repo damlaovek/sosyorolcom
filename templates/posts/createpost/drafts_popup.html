@@ -1,6 +1,6 @@
 <div class="popup box full-shadow-border">
     <p class="fs17 cg2 fwb lh20 p10">{{newpost_actions_dict.drafts}}&nbsp;&nbsp;<span class="fs14">{{drafts|length}}/30</span></p>
-    <ul class="full-width bt" style="display:inline-block;margin-bottom:-4px;">
+    <ul class="full-width bt" style="display:inline-block;margin-bottom:-4px;max-height:500px; overflow-y:scroll;">
         {% for draft in drafts %}
             <li class="w20 inline-block hand menu-item left" id="draft-popup-item-{{draft.ID}}">
                 {% if draft.post_type == "post" %}
@@ -29,7 +29,7 @@
                         </g>
                     </svg>
                 {% endif %}
-                <div class="left m010" style="margin-top:3.5px;">
+                <div class="left m010" style="margin-top:3.5px;max-width:70%;">
                     <p class="fs15 lh20 text">{{draft.post_title}}</p>
                     <p class="fs13 lh20 cg2">{{newpost_actions_dict.lastupdated}}</p>
                 </div>

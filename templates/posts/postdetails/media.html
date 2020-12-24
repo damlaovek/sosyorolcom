@@ -23,7 +23,7 @@
                     </div>
                 </div>
                 <div class="full-width inline-block">
-                    <a href='/u/{{media.author.user_login}}/{{media.hex_id}}/{{media.guid}}' class='underline-on-hover left lh30' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{media.post_title}}</a>
+                    <h1 class='left lh30' style='font-weight:var(--black-font);font-size:19px;color:var(--black);'>{{media.post_title}}</h1>
                     {% for flair in media.flairs %}
                         {% if flair.flair.term_id == -1 %}
                             <div class="noselect left p010 lh30 br15 flair active ml10" id="flair">{{flair.flair.flair}}</div>
@@ -34,7 +34,7 @@
                     <div class="bsbb answer-img p020">
                         {% if media.media_type == "video" %}
                         <video id="player" playsinline controls class="js-player" autoplay="true" style="max-height: 398px;" muted="muted">
-                            <source src="{{media.media_url}}" type="video/mp4" />
+                            <source src="{{media.media_url}}" type="video/mp4"/>
                         </video>
                         <script src='https://cdn.polyfill.io/v2/polyfill.min.js?features=es6,Array.prototype.includes,CustomEvent,Object.entries,Object.values,URL'></script>
                         <script src='https://unpkg.com/plyr@3'></script>

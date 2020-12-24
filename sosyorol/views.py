@@ -21,7 +21,11 @@ from django.views.generic.list import ListView
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATICFILES_DIR = os.path.join(BASE_DIR, 'static')
 
+<<<<<<< HEAD
 current_uid = 267
+=======
+current_uid = 7
+>>>>>>> 5b0dc3756afae296d421cac2f92293872396ea03
 
 '''---------------------------------------
   FIREBASE              
@@ -344,6 +348,7 @@ def arrange_post_slug(title):
     title = title.replace("ğ","g")
     title = title.translate(str.maketrans('', '', string.punctuation))
     title = title.replace(' ','_')
+    title = title.replace('\'','')
     return title
 
 def isquestionanswered(question, user_id):
@@ -594,14 +599,14 @@ def getcommunityflairs(request):
     flairs = Flairs.objects.filter(term_id=comm_obj.term_id).filter(flair_type="post")
     return render(request, 'posts/createpost/flair.html', {'community':comm_obj, 'flairs': flairs})
         
-def setup_current_user(current_uid):
-    current_user = User.objects.get(ID = current_uid)
+def setup_current_user(cuid):
+    current_user = User.objects.get(ID = cuid)
     try:
-        user_desc = UserMeta.objects.filter(user_id = current_uid, meta_key = 'description')[0]
+        user_desc = UserMeta.objects.filter(user_id = cuid, meta_key = 'description')[0]
         current_user.description = user_desc.meta_value
     except:
         pass
-    current_user.posts = Post.objects.filter(post_author=current_uid, post_status="publish", post_type__in=["post","quiz","media","link","questions","answer"]).order_by('-post_date')
+    current_user.posts = Post.objects.filter(post_author=cuid, post_status="publish", post_type__in=["post", "quiz", "poll", "answer", "questions", "link", "media"]).order_by('-post_date')
     '''
     mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
     if (os.path.exists(mypath)):
@@ -611,8 +616,13 @@ def setup_current_user(current_uid):
         avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
     current_user.avatar_url = avatar_url
     '''
-    current_user.avatar_url = UserMeta.objects.filter(user_id = current_uid, meta_key = 'avatar_url')[0].meta_value
-    birthday = UserMeta.objects.filter(user=current_user, meta_key="birthday")
+    try:
+        current_user.avatar_url = UserMeta.objects.filter(user_id = cuid, meta_key = 'avatar_url')[0].meta_value
+    except:
+        avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        new_avatar = UserMeta(user_id = cuid, meta_key = 'avatar_url', meta_value=avatar_url)
+        current_user.avatar_url = avatar_url
+    birthday = UserMeta.objects.filter(user=cuid, meta_key="birthday")
     if birthday.count() > 0:
         dateobj = dt.datetime.strptime(birthday[0].meta_value, '%Y-%m-%d')
         current_user.birthday["birthday"] = dateobj.strftime("%d.%m.%Y")
@@ -832,15 +842,17 @@ def loadmorecomments(request):
 def loadmoreprofileposts(request):
     try:
         offset = int(request.POST["offset"])
+        print(offset)
         limit = int(request.POST["limit"])
         user_id = int(request.POST["user_id"])
         fltr = request.POST["filter"]
         hasMore = "True"
         if fltr == "all" or flter == "":
             moreposts = Post.objects.filter(post_author=user_id, post_status="publish", post_type__in=["post","quiz","media","link","questions","answer"]).order_by('-post_date')
-            if moreposts.count() < offset :
+            if moreposts.count() <= offset :
+                moreposts = moreposts[offset:]
                 hasMore = "False"
-            elif moreposts.count() < offset + limit:
+            elif moreposts.count() <= offset + limit:
                 moreposts = moreposts[offset:]
                 hasMore = "False"
             else:
@@ -849,9 +861,10 @@ def loadmoreprofileposts(request):
             if fltr == "question":
                 fltr = "questions"
             moreposts = Post.objects.filter(post_author=user_id, post_status="publish", post_type=fltr).order_by('-post_date')
-            if moreposts.count() < offset :
+            if moreposts.count() <= offset :
+                moreposts = moreposts[offset:]
                 hasMore = "False"
-            elif moreposts.count() < offset + limit:
+            elif moreposts.count() <= offset + limit:
                 moreposts = moreposts[offset:]
                 hasMore = "False"
             else:
@@ -1332,11 +1345,11 @@ def savenewmediapost(request):
     new_quiz = Post.objects.filter(post_title=quiz_title).order_by('-post_date')[0]
 
     for follower in current_user.followers:
-        new_quiz.hex_id = hex(post.ID + 100000).replace("x", "s")
-        new_quiz.guid = arrange_post_slug(new_answer.post_title)
+        new_quiz.hex_id = hex(new_quiz.ID + 100000).replace("x", "s")
+        new_quiz.guid = arrange_post_slug(new_quiz.post_title)
         url = "/u/"+current_user.user_login+"/"+new_quiz.hex_id+"/"+new_quiz.guid
         new_notification = Notification(date=dt.datetime.now(), url=url, notification_variable="new-post", 
-                                        seen=0, from_u_id=current_uid, to_u=follower.follower_id, related_obj=new_quiz.ID)
+                                        seen=0, from_u_id=current_uid, to_u_id=follower.follower_id, related_obj=new_quiz.ID)
         new_notification.save()
 
     for (k, v) in communities.items():
@@ -1346,9 +1359,9 @@ def savenewmediapost(request):
         new_relation.save()
         followers = FollowedCommunities.objects.filter(term=term)
         for follower in followers:
-            if(follower.user != current_user):
+            if(follower.user_id != current_uid):
                 new_notification = Notification(date=dt.datetime.now(), url="/c/"+term.slug, notification_variable="community-post", 
-                                                seen=0, from_u_id=-1, to_u=follower.user_id, related_obj=term.term_id)
+                                                seen=0, from_u_id=-1, to_u_id=follower.user_id, related_obj=term.term_id)
                 new_notification.save()
 
     for (k, v) in flairs.items():
@@ -1648,9 +1661,13 @@ def editfullname(request):
 def editprofiledesc(request):
     try:
         profiledesc = request.GET["profiledesc"]
-        user_desc = UserMeta.objects.filter(user_id = current_uid, meta_key = 'description')[0]
-        user_desc.meta_value = profiledesc
-        user_desc.save()
+        try:
+            user_desc = UserMeta.objects.filter(user_id = current_uid, meta_key = 'description')[0]
+            user_desc.meta_value = profiledesc
+            user_desc.save()
+        except:
+            user_desc = UserMeta(user_id = current_uid, meta_key = 'description', meta_value=profiledesc)
+            user_desc.save()
         return "success"
     except:
         return "error"
@@ -1828,10 +1845,11 @@ def requestanswer(request):
         selectedUsers = request.POST["selectedUsers"]
         post_id = int(request.POST["post_id"])
         selected = selectedUsers.split(", ")
+        post = Post.objects.get(ID=post_id)
         if len(selected) > 0:
             selected = [int(i) for i in selected if i != '']
         for ID in selected:
-            new_request = PostRequest(sender_id=current_uid, receiver_id=ID, post_id=post_id, date=dt.datetime.now(), answered=0, post_type="answer")
+            new_request = PostRequest(sender_id=current_uid, receiver_id=ID, post_id=post_id, date=dt.datetime.now(), answered=0, post_type=post.post_type)
             new_request.save()
         lang = UserMeta.objects.filter(user_id=current_uid, meta_key='language')[0].meta_value
         word_list = Languages.objects.filter(Q(lang_code = lang))
@@ -2009,6 +2027,7 @@ def phonecodeverification(request):
     return render(request, "phoneverification.html", {'lang':lang, 'dark':dark, 'country_list':country_list, 'page_dict':page_dict, 'phone':phone, 'username':username, 'firstname':firstname, 'lastname': lastname })
 
 def home(request):
+    #fun.computePostDistances()
     page = "home"
     start_start = time.time()
 
@@ -2753,7 +2772,7 @@ def communitydetail(request, slug,  **kwargs):
     elif fltr == "answer":
         community.posts = community.posts.filter(Q(post_type="answer"))
     elif fltr == "question":
-        community.posts = community.posts.filter(Q(post_type="question"))
+        community.posts = community.posts.filter(Q(post_type="questions"))
     elif fltr == "media":
         community.posts = community.posts.filter(Q(post_type="media"))
 
@@ -2780,6 +2799,17 @@ def communitydetail(request, slug,  **kwargs):
         setup_postmeta(post, word_list)
         if post.post_type == "link":
             post.photo_from_url = fun.get_photo_from_url(post.post_content)
+        elif post.post_type == "media":
+            setup_mediameta(post)
+        elif post.post_type == "quiz":
+            post.quiz_type = PostMeta.objects.filter(post_id=post.ID, meta_key="quiz_type")[0].meta_value
+            post.post_title = post.post_title.replace(" - Sosyorol", "")
+            if post.quiz_type == "media":
+                setup_media_quizmeta(post, word_list)
+            elif post.quiz_type == "colorBox":
+                setup_colorbox_quizmeta(post, word_list)
+            else:
+                setup_quizmeta(post, word_list)
     header_dict = header(word_list)
     post_types_dict = post_types(word_list)
     comment_editor = comment_editor_dict(word_list)
@@ -3748,7 +3778,6 @@ def quizzes(request, **kwargs):
                                             })
 
 def polls(request, **kwargs):
-    #fun.find_category_of_community()
     import random
     page = "polls"
     if 'filter' in kwargs:
@@ -3826,4 +3855,30 @@ def quizrequests(request):
                                             'country_list':country_list, 'select_language':select_language,
                                             'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
                                             'title':title, 'categories':categories, 'quizzes':quizzes, 'user_list':user_list
+                                            })
+
+def pollrequests(request):
+    import random
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    title = fun.ucfirst(word_list.get(var_name = 'polls').translation)
+    categories = CommunityCategories.objects.all()
+    user_list = []
+    for user in current_user.followings:
+        user = setup_current_user(user.following_id)
+        user_list.append(user)
+    random.shuffle(user_list)
+    polls = PostRequest.objects.filter(receiver_id=current_uid, answered=0, post_type="poll").order_by("-date")
+    for poll in polls:
+        poll.sender = setup_current_user(poll.sender_id)
+        setup_postmeta(poll.post, word_list)
+    return render(request, 'pollrequests.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'title':title, 'categories':categories, 'polls':polls, 'user_list':user_list
                                             })
