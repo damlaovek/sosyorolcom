@@ -103,6 +103,7 @@ urlpatterns = [
     path('polls', sv.polls, name='polls'),
     path('polls/<path:filter>', sv.pollsfiltered, name='filteredpolls'),
     path('poll/requests', sv.pollrequests, name='pollrequests'),
+    path('chat', sv.chat, name='chat')
 ]
 
 if settings.DEBUG:

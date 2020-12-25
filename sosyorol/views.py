@@ -3878,3 +3878,15 @@ def pollrequests(request):
                                             'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
                                             'title':title, 'categories':categories, 'polls':polls, 'user_list':user_list
                                             })
+
+def chat(request):
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    return render(request, 'chat.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications})
