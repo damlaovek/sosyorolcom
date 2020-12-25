@@ -227,6 +227,7 @@ class Community(models.Model):
     posts = models.QuerySet()
     flairs = models.QuerySet()
     followers = models.QuerySet()
+    score = models.BigIntegerField()
     class Meta:
         db_table = "communities"
 

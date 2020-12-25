@@ -407,4 +407,14 @@ def computePostDistances():
                     new_sim.save()
                 except:
                     pass
+
+def calculate_community_score():
+    communities = sm.Community.objects.all()
+    for community in communities:
+        print(f"Calculating score for c/{community.name}")
+        taxonomy = sm.TermTaxonomy.objects.filter(term_id=community.term_id)[0].term_taxonomy_id
+        post_ids = sm.TermRelationship.objects.filter(Q(term_taxonomy_id=taxonomy))
+        post_ids = list({x.object_id: x for x in post_ids}.keys())
+        community.posts = sm.Post.objects.filter(Q(ID__in=post_ids)).order_by('-post_date')
+        num_posts = community.posts.filter(post_type="post").count()
         
