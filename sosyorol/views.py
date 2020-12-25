@@ -21,7 +21,7 @@ from django.views.generic.list import ListView
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATICFILES_DIR = os.path.join(BASE_DIR, 'static')
 
-current_uid = 7
+current_uid = 267
 
 '''---------------------------------------
   FIREBASE              
