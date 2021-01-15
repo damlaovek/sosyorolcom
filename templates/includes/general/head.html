@@ -39,7 +39,21 @@
         <script type="text/javascript" src="{% static 'js/notifications.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/new/index-v81.js' %}"></script>
         <!--<script src="https://cdn.plyr.io/3.6.2/plyr.polyfilled.js"></script>-->
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-database.js"></script>
         <script>
+            var firebaseConfig = {
+                apiKey: "AIzaSyA9jeHII9FVkhOQfCM_NyoifnN8eIN6EFM",
+                authDomain: "sosyorol-b6ab6.firebaseapp.com",
+                databaseURL: "https://sosyorol-b6ab6.firebaseio.com",
+                projectId: "sosyorol-b6ab6",
+                storageBucket: "sosyorol-b6ab6.appspot.com",
+                messagingSenderId: "565098272319",
+                appId: "1:565098272319:web:5105dd611ce14cf98c8a8a",
+                measurementId: "G-18ZNPD8JH4"
+            };
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
             var j = jQuery.noConflict()
             j({property: 0}).animate({property: 105}, {
                     duration: 2000,
@@ -56,4 +70,5 @@
             j(window).on('load', function(){
                 j("#page-loader").addClass("done");
             });
+            var database = firebase.database();
         </script>
