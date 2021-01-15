@@ -21,7 +21,8 @@ from django.views.generic.list import ListView
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATICFILES_DIR = os.path.join(BASE_DIR, 'static')
 
-current_uid = 267
+#current_uid = 267
+current_uid = 8
 
 '''---------------------------------------
   FIREBASE              
@@ -1669,8 +1670,11 @@ def editprofiledesc(request):
         return "error"
 
 def birthday(request):
-    try:        
-        cred = UserMeta(user_id=current_uid, meta_key="birthday", meta_value=request.GET["birthday"])
+    try:  
+        birthday = request.GET["birthday"]
+        birthdayobj = dt.datetime.strptime(birthday, '%d.%m.%Y')
+        birthday = birthdayobj.strftime("%Y-%m-%d")
+        cred = UserMeta(user_id=current_uid, meta_key="birthday", meta_value=birthday)
         cred.save()
         return "success"
     except:
@@ -1835,6 +1839,21 @@ def get_searched_users(request):
     return render(request, 'includes/select_user_list.html', {'user_list':user_list, 'container':container, 'bc':bc})
 
 @csrf_exempt
+def getsearchedpeople(request):
+    search_key = request.POST["search"]
+    selectedUsers = request.POST["selectedUsers"]
+    selected = selectedUsers.split(", ")
+    if len(selected) > 0:
+        selected = [int(i) for i in selected if i != '']
+    selected.append(current_uid)
+    results = User.objects.filter(Q(display_name__icontains=search_key)|Q(user_login__icontains=search_key)).exclude(ID__in=selected)[:15]
+    user_list = []
+    for result in results:
+        result = setup_current_user(result.ID)
+        user_list.append(result)
+    return render(request, 'includes/userlist.html', {'user_list':user_list})
+
+@csrf_exempt
 def requestanswer(request):
     response_data = {}
     try:
@@ -1907,6 +1926,39 @@ def deleteanswerdraft(request):
     except:
         response_data["msg"] = "error"
     return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
+def get_chat_item(request):
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    chats_data = json.loads(request.POST['chats'])
+    chats = []
+    for _, chat in chats_data.items():
+        receivers = chat["receivers"]
+        selected = receivers.split(", ")
+        if len(selected) > 0:
+            selected = [int(i) for i in selected if i != '']
+        results = User.objects.filter(ID__in=selected)
+        user_list = []
+        usernames = ""
+        for result in results:
+            result = setup_current_user(result.ID)
+            user_list.append(result)
+            usernames += "u/" + result.user_login + ","
+        usernames = usernames[:-1]
+        chat["receivers"] = user_list
+        chat["usernames"] = usernames
+        chat["datetime"] = dt.datetime.strptime(chat["datetime"], '%d/%m/%Y %H:%M:%S')
+        chat["date"] = fun.humanizedate(chat["datetime"], word_list)
+        chat["seen"] = int(chat["seen"])
+        if chat["msg"].startswith("<img src=") :
+            msg = word_list.filter(var_name="user-sent-sosmoji")[0].translation
+            sender = User.objects.get(ID=int(chat["sender"]))
+            chat["msg"] = msg.replace("{user}", "u/"+sender.user_login)
+        chats.append(chat)
+    chats.sort(key=lambda x: x["datetime"], reverse=True)
+    print(chats)
+    return render(request, 'chat_item.html', {'chats':chats})
 
 '''---------------------------------------
   VIEWS              
@@ -2462,12 +2514,7 @@ def newpost(request):
                                             'newpost_actions_dict':newpost_actions_dict, 'drafts':drafts, 'word_list':word_list})
 
 def createlist(request):
-    current_user = User.objects.filter(Q(ID = current_uid))[0]
-    user_desc = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'description'))[0]
-    current_user.set_description(user_desc.meta_value)
-    mypath = os.path.join(STATICFILES_DIR, f'assets/img/user_avatars/{current_uid}')
-    avatar_url = UserMeta.objects.filter(user=current_user, meta_key="avatar_url")[0].meta_value
-    current_user.set_avatar(avatar_url)
+    current_user = setup_current_user(current_uid)
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     dark = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'mode'))[0].meta_value
     word_list = Languages.objects.filter(Q(lang_code = lang))
@@ -3887,6 +3934,22 @@ def chat(request):
     country_list = Languages.objects.filter(Q(var_name = 'lang'))
     select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
     notifications, num_notifications = setup_notifications(current_uid, word_list)
+    sosmojis = os.listdir(os.path.join(STATICFILES_DIR, "assets/img/sosmojis/"))
     return render(request, 'chat.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
                                             'country_list':country_list, 'select_language':select_language,
-                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications})
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'sosmojis':sosmojis})
+
+def chatdetail(request, chat_id):
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    sosmojis = os.listdir(os.path.join(STATICFILES_DIR, "assets/img/sosmojis/"))
+    return render(request, 'chatdetail.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'sosmojis':sosmojis})

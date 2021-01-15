@@ -1,0 +1,27 @@
+{% for chat in chats %}
+    <a href="/chat/{{chat.ID}}">
+        {% if chat.seen == 1 %}
+        <div class="bsbb p020 full-width item-hover hand bb">
+        {% else %}
+        <div class="bsbb p020 bcba full-width item-hover hand bb" style="border-right: 4px solid var(--main-color);">
+        {% endif %}
+            <div class="bsbb full-width p10 inline-block">
+                {% if chat.receivers|length > 1 %}
+                    <div class="left">
+                        <img src="{{chat.receivers.0.avatar_url}}" class="sqr40 rounded" style="border:3px solid var(--white);">
+                        <img src="{{chat.receivers.1.avatar_url}}" class="sqr40 rounded" style="top:15px;margin-left:-25px;border:3px solid var(--white);">
+                    </div>
+                {% else %}
+                    <img src="{{chat.receivers.0.avatar_url}}" class="left sqr60 rounded" style="border:3px solid var(--white);">
+                {% endif %}
+                <div class="left ml10" style="width:calc(100% - 90px);">
+                    <div class="full-width inline-block">
+                        <p class="lh30 half-width oh ellipsis fwbold left">{{chat.usernames}}</p>
+                        <p class="lh30 right cg2 fs13" style="text-align:right;">{{chat.date}}</p>
+                    </div>
+                    <p class="full-width oh lh30 ellipsis">{{chat.msg}}</p>
+                </div>
+            </div>
+        </div>
+    </a>
+{% endfor %}

@@ -106,6 +106,7 @@
                         </g>
                     </svg>
                 </div>
+                <div class="absolute aligntr sqr20 bcb rounded mt10 lh20 tac cw dnone" style="right:-10px;" id="chat-counter"></div>
     		</a>
     	</div>
     	<div class="header-icon" id="header-icon-notifications" data-title="{{word_list|getword:'notifications'|ucwords}}">
@@ -279,5 +280,42 @@
             }
         });
         return true;     
+    }
+    var j = jQuery.noConflict();
+    j(document).ready(function() {
+        refreshChatCounter();
+    });
+    function refreshChatCounter(){
+        var chatRef = firebase.database().ref('chat/{{current_user.ID}}');
+        chatRef.on('value', (snapshot) => {
+            var objects = {};
+            var counter = 0;
+            snapshot.forEach((childSnapshot) => {
+                var childKey = childSnapshot.key;
+                var childData = childSnapshot.val();
+                firebase.database().ref('chat/{{current_user.ID}}/'+childKey+'/messages').orderByChild('dbdate').on('value', (snapshot2) => {
+                    snapshot2.forEach((childSnapshot2) => {
+                        var childData2 = childSnapshot2.val();
+                        var seen = parseInt(childData2.seen);
+                        if(seen == 0){
+                            counter += 1;
+                        }
+                    });
+                });
+            });
+            if (counter > 0){
+                if(counter >= 10){
+                    document.getElementById("chat-counter").classList.add("fs13");
+                }
+                if(counter > 99){
+                    document.getElementById("chat-counter").innerText = "99+";
+                    document.getElementById("chat-counter").classList.remove("fs13");
+                    document.getElementById("chat-counter").classList.add("fs10");
+                }else{
+                    document.getElementById("chat-counter").innerText = counter;
+                }
+                document.getElementById("chat-counter").classList.remove("dnone");
+            }
+        });
     }
 </script>
