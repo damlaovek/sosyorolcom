@@ -268,9 +268,9 @@
                                 {% endif %}
                             {% elif post.post_type == "media" %}
                                 {% if filter == "media" %}
-                                    {% include 'posts/posttemplates/media_template.html' %}
+                                    {% include 'posts/posttemplates/media_template.html' with media=post %}
                                 {% elif filter == "all" %}
-                                    {% include 'posts/posttemplates/media_template.html' %}
+                                    {% include 'posts/posttemplates/media_template.html' with media=post %}
                                 {% endif %}
                             {% elif post.post_type == "link" %}
                                 {% if filter == "link" %}

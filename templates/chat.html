@@ -72,11 +72,10 @@
             <div class="section-middle" style="margin-top:58px;">
                 <div class="hcentered" style="max-width: 893px;">
                     <div class="filter-options">
-                        <div class="bsbb box p10" style="min-height:648px;">
+                        <div class="bsbb box" style="min-height:648px;">
                             <div class="full-width">
-                                <div class="bsbb full-width inline-block border br4">
+                                <div class="bsbb full-width inline-block bb">
                                     <div class="left inline-block" id="selected-people">
-
                                     </div>
                                     <div class="left" style="width:260px;">
                                         <input type="text" name="search_people" id="search_people" class="bsbb p10" style="background: transparent;" placeholder="{{word_list|getword:'search-for-users'|ucfirst}}">
@@ -84,26 +83,27 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="bsbbfull-width border mt10 br4">
+                                <div class="bsbbfull-width mt10">
                                     <div class="bsbb full-width" style="height:578px; overflow-y:scroll;" id="chat_box">
                                     </div>
                                     <div class="full-width bt" style="min-height:100px;">
-                                        <textarea class="bsbb text textarea w20 m10 p10 border br4" rows=3 style="max-height: 300px;overflow-y: scroll;" placeholder='{{word_list|getword:"write-a-message"|ucfirst}}' id="chattext" onkeyup="validateChatForm()"></textarea>
+                                        <textarea class="bsbb text textarea w20 m10 p10" rows=3 style="max-height: 300px;overflow-y: scroll;" placeholder='{{word_list|getword:"write-a-message"|ucfirst}}' id="chattext" onkeyup="validateChatForm()"></textarea>
                                         <div class="w20 m010 mb10 inline-block">
                                             <div class="left hand" style="width:35px;height:35px; margin-top: 2.5px;">
                                                 <div class="icon">
                                                     <i class="fas fa-image cg2 fs19" style="width:20px;height:20px;"></i>
                                                 </div>
                                                 <div id="imageUploadForm" class="hand absolute icon" style="width:15px;height:15px;bottom:0;left:0;overflow:hidden;cursor:pointer;opacity:0;">
-                                                    <input type='file' onchange="uploadImg();" class="hand sqr15" style="overflow:hidden;opacity:0;" id="imageUpload" name="file" accept=".png, .jpg, .jpeg" />
+                                                    <input type='file' onchange="uploadImg(this, {% url 'uploadmedia' %});" class="hand sqr15" style="overflow:hidden;opacity:0;" id="imageUpload" name="file" accept=".png, .jpg, .jpeg" />
                                                 </div>
                                             </div>
+                                            <!--File upload
                                             <div class="left hand" style="width:35px;height:35px; margin-top: 2.5px;">
                                                 <i class="fas fa-paperclip icon cg2 fs19" style="width:20px;height:20px;"></i>
                                                 <div  id="imageUploadForm" class="hand absolute icon" style="width:15px;height:15px;bottom:0;left:0;overflow:hidden;cursor:pointer;opacity:0;">
                                                     <input type='file' onchange="uploadFile();" class="hand sqr15" style="overflow:hidden;opacity:0;" id="imageUpload" name="file"/>
                                                 </div>
-                                            </div>
+                                            </div>-->
                                             <div class="left hand" style="width:35px;height:35px; margin-top: 2.5px;">
                                                 <i class="fas fa-smile icon cg2 fs19" id="sosmojibtn" onclick="openCloseSosmojis(this);"></i>
                                                 <div class="absolute full-shadow-border br4 bcw dnone" style="left:0;bottom:30px;width:260px;" id="sosmojis">
@@ -146,7 +146,7 @@
         refreshChats();
     });
     function refreshChats(){
-        var chatRef = firebase.database().ref('chat/{{current_user.ID}}');
+        var chatRef = firebase.database().ref('users/{{current_user.ID}}/chats');
         chatRef.on('value', (snapshot) => {
             var objects = {};
             var index = 1;
@@ -157,29 +157,35 @@
                     document.getElementById('empty-chats').classList.add('dnone');
                     document.getElementById('chats').classList.remove('dnone');
                 }
-                firebase.database().ref('chat/{{current_user.ID}}/'+childKey+'/messages').orderByChild('dbdate').limitToLast(1).on('value', (snapshot2) => {
-                    snapshot2.forEach((childSnapshot2) => {
-                        var childData2 = childSnapshot2.val();
-                        var singleObj = {};
-                        singleObj['ID'] = childData.ID;
-                        singleObj['receivers'] = childData.receiver;
-                        singleObj['msg'] = childData2.msg;
-                        singleObj['datetime'] = childData2.datetime;
-                        singleObj['seen'] = childData2.seen;
-                        singleObj['sender'] = childData.sender;
-                        objects[index] = singleObj;
-                        if(index == snapshot.numChildren()){
-                            j.ajax({
-                                type: "POST",
-                                url: "/get_chat_item",
-                                data: {chats: JSON.stringify(objects)},
-                                success: function(response) {
-                                    document.getElementById('chats').innerHTML = response;
-                                }
+                firebase.database().ref('chats/'+childKey).on('value', (snapshot3) => {
+                    var childData3 = snapshot3.val();
+                    firebase.database().ref('chats/'+childKey+'/messages').orderByChild('dbdate').limitToLast(1).on('value', (snapshot2) => {
+                        snapshot2.forEach((childSnapshot2) => {
+                            var childData2 = childSnapshot2.val();
+                            var chRef = firebase.database().ref("chats");
+                            chRef.on('value', (snapshot) => {
                             });
-                        }else{
-                            index += 1;
-                        }
+                            var singleObj = {};
+                            singleObj['ID'] = childData3.ID;
+                            singleObj['receivers'] = childData3.users;
+                            singleObj['msg'] = childData2.msg;
+                            singleObj['datetime'] = childData2.datetime;
+                            singleObj['seen'] = childData.seen;
+                            singleObj['sender'] = childData2.sender;
+                            objects[index] = singleObj;
+                            if(index == snapshot.numChildren()){
+                                j.ajax({
+                                    type: "POST",
+                                    url: "/get_chat_item",
+                                    data: {chats: JSON.stringify(objects)},
+                                    success: function(response) {
+                                        document.getElementById('chats').innerHTML = response;
+                                    }
+                                });
+                            }else{
+                                index += 1;
+                            }
+                        });
                     });
                 });
             });
@@ -298,44 +304,50 @@
             for(var i = 0; i<users.length; i++){
                 selected_users.push(parseInt(users[i].id.split("_")[1]));
             }
+            selected_users.push(parseInt("{{current_user.ID}}"));
             console.log(selected_users);
             selected_users.sort(function(a, b) {
                 return a - b;
             });
             console.log(selected_users);
             selectedUsers = selected_users.join(', ');
-            firebase.database().ref("chat/"+cuid).orderByChild("receiver").equalTo(selectedUsers).once("value",snapshot => {
+            firebase.database().ref("chats").orderByChild("users").equalTo(selectedUsers).once("value",snapshot => {
                 if (snapshot.exists()){
                     var chatData = snapshot.val();
-                    var chatListRef = firebase.database().ref('chat/'+cuid).child(Object.keys(chatData)[0]).child("messages");
-                    var newChatRef = chatListRef.push();
-                    newChatRef.set({
+                    var msgListRef = firebase.database().ref('chats').child(Object.keys(chatData)[0]).child("messages");
+                    var newMsgRef = msgListRef.push();
+                    newMsgRef.set({
+                        ID: newMsgRef.key,
+                        sender: "{{current_user.ID}}",
                         datetime: datetime,
                         dbdate: firebase.database.ServerValue.TIMESTAMP,
                         msg: msg,
-                        seen: 0,
                     });
+                    var userChatRef = firebase.database().ref("users/"+selected_users[u]+"/chats/"+Object.keys(chatData)[0]+"/seen").set(0);
                     displayAlert("{{word_list|getword:'message-sent'|ucfirst}}");
-                    //window.location.href = "/chat/"+newChatRef.key;
+                    window.location.href = "/chat/"+Object.keys(chatData)[0];
                 }else{
-                        var chatListRef = firebase.database().ref('chat/'+cuid);
-                        var newChatRef = chatListRef.push();
-                        newChatRef.set({
-                            ID: newChatRef.key,
-                            sender: cuid,
-                            receiver: selectedUsers,
-                        });
-                        var chatListRef = firebase.database().ref('chat/'+cuid+'/'+newChatRef.key+"/messages");
-                        var newChatRef = chatListRef.push();
-                        newChatRef.set({
-                            datetime: datetime,
-                            dbdate: firebase.database.ServerValue.TIMESTAMP,
-                            msg: msg,
-                            seen: 0,
-                        });
-                        displayAlert("{{word_list|getword:'message-sent'|ucfirst}}");
-                        //window.location.href = "/chat/"+newChatRef.key;
+                    var chatListRef = firebase.database().ref('chats');
+                    var newChatRef = chatListRef.push();
+                    newChatRef.set({
+                        ID: newChatRef.key,
+                        users: selectedUsers,
+                    });
+                    var msgListRef = firebase.database().ref('chats').child(newChatRef.key).child("messages");
+                    var newMsgRef = msgListRef.push();
+                    newMsgRef.set({
+                        ID: newMsgRef.key,
+                        sender: "{{current_user.ID}}",
+                        datetime: datetime,
+                        dbdate: firebase.database.ServerValue.TIMESTAMP,
+                        msg: msg,
+                    });
+                    for(var u=0; u<selected_users.length; u++){
+                        var userChatRef = firebase.database().ref("users/"+selected_users[u]+"/chats/"+newChatRef.key).set({ID: newChatRef.key, seen:0});
                     }
+                    displayAlert("{{word_list|getword:'message-sent'|ucfirst}}");
+                    window.location.href = "/chat/"+newChatRef.key;
+                }
             });
         }
         return false;
@@ -356,8 +368,55 @@
             displayAlert("{{word_list|getword:'sosmoji-err'|ucfirst}}");
         }else{
             var sosmoji = elem.src;
-            sendChat('{{current_user.ID}}','<img src="'+sosmoji+'" alt="" class="hand sqr50"');
+            sendChat('{{current_user.ID}}','<img data-type="sosmoji" src="'+sosmoji+'" alt="" class="sqr50"/>');
             openCloseSosmojis(document.getElementById("sosmojibtn"));
+        }
+    }
+    function sendImg(url){
+        var users = document.getElementById("selected-people").getElementsByTagName("div");
+        if(users.length == 0){
+            displayAlert("{{word_list|getword:'sosmoji-err'|ucfirst}}");
+        }else{
+            sendChat('{{current_user.ID}}','<img src="'+url+'" alt="" class="sqr50"/>');
+        }
+    }
+    function uploadImg(input, url){
+        if (input.files && input.files[0]) {
+            var fd = new FormData();
+            var files = input.files[0];
+            var fullPath = input.value;
+            if (fullPath) {
+                var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+                var filename = fullPath.substring(startIndex);
+                if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+                    filename = filename.substring(1);
+                    var tokens = filename.split(".");
+                    if (tokens[0].length > 96) {
+                        tokens[0] = tokens[0].substring(0,95);
+                        filename = tokens[0].concat(tokens[1]);
+                    }
+                }
+            }
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                placeholder.src = e.target.result;
+                placeholder.style.opacity = "1";
+            }
+            reader.readAsDataURL(input.files[0]);
+            fd.append('file',files,filename);
+            j.ajax({
+                type: "POST",
+                url: url,
+                data: fd,
+                processData: false, 
+                contentType: false,
+                success: function(response) {
+                    if(response.is_valid){
+                        displayAlert(response.msg);
+                        sendImg(response.url);
+                    }
+                }
+            });
         }
     }
 </script>

@@ -106,7 +106,18 @@ urlpatterns = [
     path('chat', sv.chat, name='chat'),
     path('get_searched_people', sv.getsearchedpeople, name='getsearchedpeople'),
     path('chat/<path:chat_id>', sv.chatdetail, name='chatdetail'),
-    path('get_chat_item', sv.get_chat_item, name='get_chat_item')
+    path('getsinglechatballoon', sv.getsinglechatballoon, name='getsinglechatballoon'),
+    path('get_chat_item', sv.get_chat_item, name='get_chat_item'),
+    path('settings', sv.settings, name='settings'),
+    path('settings/privacy', sv.privacysettings, name='settings'),
+    path('checkusernameexists', sv.checkusernameexists, name='checkusernameexists'),
+    path('settings/notifications', sv.notificationsettings, name='notificationsettings'),
+    path('settings/chat', sv.chatsettings, name='chatsettings'),
+    path('settings/feed', sv.feedsettings, name='feedsettings'),
+    path('savesettings', sv.savesettings, name='savesettings'),
+    path('searchusertoblock', sv.searchusertoblock, name='searchusertoblock'),
+    path('blockunblockuser', sv.blockunblockuser, name='blockunblockuser'),
+    path('getreceivernames', sv.getreceivernames, name='getreceivernames'),
 ]
 
 if settings.DEBUG:
