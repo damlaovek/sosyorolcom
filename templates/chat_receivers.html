@@ -1,0 +1,85 @@
+{% load index %}
+{% if users|length == 1 %}
+    {% for user in users %}
+        <div class="bsbb full-width p10 inline-block">
+            <a class="left" href="/u/{{user.user_login}}"><div class="inline-flex">
+                <img src="{{user.avatar_url}}" class="sqr40 rounded">
+                <div class="ml10">
+                    <p class="lh20 fwbold">{{user.display_name}}</p>
+                    <p class="lh20 cg2 underline-on-hover">u/{{user.user_login}}</p>
+                </div>
+            </div></a>
+            <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand right' style='transform: rotate(90deg);'>
+                <g>
+                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                </g>
+            </svg>
+        </div>
+        <div class="bsbb full-width bt inline-block p510">
+            {% if user not in current_user.followings %}
+                <p class="cg2 left lh28">{{word_list|getword:"you-arent-following"|ucfirst}}</p>
+                <p class="right btn hand">{{word_list|getword:"follow"|ucwords}}</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="bsbb full-width p10 inline-flex">
+        {% for user in users %}
+            {% if forloop.counter < 4 %}
+                {% if forloop.counter == 3 %}
+                    {% if users|length == 2 %}
+                        <a href="/u/{{user.user_login}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left:-10px;">
+                    {% else %}
+                        <a href="/u/{{user.user_login}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
+                    {% endif %}
+                            <img class="sqrt30 rounded" src="{{user.avatar_url}}" style="object-fit:cover;">
+                        </a>
+                    {% if users|length > 3  %}
+                        <div class="sqrt30 imgbw rounded absolute aligntl tac" style="background-color:rgba(0,0,0,0.7);left:58px;top:10px;">
+                            <svg width='20px' height='20px' viewBox='0 0 20 20' class='hand' style='margin-top:5px;transform: rotate(90deg);'>
+                                <g>
+                                    <path style="fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                    <path style="fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                    <path style="fill:none;stroke:var(--white);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                </g>
+                            </svg>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    {% if forloop.first %}
+                        <a href="/u/{{user.user_login}}" target="_blank"  class="sqrt30 imgbw rounded">
+                    {% else %}
+                        <a href="/u/{{user.user_login}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
+                    {% endif %}
+                        <img class="sqrt30 rounded" src="{{user.avatar_url}}" style="object-fit:cover;">
+                    </a>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% if users|length == 2 %}
+        <div class="inline-flex ml10 mt10 lh40">
+        {% else %}
+        <div class="inline-flex ml10 mt10 lh30">
+        {% endif %}
+            {% for user in users %}
+                {% if users|length > 3 %}
+                    {% if forloop.counter < 3 %}
+                        <a href="/u/{{user.user_login}}" class="underline-on-hover"><p class="fwbold">u/{{user.user_login}}</p></a>
+                        <p class="fwbold">,&nbsp;</p>
+                    {% elif forloop.counter == 3 %}
+                        <p class="underline-on-hover fwbold hand">{{users|length|add:-2}} {{word_list|getword:"more-users"}}</p>
+                    {% endif %} 
+                {% else %}
+                    {% if forloop.last %}
+                        <a href="/u/{{user.user_login}}" class="underline-on-hover"><p class="fwbold">u/{{user.user_login}}</p></a>
+                    {% else %}
+                        <a href="/u/{{user.user_login}}" class="underline-on-hover"><p class="fwbold">u/{{user.user_login}}</p></a>
+                        <p class="fwbold">,&nbsp;</p>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

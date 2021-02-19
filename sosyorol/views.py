@@ -627,12 +627,19 @@ def setup_current_user(cuid):
     try:
         current_user.followers = UserRelation.objects.filter(following=current_user)
         current_user.followings = UserRelation.objects.filter(follower=current_user)
+        current_user.blocked = BlockedUsers.objects.filter(blocker=current_user)
         for f in current_user.followers:
             try:
                 avatar_url = UserMeta.objects.filter(user=f.follower, meta_key="avatar_url")[0].meta_value
                 f.follower.avatar_url = avatar_url
             except:
                 f.follower.avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
+        for b in current_user.blocked:
+            try:
+                avatar_url = UserMeta.objects.filter(user=b.blocking, meta_key="avatar_url")[0].meta_value
+                b.blocking.avatar_url = avatar_url
+            except:
+                b.blocking.avatar_url = "https://www.gravatar.com/avatar/655e8d8d32f890dd8b07377a74447a5c?s=150&r=g&d=mm"
     except:
         pass
     return current_user
@@ -1928,6 +1935,22 @@ def deleteanswerdraft(request):
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 @csrf_exempt
+def checkusernameexists(request):
+    response_data = {}
+    try:
+        username = request.POST["username"]
+        query = User.objects.filter(user_login=username)
+        if query.count() > 0:
+            lang = UserMeta.objects.filter(user_id=current_uid, meta_key='language')[0].meta_value
+            word_list = Languages.objects.filter(Q(lang_code = lang))
+            response_data["content"] = word_list.filter(var_name="username-already-exists")[0].translation
+        else:
+            response_data["content"] = "success"
+    except:
+        response_data["content"] = "error"
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
 def get_chat_item(request):
     lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
     word_list = Languages.objects.filter(Q(lang_code = lang))
@@ -1937,7 +1960,7 @@ def get_chat_item(request):
         receivers = chat["receivers"]
         selected = receivers.split(", ")
         if len(selected) > 0:
-            selected = [int(i) for i in selected if i != '']
+            selected = [int(i) for i in selected if i != '' and int(i) != current_uid]
         results = User.objects.filter(ID__in=selected)
         user_list = []
         usernames = ""
@@ -1951,14 +1974,173 @@ def get_chat_item(request):
         chat["datetime"] = dt.datetime.strptime(chat["datetime"], '%d/%m/%Y %H:%M:%S')
         chat["date"] = fun.humanizedate(chat["datetime"], word_list)
         chat["seen"] = int(chat["seen"])
-        if chat["msg"].startswith("<img src=") :
+        chat["sender"] = int(chat["sender"])
+        if chat["msg"].startswith("<img data-type=") :
             msg = word_list.filter(var_name="user-sent-sosmoji")[0].translation
+            sender = User.objects.get(ID=int(chat["sender"]))
+            chat["msg"] = msg.replace("{user}", "u/"+sender.user_login)
+        elif chat["msg"].startswith("<img src=") :
+            msg = word_list.filter(var_name="user-sent-media")[0].translation
             sender = User.objects.get(ID=int(chat["sender"]))
             chat["msg"] = msg.replace("{user}", "u/"+sender.user_login)
         chats.append(chat)
     chats.sort(key=lambda x: x["datetime"], reverse=True)
     print(chats)
-    return render(request, 'chat_item.html', {'chats':chats})
+    return render(request, 'chat_item.html', {'chats':chats, 'current_uid':current_uid})
+
+@csrf_exempt
+def getsinglechatballoon(request):
+    chat = {}
+    chat["ID"] = request.POST["ID"]
+    chat["sender"] = setup_current_user(int(request.POST["sender"]))
+    chat["msg"] = request.POST["msg"]
+    chat["date"] = request.POST["date"]
+    media = False
+    if chat["msg"].startswith("<img src=") :
+        media = True
+    return render(request, 'single_chat_balloon.html', {'chat':chat, 'current_uid':current_uid, 'media':media})
+
+@csrf_exempt
+def savesettings(request):
+    response_data = {}
+    try:
+        settings_type = request.POST["type"]
+        lang = UserMeta.objects.filter(user_id=current_uid, meta_key='language')[0].meta_value
+        word_list = Languages.objects.filter(Q(lang_code = lang))
+        if(settings_type == "feed"):
+            nsfw = request.POST["nsfw"]
+            my_setting = UserMeta.objects.filter(user_id=current_uid, meta_key='nsfw_preference')
+            if(my_setting.count() == 0):
+                new_setting = UserMeta(user_id=current_uid, meta_key='nsfw_preference', meta_value=nsfw)
+                new_setting.save()
+            else:
+                my_setting.update(meta_value=nsfw)
+            response_data["content"] = word_list.filter(var_name="changes_saved")[0].translation
+        elif(settings_type == "chat"):
+            chat_preference = request.POST["chat_preference"]
+            my_setting = UserMeta.objects.filter(user_id=current_uid, meta_key='chat_preference')
+            if(my_setting.count() == 0):
+                new_setting = UserMeta(user_id=current_uid, meta_key='chat_preference', meta_value=chat_preference)
+                new_setting.save()
+            else:
+                my_setting.update(meta_value=chat_preference)
+            response_data["content"] = word_list.filter(var_name="changes_saved")[0].translation
+        elif(settings_type == "notification"):
+            comment_notif = request.POST["comment_notif"]
+            answer_notif = request.POST["answer_notif"]
+            post_notif_comm = request.POST["post_notif_comm"]
+            post_notif_following = request.POST["post_notif_following"]
+            following_notif = request.POST["following_notif"]
+            birthday_notif = request.POST["birthday_notif"]
+            my_setting = UserMeta.objects.filter(user_id=current_uid, meta_key='comment_notif_setting')
+            if(my_setting.count() == 0):
+                new_setting = UserMeta(user_id=current_uid, meta_key='comment_notif_setting', meta_value=comment_notif)
+                new_setting.save()
+            else:
+                my_setting.update(meta_value=comment_notif)
+            my_setting = UserMeta.objects.filter(user_id=current_uid, meta_key='answer_notif_setting')
+            if(my_setting.count() == 0):
+                new_setting = UserMeta(user_id=current_uid, meta_key='answer_notif_setting', meta_value=answer_notif)
+                new_setting.save()
+            else:
+                my_setting.update(meta_value=answer_notif)
+            my_setting = UserMeta.objects.filter(user_id=current_uid, meta_key='post_notif_comm_setting')
+            if(my_setting.count() == 0):
+                new_setting = UserMeta(user_id=current_uid, meta_key='post_notif_comm_setting', meta_value=post_notif_comm)
+                new_setting.save()
+            else:
+                my_setting.update(meta_value=post_notif_comm)
+            my_setting = UserMeta.objects.filter(user_id=current_uid, meta_key='post_notif_following_setting')
+            if(my_setting.count() == 0):
+                new_setting = UserMeta(user_id=current_uid, meta_key='post_notif_following_setting', meta_value=post_notif_following)
+                new_setting.save()
+            else:
+                my_setting.update(meta_value=post_notif_following)
+            my_setting = UserMeta.objects.filter(user_id=current_uid, meta_key='following_notif_setting')
+            if(my_setting.count() == 0):
+                new_setting = UserMeta(user_id=current_uid, meta_key='following_notif_setting', meta_value=following_notif)
+                new_setting.save()
+            else:
+                my_setting.update(meta_value=following_notif)
+            my_setting = UserMeta.objects.filter(user_id=current_uid, meta_key='birthday_notif_setting')
+            if(my_setting.count() == 0):
+                new_setting = UserMeta(user_id=current_uid, meta_key='birthday_notif_setting', meta_value=birthday_notif)
+                new_setting.save()
+            else:
+                my_setting.update(meta_value=birthday_notif)
+            response_data["content"] = word_list.filter(var_name="changes_saved")[0].translation
+        elif(settings_type == "phone-privacy"):
+            phone_privacy_setting = request.POST["phone-privacy"]
+            my_setting = UserMeta.objects.filter(user_id=current_uid, meta_key='phone_privacy_setting')
+            if(my_setting.count() == 0):
+                new_setting = UserMeta(user_id=current_uid, meta_key='phone_privacy_setting', meta_value=phone_privacy_setting)
+                new_setting.save()
+            else:
+                my_setting.update(meta_value=phone_privacy_setting)
+            response_data["content"] = word_list.filter(var_name="changes_saved")[0].translation
+        elif(settings_type == "email-privacy"):
+            email_privacy_setting = request.POST["email-privacy"]
+            my_setting = UserMeta.objects.filter(user_id=current_uid, meta_key='email_privacy_setting')
+            if(my_setting.count() == 0):
+                new_setting = UserMeta(user_id=current_uid, meta_key='email_privacy_setting', meta_value=email_privacy_setting)
+                new_setting.save()
+            else:
+                my_setting.update(meta_value=email_privacy_setting)
+            response_data["content"] = word_list.filter(var_name="changes_saved")[0].translation
+        elif(settings_type == "location-privacy"):
+            location_privacy_setting = request.POST["location-privacy"]
+            my_setting = UserMeta.objects.filter(user_id=current_uid, meta_key='location_privacy_setting')
+            if(my_setting.count() == 0):
+                new_setting = UserMeta(user_id=current_uid, meta_key='location_privacy_setting', meta_value=location_privacy_setting)
+                new_setting.save()
+            else:
+                my_setting.update(meta_value=location_privacy_setting)
+            response_data["content"] = word_list.filter(var_name="changes_saved")[0].translation
+    except:
+        response_data["content"] = "error"
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
+def searchusertoblock(request):
+    search_key = request.POST["search"]
+    current_user = setup_current_user(current_uid)
+    selected = list({x.blocking_id: x for x in current_user.blocked}.keys())
+    selected.append(current_uid)
+    print(selected)
+    results = User.objects.filter(Q(display_name__icontains=search_key)|Q(user_login__icontains=search_key)).exclude(ID__in=selected)[:5]
+    response_data = {}
+    for result in results:
+        result = setup_current_user(result.ID)
+        response_data[result.user_nicename] = "user!:!" + result.avatar_url + "!:!" + result.user_login
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
+def blockunblockuser(request):
+    operation = request.POST["op"]
+    user = request.POST["user"]
+    print(user)
+    uid = User.objects.filter(user_login=user)[0]
+    if operation == "block":
+        new_data = BlockedUsers(blocker_id=current_uid, blocking_id=uid.ID, date=dt.datetime.now())
+        new_data.save()
+    elif operation == "unblock":
+        instance = BlockedUsers.objects.get(blocker_id=current_uid, blocking_id=uid.ID)
+        instance.delete()
+    return HttpResponse(json.dumps({}), content_type="application/json")
+
+@csrf_exempt
+def getreceivernames(request):
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    receivers = request.POST["receivers"]
+    selected = receivers.split(", ")
+    if len(selected) > 0:
+        selected = [int(i) for i in selected if i != '' and int(i) != current_uid]
+    usernames = []
+    for s in selected:
+        usernames.append(setup_current_user(s))
+    return render(request, 'chat_receivers.html', {'users':usernames, 'current_user':current_user, 'word_list':word_list})
 
 '''---------------------------------------
   VIEWS              
@@ -2316,6 +2498,8 @@ def search(request, **kwargs):
             setup_postmeta(post, word_list)
             if post.post_type == "link":
                 post.photo_from_url = fun.get_photo_from_url(post.post_content)
+            if post.post_type == "media":
+                setup_mediameta(post)
         for question in question_results:
             setup_postmeta(question, word_list)
     
@@ -3953,3 +4137,113 @@ def chatdetail(request, chat_id):
                                             'country_list':country_list, 'select_language':select_language,
                                             'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
                                             'sosmojis':sosmojis})
+
+def settings(request):
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    return render(request, 'settings.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications})
+
+def privacysettings(request):
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    try:
+        phone_privacy_setting = UserMeta.objects.filter(user_id=current_uid, meta_key="phone_privacy_setting")[0].meta_value
+    except:
+        phone_privacy_setting = "everyone"
+    try:
+        email_privacy_setting = UserMeta.objects.filter(user_id=current_uid, meta_key="email_privacy_setting")[0].meta_value
+    except:
+        email_privacy_setting = "everyone"
+    try:
+        location_privacy_setting = UserMeta.objects.filter(user_id=current_uid, meta_key="location_privacy_setting")[0].meta_value
+    except:
+        location_privacy_setting = "everyone"
+    return render(request, 'privacy_settings.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'phone_privacy_setting':phone_privacy_setting, 'email_privacy_setting':email_privacy_setting,
+                                            'location_privacy_setting':location_privacy_setting})
+
+def notificationsettings(request):
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    try:
+        comment_notif = int(UserMeta.objects.filter(user_id=current_uid, meta_key="comment_notif_setting")[0].meta_value)
+    except:
+        comment_notif = 1
+    try:
+        answer_notif = int(UserMeta.objects.filter(user_id=current_uid, meta_key="answer_notif_setting")[0].meta_value)
+    except:
+        answer_notif = 1
+    try:
+        post_notif_comm = int(UserMeta.objects.filter(user_id=current_uid, meta_key="post_notif_comm_setting")[0].meta_value)
+    except:
+        post_notif_comm = 1
+    try:
+        post_notif_following = int(UserMeta.objects.filter(user_id=current_uid, meta_key="post_notif_following_setting")[0].meta_value)
+    except:
+        post_notif_following = 1
+    try:
+        following_notif = int(UserMeta.objects.filter(user_id=current_uid, meta_key="following_notif_setting")[0].meta_value)
+    except:
+        following_notif = 1
+    try:
+        birthday_notif = int(UserMeta.objects.filter(user_id=current_uid, meta_key="birthday_notif_setting")[0].meta_value)
+    except:
+        birthday_notif = 1
+    return render(request, 'notification_settings.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'comment_notif':comment_notif, 'answer_notif':answer_notif, 'post_notif_comm':post_notif_comm,
+                                            'post_notif_following':post_notif_following, 'following_notif':following_notif, 'birthday_notif':birthday_notif})
+
+def chatsettings(request):
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    try:
+        chat_preference = UserMeta.objects.filter(user_id=current_uid, meta_key="chat_preference")[0].meta_value
+    except:
+        chat_preference = "everyone"
+    return render(request, 'chat_settings.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'chat_preference': chat_preference})
+
+def feedsettings(request):
+    current_user = setup_current_user(current_uid)
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'language').meta_value
+    dark = UserMeta.objects.filter(Q(user_id = current_uid)).get(meta_key = 'mode').meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    country_list = Languages.objects.filter(Q(var_name = 'lang'))
+    select_language = fun.ucfirst(word_list.get(var_name = 'select-language').translation)
+    notifications, num_notifications = setup_notifications(current_uid, word_list)
+    try:
+        nsfw = int(UserMeta.objects.filter(user_id=current_uid, meta_key="nsfw_preference")[0].meta_value)
+    except:
+        nsfw = 0
+    return render(request, 'feed_settings.html', {'lang':lang, 'dark':dark, 'current_user': current_user,
+                                            'country_list':country_list, 'select_language':select_language,
+                                            'word_list':word_list, 'notifications':notifications, 'num_notifications':num_notifications,
+                                            'nsfw':nsfw})

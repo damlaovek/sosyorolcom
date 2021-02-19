@@ -1,0 +1,429 @@
+{% load static %}
+{% load index %}
+{% include 'includes/general/head.html' %}
+        <title>Sosyorol - Sosyal İçerik Platformu</title>
+        <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
+        <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
+        <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
+        <script src="{% static 'js/new/autosize.min.js' %}"></script>
+        <script src="{% static 'js/new/user-list.min.js' %}"></script>
+        <script src="{% static 'js/index.js' %}"></script>
+        <script src="{% static 'js/sosyorol.min.js' %}"></script>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries 
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script> -->
+
+        <script>
+        // Your web app's Firebase configuration
+        //firebase.analytics();
+        function checkViewsCookie(){
+            var url = window.location.href;
+            var cookie_value=getCookie("views_count_homepage");
+            if (cookie_value == "") {
+                //setCookie("views_count_homepage", user, 30);
+            }
+        }
+        </script>
+        <style>
+            .sosmoji:hover{background-color: var(--grayish);}
+        </style>
+    </head>
+    <body class="{{darkmode}}" onload="checkViewsCookie()">
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
+        <div class="full-width inline-flex">
+            <div class="fixed section-left" id="section-left" style="overflow-x: hidden;">
+                <div class="full-width bb">
+                    <p class="ctitle title m034 p200 fs19">{{word_list|getword:"chat"|ucfirst}}</p>
+                </div>
+                <div class="bsbb m20 p20 w40 tac border bcgrayish br10" id="empty-chats">
+                    <div class="sqr40 rounded bcgrayish center full-shadow-border" style="margin:auto;">
+                        <svg class="svg-icon" viewBox="0 0 15 15" style="margin-top:-8.5px;">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 15 6.515625 C 15 9.703125 11.929688 12.316406 8.039062 12.542969 C 5.738281 14.085938 2.300781 14.527344 2.300781 14.527344 C 2.300781 14.527344 3.152344 13.304688 3.417969 11.582031 C 1.359375 10.503906 0 8.636719 0 6.515625 C 0 3.175781 3.359375 0.472656 7.5 0.472656 C 11.640625 0.472656 15 3.175781 15 6.515625 Z M 15 6.515625 "/>
+                            </g>
+                        </svg>
+                    </div>
+                    <p class="cg2 full-width tac mt10 fwbold">{{word_list|getword:"chats-shown-here"|ucfirst}}.</p>
+                </div>
+                <div class="bsbb full-width dnone" id="chats">
+                </div>
+                <div class="bsbb m20 tac bringfront fixed" style="left:0;bottom:0;">
+                    <div class="full-width">
+                        <div class="full-width hand left-list-item-link">
+                            <li class="left-list-item">
+                                <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">
+                                    <svg width="20px" height="20px" viewBox="0 0 20 20" style="margin-left:7.5px; margin-top:7.5px;">
+                                        <g>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill:white;fill-opacity:1;" d="M 0 10.296875 L 0 13.003906 L 2.710938 13.003906 L 10.699219 5.015625 L 7.988281 2.304688 Z M 12.792969 2.921875 C 12.929688 2.785156 13.003906 2.601562 13.003906 2.410156 C 13.003906 2.21875 12.929688 2.035156 12.792969 1.902344 L 11.101562 0.210938 C 10.964844 0.078125 10.78125 0 10.589844 0 C 10.398438 0 10.214844 0.078125 10.082031 0.210938 L 8.761719 1.53125 L 11.472656 4.242188 Z M 12.792969 2.921875 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                                <a href="/chat"><p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"start-a-chat"|ucfirst}}</p></a>
+                            </li>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section-middle" style="margin-top:58px;">
+                <div class="hcentered" style="max-width: 893px;">
+                    <div class="filter-options">
+                        <div class="bsbb box full-shadow" style="min-height:648px;">
+                            <div class="full-width">
+                                <div class="bsbb full-width dnone">
+                                    <div class="left inline-block" id="selected-people">
+                                    </div>
+                                </div>
+                                <div class="bsbb full-width fwbold bb" id="receivers"></div>
+                                <div class="bsbb full-width">
+                                    <div class="bsbb full-width p20" style="height:578px; overflow-y:scroll;" id="chat_box">
+                                    </div>
+                                    <div class="full-width bt" style="min-height:100px;">
+                                        <textarea class="bsbb text textarea w20 m10 p10 border br4" rows=3 style="max-height: 300px;overflow-y: scroll;" placeholder='{{word_list|getword:"write-a-message"|ucfirst}}' id="chattext" onkeyup="validateChatForm()"></textarea>
+                                        <div class="w20 m010 mb10 inline-block">
+                                            <div class="left hand" style="width:35px;height:35px; margin-top: 2.5px;">
+                                                <div class="icon">
+                                                    <i class="fas fa-image cg2 fs19" style="width:20px;height:20px;"></i>
+                                                </div>
+                                                <div id="imageUploadForm" class="hand absolute icon" style="width:15px;height:15px;bottom:0;left:0;overflow:hidden;cursor:pointer;opacity:0;">
+                                                    <input type='file' onchange="uploadImg(this, {% url 'uploadmedia' %});" class="hand sqr15" style="overflow:hidden;opacity:0;" id="imageUpload" name="file" accept=".png, .jpg, .jpeg" />
+                                                </div>
+                                            </div>
+                                            <!--File upload
+                                            <div class="left hand" style="width:35px;height:35px; margin-top: 2.5px;">
+                                                <i class="fas fa-paperclip icon cg2 fs19" style="width:20px;height:20px;"></i>
+                                                <div  id="imageUploadForm" class="hand absolute icon" style="width:15px;height:15px;bottom:0;left:0;overflow:hidden;cursor:pointer;opacity:0;">
+                                                    <input type='file' onchange="uploadFile();" class="hand sqr15" style="overflow:hidden;opacity:0;" id="imageUpload" name="file"/>
+                                                </div>
+                                            </div>-->
+                                            <div class="left hand" style="width:35px;height:35px; margin-top: 2.5px;">
+                                                <i class="fas fa-smile icon cg2 fs19" id="sosmojibtn" onclick="openCloseSosmojis(this);"></i>
+                                                <div class="absolute full-shadow-border br4 bcw dnone" style="left:0;bottom:30px;width:260px;" id="sosmojis">
+                                                    <div class="bsbb full-width p10 bb">
+                                                        <p class="title fs15 lh20">{{word_list|getword:"select-a-sosmoji"|ucfirst}}</p>
+                                                        <svg style="position:absolute;top:7.5px;right:7.5px;cursor:pointer;padding:5px;width:15px;height:15px;z-index:9999;" class="icon hand" onclick="openCloseSosmojis(document.getElementById('sosmojibtn'));" viewBox="0 0 15 15" version="1.1">
+                                                            <g id="surface1">
+                                                                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0.132812 14.878906 C 0.222656 14.964844 0.335938 15.011719 0.453125 15.011719 C 0.570312 15.011719 0.683594 14.964844 0.773438 14.878906 L 7.503906 8.144531 L 14.238281 14.878906 C 14.324219 14.964844 14.441406 15.011719 14.558594 15.011719 C 14.675781 15.011719 14.789062 14.964844 14.878906 14.878906 C 15.054688 14.703125 15.054688 14.414062 14.878906 14.238281 L 8.144531 7.503906 L 14.878906 0.773438 C 15.054688 0.597656 15.054688 0.308594 14.878906 0.132812 C 14.703125 -0.0429688 14.414062 -0.0429688 14.238281 0.132812 L 7.503906 6.863281 L 0.773438 0.132812 C 0.597656 -0.0429688 0.308594 -0.0429688 0.132812 0.132812 C -0.0429688 0.308594 -0.0429688 0.597656 0.132812 0.773438 L 6.863281 7.503906 L 0.132812 14.238281 C -0.0429688 14.414062 -0.0429688 14.703125 0.132812 14.878906 Z M 0.132812 14.878906 "/>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="bsbb p10 full-width inline-block" style="height:240px; overflow-y:scroll;">
+                                                        {% for file in sosmojis %}
+                                                            {% if file != ".DS_Store" %}  
+                                                                <img src="{% static 'assets/img/sosmojis/' %}{{file}}" alt="" class="hand sqr50 p5 left sosmoji" onclick="sendSosmoji(this);">
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <input disabled type="submit" id="send_chat" class="btn p10 right fs15 lh20 noselect cb tac br4" style="height:30px;width:calc(25% - 35px); border:none; font-weight:700;opacity:0.8;" value="{{word_list|getword:'send'|ucfirst}}" onclick="return sendChat('{{current_user.ID}}');"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section-right fixed" id="section-right">
+
+            </div>
+        </div>
+        {% include 'includes/general/chat_popup.html' %}
+    </body>
+</html>
+<script>
+    var j = jQuery.noConflict();
+    j(document).ready(function() {
+        setupCurrentChat();
+        refreshChats();
+        updateSeen()
+    });
+
+    window.onload = function(){
+        var popups = document.getElementsByClassName("media-popup");
+        document.onclick = function(e){
+            if(e.target.parentElement.classList.contains("mediatarget")){
+                for(var i=0; i<popups.length; i++){
+                    popups[i].classList.remove("hidden");
+                    document.getElementById('chat_popup').style.zIndex='-1';
+                }
+            }else{
+                for(var i=0; i<popups.length; i++){
+                    popups[i].classList.add("hidden");
+                    document.getElementById('chat_popup').style.zIndex='999999999';
+                }
+            }
+        };
+    };
+
+    function updateSeen(){
+        var splits = window.location.href.split("/");
+        var childKey = splits[splits.length-1];
+        firebase.database().ref('users/{{current_user.ID}}/chats/'+childKey+'/seen').set(1);
+    }
+
+    function setupCurrentChat(){
+        var splits = window.location.href.split("/");
+        var childKey = splits[splits.length-1];
+        firebase.database().ref('chats/'+childKey).once('value', (snapshot) => {
+            var childData = snapshot.val();
+            var receivers = childData.users.split(", ");
+            document.getElementById("selected-people").innerHTML = "";
+            for(var i=0; i<receivers.length; i++){
+                if(receivers[i] != parseInt("{{current_user.ID}}")){
+                    document.getElementById("selected-people").innerHTML += "<div id='user_"+receivers[i]+"'></div>";
+                }
+            }
+            j.ajax({
+                type: "POST",
+                url: "/getreceivernames",
+                data: {receivers:childData.users},
+                success: function(response) {
+                    document.getElementById('receivers').innerHTML = response;
+                }
+            });
+            firebase.database().ref('chats/'+childKey+'/messages').on('value', (snapshot2) => {
+                document.getElementById('chat_box').innerHTML = "";
+                var flag = true;
+                snapshot2.forEach((childSnapshot2) => {
+                    var childData2 = childSnapshot2.val();
+                    console.log(childData2);
+                    var singleObj = {};
+                    singleObj['ID'] = childData.ID;
+                    singleObj['receivers'] = childData.users;
+                    singleObj['msg'] = childData2.msg;
+                    singleObj['datetime'] = childData2.datetime;
+                    singleObj['sender'] = childData2.sender;
+                    jQuery.ajax({
+                        type: "POST",
+                        url: "/getsinglechatballoon",
+                        async: false,
+                        data: {ID:singleObj.ID, sender:singleObj.sender, msg: singleObj.msg, date: singleObj.datetime},
+                        success: function(response) {
+                            document.getElementById('chat_box').innerHTML = document.getElementById('chat_box').innerHTML + response; 
+                            var objDiv = document.getElementById("chat_box");
+                            objDiv.scrollTop = objDiv.scrollHeight;
+                        }
+                    });
+                });
+            });
+        });
+    }
+
+    function refreshChats(){
+        var chatRef = firebase.database().ref('users/{{current_user.ID}}/chats');
+        chatRef.on('value', (snapshot) => {
+            var objects = {};
+            var index = 1;
+            snapshot.forEach((childSnapshot) => {
+                var childKey = childSnapshot.key;
+                var childData = childSnapshot.val();
+                if(!document.getElementById('empty-chats').classList.contains('dnone')){
+                    document.getElementById('empty-chats').classList.add('dnone');
+                    document.getElementById('chats').classList.remove('dnone');
+                }
+                firebase.database().ref('chats/'+childKey).on('value', (snapshot3) => {
+                    var childData3 = snapshot3.val();
+                    firebase.database().ref('chats/'+childKey+'/messages').orderByChild('dbdate').limitToLast(1).on('value', (snapshot2) => {
+                        snapshot2.forEach((childSnapshot2) => {
+                            var childData2 = childSnapshot2.val();
+                            var chRef = firebase.database().ref("chats");
+                            chRef.on('value', (snapshot) => {
+                            });
+                            var singleObj = {};
+                            singleObj['ID'] = childData3.ID;
+                            singleObj['receivers'] = childData3.users;
+                            singleObj['msg'] = childData2.msg;
+                            singleObj['datetime'] = childData2.datetime;
+                            singleObj['seen'] = childData.seen;
+                            singleObj['sender'] = childData2.sender;
+                            objects[index] = singleObj;
+                            if(index == snapshot.numChildren()){
+                                j.ajax({
+                                    type: "POST",
+                                    url: "/get_chat_item",
+                                    data: {chats: JSON.stringify(objects)},
+                                    success: function(response) {
+                                        document.getElementById('chats').innerHTML = response;
+                                    }
+                                });
+                            }else{
+                                index += 1;
+                            }
+                        });
+                    });
+                });
+            });
+        });
+    }
+    var j = jQuery.noConflict();
+
+    function validateChatForm( msg2send=""){
+        var chattext = document.getElementById("chattext").value;
+        var sendbtn = document.getElementById("send_chat");
+        var users = document.getElementById("selected-people").getElementsByTagName("div");
+        if(chattext == "" && msg2send == ""){
+            sendbtn.disabled = true;
+            sendbtn.style.opacity = "0.8";
+            sendbtn.style.cursor = "default";
+            return false;
+        }else if(users.length == 0){
+            sendbtn.disabled = true;
+            sendbtn.style.opacity = "0.8";
+            sendbtn.style.cursor = "default";
+            return false;
+        }else{
+            sendbtn.disabled = false;
+            sendbtn.style.opacity = "1";
+            sendbtn.style.cursor = "pointer";
+            return true;
+        }
+    }
+    function sendChat(cuid, msg2send=""){
+        if(validateChatForm(msg2send)){
+            selectedUsers = "";
+            var users = document.getElementById("selected-people").getElementsByTagName("div");
+            var msg = document.getElementById('chattext').value;
+            if(msg2send != ""){
+                msg = msg2send;
+            }
+            var currentdate = new Date(); 
+            var datetime =  currentdate.getDate() + "/"
+                            + (currentdate.getMonth()+1)  + "/" 
+                            + currentdate.getFullYear() + " "  
+                            + currentdate.getHours() + ":"  
+                            + currentdate.getMinutes() + ":" 
+                            + currentdate.getSeconds();
+            var selected_users = [];
+            for(var i = 0; i<users.length; i++){
+                selected_users.push(parseInt(users[i].id.split("_")[1]));
+            }
+            selected_users.push(parseInt("{{current_user.ID}}"));
+            console.log(selected_users);
+            selected_users.sort(function(a, b) {
+                return a - b;
+            });
+            console.log(selected_users);
+            selectedUsers = selected_users.join(', ');
+            firebase.database().ref("chats").orderByChild("users").equalTo(selectedUsers).once("value",snapshot => {
+                if (snapshot.exists()){
+                    var chatData = snapshot.val();
+                    var msgListRef = firebase.database().ref('chats').child(Object.keys(chatData)[0]).child("messages");
+                    var newMsgRef = msgListRef.push();
+                    newMsgRef.set({
+                        ID: newMsgRef.key,
+                        sender: "{{current_user.ID}}",
+                        datetime: datetime,
+                        dbdate: firebase.database.ServerValue.TIMESTAMP,
+                        msg: msg,
+                    });
+                    var userChatRef = firebase.database().ref("users/"+selected_users[u]+"/chats/"+Object.keys(chatData)[0]+"/seen").set(0);
+                }else{
+                    var chatListRef = firebase.database().ref('chats');
+                    var newChatRef = chatListRef.push();
+                    newChatRef.set({
+                        ID: newChatRef.key,
+                        users: selectedUsers,
+                    });
+                    var msgListRef = firebase.database().ref('chats').child(newChatRef.key).child("messages");
+                    var newMsgRef = msgListRef.push();
+                    newMsgRef.set({
+                        ID: newMsgRef.key,
+                        sender: "{{current_user.ID}}",
+                        datetime: datetime,
+                        dbdate: firebase.database.ServerValue.TIMESTAMP,
+                        msg: msg,
+                    });
+                    for(var u=0; u<selected_users.length; u++){
+                        var userChatRef = firebase.database().ref("users/"+selected_users[u]+"/chats/"+newChatRef.key).set({ID: newChatRef.key, seen:0});
+                    }
+                }
+                document.getElementById('chattext').value = "";
+                validateChatForm();
+                j.ajax({
+                    type: "POST",
+                    url: "/getsinglechatballoon",
+                    data: {sender:"{{current_user.ID}}", msg: msg},
+                    success: function(response) {
+                        document.getElementById('chat_box').innerHTML += response;
+                        var objDiv = document.getElementById("chat_box");
+                        objDiv.scrollTop = objDiv.scrollHeight;
+                    }
+                });
+            });
+        }
+        return false;
+    }
+    function openCloseSosmojis(elem){
+        document.getElementById('sosmojis').classList.toggle('dnone');
+        if(document.getElementById('sosmojis').classList.contains('dnone')){
+            elem.classList.remove("cb");
+            elem.classList.add("cg2");
+        }else{
+            elem.classList.add("cb");
+            elem.classList.remove("cg2");
+        }
+    }
+    function sendSosmoji(elem){
+        var users = document.getElementById("selected-people").getElementsByTagName("div");
+        if(users.length == 0){
+            displayAlert("{{word_list|getword:'sosmoji-err'|ucfirst}}");
+        }else{
+            var sosmoji = elem.src;
+            sendChat('{{current_user.ID}}','<img data-type="sosmoji" src="'+sosmoji+'" alt="" class="sqr50"/>');
+            openCloseSosmojis(document.getElementById("sosmojibtn"));
+        }
+    }
+    function sendImg(url){
+        var users = document.getElementById("selected-people").getElementsByTagName("div");
+        if(users.length == 0){
+            displayAlert("{{word_list|getword:'sosmoji-err'|ucfirst}}");
+        }else{
+            sendChat('{{current_user.ID}}','<img src="'+url+'" alt="" class="sqr50"/>');
+        }
+    }
+    function uploadImg(input, url){
+        if (input.files && input.files[0]) {
+            var fd = new FormData();
+            var files = input.files[0];
+            var fullPath = input.value;
+            if (fullPath) {
+                var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+                var filename = fullPath.substring(startIndex);
+                if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+                    filename = filename.substring(1);
+                    var tokens = filename.split(".");
+                    if (tokens[0].length > 96) {
+                        tokens[0] = tokens[0].substring(0,95);
+                        filename = tokens[0].concat(tokens[1]);
+                    }
+                }
+            }
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                placeholder.src = e.target.result;
+                placeholder.style.opacity = "1";
+            }
+            reader.readAsDataURL(input.files[0]);
+            fd.append('file',files,filename);
+            j.ajax({
+                type: "POST",
+                url: url,
+                data: fd,
+                processData: false, 
+                contentType: false,
+                success: function(response) {
+                    if(response.is_valid){
+                        displayAlert(response.msg);
+                        sendImg(response.url);
+                    }
+                }
+            });
+        }
+    }
+</script>

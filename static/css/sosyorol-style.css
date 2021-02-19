@@ -184,6 +184,7 @@ svg{pointer-events:all;}
 .p710{padding:7px 10px}
 .p15500{padding:15px 0 5px 0}
 .p40{padding:40px;}
+.p400{padding:40px 0}
 .p040{padding:0 40px}
 .p1020{padding:10px 20px}
 .p1030{padding:10px 30px}
@@ -289,6 +290,7 @@ svg{pointer-events:all;}
 .main-color {color: var(--main-color) !important;}
 .red {color: red !important;}
 .cw{color:var(--white);}
+.cred{color:var(--red);}
 
 /*---------------------------------------
   BACKGROUND            

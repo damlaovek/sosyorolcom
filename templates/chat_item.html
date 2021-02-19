@@ -1,9 +1,9 @@
 {% for chat in chats %}
     <a href="/chat/{{chat.ID}}">
-        {% if chat.seen == 1 %}
-        <div class="bsbb p020 full-width item-hover hand bb">
-        {% else %}
+        {% if chat.seen == 0 and chat.sender != current_uid %}
         <div class="bsbb p020 bcba full-width item-hover hand bb" style="border-right: 4px solid var(--main-color);">
+        {% else %}
+        <div class="bsbb p020 full-width item-hover hand bb">
         {% endif %}
             <div class="bsbb full-width p10 inline-block">
                 {% if chat.receivers|length > 1 %}

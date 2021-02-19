@@ -21,6 +21,7 @@ class User(models.Model):
     avatar_url = ""
     followers = models.QuerySet()
     followings = models.QuerySet()
+    blocked = models.QuerySet()
     posts = models.QuerySet()
     employments = ""
     educations = ""
@@ -32,6 +33,7 @@ class User(models.Model):
     education_credentials = []
     language_credentials = []
     location_credentials = []
+    website = ""
     class Meta:
         db_table = "wpmu_users"
     
@@ -64,6 +66,13 @@ class UserData(models.Model):
     class Meta:
         db_table = "wpmu_bp_xprofile_data"
 
+class BlockedUsers(models.Model):
+    ID = models.BigIntegerField(primary_key = True)
+    blocker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blocker')
+    blocking = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blocking')
+    date = models.DateTimeField()
+    class Meta:
+        db_table = "blocked_accounts"
 
 # Post related models.
 class Post(models.Model):
