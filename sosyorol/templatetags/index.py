@@ -1,6 +1,12 @@
 from django import template
 import re
+import os
+from os import listdir
+from os.path import isfile, join
 register = template.Library()
+from django.conf import settings
+
+STATICFILES_DIR = os.path.join(settings.BASE_DIR, 'static')
 
 @register.filter
 def getword(wordlist, db_key):
@@ -79,3 +85,8 @@ def get_unit(number):
 def edit_comm_desc(txt):
     txt = striphtml(txt)
     return txt[:156]
+
+@register.filter
+def get_sosmojis(wordlist):
+    sosmojis = os.listdir(os.path.join(STATICFILES_DIR, "assets/img/sosmojis/"))
+    return sosmojis

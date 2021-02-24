@@ -1,2 +1,94 @@
+{% load index %}
+{% load static %}
+{% if chat.receivers|length == 1 %}
 <div class="bsbb full-width p20">
+    <div class="full-width tac">
+        <img src="{{chat.receivers.0.avatar_url}}" class="sqr100 rounded full-shadow" style="border:5px solid var(--white);margin:auto;">
+        <p class="full-width tac fwbold fs19 ctitle mt10">{{chat.receivers.0.display_name}}</p>
+        <p class="full-width tac cg2">u/{{chat.receivers.0.user_login}}</p>
+    </div>
+    <div class="bsbb p10 full-width">
+        <p class="full-width bb cg2 p100">{{word_list|getword:"common_followings"|ucwords}} ({{chat.common_followings|length}})</p>
+        <div class="full-width inline-block mt10">
+            {% for cf in chat.common_followings %}
+                <a href="/u/{{cf.user_login}}" target="_blank" class="left m5"><img class="sqrt30 rounded" src="{{cf.avatar_url}}"></a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="bsbb p10 full-width">
+        <p class="full-width bb cg2 p100">{{word_list|getword:"common_communities"|ucwords}} ({{chat.common_communities|length}})</p>
+        <div class="full-width">
+            {% for cf in chat.common_communities %}
+                {% if cf.term.profile_img == '' %}
+                <a href="/c/{{cf.term.slug}}" target="_blank" class="full-width inline-flex mt10">
+                    <img class="sqr40 rounded bcb p10" src="{% static 'assets/img/defaults/default-community.png' %}">
+                    <div class="ml10 p100 bb" style="width:calc(100% - 70px);">
+                        <p class="lh20 fwbold ctitle">{{cf.term.name|ucfirst}}</p>
+                        <p class="lh20 cg2 underline-on-hover">c/{{cf.term.slug}}</p>
+                    </div>
+                </a>
+                {% else %}
+                <a href="/c/{{cf.term.slug}}" target="_blank" class="full-width inline-flex mt10">
+                    <img class="sqr60 rounded" src="{{cf.term.profile_img}}">
+                    <div class="ml10 p100 bb" style="width:calc(100% - 70px);">
+                        <p class="lh20 fwbold ctitle">{{cf.term.name|ucfirst}}</p>
+                        <p class="lh20 cg2 underline-on-hover">c/{{cf.term.slug}}</p>
+                    </div>
+                </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
 </div>
+{% else %}
+<div class="bsbb full-width p20">
+    <div class="bsbb p10 full-width">
+        <p class="full-width bb cg2 p100">{{word_list|getword:"users"|ucwords}} ({{chat.receivers|length}})</p>
+        <div class="full-width">
+            {% for user in chat.receivers %}
+                {% if forloop.counter < 6 %}
+                    <a href="/u/{{user.user_login}}" target="_blank" class="full-width inline-flex mt10">
+                        <img class="sqr60 rounded full-shadow-border" src="{{user.avatar_url}}">
+                        <div class="ml10 p100 bb" style="width:calc(100% - 70px);">
+                            <p class="lh20 fwbold ctitle">{{user.display_name}}</p>
+                            <p class="lh20 cg2 underline-on-hover">u/{{user.user_login}}</p>
+                        </div>
+                    </a>
+                {% elif forloop.counter == 6 and chat.receivers|length > 5 %}
+                    <div class="full-width hand left-list-item-link mt10" id="loadmorechatusers" onclick="loadMoreChatUsers(this)">
+                        <div class="left-list-item p510">
+                            <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
+                                <i class="fa fa-chevron-down cb fs19" style="top:4px" aria-hidden="true"></i>
+                            </div>
+                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
+                        </div>
+                    </div>
+                    <a href="/u/{{user.user_login}}" target="_blank" class="full-width inline-flex mt10 hidden hidden-members">
+                        <img class="sqr60 rounded full-shadow-border" src="{{user.avatar_url}}">
+                        <div class="ml10 p100 bb" style="width:calc(100% - 70px);">
+                            <p class="lh20 fwbold ctitle">{{user.display_name}}</p>
+                            <p class="lh20 cg2 underline-on-hover">u/{{user.user_login}}</p>
+                        </div>
+                    </a>
+                {% else %}
+                    <a href="/u/{{user.user_login}}" target="_blank" class="full-width inline-flex mt10 hidden hidden-members">
+                        <img class="sqr60 rounded full-shadow-border" src="{{user.avatar_url}}">
+                        <div class="ml10 p100 bb" style="width:calc(100% - 70px);">
+                            <p class="lh20 fwbold ctitle">{{user.display_name}}</p>
+                            <p class="lh20 cg2 underline-on-hover">u/{{user.user_login}}</p>
+                        </div>
+                    </a>
+                {% endif %}
+            {% endfor %}
+            <div class="full-width hand left-list-item-link hidden-members hidden mt10"  id="showless" onclick="showLessChatUsers(this)">
+                <div class="left-list-item p510">
+                    <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
+                        <i class="fa fa-chevron-up cb fs19" style="top:2px;" aria-hidden="true"></i>
+                    </div>
+                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"less"|ucwords}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

@@ -477,7 +477,8 @@ def setup_postmeta(post, word_list):
     if post.communities.count() > 0:
         post.first_community = post.communities[0].name
         
-    avatar_url = UserMeta.objects.filter(user=post.author, meta_key="avatar_url")[0].meta_value
+    avatar_url = UserMeta.objects.filter(user_id=post.post_author, meta_key="avatar_url")[0].meta_value
+    post.author = setup_current_user(post.post_author)
     post.author.set_avatar(avatar_url)
     post.time_diff = fun.humanizedate(post.post_date.replace(tzinfo=None), word_list)
 
@@ -1985,8 +1986,84 @@ def get_chat_item(request):
             chat["msg"] = msg.replace("{user}", "u/"+sender.user_login)
         chats.append(chat)
     chats.sort(key=lambda x: x["datetime"], reverse=True)
-    print(chats)
     return render(request, 'chat_item.html', {'chats':chats, 'current_uid':current_uid})
+
+@csrf_exempt
+def get_chat_popup_item(request):
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    chats_data = json.loads(request.POST['chats'])
+    chats = []
+    for _, chat in chats_data.items():
+        receivers = chat["receivers"]
+        selected = receivers.split(", ")
+        if len(selected) > 0:
+            selected = [int(i) for i in selected if i != '' and int(i) != current_uid]
+        results = User.objects.filter(ID__in=selected)
+        user_list = []
+        usernames = ""
+        for result in results:
+            result = setup_current_user(result.ID)
+            user_list.append(result)
+            usernames += "u/" + result.user_login + ","
+        usernames = usernames[:-1]
+        chat["receivers"] = user_list
+        chat["usernames"] = usernames
+        chat["datetime"] = dt.datetime.strptime(chat["datetime"], '%d/%m/%Y %H:%M:%S')
+        chat["date"] = fun.humanizedate(chat["datetime"], word_list)
+        chat["seen"] = int(chat["seen"])
+        chat["sender"] = int(chat["sender"])
+        if chat["msg"].startswith("<img data-type=") :
+            msg = word_list.filter(var_name="user-sent-sosmoji")[0].translation
+            sender = User.objects.get(ID=int(chat["sender"]))
+            chat["msg"] = msg.replace("{user}", "u/"+sender.user_login)
+        elif chat["msg"].startswith("<img src=") :
+            msg = word_list.filter(var_name="user-sent-media")[0].translation
+            sender = User.objects.get(ID=int(chat["sender"]))
+            chat["msg"] = msg.replace("{user}", "u/"+sender.user_login)
+        chats.append(chat)
+    chats.sort(key=lambda x: x["datetime"], reverse=True)
+    return render(request, 'chat_popup_item.html', {'chats':chats, 'current_uid':current_uid})
+
+@csrf_exempt
+def get_chat_right_menu(request):
+    lang = UserMeta.objects.filter(Q(user_id = current_uid)).filter(Q(meta_key = 'language'))[0].meta_value
+    word_list = Languages.objects.filter(Q(lang_code = lang))
+    receivers = request.POST['receivers']
+    selected = receivers.split(", ")
+    if len(selected) > 0:
+        selected = [int(i) for i in selected if i != '' and int(i) != current_uid]
+    results = User.objects.filter(ID__in=selected)
+    user_list = []
+    usernames = ""
+    for result in results:
+        result = setup_current_user(result.ID)
+        user_list.append(result)
+        usernames += "u/" + result.user_login + ","
+    usernames = usernames[:-1]
+    chat = {}
+    if(len(user_list) == 1):
+        current_user = setup_current_user(current_uid)
+        current_followings = []
+        for cf in current_user.followings:
+            current_followings.append(cf.following.ID)
+        common_followings = UserRelation.objects.filter(follower=user_list[0], following_id__in=current_followings)
+        common_followings_list = []
+        for cf in common_followings:
+            try:
+                cf = setup_current_user(cf.following_id)
+                common_followings_list.append(cf)
+            except:
+                pass
+        print(common_followings_list)
+        chat["common_followings"] = common_followings_list
+        followed_communities = FollowedCommunities.objects.filter(user_id = current_uid).order_by('-date').prefetch_related()
+        community_ids = list({x.term_id: x for x in followed_communities}.keys())
+        common_communities = FollowedCommunities.objects.filter(user_id = user_list[0].ID, term_id__in=community_ids).order_by('-date').prefetch_related()
+        chat["common_communities"] = common_communities
+    chat["receivers"] = user_list
+    chat["usernames"] = usernames
+    return render(request, 'chat_right_menu.html', {'chat':chat, 'current_uid':current_uid, 'word_list':word_list})
 
 @csrf_exempt
 def getsinglechatballoon(request):
