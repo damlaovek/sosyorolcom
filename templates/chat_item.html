@@ -1,11 +1,11 @@
 {% for chat in chats %}
     <a href="/chat/{{chat.ID}}">
         {% if chat.seen == 0 and chat.sender != current_uid %}
-        <div class="bsbb p020 bcba full-width item-hover hand bb" style="border-right: 4px solid var(--main-color);">
+        <div class="bsbb cba full-width item-hover hand bb" style="border-right: 4px solid var(--main-color);padding-left: 20px;">
         {% else %}
-        <div class="bsbb p020 full-width item-hover hand bb">
+        <div class="bsbb full-width item-hover hand bb" style="padding-left: 30px;">
         {% endif %}
-            <div class="bsbb full-width p10 inline-block">
+            <div class="bsbb full-width p100 inline-block">
                 {% if chat.receivers|length > 1 %}
                     <div class="left">
                         <img src="{{chat.receivers.0.avatar_url}}" class="sqr40 rounded" style="border:3px solid var(--white);">
@@ -14,7 +14,11 @@
                 {% else %}
                     <img src="{{chat.receivers.0.avatar_url}}" class="left sqr60 rounded" style="border:3px solid var(--white);">
                 {% endif %}
-                <div class="left ml10" style="width:calc(100% - 90px);">
+                {% if chat.receivers|length > 1 %}
+                <div class="left ml10" style="width:calc(100% - 100px);">
+                {% else %}
+                <div class="left" style="width:calc(100% - 100px);margin-left:15px;">
+                {% endif %}
                     <div class="full-width inline-block">
                         <p class="lh30 half-width oh ellipsis fwbold left">{{chat.usernames}}</p>
                         <p class="lh30 right cg2 fs13" style="text-align:right;">{{chat.date}}</p>

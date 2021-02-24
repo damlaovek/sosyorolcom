@@ -61,7 +61,7 @@
         {% if users|length == 2 %}
         <div class="inline-flex ml10 mt10 lh40">
         {% else %}
-        <div class="inline-flex ml10 mt10 lh30">
+        <div class="inline-flex ml10 lh30" style="margin-top: 1px;">
         {% endif %}
             {% for user in users %}
                 {% if users|length > 3 %}
@@ -69,7 +69,28 @@
                         <a href="/u/{{user.user_login}}" class="underline-on-hover"><p class="fwbold">u/{{user.user_login}}</p></a>
                         <p class="fwbold">,&nbsp;</p>
                     {% elif forloop.counter == 3 %}
-                        <p class="underline-on-hover fwbold hand">{{users|length|add:-2}} {{word_list|getword:"more-users"}}</p>
+                        <div onmouseover="openRemainingReceivers();" onmouseout="closeRemainingReceivers();">
+                            <p class="fwbold hand noselect underline-on-hover" id="remainingReceiversBtn">{{users|length|add:-2}} {{word_list|getword:"more-users"}}</p>
+                            <div class="absolute aligntr dnone" id="remaining-receivers" style="top:20px;width:200px;z-index:99;">
+                                <div class="bsbb full-width br4 full-shadow-border mt10 bcw">
+                                    {% for ru in users %}
+                                        {% if forloop.counter > 2 %}
+                                            {% if forloop.last %}
+                                            <a href="/u/{{ru.user_login}}" class="bsbb full-width p10 inline-flex item-hover">
+                                                <img class="sqr20 rounded hand" src="{{ru.avatar_url}}" style="object-fit:cover;">
+                                                <p class="lh20 ml10 hand">u/{{ru.user_login}}</p>
+                                            </a>
+                                            {% else %}
+                                            <a href="/u/{{ru.user_login}}" class="bsbb full-width p10 bb inline-flex item-hover">
+                                                <img class="sqr20 rounded hand" src="{{ru.avatar_url}}" style="object-fit:cover;">
+                                                <p class="lh20 ml10 hand">u/{{ru.user_login}}</p>
+                                            </a>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
                     {% endif %} 
                 {% else %}
                     {% if forloop.last %}

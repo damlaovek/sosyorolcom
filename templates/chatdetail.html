@@ -167,6 +167,13 @@
         firebase.database().ref('users/{{current_user.ID}}/chats/'+childKey+'/seen').set(1);
     }
 
+    function openRemainingReceivers(){
+        document.getElementById("remaining-receivers").classList.remove("dnone");
+    }
+    function closeRemainingReceivers(){
+        document.getElementById("remaining-receivers").classList.add("dnone");
+    }
+
     function setupCurrentChat(){
         var splits = window.location.href.split("/");
         var childKey = splits[splits.length-1];
@@ -185,6 +192,14 @@
                 data: {receivers:childData.users},
                 success: function(response) {
                     document.getElementById('receivers').innerHTML = response;
+                }
+            });
+            j.ajax({
+                type: "POST",
+                url: "/get_chat_right_menu",
+                data: {"receivers": childData.users},
+                success: function(response) {
+                    document.getElementById('section-right').innerHTML = response;
                 }
             });
             firebase.database().ref('chats/'+childKey+'/messages').on('value', (snapshot2) => {
@@ -425,5 +440,19 @@
                 }
             });
         }
+    }
+    function loadMoreChatUsers(elem){
+        elem.classList.add("dnone");
+        hiddencoms = document.getElementsByClassName("hidden-members");
+        for (var i = 0; i < hiddencoms.length; i++) {
+            hiddencoms[i].classList.remove("hidden");
+        }
+    }
+    function showLessChatUsers(elem){
+        hiddencoms = document.getElementsByClassName("hidden-members");
+        for (var i = 0; i < hiddencoms.length; i++) {
+            hiddencoms[i].classList.add("hidden");
+        }
+        document.getElementById("loadmorechatusers").classList.remove("dnone");
     }
 </script>
