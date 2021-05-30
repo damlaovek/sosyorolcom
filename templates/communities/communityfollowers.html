@@ -1,0 +1,275 @@
+{% load static %}
+{% load index %}
+{% include 'includes/general/head.html' %}
+        <title>{{community.name}} - Sosyorol</title>
+        <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
+        <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
+        <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
+        <script src="{% static 'js/new/autosize.min.js' %}"></script>
+        <script src="{% static 'js/new/user-list.min.js' %}"></script>
+        <script src="{% static 'js/new/community.js' %}"></script>
+        <script src="{% static 'js/index.js' %}"></script>
+        <script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/jquery.textfill.js'></script>
+        <style>
+            .box{box-shadow:0px 3px 4px rgba(173,173,173, 0.53);}
+            .box .box{box-shadow:none;}
+            .lst-item{padding:10px 0 15px 0;}
+            .lst-item:hover{border-bottom:5px solid var(--main-color);padding-bottom:10px; color:var(--main-color);}
+            .lst-item.active{border-bottom:5px solid var(--main-color);padding-bottom:10px; color:var(--main-color);}
+            .hide{display:none;}
+            #profileImg{overflow:hidden;left:calc(50% - 65px);}
+            #coverImg{height:150px;top:0;opacity:1;}
+        </style>
+    </head>
+    <body class="{{darkmode}}">
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
+        <input type="hidden" name="filter" id="filter" value="{{filter}}">
+        <div class="full-width inline-flex">
+            {% include 'includes/general/left_menu.html' %}
+            <div class="section-middle" style="margin-top:45px; padding-bottom:32px;">
+                <div class="bsbb p2040">
+                    <div class="full-width full-shadow-border box" style="z-index:2;">
+                        <div class="full-width">
+                            <div class="full-width bcgrayish" style="height: 150px; background-color: {{community.cover_color}};" id="coverColor"></div>
+                            {% if community.cover_img == '' %}
+                            <img src="{% static 'assets/img/community_default/blackBG.png' %}" class="absolute full-width align tr non-draggable" id="coverImg"/>
+                            {% else %}
+                            <img src="{{community.cover_img}}" class="absolute full-width align tr non-draggable" id="coverImg"/>
+                            {% endif %}
+                            <div class="full-width bt"></div>
+                            <div class="full-width inline-flex" style="padding-bottom: 20px;">
+                                <div class="ml20 mt20 icon-bg-large full-shadow twb tac">
+                                    {% if community.profile_img == '' %}
+                                    <img src="{% static 'assets/img/defaults/default-community.png' %}" class="bsbb rounded sqr130 bcb p20" id="profileImg" style="z-index:4;object-fit:contain;">
+                                    {% else %}
+                                    <img src="{{community.profile_img}}" class="rounded sqr130" id="profileImg" style="z-index:4;">
+                                    {% endif %}
+                                </div>
+                                <div class="ml30 mt10" style="width:600px;">
+                                    <div class="inline-flex">
+                                        <p class="fs19 mt10 fwblack ctitle">{{community.name}}</p>
+                                        <a href="">
+                                            <svg width="16px" height="16px" viewBox="0 0 20 20" style="margin-top:13px;margin-left:10px;">
+                                                <g>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                                    <path style=" stroke:none;fill-rule:nonzero;fill:var(--main-color);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                                                </g>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                    <p class="fs15 cg2 lh20">c/{{community.slug}}</p>
+                                    <p class="fs15 cg2 lh20 mt20" id="desc-placeholder">{% autoescape off %}{{community.description|edit_comm_desc}}{% endautoescape %}</p>
+                                    <div class="full-width inline-flex mt20">
+                                        <p class="cb noselect"><span class="fwbold">{{community.views}}</span>&nbsp;{{page_dict.views}}</p>
+                                        <a href="/c/{{community.slug}}/followers"><p class="cb ml20 noselect"><span class="fwbold">{{followers|length}}</span>&nbsp;{{page_dict.usersfollowing}}</p></a>
+                                        <p class="cb ml20 noselect">{% autoescape off %}{{page_dict.rank}}{% endautoescape %}</p>
+                                    </div>
+                                    <div class="full-width inline-flex mt20">
+                                        {% if is_followed %}
+                                        <p class="btn hand" style="padding-left: 30px; padding-right: 30px; top:3.5px;" onclick="unfollowCommunity(this, '{{community.term_id}}', '{{page_dict.join}}');">{{page_dict.following}}</p>
+                                        {% else %}
+                                        <p class="btn hand" style="padding-left: 30px; padding-right: 30px; top:3.5px;" onclick="joinCommunity(this, '{{community.term_id}}', '{{page_dict.following}}');">{{page_dict.join}}</p>
+                                        {% endif %}
+                                        <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon hand' style='margin-top:-3.5px;margin-left:10px;transform: rotate(90deg);'>
+                                            <g>
+                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="bsbb full-width p020 full-shadow-border box" style="width:calc(100% + 2px);margin-top: -4px;">
+                        <ul class="full-width mt10 inline-flex" style="top:1px;">
+                            {% if filter == "all" or filter == "" %}
+                            <a href="/c/{{community.slug}}"><li class="hand fs15 cg2 fwmedium lst-item active">{{word_list|getword:"all"|ucwords}}</li></a>
+                            {% else %}
+                            <a href="/c/{{community.slug}}"><li class="hand fs15 cg2 fwmedium lst-item">{{word_list|getword:"all"|ucwords}}</li></a>
+                            {% endif %}
+                            {% if filter == "post" %}
+                            <a href="/c/{{community.slug}}/post"><li class="hand fs15 cg2 fwmedium lst-item m020 active" onclick="filter(this, 'post', '{{list.url}}')">{{post_types_dict.post}}</li></a>
+                            {% else %}
+                            <a href="/c/{{community.slug}}/post"><li class="hand fs15 cg2 fwmedium lst-item m020" onclick="filter(this, 'post', '{{list.url}}')">{{post_types_dict.post}}</li></a>
+                            {% endif %}
+                            {% if filter == "media" %}
+                            <a href="/c/{{community.slug}}/media"><li class="hand fs15 cg2 fwmedium lst-item active" onclick="filter(this, 'media', '{{list.url}}')">{{post_types_dict.media}}</li></a>
+                            {% else %}
+                            <a href="/c/{{community.slug}}/media"><li class="hand fs15 cg2 fwmedium lst-item" onclick="filter(this, 'media', '{{list.url}}')">{{post_types_dict.media}}</li></a>
+                            {% endif %}
+                            {% if filter == "link" %}
+                            <a href="/c/{{community.slug}}/link"><li class="hand fs15 cg2 fwmedium lst-item m020 active" onclick="filter(this, 'link', '{{list.url}}')">{{post_types_dict.link}}</li></a>
+                            {% else %}
+                            <a href="/c/{{community.slug}}/link"><li class="hand fs15 cg2 fwmedium lst-item m020" onclick="filter(this, 'link', '{{list.url}}')">{{post_types_dict.link}}</li></a>
+                            {% endif %}
+                            {% if filter == "question" %}
+                            <a href="/c/{{community.slug}}/question"><li class="hand fs15 cg2 fwmedium lst-item active" onclick="filter(this, 'question', '{{list.url}}')">{{post_types_dict.question}}</li></a>
+                            {% else %}
+                            <a href="/c/{{community.slug}}/question"><li class="hand fs15 cg2 fwmedium lst-item" onclick="filter(this, 'question', '{{list.url}}')">{{post_types_dict.question}}</li></a>
+                            {% endif %}
+                            {% if filter == "answer" %}
+                            <a href="/c/{{community.slug}}/answer"><li class="hand fs15 cg2 fwmedium lst-item m020 active" onclick="filter(this, 'answer', '{{list.url}}')">{{post_types_dict.answer}}</li></a>
+                            {% else %}
+                            <a href="/c/{{community.slug}}/answer"><li class="hand fs15 cg2 fwmedium lst-item m020" onclick="filter(this, 'answer', '{{list.url}}')">{{post_types_dict.answer}}</li></a>
+                            {% endif %}
+                            {% if filter == "poll" %}
+                            <a href="/c/{{community.slug}}/poll"><li class="hand fs15 cg2 fwmedium lst-item active" onclick="filter(this, 'poll', '{{list.url}}')">{{post_types_dict.poll}}</li></a>
+                            {% else %}
+                            <a href="/c/{{community.slug}}/poll"><li class="hand fs15 cg2 fwmedium lst-item" onclick="filter(this, 'poll', '{{list.url}}')">{{post_types_dict.poll}}</li></a>
+                            {% endif %}
+                            {% if filter == "quiz" %}
+                            <a href="/c/{{community.slug}}/quiz"><li class="hand fs15 cg2 fwmedium lst-item m020 active" onclick="filter(this, 'quiz', '{{list.url}}')">{{post_types_dict.quiz}}</li></a>
+                            {% else %}
+                            <a href="/c/{{community.slug}}/quiz"><li class="hand fs15 cg2 fwmedium lst-item m020" onclick="filter(this, 'quiz', '{{list.url}}')">{{post_types_dict.quiz}}</li></a>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    {% if community_followers|length > 0 %}
+                    <div class="full-width full-shadow-border box mt20">
+                        <ul class="full-width">
+                            {% for user in community_followers %}
+                                <a href="/u/{{user.user_login}}">
+                                    {% if forloop.last %}
+                                    <li class="bsbb full-width p20 inline-block">
+                                    {% else %}
+                                    <li class="bsbb full-width p20 inline-block bb">
+                                    {% endif %}
+                                        <img src="{{user.avatar_url}}" class="sqr60 left rounded"/>
+                                        <div class="ml20 left" style="width:calc(100% - 80px);">
+                                            <p class="fs19 fwblack ctitle underline-on-hover">{{user.display_name}}</p>
+                                            <p class="fs15 cg2 lh20 underline-on-hover">u/{{user.user_login}}</p>
+                                            <p class="fs15 cg2 lh20 mt10" id="desc-placeholder">{% autoescape off %}{{user.description|edit_comm_desc}}{% endautoescape %}</p>
+                                            {% if user.ID == current_user.ID %}
+                                            {% elif current_user.followings|isfollowing:user.ID %}
+                                                <div class="absolute aligntr">
+                                                    <p class="btn hand" style="background: var(--main-color); color:white;" onclick="return unfollow(this,'{{current_user.ID}}','{{user.follower.ID}}', '{{followtxt|ucwords}}', '{{current_user.ID}}', '{{profile.ID}}');"><span class="p115">{{word_list|getword:"following"|ucwords}}</span></p>
+                                                </div>
+                                            {% else %}
+                                                <div class="absolute aligntr">
+                                                    <p class="btn hand" onclick="return follow(this,'{{current_user.ID}}','{{user.follower.ID}}', '{{followingtxt|ucwords}}', '{{current_user.ID}}', '{{profile.ID}}');"><span class="p115">{{word_list|getword:"follow"|ucwords}}</span></p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                </a>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="section-right fixed" id="section-right">
+                <div  class="full-shadow-border section-right-bottom" style="padding:10px 0;width:calc(100% - 60px);">
+                    <div class="bsbb full-width inline-block p020 mt5">
+                        <p class="fs19 fwblack ctitle left">{{page_dict.moderators}}&nbsp;({{moderators|length}})</p>
+                        <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                            </g>
+                        </svg>
+                    </div>
+                    <ul class="full-width mt7 bt">
+                        {% for user in moderators %}
+                            {% if forloop.counter < 4 %}
+                                {% if forloop.counter == 3 or forloop.counter == moderators|length and moderators|length < 4 %}
+                                    <li class="bsbb full-width right-list-item">
+                                        <a href="" class="bsbb full-width p1020 inline-block">
+                                            <img class="sqr40 rounded lh30 left" src="{{user.user.avatar_url}}"/>
+                                            <div class="ml10 left">
+                                                <p class="lh20 fwblack ctitle">{{user.user.display_name}}</p>
+                                                <p class="cg2 lh20">u/{{user.user.user_login}}</p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="bsbb full-width bb right-list-item">
+                                        <a href="" class="bsbb full-width p1020 inline-block">
+                                            <img class="sqr40 rounded lh30 left" src="{{user.user.avatar_url}}"/>
+                                            <div class="ml10 left">
+                                                <p class="lh20 fwblack ctitle">{{user.user.display_name}}</p>
+                                                <p class="cg2 lh20">u/{{user.user.user_login}}</p>
+                                            </div>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    {% if moderators|length > 3 %}
+                        <div class="bsbb p020 mt10">
+                            <a href="" class="cb">{{page_dict.showmore}}</a>
+                        </div>
+                    {% endif %}
+                </div>
+                <div  class="full-shadow-border section-right-bottom" style="padding:10px 0;width:calc(100% - 60px);">
+                    <div class="bsbb full-width inline-block p020 mt5">
+                        <p class="fs19 fwblack ctitle left">{{page_dict.communityrules}}</p>
+                        <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                            </g>
+                        </svg>
+                    </div>
+                    <ul class="full-width mt7 bt">
+                        {% for rule in community.rules %}
+                        <li class="bsbb full-width m100">
+                            <a href="" class="bsbb full-width p020 inline-block">
+                                <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                                    <div class="checkbox-inner sqr10 rounded"></div>
+                                </div>
+                                <div class="ml10 p530 br20 left hand" style="background-color: {{flair.background_color}};">
+                                    <p style="color:{{flair.text_color}};">{{flair.flair}}</p>
+                                </div>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div  class="full-shadow-border section-right-bottom" style="padding:10px 0;width:calc(100% - 60px);">
+                    <div class="bsbb full-width inline-block p020 mt5">
+                        <p class="fs19 fwblack ctitle left">{{page_dict.filterbylabel}}</p>
+                        <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                            </g>
+                        </svg>
+                    </div>
+                    <ul class="full-width mt7 bt">
+                        {% for flair in community.flairs %}
+                            {% if forloop.counter < 3 %}
+                                <li class="bsbb full-width m100">
+                                    <a href="" class="bsbb full-width p020 inline-block">
+                                        <div class="checkbox left rounded checked" onclick="this.classList.toggle('checked');">
+                                            <div class="checkbox-inner sqr10 rounded"></div>
+                                        </div>
+                                        <div class="ml10 p530 br20 left hand" style="background-color: {{flair.background_color}};">
+                                            <p style="color:{{flair.text_color}};">{{flair.flair}}</p>
+                                        </div>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    {% if community.flairs|length > 2 %}
+                        <div class="bsbb p020 mt10">
+                            <a href="" class="cb">{{page_dict.showmore}}</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

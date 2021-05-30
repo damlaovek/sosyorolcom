@@ -1,12 +1,13 @@
+{% load index %}
 <div class='question-template-box item'>
     <div class='full-shadow-border box question-template-box-oc'>
         <p class="fs15" style='font-weight:var(--bold);line-height:17px;color:var(--title-color);'>{{question.post_title}}</p>
         <div class='question-template-box-ic'>
             <a href='/u/{{question.author.user_login}}/{{question.hex_id}}/{{question.guid}}' class='left fs15 noselect'>
-                <p class='btn fs15' style="font-size:15px;">{{post_template_dict.answer}}</p>
+                <p class='btn fs15' style="font-size:15px;">{{word_list|getword:"answer"|ucfirst}}</p>
             </a>
             <a href='#' class='right fs15 noselect'>
-                <p class='btn fs15' style="font-size:15px;">{{post_template_dict.send}}</p>
+                <p class='btn fs15' style="font-size:15px;">{{word_list|getword:"send"|ucfirst}}</p>
             </a>
         </div>
     </div>

@@ -1,0 +1,164 @@
+{% load index %}
+{% load static %}
+<style>
+    .chat_balloon_popup:not(:first-child){margin-top:10px;}
+</style>
+{% if chat.receiver|length > 1 %}
+<div class="bsbb right chat_box_item_popup" id="chat_box_popup{{chat.ID}}" style="width:324px;">
+    <div class="bsbb full-width bcw full-shadow-border br4 noselect hand mr10" style="width:314px;">
+        <div class="bsbb full-width p100 inline-block bcgrayish" style="padding-bottom:5px;" id="chat_popup_inner">
+            {% for receiver in chat.receiver %}
+                {% if forloop.first %}
+                <div class="sqrt30 left ml10">
+                    <img class="non-draggable rounded sqrt30" src="{{receiver.avatar_url}}" style="margin-top:-3px;border:3px solid var(--white);"/>
+                </div>
+                {% elif forloop.counter == 2%}
+                <div class="sqrt30 left ml-10">
+                    <img class="non-draggable rounded sqrt30" src="{{receiver.avatar_url}}" style="margin-top:-3px;border:3px solid var(--white);"/>
+                </div>
+                {% endif %}
+            {% endfor %}
+            <p class="fwbold left ml10 lh30 ellipsis oh" id="receiver_{{chat.ID}}" style="width:calc(100% - 126px);">{{chat.receiver_names}}</p>
+            <i class="right icon fas fa-times hand lh30 fs15 cg2 tac" style="margin-top:-5px;width:20px;" onclick="closeChatBoxItemPopup('{{chat.ID}}');"></i>
+        </div>
+        <div class="bsbb full-width p10">
+            <div class="bsbb full-width p10 bcw br4 border" style="height:240px; overflow:scroll;" id="chat_box_popup_messages{{chat.ID}}">
+                {% for msg in chat.messages %}
+                    <div class="full-width inline-block">
+                        {% if msg.sender.ID == current_user.ID %}
+                            <div class="right inline-block mt10 chat_balloon_popup">
+                                <img src="{{current_user.avatar_url}}" class="sqrt30 rounded right">
+                                <div class="right mr10 bcgrayish br10 chat_balloon_msg p5" style="text-align:right;">
+                                    <div class="cb full-width fwbold" style="text-align:right;">u/{{current_user.user_login}}</div>
+                                    <div class="full-width">{% autoescape off %}{{msg.msg}}{% endautoescape %}</div>
+                                    <div class="full-width fs13 cg2" style="text-align:right;">{{msg.date}}</div>
+                                </div>
+                            </div>
+                        {% else %}
+                        <div class="left inline-block mt10 chat_balloon_popup">
+                            <img src="{{msg.sender.avatar_url}}" class="sqrt30 rounded left">
+                            <div class="left ml10 bcba br10 chat_balloon_msg p5">
+                                <div class="cb full-width fwbold">u/{{msg.sender.user_login}}</div>
+                                    <div class="full-width">
+                                        {% autoescape off %}{{msg.msg}}{% endautoescape %}
+                                    </div>
+                                <div class="full-width fs13 cg2" style="text-align:left;">{{msg.date}}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="full-width bt" style="min-height:30px;">
+            <textarea class="bsbb text textarea w20 m10 p10 br4" rows="1" style="max-height: 100px;overflow-y: scroll;" placeholder='{{word_list|getword:"write-a-message"|ucfirst}}' id="chatpopuptext_{{chat.ID}}" onkeyup="validateChatPopupBoxForm('{{chat.ID}}')"></textarea>
+            <div class="w20 m010 mb10 inline-block">
+                <div class="left hand" style="width:35px;height:35px; margin-top: 2.5px;">
+                    <div class="icon">
+                        <i class="fas fa-image cg2 fs19" style="width:20px;height:20px;"></i>
+                    </div>
+                    <div id="imageUploadForm" class="hand absolute icon" style="width:15px;height:15px;bottom:0;left:0;overflow:hidden;cursor:pointer;opacity:0;">
+                        <input type='file' onchange="uploadImgChatPopupBox(this, '{{chat.ID}}', {% url 'uploadmedia' %});" class="hand sqr15" style="overflow:hidden;opacity:0;" id="imageUpload_{{chat.ID}}" name="file" accept=".png, .jpg, .jpeg" />
+                    </div>
+                </div>
+                <div class="left hand" style="width:35px;height:35px; margin-top: 2.5px;">
+                    <i class="fas fa-smile icon cg2 fs19" id="sosmojibtn_chatpopup_{{chat.ID}}" onclick="openCloseSosmojisChatPopupBox(this, '{{chat.ID}}');"></i>
+                    <div class="absolute full-shadow-border br4 bcw dnone" style="left:0;bottom:30px;width:260px;" id="sosmojis_chat_popup_{{chat.ID}}">
+                        <div class="bsbb full-width p10 bb">
+                            <p class="title fs15 lh20">{{word_list|getword:"select-a-sosmoji"|ucfirst}}</p>
+                            <svg style="position:absolute;top:7.5px;right:7.5px;cursor:pointer;padding:5px;width:15px;height:15px;z-index:9999;" class="icon hand" onclick="openCloseSosmojisChatPopupBox(document.getElementById('sosmojibtn_chatpopup_{{chat.ID}}'), '{{chat.ID}}');" viewBox="0 0 15 15" version="1.1">
+                                <g id="surface1">
+                                    <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0.132812 14.878906 C 0.222656 14.964844 0.335938 15.011719 0.453125 15.011719 C 0.570312 15.011719 0.683594 14.964844 0.773438 14.878906 L 7.503906 8.144531 L 14.238281 14.878906 C 14.324219 14.964844 14.441406 15.011719 14.558594 15.011719 C 14.675781 15.011719 14.789062 14.964844 14.878906 14.878906 C 15.054688 14.703125 15.054688 14.414062 14.878906 14.238281 L 8.144531 7.503906 L 14.878906 0.773438 C 15.054688 0.597656 15.054688 0.308594 14.878906 0.132812 C 14.703125 -0.0429688 14.414062 -0.0429688 14.238281 0.132812 L 7.503906 6.863281 L 0.773438 0.132812 C 0.597656 -0.0429688 0.308594 -0.0429688 0.132812 0.132812 C -0.0429688 0.308594 -0.0429688 0.597656 0.132812 0.773438 L 6.863281 7.503906 L 0.132812 14.238281 C -0.0429688 14.414062 -0.0429688 14.703125 0.132812 14.878906 Z M 0.132812 14.878906 "/>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="bsbb p10 full-width inline-block" style="height:240px; overflow-y:scroll;">
+                            {% for file in word_list|get_sosmojis %}
+                                {% if file != ".DS_Store" %}  
+                                    <img src="{% static 'assets/img/sosmojis/' %}{{file}}" alt="" class="hand sqr50 p5 left sosmoji" onclick="sendSosmojiChatPopupBox(this, '{{chat.ID}}');">
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <input disabled type="submit" id="send_chat_popup_{{chat.ID}}" class="btn p10 right fs15 lh20 noselect cb tac br4" style="height:30px;border:none; font-weight:700;opacity:0.8;" value="{{word_list|getword:'send'|ucfirst}}" onclick="return sendChatPopupBox('{{current_user.ID}}', '{{chat.ID}}');"/>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="bsbb right chat_box_item_popup" id="chat_box_popup{{chat.ID}}" style="width:324px;">
+    <div class="bsbb full-width bcw full-shadow-border br4 noselect hand mr10" style="width:314px;">
+        <div class="bsbb full-width p100 inline-block bcgrayish" style="padding-bottom:5px;" id="chat_popup_inner">
+            <div class="sqrt30 left ml10">
+                <img class="non-draggable rounded sqrt30" src="{{chat.receiver.avatar_url}}" style="margin-top:-3px;border:3px solid var(--white);"/>
+            </div>
+            <p class="fwbold left ml10 lh30" id="receiver_{{chat.ID}}">u/{{chat.receiver.user_login}}</p>
+            <i class="right icon fas fa-times hand lh30 fs15 cg2 tac" style="margin-top:-5px;width:20px;" onclick="closeChatBoxItemPopup('{{chat.ID}}');"></i>
+        </div>
+        <div class="bsbb full-width p10">
+            <div class="bsbb full-width p10 bcw br4 border" style="height:240px; overflow:scroll;" id="chat_box_popup_messages{{chat.ID}}">
+                {% for msg in chat.messages %}
+                    <div class="full-width inline-block">
+                        {% if msg.sender|get_int_value == current_user.ID %}
+                            <div class="right inline-block mt10 chat_balloon_popup">
+                                <img src="{{current_user.avatar_url}}" class="sqrt30 rounded right">
+                                <div class="right mr10 bcgrayish br10 chat_balloon_msg p5" style="text-align:right;">
+                                    <div class="cb full-width fwbold" style="text-align:right;">u/{{current_user.user_login}}</div>
+                                    <div class="full-width">{% autoescape off %}{{msg.msg}}{% endautoescape %}</div>
+                                    <div class="full-width fs13 cg2" style="text-align:right;">{{msg.date}}</div>
+                                </div>
+                            </div>
+                        {% else %}
+                        <div class="left inline-block mt10 chat_balloon_popup">
+                            <img src="{{chat.receiver.avatar_url}}" class="sqrt30 rounded left">
+                            <div class="left ml10 bcba br10 chat_balloon_msg p5">
+                                <div class="cb full-width fwbold">u/{{chat.receiver.user_login}}</div>
+                                    <div class="full-width">
+                                        {% autoescape off %}{{msg.msg}}{% endautoescape %}
+                                    </div>
+                                <div class="full-width fs13 cg2" style="text-align:left;">{{msg.date}}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="full-width bt" style="min-height:30px;">
+            <textarea class="bsbb text textarea w20 m10 p10 br4" rows="1" style="max-height: 100px;overflow-y: scroll;" placeholder='{{word_list|getword:"write-a-message"|ucfirst}}' id="chatpopuptext_{{chat.ID}}" onkeyup="validateChatPopupBoxForm('{{chat.ID}}')"></textarea>
+            <div class="w20 m010 mb10 inline-block">
+                <div class="left hand" style="width:35px;height:35px; margin-top: 2.5px;">
+                    <div class="icon">
+                        <i class="fas fa-image cg2 fs19" style="width:20px;height:20px;"></i>
+                    </div>
+                    <div id="imageUploadForm" class="hand absolute icon" style="width:15px;height:15px;bottom:0;left:0;overflow:hidden;cursor:pointer;opacity:0;">
+                        <input type='file' onchange="uploadImgChatPopupBox(this, '{{chat.ID}}', {% url 'uploadmedia' %});" class="hand sqr15" style="overflow:hidden;opacity:0;" id="imageUpload_{{chat.ID}}" name="file" accept=".png, .jpg, .jpeg" />
+                    </div>
+                </div>
+                <div class="left hand" style="width:35px;height:35px; margin-top: 2.5px;">
+                    <i class="fas fa-smile icon cg2 fs19" id="sosmojibtn_chatpopup_{{chat.ID}}" onclick="openCloseSosmojisChatPopupBox(this, '{{chat.ID}}');"></i>
+                    <div class="absolute full-shadow-border br4 bcw dnone" style="left:0;bottom:30px;width:260px;" id="sosmojis_chat_popup_{{chat.ID}}">
+                        <div class="bsbb full-width p10 bb">
+                            <p class="title fs15 lh20">{{word_list|getword:"select-a-sosmoji"|ucfirst}}</p>
+                            <svg style="position:absolute;top:7.5px;right:7.5px;cursor:pointer;padding:5px;width:15px;height:15px;z-index:9999;" class="icon hand" onclick="openCloseSosmojisChatPopupBox(document.getElementById('sosmojibtn_chatpopup_{{chat.ID}}'), '{{chat.ID}}');" viewBox="0 0 15 15" version="1.1">
+                                <g id="surface1">
+                                    <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0.132812 14.878906 C 0.222656 14.964844 0.335938 15.011719 0.453125 15.011719 C 0.570312 15.011719 0.683594 14.964844 0.773438 14.878906 L 7.503906 8.144531 L 14.238281 14.878906 C 14.324219 14.964844 14.441406 15.011719 14.558594 15.011719 C 14.675781 15.011719 14.789062 14.964844 14.878906 14.878906 C 15.054688 14.703125 15.054688 14.414062 14.878906 14.238281 L 8.144531 7.503906 L 14.878906 0.773438 C 15.054688 0.597656 15.054688 0.308594 14.878906 0.132812 C 14.703125 -0.0429688 14.414062 -0.0429688 14.238281 0.132812 L 7.503906 6.863281 L 0.773438 0.132812 C 0.597656 -0.0429688 0.308594 -0.0429688 0.132812 0.132812 C -0.0429688 0.308594 -0.0429688 0.597656 0.132812 0.773438 L 6.863281 7.503906 L 0.132812 14.238281 C -0.0429688 14.414062 -0.0429688 14.703125 0.132812 14.878906 Z M 0.132812 14.878906 "/>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="bsbb p10 full-width inline-block" style="height:240px; overflow-y:scroll;">
+                            {% for file in word_list|get_sosmojis %}
+                                {% if file != ".DS_Store" %}  
+                                    <img src="{% static 'assets/img/sosmojis/' %}{{file}}" alt="" class="hand sqr50 p5 left sosmoji" onclick="sendSosmojiChatPopupBox(this, '{{chat.ID}}');">
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <input disabled type="submit" id="send_chat_popup_{{chat.ID}}" class="btn p10 right fs15 lh20 noselect cb tac br4" style="height:30px;border:none; font-weight:700;opacity:0.8;" value="{{word_list|getword:'send'|ucfirst}}" onclick="return sendChatPopupBox('{{current_user.ID}}', '{{chat.ID}}');"/>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

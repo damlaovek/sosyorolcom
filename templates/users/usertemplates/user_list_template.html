@@ -13,7 +13,7 @@
             <a href='https://www.sosyorol.com/u/{{user.user_login}}' class='user-template-name'><p>{{user.display_name}}</p></a>
             <p class='limited-lines seven user-template-bio'>{{user.description}}</p>
             <div class='absolute full-width' id='follow-btn-c'>
-                <p class='btn'>{{feed_dict.follow|ucwords}}</p>
+                <p class='btn hand noselect'>{{word_list|getword:"follow"|ucwords}}</p>
             </div>
         </div>
     </div>

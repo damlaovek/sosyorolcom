@@ -1,39 +1,39 @@
 {% for chat in chats %}
-    <a href="/chat/{{chat.ID}}">
+    <div class="hand full-width chat-popup-item" onclick="openChatItemPopup('{{chat.ID}}');">
         {% if forloop.first %}
             {% if chat.seen == 0 and chat.sender != current_uid %}
-            <div class="bsbb cba full-width item-hover hand bb bt p010" style="border-right: 4px solid var(--main-color);">
+                <div class="bsbb cba full-width item-hover hand bb bt p010" style="border-right: 4px solid var(--main-color);">
             {% else %}
-            <div class="bsbb full-width item-hover hand bb bt p010">
+                <div class="bsbb full-width item-hover hand bb bt p010">
             {% endif %}
         {% else %}
             {% if chat.seen == 0 and chat.sender != current_uid %}
-            <div class="bsbb cba full-width item-hover hand bb p010" style="border-right: 4px solid var(--main-color);">
+                <div class="bsbb cba full-width item-hover hand bb p010" style="border-right: 4px solid var(--main-color);">
             {% else %}
-            <div class="bsbb full-width item-hover hand bb p010">
+                <div class="bsbb full-width item-hover hand bb p010">
             {% endif %}
         {% endif %}
-            <div class="bsbb full-width p100 inline-block">
-                {% if chat.receivers|length > 1 %}
-                    <div class="left">
-                        <img src="{{chat.receivers.0.avatar_url}}" class="sqr20 rounded" style="border:3px solid var(--white);">
-                        <img src="{{chat.receivers.1.avatar_url}}" class="sqr20 rounded" style="top:5px;margin-left:-15px;border:3px solid var(--white);">
+                    <div class="bsbb full-width p100 inline-block">
+                        {% if chat.receivers|length > 1 %}
+                            <div class="left">
+                                <img src="{{chat.receivers.0.avatar_url}}" class="sqr20 rounded" style="border:3px solid var(--white);">
+                                <img src="{{chat.receivers.1.avatar_url}}" class="sqr20 rounded" style="top:5px;margin-left:-15px;border:3px solid var(--white);">
+                            </div>
+                        {% else %}
+                            <img src="{{chat.receivers.0.avatar_url}}" class="left sqrt30 rounded" style="border:3px solid var(--white);">
+                        {% endif %}
+                        {% if chat.receivers|length > 1 %}
+                        <div class="left ml10" style="width:calc(100% - 55px);">
+                        {% else %}
+                        <div class="left" style="width:calc(100% - 55px);margin-left:15px;">
+                        {% endif %}
+                            <div class="full-width inline-block">
+                                <p class="half-width oh ellipsis fwbold left">{{chat.usernames}}</p>
+                                <p class="right cg2 fs13" style="text-align:right;">{{chat.date}}</p>
+                            </div>
+                            <p class="full-width oh ellipsis fs13">{{chat.msg}}</p>
+                        </div>
                     </div>
-                {% else %}
-                    <img src="{{chat.receivers.0.avatar_url}}" class="left sqrt30 rounded" style="border:3px solid var(--white);">
-                {% endif %}
-                {% if chat.receivers|length > 1 %}
-                <div class="left ml10" style="width:calc(100% - 55px);">
-                {% else %}
-                <div class="left" style="width:calc(100% - 55px);margin-left:15px;">
-                {% endif %}
-                    <div class="full-width inline-block">
-                        <p class="half-width oh ellipsis fwbold left">{{chat.usernames}}</p>
-                        <p class="right cg2 fs13" style="text-align:right;">{{chat.date}}</p>
-                    </div>
-                    <p class="full-width oh ellipsis fs13">{{chat.msg}}</p>
                 </div>
-            </div>
-        </div>
-    </a>
+    </div>
 {% endfor %}

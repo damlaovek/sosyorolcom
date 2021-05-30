@@ -6,6 +6,9 @@ from os.path import isfile, join
 register = template.Library()
 from django.conf import settings
 
+from sosyorol.views import current_uid
+from sosyorol.models import UserMeta
+
 STATICFILES_DIR = os.path.join(settings.BASE_DIR, 'static')
 
 @register.filter
@@ -34,9 +37,11 @@ def getdata(json, field):
 
 @register.filter
 def tolower(txt):
-    rep = [ ('İ','i'), ('I','ı'), ('Ğ','ğ'),('Ü','ü'), ('Ş','ş'), ('Ö','ö'),('Ç','ç')]
-    for search, replace in rep:
-        txt = txt.replace(search, replace)
+    lang = UserMeta.objects.filter(user_id = current_uid).filter(meta_key = 'language')[0].meta_value
+    if lang == "tr-TR":
+        rep = [ ('İ','i'), ('I','ı'), ('Ğ','ğ'),('Ü','ü'), ('Ş','ş'), ('Ö','ö'),('Ç','ç')]
+        for search, replace in rep:
+            txt = txt.replace(search, replace)
     return txt.lower()
 
 def striphtml(data):
@@ -45,9 +50,11 @@ def striphtml(data):
 
 @register.filter
 def toupper(txt):
-    rep = [ ('İ','i'), ('I','ı'), ('Ğ','ğ'),('Ü','ü'), ('Ş','ş'), ('Ö','ö'),('Ç','ç')]
-    for search, replace in rep:
-        txt = txt.replace(replace, search)
+    lang = UserMeta.objects.filter(user_id = current_uid).filter(meta_key = 'language')[0].meta_value
+    if lang == "tr-TR":
+        rep = [ ('İ','i'), ('I','ı'), ('Ğ','ğ'),('Ü','ü'), ('Ş','ş'), ('Ö','ö'),('Ç','ç')]
+        for search, replace in rep:
+            txt = txt.replace(replace, search)
     return txt.upper()
 
 @register.filter
@@ -90,3 +97,7 @@ def edit_comm_desc(txt):
 def get_sosmojis(wordlist):
     sosmojis = os.listdir(os.path.join(STATICFILES_DIR, "assets/img/sosmojis/"))
     return sosmojis
+
+@register.filter
+def get_int_value(txt):
+    return int(txt)

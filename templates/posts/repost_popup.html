@@ -1,0 +1,27 @@
+{% load index %}
+<div class="absolute bcba dnone popup-container repost_popup" id="repost_popup">
+    <div class="popup box full-shadow-border p20">
+        <svg style="position:absolute;top:20px;right:20px;cursor:pointer;padding:5px;width:15px;height:15px;z-index:9999;" class="icon hand" onclick="closeRepostPopup()" viewBox="0 0 15 15" version="1.1">
+            <g id="surface1">
+                <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0.132812 14.878906 C 0.222656 14.964844 0.335938 15.011719 0.453125 15.011719 C 0.570312 15.011719 0.683594 14.964844 0.773438 14.878906 L 7.503906 8.144531 L 14.238281 14.878906 C 14.324219 14.964844 14.441406 15.011719 14.558594 15.011719 C 14.675781 15.011719 14.789062 14.964844 14.878906 14.878906 C 15.054688 14.703125 15.054688 14.414062 14.878906 14.238281 L 8.144531 7.503906 L 14.878906 0.773438 C 15.054688 0.597656 15.054688 0.308594 14.878906 0.132812 C 14.703125 -0.0429688 14.414062 -0.0429688 14.238281 0.132812 L 7.503906 6.863281 L 0.773438 0.132812 C 0.597656 -0.0429688 0.308594 -0.0429688 0.132812 0.132812 C -0.0429688 0.308594 -0.0429688 0.597656 0.132812 0.773438 L 6.863281 7.503906 L 0.132812 14.238281 C -0.0429688 14.414062 -0.0429688 14.703125 0.132812 14.878906 Z M 0.132812 14.878906 "/>
+            </g>
+        </svg>
+        <p class="title ctitle fs19 fwbold noselect">{{word_list|getword:"repost"|ucfirst}}</p>
+        <div class="bsbb full-width inline-flex mt10">
+            <img src="{{current_user.avatar_url}}" class="sqr40 rounded">
+            <div class="ml10">
+                <p class="lh20 fwbold">{{current_user.display_name}}</p>
+                <p class="lh20 br4 bcba cb fs13 p05" style="max-width:50px;">{{word_list|getword:"my-profile"|ucfirst}}</p>
+            </div>
+        </div>
+        <div class="bsbb full-width mt10" style="max-height:calc(100vh - 510px); overflow-y:scroll;">
+            <form class="bsbb full-width">
+                <textarea name="repost_txt" id="repost_txt" style='padding-right:70px;border:none;padding-left:0;' rows="1" onblur='this.classList.remove("active");document.getElementById("title-counter").innerHTML = "";' onfocus='this.classList.add("active");var len = this.value.length;document.getElementById("title-counter").innerHTML = len+"/"+80;' onkeyup="updateTextareaCounter(this, 'title-counter', 80);validateForm();" class="bsbb box full-width p10 lh20 fs15 text textarea" maxlength="80" placeholder="{{word_list|getword:'whats_on_your_mind'}}"></textarea>
+            </form>
+            <div class="bsbb full-width mt10" id="repost_post" style="width:calc(100% - 2px);"></div>
+        </div>
+        <div class="mt20 full-width inline-block">
+            <input type="submit" id="repost_btn" class="btn p10 right fs15 lh20 hand" style="border-radius:4px;height:30px;width:calc(25% - 35px); border:none; text-align:center; color:var(--main-color); font-weight:700;" value="{{word_list|getword:'share'|ucfirst}}"/>
+        </div>
+    </div>
+</div>

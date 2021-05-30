@@ -1,0 +1,126 @@
+{% load index %}
+{% load static %}
+<style>
+    .re_post .post_operations{display:none; visibility: hidden;}
+    .re_post .post_comments{ display:none; visibility: hidden;}
+    .re_post .hide{display: none; visibility: hidden;}
+</style>
+<div class='full-width'>
+    <div class='full-width box answer-template-oc'>
+        <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
+            <div style='width:calc(100% - 20px);' class='p010'>
+                <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon absolute hand' style='top:0;right:0;transform: rotate(90deg);'>
+                    <g>
+                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                    </g>
+                </svg>
+                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{word_list|getword:"repost"|ucfirst}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{word_list|getword:"recommended-for-you"|ucfirst}}</span></p>
+                <div  class='full-width inline-flex' style='margin-bottom:10px;'>
+                    <img src='{{repost.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
+                    <div style='margin-left:10px;width:calc(100% - 50px);'>
+                        <a href='/u/{{repost.author.user_login}}' class='underline-on-hover full-width' style='font-size:15px;line-height:20px;color:var(--black);'>{{repost.author.display_name}}</a><br>
+                        <a href='/u/{{repost.author.user_login}}/{{repost.hex_id}}/{{repost.guid}}' class='underline-on-hover full-width' style='font-size:13px;line-height:20px;color:var(--gray2);'>{{repost.time_diff}}</a>
+                    </div>
+                </div>
+                <p>{% autoescape off %}{{repost.post_content}}{% endautoescape %}</p>
+                <div class="full-width mt10 re_post">
+                    {% if repost.parent.post_type == "post" %}
+                        {% include 'posts/posttemplates/post_template.html' with post=repost.parent %}
+                    {% elif repost.parent.post_type == "media" %}
+                        {% include 'posts/posttemplates/media_template.html' with media=repost.parent %}
+                    {% elif repost.parent.post_type == "link" %}
+                        {% include 'posts/posttemplates/link_template.html' with link=repost.parent %}
+                    {% elif repost.parent.post_type == "questions" %}
+                        {% include 'posts/posttemplates/post_template.html' with post=repost.parent %}
+                    {% elif repost.parent.post_type == "answer" %}
+                        {% include 'posts/posttemplates/answer_template.html' with answer=repost.parent %}           
+                    {% elif repost.parent.post_type == "poll" %}
+                        {% include 'posts/posttemplates/poll_template.html' with poll=repost.parent %}
+                    {% elif repost.parent.post_type == "quiz" %}
+                        {% if repost.parent.quiz_type == "colorBox" %}
+                            {% include 'posts/posttemplates/colorBox_quiz_template.html' with quiz=repost.parent number=1 %}
+                        {% elif repost.parent.quiz_type == "media" %}
+                            {% include 'posts/posttemplates/media_quiz_template.html' with quiz=repost.parent number=1 %}
+                        {% else %}
+                            {% include 'posts/posttemplates/quiz_template.html' with quiz=repost.parent number=1 %}
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class='full-width post_operations'>
+                <div class='full-width' style='display:inline-block;margin-top:5px;'>
+                    {% if repost.user_rate == "like" %}
+                        <div class='icon left answer-hint' onclick="upvote({{repost.ID}}, '{{csrf_token}}');" data-title='{{word_list|getword:"upvote"|ucfirst}}'>
+                            <svg width='20px' height='20px' id='upvote{{repost.ID}}' class='upvote active' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+                                <g id='surface1'>
+                                    <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                                </g>
+                            </svg>
+                        </div>
+                    {% else %}
+                        <div class='icon left answer-hint' onclick="upvote({{repost.ID}}, '{{csrf_token}}');" data-title='{{word_list|getword:"upvote"|ucfirst}}'>
+                            <svg width='20px' height='20px' id='upvote{{repost.ID}}' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+                                <g id='surface1'>
+                                    <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                                </g>
+                            </svg>
+                        </div>
+                    {% endif %}
+    
+                    {% if repost.user_rate == "like" %}
+                        <p class='main-color vote noselect' id='vote{{repost.ID}}'>{{repost.rating}}</p>
+                    {% elif repost.user_rate == "dislike" %}
+                        <p class='vote noselect red' id='vote{{repost.ID}}'>{{repost.rating}}</p>
+                    {% else %}
+                        <p class='vote noselect' id='vote{{repost.ID}}'>{{repost.rating}}</p>
+                    {% endif %}
+                    
+                    {% if repost.user_rate == "dislike" %}
+                        <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote({{repost.ID}}, "{{csrf_token}}");' data-title='{{word_list|getword:"downvote"|ucfirst}}'>
+                            <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{repost.ID}}' class='downvote active'>
+                                <g id='surface1'>
+                                    <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                                </g>
+                            </svg>
+                        </div>
+                    {% else %}
+                        <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote({{repost.ID}}, "{{csrf_token}}");' data-title='{{word_list|getword:"downvote"|ucfirst}}'>
+                            <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{repost.ID}}' class='downvote'>
+                                <g id='surface1'>
+                                    <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                                </g>
+                            </svg>
+                        </div>
+                    {% endif %}
+                    {% if comments.count > 0 %}
+                        <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comments-wrapperanswer{{repost.ID}}").style.display = "block";' data-title='{{word_list|getword:"comments"|ucfirst}}'>
+                    {% else %}
+                        <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comment-editor{{repost.ID}}").focus();' data-title='{{word_list|getword:"comments"|ucfirst}}'>
+                    {% endif %}
+                            <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                <g>
+                                    <path style='stroke-width:0.3;stroke:var(--gray2);fill-rule:nonzero;fill-opacity:1;' d='M 9.910156 19.820312 L 6.863281 14.539062 L 3.050781 14.539062 C 1.484375 14.539062 0.210938 13.386719 0.210938 11.960938 L 0.210938 2.578125 C 0.210938 1.15625 1.484375 0 3.050781 0 L 16.769531 0 C 18.335938 0 19.613281 1.15625 19.613281 2.578125 L 19.613281 11.960938 C 19.613281 13.386719 18.335938 14.539062 16.769531 14.539062 L 12.960938 14.539062 Z M 3.050781 1.429688 C 2.273438 1.429688 1.636719 1.945312 1.636719 2.578125 L 1.636719 11.960938 C 1.636719 12.597656 2.273438 13.113281 3.050781 13.113281 L 7.683594 13.113281 L 9.910156 16.964844 L 12.132812 13.113281 L 16.765625 13.113281 C 17.546875 13.113281 18.179688 12.597656 18.179688 11.960938 L 18.179688 2.578125 C 18.179688 1.945312 17.546875 1.429688 16.765625 1.429688 Z M 3.050781 1.429688 '/>
+                                </g>
+                            </svg>
+                        </div>
+                    <p class='vote noselect'>{{comments.count}}</p>
+                    <div class='icon right answer-hint' data-title='{{word_list|getword:"share"|ucfirst}}' onclick="document.getElementById('share_menu_{{repost.ID}}').classList.toggle('dnone');">
+                        <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                            <g>
+                                <path style='stroke-width:0.5;stroke:var(--gray2);fill-rule:nonzero;fill-opacity:1;' d='M 0.664062 18.40625 C 0.671875 18.40625 0.675781 18.40625 0.683594 18.40625 C 1 18.394531 1.199219 18.148438 1.226562 17.832031 C 1.25 17.601562 1.871094 11.992188 10.625 12 L 10.644531 15.585938 C 10.644531 15.828125 10.785156 16.046875 11.003906 16.148438 C 11.21875 16.253906 11.480469 16.222656 11.667969 16.066406 L 19.773438 9.351562 C 19.917969 9.234375 20 9.054688 20 8.871094 C 20 8.683594 19.914062 8.503906 19.769531 8.386719 L 11.664062 1.734375 C 11.480469 1.582031 11.21875 1.554688 11.003906 1.65625 C 10.785156 1.757812 10.644531 1.976562 10.644531 2.21875 L 10.628906 5.726562 C 6.996094 5.84375 4.183594 7.011719 2.359375 9.144531 C -0.609375 12.617188 0.0546875 17.664062 0.0820312 17.875 C 0.128906 18.179688 0.355469 18.40625 0.664062 18.40625 Z M 11.269531 10.738281 C 5.015625 10.742188 2.625 12.855469 1.261719 14.71875 C 1.460938 13.222656 2.042969 11.425781 3.3125 9.953125 C 4.996094 7.996094 7.714844 6.96875 11.269531 6.96875 C 11.617188 6.96875 11.894531 6.6875 11.894531 6.34375 L 11.894531 3.535156 L 18.390625 8.875 L 11.894531 14.261719 L 11.894531 11.363281 C 11.894531 11.195312 11.828125 11.039062 11.710938 10.921875 C 11.59375 10.804688 11.4375 10.738281 11.269531 10.738281 Z M 11.269531 10.738281'/>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="post_comments">
+            <div class='comments-wrapper pt10' id='comments-wrapper{{repost.ID}}' style="display:block;">
+                {% include 'posts/comments/comment_list.html' with comments=repost.comments padding=0 %}
+            </div>
+            {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=repost.ID %}
+        </div>
+    </div>
+</div>

@@ -98,21 +98,21 @@ def get_unit(number):
   DATE OPERATIONS        
 -----------------------------------------'''
 def humanizedate(date, word_list, to=None):
-    sec_text = localized_lower(word_list.filter(Q(var_name = 'sec'))[0].translation)
-    secs_text = localized_lower(word_list.filter(Q(var_name = 'secs'))[0].translation)
-    min_text = localized_lower(word_list.filter(Q(var_name = 'min'))[0].translation)
-    mins_text = localized_lower(word_list.filter(Q(var_name = 'mins'))[0].translation)
-    hour_text = localized_lower(word_list.filter(Q(var_name = 'hour'))[0].translation)
-    hours_text = localized_lower(word_list.filter(Q(var_name = 'hours'))[0].translation)
-    day_text = localized_lower(word_list.filter(Q(var_name = 'day'))[0].translation)
-    days_text = localized_lower(word_list.filter(Q(var_name = 'days'))[0].translation)
-    week_text = localized_lower(word_list.filter(Q(var_name = 'week'))[0].translation)
-    weeks_text = localized_lower(word_list.filter(Q(var_name = 'weeks'))[0].translation)
-    month_text = localized_lower(word_list.filter(Q(var_name = 'month'))[0].translation)
-    months_text = localized_lower(word_list.filter(Q(var_name = 'months'))[0].translation)
-    year_text = localized_lower(word_list.filter(Q(var_name = 'year'))[0].translation)
-    years_text = localized_lower(word_list.filter(Q(var_name = 'years'))[0].translation)
-    ago = localized_lower(word_list.filter(Q(var_name = 'ago'))[0].translation)
+    sec_text = localized_lower(word_list.filter(var_name = 'sec')[0].translation)
+    secs_text = localized_lower(word_list.filter(var_name = 'secs')[0].translation)
+    min_text = localized_lower(word_list.filter(var_name = 'min')[0].translation)
+    mins_text = localized_lower(word_list.filter(var_name = 'mins')[0].translation)
+    hour_text = localized_lower(word_list.filter(var_name = 'hour')[0].translation)
+    hours_text = localized_lower(word_list.filter(var_name = 'hours')[0].translation)
+    day_text = localized_lower(word_list.filter(var_name = 'day')[0].translation)
+    days_text = localized_lower(word_list.filter(var_name = 'days')[0].translation)
+    week_text = localized_lower(word_list.filter(var_name = 'week')[0].translation)
+    weeks_text = localized_lower(word_list.filter(var_name = 'weeks')[0].translation)
+    month_text = localized_lower(word_list.filter(var_name = 'month')[0].translation)
+    months_text = localized_lower(word_list.filter(var_name = 'months')[0].translation)
+    year_text = localized_lower(word_list.filter(var_name = 'year')[0].translation)
+    years_text = localized_lower(word_list.filter(var_name = 'years')[0].translation)
+    ago = localized_lower(word_list.filter(var_name = 'ago')[0].translation)
     if to is None:
         to = dt.datetime.now()
     diff = to - date
@@ -290,6 +290,23 @@ def get_date_created():
             pass
     return
 
+def find_similar_communities(community, user):
+    taxonomies = sm.TermTaxonomy.objects.filter(term_id=community.term_id)
+    post_ids = sm.TermRelationship.objects.filter(term_taxonomy_id__in=taxonomies)
+    post_ids = list({x.object_id: x for x in post_ids}.keys())
+    posts = sm.Post.objects.filter(ID__in=post_ids)
+    similars = []
+    for post in posts:
+        community_taxonomy_ids = sm.TermRelationship.objects.filter(object_id=post.ID)
+        community_taxonomy_ids = list({x.term_taxonomy_id: x for x in community_taxonomy_ids}.keys())
+        community_ids = sm.TermTaxonomy.objects.filter(term_taxonomy_id__in=community_taxonomy_ids)
+        community_ids = list({x.term_id: x for x in community_ids if x.term_id != community.term_id}.keys())
+        comms = sm.Community.objects.filter(term_id__in=community_ids)
+        for c in comms:
+            if not c in similars:
+                if sm.FollowedCommunities.objects.filter(user=user, term=c, is_active=1).count() == 0:
+                    similars.append(c)
+    return similars
 
 '''---------------------------------------
   TRANSFER USERS TO FIREBASE        
@@ -417,4 +434,57 @@ def calculate_community_score():
         post_ids = list({x.object_id: x for x in post_ids}.keys())
         community.posts = sm.Post.objects.filter(Q(ID__in=post_ids)).order_by('-post_date')
         num_posts = community.posts.filter(post_type="post").count()
+
+def update_post_authors():
+    authors = [7,8,49,86,209,267]
+    posts = sm.Post.objects.all()
+    index = 0
+    for post in posts:
+        if post.post_author not in authors:
+            if index % 2 == 0:
+                post.post_author = 209
+            else:
+                post.post_author = 267
+            post.author_id = post.post_author
+            post.save()
+        index += 1
+
+def update_post_history():
+    posts = sm.Post.objects.filter(post_status="publish")
+    for post in posts:
+        try:
+            view_count = int(sm.PostMeta.objects.filter(post_id=post.ID, meta_key="post_views_count")[0].meta_value)
+            history = sm.PostHistory(user_id=-1, post_id=post.ID, date=dt.datetime.now(), is_deleted=0, counter=view_count)
+            history.save()
+        except:
+            pass
+
+def update_community_views():
+    communities = sm.Community.objects.all()
+    for community in communities:
+        try:
+            taxonomy = sm.TermTaxonomy.objects.filter(term_id=community.term_id)[0].term_taxonomy_id
+            post_ids = sm.TermRelationship.objects.filter(term_taxonomy_id=taxonomy)
+            post_ids = list({x.object_id: x for x in post_ids}.keys())
+            community.posts = sm.Post.objects.filter(ID__in=post_ids).order_by('-post_date')
+            view_count = 0
+            for post in community.posts:
+                try:
+                    view_count += int(sm.PostMeta.objects.filter(post_id=post.ID, meta_key="post_views_count")[0].meta_value)
+                except:
+                    pass
+            community.views = view_count
+            community.save()
+        except:
+            pass
         
+def update_community_followers():
+    followers = sm.FollowedCommunities.objects.all()
+    for f in followers:
+        try:
+            user = sm.User.objects.filter(ID=f.user_id)
+            if len(user) == 0:
+                f.delete()
+        except:
+            f.delete()
+
