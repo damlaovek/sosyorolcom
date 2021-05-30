@@ -18,6 +18,7 @@
             <ul id="search_results_container" class="full-width p020 full-shadow2" style="width:calc(100% - 40px); background-color: var(--white); z-index:100;">
             </ul>
         </div>
+        {% if page == "home" %}
         <a href="/">
             <div class="full-width hand">
                 <li class="inline-flex" id="home">
@@ -26,10 +27,20 @@
                 </li>
             </div>
         </a>
+        {% else %}
+        <a href="/">
+            <div class="full-width hand">
+                <li class="inline-flex">
+                    <p class="non-draggable rounded background-image" id="home-icon"></p>
+                    <p class="fs19 fwbold ctitle lh40 ml15">{{word_list|getword:"feed"|ucfirst}}</p>
+                </li>
+            </div>
+        </a>
+        {% endif %}
         {% for c in followed_communities %}
             {% if forloop.counter <= 4 %}
                 <div class="full-width">
-                    <a href="c/{{c.term.slug}}" title="{{c.name}}" class="full-width">
+                    <a href="/c/{{c.term.slug}}" title="{{c.name}}" class="full-width">
                         <div class="full-width hand left-list-item-link">
                             <li class="left-list-item">
                                 {% if c.term.profile_img == '' %}
@@ -62,7 +73,7 @@
                 </div>
                 {% endif %}
                 <div class="full-width com dnone">
-                    <a href="c/{{c.term.slug}}" title="{{c.name}}" class="full-width">
+                    <a href="/c/{{c.term.slug}}" title="{{c.name}}" class="full-width">
                         <div class="full-width hand left-list-item-link">
                             <li class="left-list-item">
                                 {% if c.term.profile_img == '' %}
@@ -78,15 +89,15 @@
                 </div>
             {% else %}
                 <div class="full-width com dnone">
-                    <a href="c/{{c.term.slug}}" title="{{c.name}}" class="full-width">
+                    <a href="/c/{{c.term.slug}}" title="{{c.name}}" class="full-width">
                         <div class="full-width hand left-list-item-link">
                             <li class="left-list-item">
                                 {% if c.term.profile_img == '' %}
                                     <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
-                                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                    <p class="ellipsis followed-community-name fs19 noselect" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                 {% else %}
                                     <img src="{{c.term.profile_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.term.cover_color}}" data-no-lazy="1"/>
-                                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                    <p class="ellipsis followed-community-name fs19 noselect" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                 {% endif %}
                             </li>
                         </div>
@@ -106,7 +117,7 @@
     <div id="divider" style="margin:0;width:100%;z-index:99;margin-bottom:20px;"></div>
     <ul class="nav" style="margin-top:0; top:0;padding-top:0;">
         <div class="full-width">
-            <a href="/feed/lists" class="full-width">
+            <a href="/lists" class="full-width">
                 <div class="full-width hand left-list-item-link">
                     <li class="left-list-item">
                         <div class="bgb rounded" style="width:30px;height:30px;padding:5px;border-radius:50%;">

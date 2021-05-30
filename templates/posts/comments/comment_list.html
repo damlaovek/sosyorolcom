@@ -3,9 +3,9 @@
 <ul style="padding-left:{{padding}}px">
     {% for comment in comments %}
         {% if comment.comment_parent == 0 and forloop.counter < comments|length %}
-        <li class='full-width pt10 bb pb10'>
+        <li class='full-width pt10 bt pb10'>
         {% elif comment.comment_parent == 0 and forloop.counter == comments|length %}
-        <li class='full-width pt10 pb10'>
+        <li class='full-width pt10 pb10 bt'>
         {% else %}
         <li class='full-width pt10' style="border-left:2px solid var(--border-color)">
         {% endif %}

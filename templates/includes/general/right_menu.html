@@ -85,7 +85,7 @@
                         <div class="left" id="community-info">
                             <p  class="ellipsis underline-onhover lh30 fwbold">c/{{c.term.name}}</p>
                         </div>
-                        {% if forloop.counter|divisibleby:2 %}
+                        {% if c.term.popularity_change == "up" %}
                         <div class="pl20 right pt11">
                             <svg width="16px" height="16px" viewBox="0 0 20 12">
                                 <g>
@@ -93,7 +93,7 @@
                                 </g>
                             </svg>
                         </div>
-                        {% else %}
+                        {% elif c.term.popularity_change == "down" %}
                         <div class="pl20 right pt11">
                             <svg width="16px" height="16px" viewBox="0 0 20 12">
                                 <g>
@@ -107,7 +107,7 @@
             {% endfor %}
         </ul>
         <div class="bsbb p1020 bt hand right-list-item">
-            <a href="" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
+            <a href="/communities/leaderboard" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
         </div>
         <div class="absolute aligntr bl" style="height:calc(100% - 39px);margin-right:56px;"></div>
     </div>

@@ -125,9 +125,78 @@ var scrollDuration = 600,
             });
         }
     }
+
+    function repost(postId) {
+        document.getElementsByClassName("repost_popup")[0].id = "repost_popup_"+postId
+        j.ajax({
+            url:"getpostbyid/",
+            type : "POST", // http method
+            data : {postId: postId}, // data sent with the post request
+            // handle a successful response
+            success : function(json) {
+                document.getElementById("repost_post").innerHTML = json;
+                document.getElementById("repost_popup_"+postId).classList.remove("dnone");
+                document.getElementById("repost_btn").onclick = function(){return re_post(postId)};
+            }
+        });
+    }
+
+    function re_post(postId){
+        var txt = document.getElementById("repost_txt").value;
+        j.ajax({
+            url:"repost/",
+            type : "POST", // http method
+            data : {postId: postId, txt: txt}, // data sent with the post request
+            // handle a successful response
+            success : function(json) {
+                displayAlert(json.success);
+                closeRepostPopup();
+            }
+        });
+    }
+
+    function closeRepostPopup(){
+        document.getElementsByClassName("repost_popup")[0].id = "repost_popup";
+        document.getElementById("repost_post").innerHTML = "";
+        document.getElementById("repost_txt").value = "";
+        document.getElementById("repost_popup").classList.add("dnone");
+        document.getElementById("repost_btn").onclick = function(){return false};
+    }
     
     function commentEditorChange(e) {
         var t = document.getElementById("comment-editor" + e).value,
             n = document.getElementById("comment-send-btn" + e);
         "" == t ? n.classList.contains("active") && n.classList.remove("active") : n.classList.contains("active") || n.classList.add("active")
+    }
+
+    function toggleClass(containerId, className){
+        document.getElementById(containerId).classList.toggle(className);
+    }
+    function refreshChatCounter(userId){
+        var chatRef = firebase.database().ref('users/'+userId+'/chats');
+        chatRef.on('value', (snapshot) => {
+            var objects = {};
+            var counter = 0;
+            snapshot.forEach((childSnapshot) => {
+                var childKey = childSnapshot.key;
+                var childData = childSnapshot.val();
+                var seen = parseInt(childData.seen);
+                if(seen == 0){
+                    counter += 1;
+                }
+            });
+            if (counter > 0){
+                if(counter >= 10){
+                    document.getElementById("chat-counter").classList.add("fs13");
+                }
+                if(counter > 99){
+                    document.getElementById("chat-counter").innerText = "99+";
+                    document.getElementById("chat-counter").classList.remove("fs13");
+                    document.getElementById("chat-counter").classList.add("fs10");
+                }else{
+                    document.getElementById("chat-counter").innerText = counter;
+                }
+                document.getElementById("chat-counter").classList.remove("dnone");
+            }
+        });
     }

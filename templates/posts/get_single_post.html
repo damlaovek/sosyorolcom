@@ -1,0 +1,28 @@
+<style>
+    .single_post .post_operations{display:none; visibility: hidden;}
+    .single_post .post_comments{ display:none; visibility: hidden;}
+    .single_post .hide{display: none; visibility: hidden;}
+</style>
+<div class="single_post">
+    {% if post.post_type == "post" %}
+        {% include 'posts/posttemplates/post_template.html' with post=post %}
+    {% elif post.post_type == "media" %}
+        {% include 'posts/posttemplates/media_template.html' with media=post %}
+    {% elif post.post_type == "link" %}
+        {% include 'posts/posttemplates/link_template.html' with link=post %}
+    {% elif post.post_type == "questions" %}
+        {% include 'posts/posttemplates/post_template.html' with post=post %}
+    {% elif post.post_type == "answer" %}
+        {% include 'posts/posttemplates/answer_template.html' with answer=post %}           
+    {% elif post.post_type == "poll" %}
+        {% include 'posts/posttemplates/poll_template.html' with poll=post %}
+    {% elif post.post_type == "quiz" %}
+        {% if post.quiz_type == "colorBox" %}
+            {% include 'posts/posttemplates/colorBox_quiz_template.html' with quiz=post number=1 %}
+        {% elif post.quiz_type == "media" %}
+            {% include 'posts/posttemplates/media_quiz_template.html' with quiz=post number=1 %}
+        {% else %}
+            {% include 'posts/posttemplates/quiz_template.html' with quiz=post number=1 %}
+        {% endif %}
+    {% endif %}
+</div>

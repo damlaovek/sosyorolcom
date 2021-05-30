@@ -1,11 +1,13 @@
 function openCloseNotifications(url){
     if(document.getElementById("notifications-c").classList.contains("dnone")){
-        document.getElementById("notifications-c").classList.remove("dnone");
-        document.getElementById("num-unseen-notifications").classList.add("dnone");
         jQuery.ajax({
             type: "POST",
             url: url,
-            success: function(response) {}
+            success: function(response) {
+                document.getElementById("notifications-c").innerHTML = response;
+                document.getElementById("notifications-c").classList.remove("dnone");
+                document.getElementById("num-unseen-notifications").classList.add("dnone");
+            }
         });
     }else{
         document.getElementById("notifications-c").classList.add("dnone");

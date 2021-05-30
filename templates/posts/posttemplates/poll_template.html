@@ -1,3 +1,4 @@
+{% load index %}
 <div class='bsbb full-width'>
     <div class='bsbb full-width box answer-template-oc'>
         <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
@@ -14,7 +15,7 @@
                 <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{poll.ID}}">
                     <li class="hand" onclick="savePost(this, {{poll.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
                 </ul>
-                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{post_template_dict.poll}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{post_template_dict.recommendedfy}}</span></p>
+                <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{word_list|getword:"poll"|ucfirst}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{word_list|getword:"recommended-for-you"|ucwords}}</span></p>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
                     <img src='{{poll.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
                     <div style='margin-left:10px;width:calc(100% - 50px);'>
@@ -51,9 +52,9 @@
                             <div class="full-width bt mt10"></div>
                             <div class='bsbb full-width p10 inline-flex'>
                                 {% if poll.votes|length == 1 %}
-                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;'>{{poll.votes|length}} {{post_template_dict.votenoun}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
+                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;'>{{poll.votes|length}} {{word_list|getword:"vote-noun"}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
                                 {% else %}
-                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;'>{{poll.votes|length}} {{post_template_dict.votesnoun}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
+                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;'>{{poll.votes|length}} {{word_list|getword:"votes-noun"}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
                                 {% endif %}
                             </div>
                         </div>
@@ -85,84 +86,95 @@
                     {% endif %}
                 </div>
             </div>
-            <div class='bsbb full-width' style='display:inline-block;margin-top:5px;'>
-                {% if poll.user_rate == "like" %}
-                    <div class='icon left answer-hint' onclick='upvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.upvote}}'>
-                        <svg width='20px' height='20px' id='upvote{{poll.ID}}' class='upvote active' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+            <div class='full-width post_operations'>
+                <div class='bsbb full-width' style='display:inline-block;margin-top:5px;'>
+                    {% if poll.user_rate == "like" %}
+                        <div class='icon left answer-hint' onclick='upvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.upvote}}'>
+                            <svg width='20px' height='20px' id='upvote{{poll.ID}}' class='upvote active' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+                                <g id='surface1'>
+                                    <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                                </g>
+                            </svg>
+                        </div>
+                    {% else %}
+                        <div class='icon left answer-hint' onclick='upvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.upvote}}'>
+                            <svg width='20px' height='20px' id='upvote{{poll.ID}}' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+                                <g id='surface1'>
+                                    <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                                </g>
+                            </svg>
+                        </div>
+                    {% endif %}
+    
+                    {% if poll.user_rate == "like" %}
+                        <p class='main-color vote noselect' id='vote{{poll.ID}}'>{{poll.rating}}</p>
+                    {% elif poll.user_rate == "dislike" %}
+                        <p class='vote noselect red' id='vote{{poll.ID}}'>{{poll.rating}}</p>
+                    {% else %}
+                        <p class='vote noselect' id='vote{{poll.ID}}'>{{poll.rating}}</p>
+                    {% endif %}
+                    
+                    {% if poll.user_rate == "dislike" %}
+                        <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.downvote}}'>
+                            <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{poll.ID}}' class='downvote active'>
+                                <g id='surface1'>
+                                    <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                                </g>
+                            </svg>
+                        </div>
+                    {% else %}
+                        <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.downvote}}'>
+                            <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{poll.ID}}' class='downvote'>
+                                <g id='surface1'>
+                                    <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                                </g>
+                            </svg>
+                        </div>
+                    {% endif %}
+                    <div class='icon left answer-hint' data-title='{{post_template_dict.repost}}' onclick='repost("{{poll.ID}}");'>
+                        <svg width='20px' height='20px' viewBox='0 0 20 20'>
                             <g id='surface1'>
-                                <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                                <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 15.800781 2.445312 L 16.769531 2.324219 C 17.203125 2.269531 17.511719 1.875 17.460938 1.4375 C 17.410156 1.035156 17.082031 0.707031 16.574219 0.746094 L 13.660156 1.109375 C 13.226562 1.164062 12.917969 1.558594 12.96875 1.992188 L 13.328125 4.945312 C 13.382812 5.378906 13.777344 5.691406 14.210938 5.636719 C 14.644531 5.582031 14.957031 5.1875 14.902344 4.75 L 14.769531 3.652344 C 17.507812 5.683594 18.644531 9.207031 17.59375 12.46875 C 16.542969 15.730469 13.457031 17.96875 10.046875 17.976562 C 9.542969 17.976562 9.222656 18.3125 9.210938 18.75 C 9.203125 19.1875 9.515625 19.5625 10.046875 19.5625 C 14.140625 19.5625 17.847656 16.871094 19.105469 12.953125 C 20.355469 9.082031 19.027344 4.890625 15.800781 2.445312 Z M 15.800781 2.445312 '/>
+                                <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 6.667969 15.050781 C 6.613281 14.617188 6.21875 14.304688 5.785156 14.359375 C 5.351562 14.414062 5.039062 14.808594 5.09375 15.246094 L 5.226562 16.34375 C 2.488281 14.3125 1.351562 10.789062 2.402344 7.527344 C 3.453125 4.265625 6.539062 2.027344 9.949219 2.019531 C 10.453125 2.019531 10.773438 1.683594 10.785156 1.246094 C 10.792969 0.808594 10.480469 0.433594 9.949219 0.433594 C 5.859375 0.429688 2.152344 3.121094 0.894531 7.039062 C -0.355469 10.917969 0.972656 15.109375 4.199219 17.554688 L 3.230469 17.675781 C 2.796875 17.730469 2.488281 18.125 2.539062 18.5625 C 2.589844 18.964844 2.917969 19.292969 3.425781 19.253906 L 6.339844 18.890625 C 6.773438 18.835938 7.082031 18.441406 7.03125 18.007812 Z M 6.667969 15.050781 '/>
                             </g>
                         </svg>
                     </div>
-                {% else %}
-                    <div class='icon left answer-hint' onclick='upvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.upvote}}'>
-                        <svg width='20px' height='20px' id='upvote{{poll.ID}}' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
-                            <g id='surface1'>
-                                <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
-                            </g>
-                        </svg>
-                    </div>
-                {% endif %}
-
-                {% if poll.user_rate == "like" %}
-                    <p class='main-color vote noselect' id='vote{{poll.ID}}'>{{poll.rating}}</p>
-                {% elif poll.user_rate == "dislike" %}
-                    <p class='vote noselect red' id='vote{{poll.ID}}'>{{poll.rating}}</p>
-                {% else %}
-                    <p class='vote noselect' id='vote{{poll.ID}}'>{{poll.rating}}</p>
-                {% endif %}
-                
-                {% if poll.user_rate == "dislike" %}
-                    <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.downvote}}'>
-                        <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{poll.ID}}' class='downvote active'>
-                            <g id='surface1'>
-                                <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
-                            </g>
-                        </svg>
-                    </div>
-                {% else %}
-                    <div style='margin-left:5px;'class='left icon answer-hint' onclick='downvote({{poll.ID}}, "{{csrf_token}}");' data-title='{{post_template_dict.downvote}}'>
-                        <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote{{poll.ID}}' class='downvote'>
-                            <g id='surface1'>
-                                <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
-                            </g>
-                        </svg>
-                    </div>
-                {% endif %}
-                <div class='icon left answer-hint' data-title='{{post_template_dict.repost}}'>
-                    <svg width='20px' height='20px' viewBox='0 0 20 20'>
-                        <g id='surface1'>
-                            <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 15.800781 2.445312 L 16.769531 2.324219 C 17.203125 2.269531 17.511719 1.875 17.460938 1.4375 C 17.410156 1.035156 17.082031 0.707031 16.574219 0.746094 L 13.660156 1.109375 C 13.226562 1.164062 12.917969 1.558594 12.96875 1.992188 L 13.328125 4.945312 C 13.382812 5.378906 13.777344 5.691406 14.210938 5.636719 C 14.644531 5.582031 14.957031 5.1875 14.902344 4.75 L 14.769531 3.652344 C 17.507812 5.683594 18.644531 9.207031 17.59375 12.46875 C 16.542969 15.730469 13.457031 17.96875 10.046875 17.976562 C 9.542969 17.976562 9.222656 18.3125 9.210938 18.75 C 9.203125 19.1875 9.515625 19.5625 10.046875 19.5625 C 14.140625 19.5625 17.847656 16.871094 19.105469 12.953125 C 20.355469 9.082031 19.027344 4.890625 15.800781 2.445312 Z M 15.800781 2.445312 '/>
-                            <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 6.667969 15.050781 C 6.613281 14.617188 6.21875 14.304688 5.785156 14.359375 C 5.351562 14.414062 5.039062 14.808594 5.09375 15.246094 L 5.226562 16.34375 C 2.488281 14.3125 1.351562 10.789062 2.402344 7.527344 C 3.453125 4.265625 6.539062 2.027344 9.949219 2.019531 C 10.453125 2.019531 10.773438 1.683594 10.785156 1.246094 C 10.792969 0.808594 10.480469 0.433594 9.949219 0.433594 C 5.859375 0.429688 2.152344 3.121094 0.894531 7.039062 C -0.355469 10.917969 0.972656 15.109375 4.199219 17.554688 L 3.230469 17.675781 C 2.796875 17.730469 2.488281 18.125 2.539062 18.5625 C 2.589844 18.964844 2.917969 19.292969 3.425781 19.253906 L 6.339844 18.890625 C 6.773438 18.835938 7.082031 18.441406 7.03125 18.007812 Z M 6.667969 15.050781 '/>
-                        </g>
-                    </svg>
-                </div>
-                <p class='vote noselect'>{{poll.repost}}</p>
-                {% if comments.count > 0 %}
-                    <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comments-wrapperanswer{{poll.ID}}").style.display = "block";' data-title='{{post_template_dict.comments}}'>
-                {% else %}
-                    <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comment-editor{{poll.ID}}").focus();' data-title='{{post_template_dict.comments}}'>
-                {% endif %}
+                    <p class='vote noselect'>{{poll.repost|length}}</p>
+                    {% if comments.count > 0 %}
+                        <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comments-wrapperanswer{{poll.ID}}").style.display = "block";' data-title='{{post_template_dict.comments}}'>
+                    {% else %}
+                        <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comment-editor{{poll.ID}}").focus();' data-title='{{post_template_dict.comments}}'>
+                    {% endif %}
+                            <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                <g>
+                                    <path style='stroke-width:0.3;stroke:var(--gray2);fill-rule:nonzero;fill-opacity:1;' d='M 9.910156 19.820312 L 6.863281 14.539062 L 3.050781 14.539062 C 1.484375 14.539062 0.210938 13.386719 0.210938 11.960938 L 0.210938 2.578125 C 0.210938 1.15625 1.484375 0 3.050781 0 L 16.769531 0 C 18.335938 0 19.613281 1.15625 19.613281 2.578125 L 19.613281 11.960938 C 19.613281 13.386719 18.335938 14.539062 16.769531 14.539062 L 12.960938 14.539062 Z M 3.050781 1.429688 C 2.273438 1.429688 1.636719 1.945312 1.636719 2.578125 L 1.636719 11.960938 C 1.636719 12.597656 2.273438 13.113281 3.050781 13.113281 L 7.683594 13.113281 L 9.910156 16.964844 L 12.132812 13.113281 L 16.765625 13.113281 C 17.546875 13.113281 18.179688 12.597656 18.179688 11.960938 L 18.179688 2.578125 C 18.179688 1.945312 17.546875 1.429688 16.765625 1.429688 Z M 3.050781 1.429688 '/>
+                                </g>
+                            </svg>
+                        </div>
+                    <p class='vote noselect'>{{comments.count}}</p>
+                    <div class='icon right answer-hint' data-title='{{word_list|getword:"share"|ucfirst}}' onclick="document.getElementById('share_menu_{{poll.ID}}').classList.toggle('dnone');">
                         <svg width='20px' height='20px' viewBox='0 0 20 20'>
                             <g>
-                                <path style='stroke-width:0.3;stroke:var(--gray2);fill-rule:nonzero;fill-opacity:1;' d='M 9.910156 19.820312 L 6.863281 14.539062 L 3.050781 14.539062 C 1.484375 14.539062 0.210938 13.386719 0.210938 11.960938 L 0.210938 2.578125 C 0.210938 1.15625 1.484375 0 3.050781 0 L 16.769531 0 C 18.335938 0 19.613281 1.15625 19.613281 2.578125 L 19.613281 11.960938 C 19.613281 13.386719 18.335938 14.539062 16.769531 14.539062 L 12.960938 14.539062 Z M 3.050781 1.429688 C 2.273438 1.429688 1.636719 1.945312 1.636719 2.578125 L 1.636719 11.960938 C 1.636719 12.597656 2.273438 13.113281 3.050781 13.113281 L 7.683594 13.113281 L 9.910156 16.964844 L 12.132812 13.113281 L 16.765625 13.113281 C 17.546875 13.113281 18.179688 12.597656 18.179688 11.960938 L 18.179688 2.578125 C 18.179688 1.945312 17.546875 1.429688 16.765625 1.429688 Z M 3.050781 1.429688 '/>
+                                <path style='stroke-width:0.5;stroke:var(--gray2);fill-rule:nonzero;fill-opacity:1;' d='M 0.664062 18.40625 C 0.671875 18.40625 0.675781 18.40625 0.683594 18.40625 C 1 18.394531 1.199219 18.148438 1.226562 17.832031 C 1.25 17.601562 1.871094 11.992188 10.625 12 L 10.644531 15.585938 C 10.644531 15.828125 10.785156 16.046875 11.003906 16.148438 C 11.21875 16.253906 11.480469 16.222656 11.667969 16.066406 L 19.773438 9.351562 C 19.917969 9.234375 20 9.054688 20 8.871094 C 20 8.683594 19.914062 8.503906 19.769531 8.386719 L 11.664062 1.734375 C 11.480469 1.582031 11.21875 1.554688 11.003906 1.65625 C 10.785156 1.757812 10.644531 1.976562 10.644531 2.21875 L 10.628906 5.726562 C 6.996094 5.84375 4.183594 7.011719 2.359375 9.144531 C -0.609375 12.617188 0.0546875 17.664062 0.0820312 17.875 C 0.128906 18.179688 0.355469 18.40625 0.664062 18.40625 Z M 11.269531 10.738281 C 5.015625 10.742188 2.625 12.855469 1.261719 14.71875 C 1.460938 13.222656 2.042969 11.425781 3.3125 9.953125 C 4.996094 7.996094 7.714844 6.96875 11.269531 6.96875 C 11.617188 6.96875 11.894531 6.6875 11.894531 6.34375 L 11.894531 3.535156 L 18.390625 8.875 L 11.894531 14.261719 L 11.894531 11.363281 C 11.894531 11.195312 11.828125 11.039062 11.710938 10.921875 C 11.59375 10.804688 11.4375 10.738281 11.269531 10.738281 Z M 11.269531 10.738281'/>
                             </g>
                         </svg>
                     </div>
-                <p class='vote noselect'>{{comments.count}}</p>
-                <div class='icon right answer-hint' data-title='{{post_template_dict.share}}'>
-                    <svg width='20px' height='20px' viewBox='0 0 20 20'>
-                        <g>
-                            <path style='stroke-width:0.5;stroke:var(--gray2);fill-rule:nonzero;fill-opacity:1;' d='M 0.664062 18.40625 C 0.671875 18.40625 0.675781 18.40625 0.683594 18.40625 C 1 18.394531 1.199219 18.148438 1.226562 17.832031 C 1.25 17.601562 1.871094 11.992188 10.625 12 L 10.644531 15.585938 C 10.644531 15.828125 10.785156 16.046875 11.003906 16.148438 C 11.21875 16.253906 11.480469 16.222656 11.667969 16.066406 L 19.773438 9.351562 C 19.917969 9.234375 20 9.054688 20 8.871094 C 20 8.683594 19.914062 8.503906 19.769531 8.386719 L 11.664062 1.734375 C 11.480469 1.582031 11.21875 1.554688 11.003906 1.65625 C 10.785156 1.757812 10.644531 1.976562 10.644531 2.21875 L 10.628906 5.726562 C 6.996094 5.84375 4.183594 7.011719 2.359375 9.144531 C -0.609375 12.617188 0.0546875 17.664062 0.0820312 17.875 C 0.128906 18.179688 0.355469 18.40625 0.664062 18.40625 Z M 11.269531 10.738281 C 5.015625 10.742188 2.625 12.855469 1.261719 14.71875 C 1.460938 13.222656 2.042969 11.425781 3.3125 9.953125 C 4.996094 7.996094 7.714844 6.96875 11.269531 6.96875 C 11.617188 6.96875 11.894531 6.6875 11.894531 6.34375 L 11.894531 3.535156 L 18.390625 8.875 L 11.894531 14.261719 L 11.894531 11.363281 C 11.894531 11.195312 11.828125 11.039062 11.710938 10.921875 C 11.59375 10.804688 11.4375 10.738281 11.269531 10.738281 Z M 11.269531 10.738281'/>
-                        </g>
-                    </svg>
+                    <div id="share_menu_{{poll.ID}}" class="full-shadow-border absolute dnone aligntr bcw bringfront" style="top:40px;z-index: 50;">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=www.sosyorol.com/u/{{poll.author.user_login}}/{{poll.hex_id}}/{{poll.guid}}" target="_blank"><p class="p10 cg2 fs15 hand item-hover">{{word_list|getword:"share-on-facebook"}}</p></a>
+                        <a href="https://twitter.com/intent/tweet?text={{poll.post_title}}&amp;url=www.sosyorol.com/u/{{poll.author.user_login}}/{{poll.hex_id}}/{{poll.guid}}&amp;via=Sosyorol" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-twitter"}}</p></a>
+                        <a href="whatsapp://send?text={{poll.post_title}} www.sosyorol.com/u/{{poll.author.user_login}}/{{poll.hex_id}}/{{poll.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"share-on-whatsapp"}}</p></a>
+                        <a href="mailto:''?Subject={{poll.post_title}}&body={{poll.post_title}}%20%3A%0D%0A%20www.sosyorol.com/u/{{poll.author.user_login}}/{{poll.hex_id}}/{{poll.guid}}" target="_blank"><p class="p10 cg2 bt fs15 hand item-hover">{{word_list|getword:"send-email"}}</p></a>
+                        <p class="p10 cg2 bt fs15 hand item-hover" onclick="document.getElementById('share_menu_{{poll.ID}}').classList.add('dnone');copyLink('www.sosyorol.com/u/{{poll.author.user_login}}/{{poll.hex_id}}/{{poll.guid}}', '{{word_list|getword:"link-copied"|ucfirst}}');">{{word_list|getword:"copy-link"|ucfirst}}</p>
+                    </div>
                 </div>
             </div>
         </div>
-        <ul class='comments-wrapper bt pt10' id='comments-wrapperanswer{{answer.ID}}'>
-            {% include 'posts/comments/comment_list.html' %}
-        </ul>
-        {% include 'posts/comments/comment_editor.html' %}
+        <div class="post_comments">
+            <div class='comments-wrapper pt10' id='comments-wrapper{{poll.ID}}' style="display:block;">
+                {% include 'posts/comments/comment_list.html' with comments=poll.comments padding=0 %}
+            </div>
+            {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=poll.ID %}
+        </div>
     </div>
 </div>
 <script type="text/javascript"> 

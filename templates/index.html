@@ -1,4 +1,5 @@
 {% load static %}
+{% load index %}
 {% include 'includes/general/head.html' %}
         <title>Sosyorol - Sosyal İçerik Platformu</title>
         <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
@@ -22,11 +23,57 @@
     <body class="{{darkmode}}" onload="checkViewsCookie()">
         {% include 'includes/general/header.html' %}
         {% include 'includes/general/lang_popup.html' %}
+        {% include 'select-user-popup.html' with popup_title=word_list|getword:"select-users-to-request-poll"|ucfirst %}
+        {% include 'select-user-popup.html' with popup_title=word_list|getword:"select-users-to-request-quiz"|ucfirst %}
         <div class="full-width inline-flex">
             {% include 'includes/general/left_menu.html' %}
             {% include 'includes/general/home_feed.html' %}
             {% include 'includes/general/right_menu.html' %}
         </div>
         {% include 'includes/general/chat_popup.html' %}
+        {% include 'posts/repost_popup.html' %}
+        <script>
+            var offset = 0;
+            var limit = 6;
+            var isLoading = false;
+            var hasMore = true;
+            window.onload = () => {
+                offset = 0;
+                isLoading = false;
+                hasMore = true;
+            }
+            var j = jQuery.noConflict();
+            window.onscroll = () => {
+                if (document.documentElement.scrollHeight - document.documentElement.scrollTop === document.documentElement.clientHeight){
+                    if(hasMore){
+                        if(isLoading){
+                            return;
+                        }else{
+                            if(hasMore){
+                                isLoading = true;
+                                document.getElementById("loader").classList.remove("dnone");
+                                j.ajax({
+                                    url:"{% url 'loadmorehomeposts' %}",
+                                    type : "POST", // http method
+                                    data : { limit: limit, offset: offset + limit}, // data sent with the post request
+                                    // handle a successful response
+                                    success : function(json) {
+                                        // log the returned json to the console
+                                        //console.log(json); // another sanity check
+                                        document.getElementById("posts").innerHTML += json;
+                                        if (document.getElementById("has-more-"+offset).value == false || document.getElementById("has-more-"+offset).value == "False"){
+                                            hasMore = false;
+                                        }
+                                        offset += limit;
+                                        isLoading = false;
+                                        document.getElementById("loader").classList.add("dnone");
+                                    }
+                                });   
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
     </body>
 </html>

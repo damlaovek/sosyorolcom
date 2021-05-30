@@ -1,3 +1,4 @@
+from math import inf
 from django.db import models
 
 class Languages(models.Model):
@@ -94,8 +95,9 @@ class Post(models.Model):
     post_content_filtered = models.TextField()
     parent = None
     rating = 0
-    likes = 0
-    dislikes = 0
+    likes = models.QuerySet()
+    dislikes = models.QuerySet()
+    repost = models.QuerySet()
     short_content = ""
     preview = ""
     comments = models.QuerySet()
@@ -122,6 +124,7 @@ class Post(models.Model):
     quiz_type = ""
     isanswered = False
     isfollowed = 0
+    hot = models.FloatField()
     class Meta:
         db_table = "wpmu_posts"
 
@@ -237,6 +240,9 @@ class Community(models.Model):
     flairs = models.QuerySet()
     followers = models.QuerySet()
     score = models.BigIntegerField()
+    popularity_change = ""
+    rank = 0
+    is_followed = False
     class Meta:
         db_table = "communities"
 
@@ -294,6 +300,7 @@ class FollowedCommunities(models.Model):
     term = models.ForeignKey(Community, on_delete=models.CASCADE)
     date = models.DateTimeField()
     role = models.TextField()
+    is_active = models.IntegerField()
     class Meta:
         db_table = "term_members"
 
