@@ -35,41 +35,41 @@
         <div class="horizontally-centered-auto-width">
             <a class="horizontally-centered-auto-width-item" href="/">
                 {% if page == "home" %}
-                <div class="header-elems selected">{{word_list|getword:"home"|toupper}}</div>
+                <div class="header-elems selected noselect">{{word_list|getword:"home"|toupper}}</div>
                 {% else %}
-                <div class="header-elems">{{word_list|getword:"home"|toupper}}</div>
+                <div class="header-elems noselect">{{word_list|getword:"home"|toupper}}</div>
                 {% endif %}
                 <div class="header-elems-border"></div>
             </a>
             <a class="horizontally-centered-auto-width-item" href="/quizzes">
                 {% if page == "quizzes" %}
-                <div class="header-elems selected">{{word_list|getword:"quizzes"|toupper}}</div>
+                <div class="header-elems selected noselect">{{word_list|getword:"quizzes"|toupper}}</div>
                 {% else %}
-                <div class="header-elems">{{word_list|getword:"quizzes"|toupper}}</div>
+                <div class="header-elems noselect">{{word_list|getword:"quizzes"|toupper}}</div>
                 {% endif %}
                 <div class="header-elems-border"></div>
             </a>
             <a href="/questions" class="horizontally-centered-auto-width-item">
                 {% if page == "questions" %}
-                <div class="header-elems selected">{{word_list|getword:"questions"|toupper}}</div>
+                <div class="header-elems selected noselect">{{word_list|getword:"questions"|toupper}}</div>
                 {% else %}
-                <div class="header-elems">{{word_list|getword:"questions"|toupper}}</div>
+                <div class="header-elems noselect">{{word_list|getword:"questions"|toupper}}</div>
                 {% endif %}
                 <div class="header-elems-border"></div>
             </a>
             <a class="horizontally-centered-auto-width-item" href="/polls">
                 {% if page == "polls" %}
-                <div class="header-elems selected">{{word_list|getword:"polls"|toupper}}</div>
+                <div class="header-elems selected noselect">{{word_list|getword:"polls"|toupper}}</div>
                 {% else %}
-                <div class="header-elems">{{word_list|getword:"polls"|toupper}}</div>
+                <div class="header-elems noselect">{{word_list|getword:"polls"|toupper}}</div>
                 {% endif %}
                 <div class="header-elems-border"></div>
             </a>
             <a class="horizontally-centered-auto-width-item" href="/communities/leaderboard/">
                 {% if page == "communities" %}
-                <div class="header-elems selected">{{word_list|getword:"communities"|toupper}}</div>
+                <div class="header-elems selected noselect">{{word_list|getword:"communities"|toupper}}</div>
                 {% else %}
-                <div class="header-elems">{{word_list|getword:"communities"|toupper}}</div>
+                <div class="header-elems noselect">{{word_list|getword:"communities"|toupper}}</div>
                 {% endif %}
                 <div class="header-elems-border"></div>
             </a>

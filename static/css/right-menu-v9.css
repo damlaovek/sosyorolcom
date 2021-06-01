@@ -2,7 +2,7 @@
 .section-right-top{width:calc(100% - 102px); padding:10px 20px; margin:30px; border-radius:4px;background-color:var(--grayish);}
 .section-right-top .profile-title{font-size:19px;font-weight:700;float:left;color:var(--title-color);}
 .section-right #profile-more-submenu{display:none;top:40px;right:-10px;border-radius:4px;z-index:3;background-color:var(--grayish);}
-.section-right #profile-more-submenu.open{display:block;}#profile-link{padding:7.5px 15px;}
+.section-right #profile-more-submenu.open{display:block;}#profile-link{padding:7.5px 15px;}#viewPRofile{color:var(--gray);}#profile-link:hover #viewPRofile{color:var(--black);}
 .section-right #profile-more-actions{top:0;right:0;width:20px;height:20px;margin-right:-10px;}
 .section-right #profile-more-submenu:hover{background-color:var(--background-gray);}
 .section-right #profile-more-submenu:hover #viewProfile{color:var(--title-color);}

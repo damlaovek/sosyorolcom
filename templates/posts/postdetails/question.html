@@ -87,7 +87,7 @@
                         </g>
                     </svg>
                 </div>
-                <p class='vote noselect'>{{question.repost}}</p>
+                <p class='vote noselect'>{{question.repost|length}}</p>
                 {% if comments.count > 0 %}
                     <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comments-wrapperanswer{{question.ID}}").style.display = "block";' data-title='{{post_template_dict.comments}}'>
                 {% else %}
@@ -112,12 +112,13 @@
         <div>
             {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=poll.ID %}
         </div>
-        {% if comments|length > 0 %}
-            <div class='comments-wrapper pt10' id='comments-wrapper{{post.ID}}' style="display:block;">
-                {% include 'posts/comments/comment_list.html' with comments=comments padding=0 %}
-            </div>
+        {% if comments.count > 0 %}
+            {{comments}}
+            <!--<div class='comments-wrapper pt10' id='comments-wrapper{{question.ID}}' style="display:block;">
+                {% include 'posts/comments/comment_list.html' with comments=question.comments padding=0 %}
+            </div>-->
         {% endif %}
-        {% if comment_length > comments|length %}
+        {% if comment_length > comments.count %}
             <div id="loader" class="full-width tac dnone">
                 <img src="{% static 'assets/img/sosyorol-loader.gif' %}" style="margin:auto; height: 80px;">
             </div>

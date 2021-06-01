@@ -223,9 +223,9 @@
                 </div>
             </div>
             <div class="section-right fixed" id="section-right">
-                <div  class="full-shadow-border section-right-bottom" style="padding:10px 0;width:calc(100% - 60px);">
+                <div  class="full-shadow-border section-right-bottom" style="padding:10px 0 0 0;width:calc(100% - 60px);">
                     <div class="bsbb full-width inline-block p020 mt5">
-                        <p class="fs19 fwblack ctitle left">{{word_list|getword:"similar_communities"}}</p>
+                        <p class="fs19 fwblack ctitle left mb10">{{word_list|getword:"similar_communities"}}</p>
                         <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
                             <g>
                                 <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
@@ -236,26 +236,27 @@
                     </div>
                     <ul class="full-width mt7 bt">
                         {% for c in similars %}
-                            <a href="c/{{c.slug}}" title="{{c.name}}" class="full-width">
-                                <li class="bsbb full-width p10 bt inline-flex right-list-item">
+                            <li class="bsbb full-width bb"></li>
+                                <a href="/c/{{c.slug}}" class="bsbb full-width p1020 inline-block right-list-item">
                                     {% if c.profile_img == '' %}
-                                        <img class="p5 left sqrt30 rounded img-sd non-draggable" src="{% static 'assets/img/defaults/default-community.png' %}" style="background-color:var(--main-color)"/>
+                                        <img class="bsbb p5 sqr40 rounded lh30 left non-draggable" src="{% static 'assets/img/defaults/default-community.png' %}" style="background-color:var(--main-color)"/>
                                     {% else %}
-                                        <img class="p5 left sqrt30 rounded img-sd non-draggable" src="{{c.profile_img}}" style="background-color:{{c.cover_color}}"/>
+                                        <img class="bsbb p5 sqr40 rounded lh30 left non-draggable" src="{{c.profile_img}}" style="background-color:{{c.cover_color}}"/>
                                     {% endif %}
-                                    <div class="left oh ml10" style="width:400px;">
-                                        <p class="ellipsis underline-onhover lh20 fwbold oh" style="width:400px;">c/{{c.name}}</p>
-                                        <p class="ellipsis underline-onhover lh20 cg2 oh" style="width:400px;">{{c.views}}&nbsp;{{page_dict.views}}</p>
+                                    <div class="ml10 left">
+                                        <div class="lh20 fwblack ctitle ellipsis underline-onhover" style="width:145px;">c/{{c.name}}</div>
+                                        <p class="cg2 lh20 ellipsis underline-onhover">{{c.views}}&nbsp;{{page_dict.views}}</p>
                                     </div>
-                                    {% if c.is_followed %}
-                                        <p class="left btn hand" style="padding-left: 20px; padding-right: 20px; top:5px;" onclick="unfollowCommunity(this, '{{c.term_id}}', '{{page_dict.join}}');">{{page_dict.following}}</p>
-                                    {% else %}
-                                        <p class="left btn hand" style="padding-left: 20px; padding-right: 20px; top:5px;" onclick="joinCommunity(this, '{{c.term_id}}', '{{page_dict.following}}');">{{page_dict.join}}</p>
-                                    {% endif %}
-                                </li>
-                            </a>
+                                    <div class="right" style="top:5.5px;">
+                                        <p class="btn hand" onclick="joinCommunity(this, '{{c.term_id}}', '&#10003;');this.onclick=function(){return false;};return false;"><span class="p115">{{page_dict.join}}</span></p>
+                                    </div>
+                                </a>
+                            </li>
                         {% endfor %}
                     </ul>
+                    <div class="bsbb p1020 bt hand right-list-item">
+                        <a href="/communities/leaderboard/{{category}}" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
+                    </div>
                 </div>
                 <!--
                 <div  class="full-shadow-border section-right-bottom" style="padding:10px 0;width:calc(100% - 60px);">

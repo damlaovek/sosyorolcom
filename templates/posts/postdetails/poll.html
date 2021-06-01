@@ -145,7 +145,7 @@
                         </g>
                     </svg>
                 </div>
-                <p class='vote noselect'>{{poll.repost}}</p>
+                <p class='vote noselect'>{{poll.repost|length}}</p>
                 {% if comments.count > 0 %}
                     <div style='margin-left:10px;' class='icon left answer-hint' onclick='document.getElementById("comments-wrapperanswer{{poll.ID}}").style.display = "block";' data-title='{{post_template_dict.comments}}'>
                 {% else %}
