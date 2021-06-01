@@ -5,7 +5,7 @@
         <div class="absolute aligntl bb full-width mt40"></div>
         <div class="inline-block full-width" style="margin-top:-10px;">
             <p class="fwblack fs19 lh40">{{word_list|getword:"my-profile"|ucwords}}</p>
-            <svg viewBox="0 0 20 20" id="profile-more-actions" class="absolute icon hand right">
+            <svg viewBox="0 0 20 20" id="profile-more-actions" class="absolute icon hand right" onclick="showHide2('profile-more-submenu');">
                 <g>
                     <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12 " transform="matrix(0.833333,0,0,0.833333,0,0)"/>
                     <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562 " transform="matrix(0.833333,0,0,0.833333,0,0)"/>
@@ -20,7 +20,7 @@
                             <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 15.003222 11.997149 C 15.003222 13.652864 13.652864 15.003222 11.997149 15.003222 C 10.34822 15.003222 8.997862 13.652864 8.997862 11.997149 C 8.997862 10.34822 10.34822 8.997862 11.997149 8.997862 C 13.652864 8.997862 15.003222 10.34822 15.003222 11.997149 Z M 15.003222 11.997149 " transform="matrix(0.575658,0,0,0.575658,0,0)"/>
                         </g>
                     </svg>
-                    <p id="viewPRofile">{{word_list|getword:"go-to-profile"|ucwords}}</p>
+                    <p id="viewPRofile" class="ml10 noselect">{{word_list|getword:"go-to-profile"|ucwords}}</p>
                 </a>
             </div>
         </div>
@@ -56,8 +56,8 @@
             </svg>
         </div>
         <p id="user-bio">{{current_user.description}}</p>
-        <a href="https://www.sosyorol.com/submit" class="full-width"><p class="btn full-width" id="cp-btn" style="font-weight:bold;">{{word_list|getword:"create-post"|ucwords}}</p></a>
-        <a href="/c/communities/create" class="full-width mt10"><p class="btn full-width" id="cp-btn" style="font-weight:bold;">{{word_list|getword:"create-community"|ucwords}}</p></a>
+        <a href="/submit" class="full-width"><p class="btn full-width" id="cp-btn" style="font-weight:bold;">{{word_list|getword:"create-post"|ucwords}}</p></a>
+        <!--<a href="/c/communities/create" class="full-width mt10"><p class="btn full-width" id="cp-btn" style="font-weight:bold;">{{word_list|getword:"create-community"|ucwords}}</p></a>-->
     </div>
     <div  class="full-shadow-border section-right-bottom">
         <div class="bsbb inline-block full-width p1020">
@@ -107,11 +107,11 @@
             {% endfor %}
         </ul>
         <div class="bsbb p1020 bt hand right-list-item">
-            <a href="/communities/leaderboard" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
+            <a href="/communities/leaderboard" class="cb noselect">{{word_list|getword:"show-more"|ucfirst}}</a>
         </div>
         <div class="absolute aligntr bl" style="height:calc(100% - 39px);margin-right:56px;"></div>
     </div>
-    <p class="btn hand scroll-to-top dnone">{{word_list|getword:"scroll-to-top"|toupper}}</p>
+    <p class="btn hand scroll-to-top dnone noselect">{{word_list|getword:"scroll-to-top"|toupper}}</p>
 </div>
 <script>
     var j = jQuery.noConflict();

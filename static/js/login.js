@@ -108,6 +108,13 @@ function loginWithEmailAndPassword(email, password){
                 console.log(user.uid);
                 var signin_form = document.getElementById("signin_form");
                 document.getElementsByName("uid")[0].value = user.uid;
+                var j = jQuery.noConflict();
+                j.ajax({
+                    url:"/",
+                    Type:'POST',
+                    data:{uid:user.uid},
+                    success:function(response){ }
+                });
                 signin_form.action = "/";
                 signin_form.submit();
             }

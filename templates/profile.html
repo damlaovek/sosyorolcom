@@ -198,44 +198,49 @@
                     <div class="bsbb full-width p020 full-shadow-border box" style="width:calc(100% + 2px);margin-top: -4px;">
                         <ul class="full-width mt10 inline-flex" style="top:1px;">
                             {% if filter == "all" or filter == "" %}
-                            <a href="/u/{{profile.user_login}}"><li class="hand fs15 cg2 fwmedium lst-item active">{{word_list|getword:"all"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}"><li class="hand fs15 cg2 fwmedium lst-item active noselect">{{word_list|getword:"all"|ucwords}}</li></a>
                             {% else %}
-                            <a href="/u/{{profile.user_login}}"><li class="hand fs15 cg2 fwmedium lst-item">{{word_list|getword:"all"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}"><li class="hand fs15 cg2 fwmedium lst-item noselect">{{word_list|getword:"all"|ucwords}}</li></a>
                             {% endif %}
                             {% if filter == "post" %}
-                            <a href="/u/{{profile.user_login}}/post"><li class="hand fs15 cg2 fwmedium lst-item m020 active">{{word_list|getword:"post"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/post"><li class="hand fs15 cg2 fwmedium lst-item m020 active noselect">{{word_list|getword:"post"|ucwords}}</li></a>
                             {% else %}
-                            <a href="/u/{{profile.user_login}}/post"><li class="hand fs15 cg2 fwmedium lst-item m020">{{word_list|getword:"post"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/post"><li class="hand fs15 cg2 fwmedium lst-item m020 noselect">{{word_list|getword:"post"|ucwords}}</li></a>
                             {% endif %}
                             {% if filter == "media" %}
-                            <a href="/u/{{profile.user_login}}/media"><li class="hand fs15 cg2 fwmedium lst-item active">{{word_list|getword:"media"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/media"><li class="hand fs15 cg2 fwmedium lst-item active noselect">{{word_list|getword:"media"|ucwords}}</li></a>
                             {% else %}
-                            <a href="/u/{{profile.user_login}}/media"><li class="hand fs15 cg2 fwmedium lst-item">{{word_list|getword:"media"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/media"><li class="hand fs15 cg2 fwmedium lst-item noselect">{{word_list|getword:"media"|ucwords}}</li></a>
                             {% endif %}
                             {% if filter == "link" %}
-                            <a href="/u/{{profile.user_login}}/link"><li class="hand fs15 cg2 fwmedium lst-item m020 active">{{word_list|getword:"link"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/link"><li class="hand fs15 cg2 fwmedium lst-item m020 active noselect">{{word_list|getword:"link"|ucwords}}</li></a>
                             {% else %}
-                            <a href="/u/{{profile.user_login}}/link"><li class="hand fs15 cg2 fwmedium lst-item m020">{{word_list|getword:"link"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/link"><li class="hand fs15 cg2 fwmedium lst-item m020 noselect">{{word_list|getword:"link"|ucwords}}</li></a>
                             {% endif %}
                             {% if filter == "question" %}
-                            <a href="/u/{{profile.user_login}}/question"><li class="hand fs15 cg2 fwmedium lst-item active">{{word_list|getword:"question"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/question"><li class="hand fs15 cg2 fwmedium lst-item active noselect">{{word_list|getword:"question"|ucwords}}</li></a>
                             {% else %}
-                            <a href="/u/{{profile.user_login}}/question"><li class="hand fs15 cg2 fwmedium lst-item">{{word_list|getword:"question"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/question"><li class="hand fs15 cg2 fwmedium lst-item noselect">{{word_list|getword:"question"|ucwords}}</li></a>
                             {% endif %}
                             {% if filter == "answer" %}
-                            <a href="/u/{{profile.user_login}}/answer"><li class="hand fs15 cg2 fwmedium lst-item m020 active">{{word_list|getword:"answer-noun"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/answers"><li class="hand fs15 cg2 fwmedium lst-item m020 active noselect">{{word_list|getword:"answer-noun"|ucwords}}</li></a>
                             {% else %}
-                            <a href="/u/{{profile.user_login}}/answer"><li class="hand fs15 cg2 fwmedium lst-item m020">{{word_list|getword:"answer-noun"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/answers"><li class="hand fs15 cg2 fwmedium lst-item m020 noselect">{{word_list|getword:"answer-noun"|ucwords}}</li></a>
                             {% endif %}
                             {% if filter == "poll" %}
-                            <a href="/u/{{profile.user_login}}/poll"><li class="hand fs15 cg2 fwmedium lst-item active">{{word_list|getword:"poll"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/poll"><li class="hand fs15 cg2 fwmedium lst-item active noselect">{{word_list|getword:"poll"|ucwords}}</li></a>
                             {% else %}
-                            <a href="/u/{{profile.user_login}}/poll"><li class="hand fs15 cg2 fwmedium lst-item">{{word_list|getword:"poll"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/poll"><li class="hand fs15 cg2 fwmedium lst-item noselect">{{word_list|getword:"poll"|ucwords}}</li></a>
                             {% endif %}
                             {% if filter == "quiz" %}
-                            <a href="/u/{{profile.user_login}}/quiz"><li class="hand fs15 cg2 fwmedium lst-item m020 active">{{word_list|getword:"quiz"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/quiz"><li class="hand fs15 cg2 fwmedium lst-item m020 active noselect">{{word_list|getword:"quiz"|ucwords}}</li></a>
                             {% else %}
-                            <a href="/u/{{profile.user_login}}/quiz"><li class="hand fs15 cg2 fwmedium lst-item m020">{{word_list|getword:"quiz"|ucwords}}</li></a>
+                            <a href="/u/{{profile.user_login}}/quiz"><li class="hand fs15 cg2 fwmedium lst-item m020 noselect">{{word_list|getword:"quiz"|ucwords}}</li></a>
+                            {% endif %}
+                            {% if filter == "comment" %}
+                            <a href="/u/{{profile.user_login}}/comments"><li class="hand fs15 cg2 fwmedium lst-item active noselect">{{word_list|getword:"comment"|ucwords}}</li></a>
+                            {% else %}
+                            <a href="/u/{{profile.user_login}}/comments"><li class="hand fs15 cg2 fwmedium lst-item noselect">{{word_list|getword:"comment"|ucwords}}</li></a>
                             {% endif %}
                         </ul>
                     </div>
@@ -271,7 +276,7 @@
                                     {% include 'posts/posttemplates/post_template.html' with post=post %}
                                 {% endif %}
                             {% elif post.post_type == "answer" %}
-                                {% if filter == "question" %}
+                                {% if filter == "answer" %}
                                     {% include 'posts/posttemplates/answer_template.html' with answer=post %}
                                 {% elif filter == "all" %}
                                     {% include 'posts/posttemplates/answer_template.html' with answer=post %}

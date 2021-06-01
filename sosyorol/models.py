@@ -124,7 +124,6 @@ class Post(models.Model):
     quiz_type = ""
     isanswered = False
     isfollowed = 0
-    hot = models.FloatField()
     class Meta:
         db_table = "wpmu_posts"
 

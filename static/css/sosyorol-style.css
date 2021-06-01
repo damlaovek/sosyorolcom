@@ -59,7 +59,8 @@
   --black: white;
 }
 
-*{position:relative;margin:0;padding:0;border:0;outline:0;box-sizing:content-box;font-family:Roboto,helvetica,sans-serif;font-size:15px;vertical-align:bottom;font-weight: 400;}
+*{position:relative;margin:0;padding:0;border:0;outline:0;box-sizing:content-box;font-family:Roboto,helvetica,sans-serif;vertical-align:bottom;}
+div,p{font-weight: 400;font-size:15px;}
 ul {list-style-type: none;}
 embed, iframe, img, object, video, source {max-width: 100%;}
 body {height: 100%;-webkit-font-smoothing: subpixel-antialiased;}
@@ -76,7 +77,7 @@ svg{pointer-events:all;}
 /*---------------------------------------
   TYPOGRAPHY              
 -----------------------------------------*/
-.fs10{font-size: 10px;}.fs13{font-size:13px}.fs15{font-size:15px}.fs19{font-size:19px}.fs18{font-size: 18px;}.fs20{font-size: 20px;}
+.fs10{font-size: 10px;}.fs13{font-size:13px}.fs15{font-size:15px}.fs19{font-size:19px}.fs18{font-size: 18px;}.fs20{font-size: 20px;}.fs29{font-size:29px;}.fs24{font-size: 24px;}
 .fwblack{font-weight:var(--black-font)}.fwbold{font-weight:var(--bold)}.fwmedium{font-weight:var(--medium)}.fwnormal{font-weight:var(--regular)}.fwlight{font-weight:var(--light)}.fwthin{font-weight:var(--thin)}
 
 /*---------------------------------------
@@ -287,6 +288,7 @@ svg{pointer-events:all;}
   TEXT COLORS            
 -----------------------------------------*/
 .cg {color: var(--gray);}
+.clg{color: var(--light-gray);}
 .cg2 {color: var(--gray2);}
 .cb {color: var(--main-color);}
 .cba{color: var(--main-color-alpha);}

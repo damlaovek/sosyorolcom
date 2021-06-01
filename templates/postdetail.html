@@ -1,16 +1,18 @@
 {% load static %}
 {% load index %}
 {% include 'includes/general/head.html' %}
-        <title>Sosyorol - Sosyal İçerik Platformu</title>
+        <title>{{post.post_title}}</title>
         <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
         <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
         <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
         <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
         <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
         <link rel="stylesheet" href="{% static 'css/submit-v23.css' %}">
+        <link rel="stylesheet" href="{% static 'css/postdetail.css' %}">
         <script src="{% static 'js/new/autosize.min.js' %}"></script>
         <script src="{% static 'js/new/user-list.min.js' %}"></script>
         <script src="{% static 'js/index.js' %}"></script>
+        <script src="{% static 'js/user-actions.js' %}"></script>
         <script src="{% static 'js/sosyorol.min.js' %}"></script>
         <!-- The core Firebase JS SDK is always required and must be listed first -->
         <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
@@ -75,18 +77,63 @@
                 {% include 'includes/general/notifications-menu.html' %}
             {% else %}
             <div class="section-right fixed" id="section-right">
-                {% if post.post_type == "media" %}
-                {% elif post.post_type == "poll"  %}
-                {% elif post.post_type == "questions"  %}
-                    {% include 'posts/similarposts/questions.html' %}
-                {% elif post.post_type == "link"  %}
-                {% elif post.post_type == "post"  %}
-                {% elif post.post_type == "quiz"  %}
-                    {% if post.quiz_type == "media" %}
-                    {% elif post.quiz_type == "colorBox" %}
+                <div class="full-shadow-border section-right-top">
+                    <div class="absolute aligntl bb full-width mt40"></div>
+                    <div class="inline-block full-width" style="margin-top:-10px;">
+                        <p class="fwblack fs19 lh40">{{word_list|getword:"content_owner"}}</p>
+                        <svg viewBox="0 0 20 20" id="profile-more-actions" class="absolute icon hand right" onclick="showHide2('profile-more-submenu');">
+                            <g>
+                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12 " transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562 " transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437 " transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                            </g>
+                        </svg>
+                        <div class="absolute full-shadow-border" id="profile-more-submenu">
+                            <a href="/u/{{post.author.user_login}}" class="inline-flex" id="profile-link">
+                                <svg width="14pt" height="14pt" viewBox="0 0 14 14">
+                                    <g>
+                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 1.004286 11.997149 C 1.004286 11.997149 5.001074 3.996788 11.997149 3.996788 C 19.00001 3.996788 22.996797 11.997149 22.996797 11.997149 C 22.996797 11.997149 19.00001 20.004296 11.997149 20.004296 C 5.001074 20.004296 1.004286 11.997149 1.004286 11.997149 Z M 1.004286 11.997149 " transform="matrix(0.575658,0,0,0.575658,0,0)"/>
+                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 15.003222 11.997149 C 15.003222 13.652864 13.652864 15.003222 11.997149 15.003222 C 10.34822 15.003222 8.997862 13.652864 8.997862 11.997149 C 8.997862 10.34822 10.34822 8.997862 11.997149 8.997862 C 13.652864 8.997862 15.003222 10.34822 15.003222 11.997149 Z M 15.003222 11.997149 " transform="matrix(0.575658,0,0,0.575658,0,0)"/>
+                                    </g>
+                                </svg>
+                                <p id="viewPRofile" class="ml10 noselect">{{word_list|getword:"go-to-profile"|ucwords}}</p>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="inline-block full-width" id="user-profile-c">
+                        <img class="non-draggable rounded left sqr40" src="{{post.author.avatar_url}}"/>
+                        <div class="left" id="user-profile-ic">
+                            <p class="ellipsis">{{post.author.display_name}}</p>
+                            <a href=""><p class="ellipsis">u/{{post.author.user_login}}</p></a>
+                        </div>
+                    </div>
+                    <p id="user-bio" class="mt10">{{post.author.description}}</p>
+                    {% if current_user.followings|isfollowing:post.author %}
+                        <p class="btn full-width hand noselect fwbold" id="cp-btn" style="font-weight: bold;" onclick="return unfollow(this,'{{current_user.ID}}','{{post.author.ID}}', '{{followtxt|ucwords}}', '{{current_user.ID}}','{{post.author.ID}}');">{{word_list|getword:"following"|ucwords}}</p>
                     {% else %}
+                        <p class="btn full-width hand noselect fwbold" id="cp-btn" style="font-weight: bold;" onclick="return follow(this,'{{current_user.ID}}','{{post.author.ID}}', '{{followingtxt|ucwords}}', '{{current_user.ID}}','{{post.author.ID}}');">{{word_list|getword:"follow"|ucwords}}</p>
                     {% endif %}
-                {% endif %}
+                    <p class="p100 cg2"><span class="fwbold">{{word_list|getword:"joined"|ucfirst}}:</span> {{post.author.user_registered}}</p>
+                </div>
+                <div  class="full-shadow-border section-right-bottom">
+                    <div class="bsbb inline-block full-width p1020">
+                        <p class="fwblack fs19 left">{% autoescape off %}{{more_from_content_owner}}{% endautoescape %}</p>
+                    </div>
+                    <ul class="full-width">
+                        {% for op in other_posts %}
+                            <a href="/u/{{op.author.user_login}}/{{op.hex_id}}/{{op.guid}}" title="{{c.name}}" class="full-width">
+                                <li class="bsbb full-width p1020 bt inline-block right-list-item">
+                                    <p class="underline-on-hover fs15 noselect">{{op.post_title}}</p>
+                                    <ul class="full-width inline-block mt10">
+                                        {% for c in op.communities %}
+                                        <a href="/c/{{c.slug}}" class="left mr10"><li class="underline-on-hover clg">c/<span class="cg">{{c.name}}</span></li></a>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            </a>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
             {% endif %}
         </div>

@@ -45,10 +45,10 @@
                             <li class="left-list-item">
                                 {% if c.term.profile_img == '' %}
                                     <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
-                                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                    <p class="ellipsis followed-community-name fs19 noselect" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                 {% else %}
                                     <img src="{{c.term.profile_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.term.cover_color}}" data-no-lazy="1"/>
-                                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                    <p class="ellipsis followed-community-name fs19 noselect" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                 {% endif %}
                             </li>
                         </div>
@@ -59,7 +59,7 @@
                 <div class="full-width hand left-list-item-link" id="loadmore" onclick="loadMoreCommunities(this)">
                     <li class="left-list-item">
                         <p class="non-draggable rounded fwblack fs19" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">+{{followed_communities|length|add:-4}}</p>
-                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
+                        <p class="ellipsis followed-community-name fs19 noselect" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
                     </li>
                 </div>
                 {% else %}
@@ -68,7 +68,7 @@
                         <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
                             <i class="fa fa-chevron-down cb fs19" style="top:4px" aria-hidden="true"></i>
                         </div>
-                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
+                        <p class="ellipsis followed-community-name fs19 noselect" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
                     </li>
                 </div>
                 {% endif %}
@@ -78,10 +78,10 @@
                             <li class="left-list-item">
                                 {% if c.term.profile_img == '' %}
                                     <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
-                                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                    <p class="ellipsis followed-community-name fs19 noselect" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                 {% else %}
                                     <img src="{{c.term.profile_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.term.cover_color}}" data-no-lazy="1"/>
-                                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                    <p class="ellipsis followed-community-name fs19 noselect" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                 {% endif %}
                             </li>
                         </div>
@@ -110,7 +110,7 @@
                 <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
                     <i class="fa fa-chevron-up cb fs19" style="top:2px;" aria-hidden="true"></i>
                 </div>
-                <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"less"|ucwords}}</p>
+                <p class="ellipsis followed-community-name fs19 noselect" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"less"|ucwords}}</p>
             </li>
         </div>
     </ul>
@@ -133,7 +133,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"lists"|ucfirst}}</p>
+                        <p class="ellipsis followed-community-name fs19 noselect" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"lists"|ucfirst}}</p>
                     </li>
                 </div>
             </a>
@@ -165,7 +165,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"visithistory"|ucfirst}}</p>
+                        <p class="ellipsis followed-community-name fs19 noselect" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"visithistory"|ucfirst}}</p>
                     </li>
                 </div>
             </a>
@@ -181,7 +181,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"savedposts"|ucfirst}}</p>
+                        <p class="ellipsis followed-community-name fs19 noselect" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"savedposts"|ucfirst}}</p>
                     </li>
                 </div>
             </a>
@@ -195,31 +195,31 @@
                     <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 12.472656 8.527344 C 12.703125 7.863281 12.828125 7.152344 12.828125 6.414062 C 12.828125 5.675781 12.703125 4.964844 12.472656 4.304688 C 12.464844 4.28125 12.457031 4.265625 12.453125 4.246094 C 11.558594 1.773438 9.191406 0 6.414062 0 C 3.636719 0 1.269531 1.773438 0.378906 4.246094 C 0.371094 4.265625 0.363281 4.28125 0.359375 4.304688 C 0.128906 4.964844 0 5.675781 0 6.414062 C 0 7.152344 0.128906 7.863281 0.359375 8.527344 C 0.363281 8.546875 0.371094 8.5625 0.378906 8.582031 C 1.269531 11.054688 3.636719 12.828125 6.414062 12.828125 C 9.191406 12.828125 11.558594 11.054688 12.453125 8.582031 C 12.457031 8.5625 12.464844 8.546875 12.472656 8.527344 Z M 6.414062 11.910156 C 6.171875 11.910156 5.777344 11.464844 5.445312 10.480469 C 5.289062 10.003906 5.160156 9.453125 5.066406 8.859375 L 7.761719 8.859375 C 7.667969 9.453125 7.539062 10.003906 7.382812 10.480469 C 7.050781 11.464844 6.660156 11.910156 6.414062 11.910156 Z M 4.957031 7.941406 C 4.910156 7.449219 4.886719 6.9375 4.886719 6.414062 C 4.886719 5.890625 4.910156 5.378906 4.957031 4.886719 L 7.871094 4.886719 C 7.917969 5.378906 7.941406 5.890625 7.941406 6.414062 C 7.941406 6.9375 7.917969 7.449219 7.871094 7.941406 Z M 0.917969 6.414062 C 0.917969 5.886719 0.996094 5.371094 1.136719 4.886719 L 4.035156 4.886719 C 3.992188 5.390625 3.96875 5.902344 3.96875 6.414062 C 3.96875 6.925781 3.992188 7.441406 4.035156 7.941406 L 1.136719 7.941406 C 0.996094 7.457031 0.917969 6.941406 0.917969 6.414062 Z M 6.414062 0.917969 C 6.660156 0.917969 7.050781 1.363281 7.382812 2.347656 C 7.539062 2.828125 7.667969 3.375 7.761719 3.96875 L 5.066406 3.96875 C 5.160156 3.375 5.289062 2.828125 5.445312 2.347656 C 5.777344 1.363281 6.171875 0.917969 6.414062 0.917969 Z M 8.792969 4.886719 L 11.691406 4.886719 C 11.832031 5.371094 11.910156 5.886719 11.910156 6.414062 C 11.910156 6.941406 11.832031 7.457031 11.691406 7.941406 L 8.792969 7.941406 C 8.835938 7.441406 8.859375 6.925781 8.859375 6.414062 C 8.859375 5.902344 8.835938 5.390625 8.792969 4.886719 Z M 11.335938 3.96875 L 8.691406 3.96875 C 8.527344 2.84375 8.246094 1.832031 7.851562 1.109375 C 9.378906 1.523438 10.640625 2.578125 11.335938 3.96875 Z M 4.976562 1.109375 C 4.582031 1.832031 4.304688 2.84375 4.140625 3.96875 L 1.492188 3.96875 C 2.1875 2.578125 3.449219 1.523438 4.976562 1.109375 Z M 1.492188 8.859375 L 4.140625 8.859375 C 4.304688 9.984375 4.582031 11 4.976562 11.71875 C 3.449219 11.304688 2.1875 10.25 1.492188 8.859375 Z M 7.851562 11.71875 C 8.246094 11 8.527344 9.984375 8.691406 8.859375 L 11.335938 8.859375 C 10.640625 10.25 9.378906 11.304688 7.851562 11.71875 Z M 7.851562 11.71875 "/>
                 </g>
             </svg>
-            <p id="lang-text">{{word_list|getword:"lang"|ucfirst}}</p>
+            <p id="lang-text" class="noselect">{{word_list|getword:"lang"|ucfirst}}</p>
         </div>
         {% if dark == "dark"  %}
             <div class="switch__container left">
                 <input id="switch-shadow" class="switch switch--shadow" type="checkbox" checked>
                 <label for="switch-shadow"></label>
             </div>
-            <p id="mode-text">{{word_list|getword:"dark-mode"|ucfirst}}</p>
+            <p id="mode-text" class="noselect">{{word_list|getword:"dark-mode"|ucfirst}}</p>
         {% else %}
             <div class="switch__container left">
                 <input id="switch-shadow" class="switch switch--shadow" type="checkbox">
                 <label for="switch-shadow"></label>
             </div>
-            <p id="mode-text">{{word_list|getword:"light-mode"|ucfirst}}</p>
+            <p id="mode-text" class="noselect">{{word_list|getword:"light-mode"|ucfirst}}</p>
         {% endif %}
     </div>
     <div class="corporate-footer">
         <div class="full-width inline-block">
-            <a href="#" class="left">{{word_list|getword:"about"|ucfirst}}</a>
-            <a href="#" class="left m010">{{word_list|getword:"careers"|ucfirst}}</a>
-            <a href="#"  class="left">{{word_list|getword:"terms"|ucfirst}}</a>
-            <a href="#" class="left m010">{{word_list|getword:"advertise"|ucfirst}}</a>
-            <a href="#" class="left">{{word_list|getword:"help"|ucfirst}}</a>
+            <a href="#" class="left noselect">{{word_list|getword:"about"|ucfirst}}</a>
+            <a href="#" class="left m010 noselect">{{word_list|getword:"careers"|ucfirst}}</a>
+            <a href="#"  class="left noselect">{{word_list|getword:"terms"|ucfirst}}</a>
+            <a href="#" class="left m010 noselect">{{word_list|getword:"advertise"|ucfirst}}</a>
+            <a href="#" class="left noselect">{{word_list|getword:"help"|ucfirst}}</a>
         </div>
-        <p class="copyright">&copy; 2020 Sosyorol, Inc.</p>
+        <p class="copyright noselect">&copy; 2020 Sosyorol, Inc.</p>
     </div>
 </div>
 <script type="text/javascript" src="{% static 'js/search.js' %}"></script>

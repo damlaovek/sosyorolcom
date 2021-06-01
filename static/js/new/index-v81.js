@@ -26,6 +26,15 @@ function showHide(elemId){
     elem.classList.toggle('hidden');
 }
 
+function showHide2(elemId){
+    var elem = document.getElementById(elemId);
+    if(elem.style.display == "none"){
+        elem.style.display = "block";
+    }else{
+        elem.style.display = "none";
+    }
+}
+
 function setCookie(cname, cvalue, exsecs) {
     var d = new Date();
     d.setTime(d.getTime() + (exsecs*1000));
