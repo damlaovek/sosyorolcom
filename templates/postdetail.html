@@ -101,20 +101,23 @@
                         </div>
                     </div>
                     <div class="inline-block full-width" id="user-profile-c">
-                        <img class="non-draggable rounded left sqr40" src="{{post.author.avatar_url}}"/>
+                        <img class="non-draggable rounded left sqr40 cover" src="{{post.author.avatar_url}}"/>
                         <div class="left" id="user-profile-ic">
                             <p class="ellipsis">{{post.author.display_name}}</p>
                             <a href=""><p class="ellipsis">u/{{post.author.user_login}}</p></a>
                         </div>
                     </div>
                     <p id="user-bio" class="mt10">{{post.author.description}}</p>
-                    {% if current_user.followings|isfollowing:post.author %}
-                        <p class="btn full-width hand noselect fwbold" id="cp-btn" style="font-weight: bold;" onclick="return unfollow(this,'{{current_user.ID}}','{{post.author.ID}}', '{{followtxt|ucwords}}', '{{current_user.ID}}','{{post.author.ID}}');">{{word_list|getword:"following"|ucwords}}</p>
-                    {% else %}
-                        <p class="btn full-width hand noselect fwbold" id="cp-btn" style="font-weight: bold;" onclick="return follow(this,'{{current_user.ID}}','{{post.author.ID}}', '{{followingtxt|ucwords}}', '{{current_user.ID}}','{{post.author.ID}}');">{{word_list|getword:"follow"|ucwords}}</p>
+                    {% if current_user.ID != post.author.ID %}
+                        {% if current_user != None and current_user.followings|isfollowing:post.author %}
+                            <p class="btn full-width hand noselect fwbold" id="cp-btn" style="font-weight: bold;" onclick="return unfollow(this,'{{current_user.ID}}','{{post.author.ID}}', '{{followtxt|ucwords}}', '{{current_user.ID}}','{{post.author.ID}}');">{{word_list|getword:"following"|ucwords}}</p>
+                        {% else %}
+                            <p class="btn full-width hand noselect fwbold" id="cp-btn" style="font-weight: bold;" onclick="return follow(this,'{{current_user.ID}}','{{post.author.ID}}', '{{followingtxt|ucwords}}', '{{current_user.ID}}','{{post.author.ID}}');">{{word_list|getword:"follow"|ucwords}}</p>
+                        {% endif %}
                     {% endif %}
                     <p class="p100 cg2"><span class="fwbold">{{word_list|getword:"joined"|ucfirst}}:</span> {{post.author.user_registered}}</p>
                 </div>
+                {% if other_posts|length > 0 %}
                 <div  class="full-shadow-border section-right-bottom">
                     <div class="bsbb inline-block full-width p1020">
                         <p class="fwblack fs19 left">{% autoescape off %}{{more_from_content_owner}}{% endautoescape %}</p>
@@ -134,6 +137,7 @@
                         {% endfor %}
                     </ul>
                 </div>
+                {% endif %}
             </div>
             {% endif %}
         </div>

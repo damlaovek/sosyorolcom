@@ -2,7 +2,7 @@
 {% load index %}
 <div class="fixed section-left" id="section-left" style="overflow-x: hidden;">
     <ul class="nav">
-        <form method="GET" action="/search" class="relative" style="margin:0;width:calc(100% + 80px);margin-left:-22px;margin-top:-58px;z-index:99;filter:drop-shadow(0 1px 6px rgba(0, 0, 0, .161));" id="search_form">
+        <form method="GET" action="/search" class="relative" style="margin:0;width:calc(100% + 80px);margin-left:-22px;margin-top:-58px;z-index:99;filter:drop-shadow(0 1px 6px rgba(223,223,223, 0.53));" id="search_form">
             {% csrf_token %}
             <input type="text" name="search_key" id="search" class="bsbb full-width p20" style="padding-top:58px;padding-left:32px;padding-right:70px;" placeholder="Search in Sosyorol"  autocomplete='off'>
             <svg class="absolute aligntr svg-icon" style="top: 38px; right:40px;" viewBox="0 0 15 15">
@@ -46,10 +46,10 @@
                                 <li class="left-list-item">
                                     {% if c.term.profile_img == '' %}
                                         <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
-                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                        <p class="ellipsis followed-community-name fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                     {% else %}
                                         <img src="{{c.term.profile_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.term.cover_color}}" data-no-lazy="1"/>
-                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                        <p class="ellipsis followed-community-name fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                     {% endif %}
                                 </li>
                             </div>
@@ -59,8 +59,8 @@
                     {% if followed_communities|length|add:-4 < 10 %}
                     <div class="full-width hand left-list-item-link" id="loadmore" onclick="loadMoreCommunities(this)">
                         <li class="left-list-item">
-                            <p class="non-draggable rounded fwblack fs19" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">+{{followed_communities|length|add:-4}}</p>
-                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
+                            <p class="non-draggable rounded fwblack fs19 ctitle" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">+{{followed_communities|length|add:-4}}</p>
+                            <p class="ellipsis followed-community-name fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
                         </li>
                     </div>
                     {% else %}
@@ -69,7 +69,7 @@
                             <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
                                 <i class="fa fa-chevron-down cb fs19" style="top:4px" aria-hidden="true"></i>
                             </div>
-                            <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
+                            <p class="ellipsis followed-community-name fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
                         </li>
                     </div>
                     {% endif %}
@@ -79,10 +79,10 @@
                                 <li class="left-list-item">
                                     {% if c.term.profile_img == '' %}
                                         <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
-                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                        <p class="ellipsis followed-community-name fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                     {% else %}
                                         <img src="{{c.term.profile_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.term.cover_color}}" data-no-lazy="1"/>
-                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                        <p class="ellipsis followed-community-name fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                     {% endif %}
                                 </li>
                             </div>
@@ -95,10 +95,10 @@
                                 <li class="left-list-item">
                                     {% if c.term.profile_img == '' %}
                                         <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
-                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                        <p class="ellipsis followed-community-name fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                     {% else %}
                                         <img src="{{c.term.profile_img}}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:{{c.term.cover_color}}" data-no-lazy="1"/>
-                                        <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
+                                        <p class="ellipsis followed-community-name fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">c/{{c.term.name}}</p>
                                     {% endif %}
                                 </li>
                             </div>
@@ -111,7 +111,7 @@
                     <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
                         <i class="fa fa-chevron-up cb fs19" style="top:2px;" aria-hidden="true"></i>
                     </div>
-                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"less"|ucwords}}</p>
+                    <p class="ellipsis followed-community-name fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"less"|ucwords}}</p>
                 </li>
             </div>
             <div id="divider" style="margin:0;width:calc(100% + 70px);left:-25px;z-index:99;margin-bottom:20px;"></div>
@@ -195,7 +195,7 @@
                         <div class="full-width hand left-list-item-link active" id="allcategories">
                             <li class="left-list-item">
                                 <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
-                                <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"all"|ucfirst}}</p>
+                                <p class="ellipsis fwbold fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"all"|ucfirst}}</p>
                             </li>
                         </div>
                     </a>
@@ -206,7 +206,7 @@
                         <div class="full-width hand left-list-item-link"  id="allcategories">
                             <li class="left-list-item">
                                 <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
-                                <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"all"|ucfirst}}</p>
+                                <p class="ellipsis fwbold fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"all"|ucfirst}}</p>
                             </li>
                         </div>
                     </a>
@@ -221,7 +221,7 @@
                             <div class="full-width hand left-list-item-link active" id="{{item.slug|tolower}}">
                                 <li class="left-list-item">
                                     <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
-                                    <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
+                                    <p class="ellipsis fwbold fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
                                 </li>
                             </div>
                         </a>
@@ -232,7 +232,7 @@
                             <div class="full-width hand left-list-item-link" id="{{item.slug|tolower}}">
                                 <li class="left-list-item">
                                     <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
-                                    <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
+                                    <p class="ellipsis fwbold fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
                                 </li>
                             </div>
                         </a>
@@ -245,7 +245,7 @@
                                 <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
                                     <i class="fa fa-chevron-down cb fs19" style="top:4px" aria-hidden="true"></i>
                                 </div>
-                                <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
+                                <p class="ellipsis fwbold fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"more"|ucwords}}</p>
                             </li>
                         </div>
                     {% endif %}
@@ -255,7 +255,7 @@
                                 <div class="full-width hand left-list-item-link active" id="{{item.slug|tolower}}">
                                     <li class="left-list-item">
                                         <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
-                                        <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
+                                        <p class="ellipsis fwbold fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
                                     </li>
                                 </div>
                             </a>
@@ -266,7 +266,7 @@
                                 <div class="full-width hand left-list-item-link" id="{{item.slug|tolower}}">
                                     <li class="left-list-item">
                                         <img src="{% static 'assets/img/defaults/default-community.png' %}" class="non-draggable rounded" style="padding:5px;width:30px;height:30px;object-fit:scale-down; background-color:var(--main-color)" data-no-lazy="1"/>
-                                        <p class="ellipsis fwbold fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
+                                        <p class="ellipsis fwbold fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{item.name|ucfirst}}</p>
                                     </li>
                                 </div>
                             </a>
@@ -279,7 +279,7 @@
                     <div class="non-draggable rounded fwblack" style="padding:5px;width:30px;height:30px;line-height:30px; text-align:center;color:var(--main-color);background-color:rgba(0,164,236,0.15);">
                         <i class="fa fa-chevron-up cb fs19" style="top:2px;" aria-hidden="true"></i>
                     </div>
-                    <p class="ellipsis followed-community-name fs19" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"less"|ucwords}}</p>
+                    <p class="ellipsis followed-community-name fs19 ctitle" style="padding:0 15px;font-weight:var(--bold);line-height:40px;">{{word_list|getword:"less"|ucwords}}</p>
                 </li>
             </div>
         </div>

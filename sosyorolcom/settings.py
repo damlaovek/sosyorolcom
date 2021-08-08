@@ -14,6 +14,9 @@ import os
 import mimetypes
 mimetypes.add_type("text/css", ".css", True)
 
+CSRF_COOKIE_SAMESITE = None
+SESSION_COOKIE_SAMESITE = None
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -27,13 +30,15 @@ SECRET_KEY = 'ls#&d__5r&nz891eo3$^mdd=f8&s1+#t$b2)&s5#x5^=erz#yq'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['www.assetlogo.com', '*']
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
 
 
 MEDIA_ROOT =  os.path.join(STATICFILES_DIRS[0], 'assets') 
 MEDIA_URL = '/media/'
+
+APPEND_SLASH = True
 
 
 # Application definition

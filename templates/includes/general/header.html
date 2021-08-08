@@ -86,7 +86,11 @@
             </div>
     	</a>
     	<div class="header-icon" data-title="{{word_list|getword:'profile'|ucwords}}">
-            <a href="" class="right" id="header-icon-profile">
+            {% if current_user == None %}
+            <a href="/signin/" class="right" id="header-icon-profile">
+            {% else %}
+            <a href="/u/{{current_user.user_login}}/" class="right" id="header-icon-profile">
+            {% endif %}
                 <div class="header-icon-background full-shadow-border">
                     <svg class="svg-icon" viewBox="0 0 15 15">
                         <g>
@@ -97,8 +101,12 @@
                 </div>
     		</a>
     	</div>
-    	<div class="header-icon" data-title="{{word_list|getword:'messages'|ucwords}}">
-            <a href="/chat" class="right">
+    	<div class="header-icon" id="header-icon-chat" data-title="{{word_list|getword:'messages'|ucwords}}">
+            {% if current_user == None %}
+            <a href="/signin/" class="right" id="chatbtn">
+            {% else %}
+            <a href="/chat/" id="chatbtn" class="right">
+             {% endif %}
                 <div class="header-icon-background full-shadow-border">
                     <svg class="svg-icon" viewBox="0 0 15 15">
                         <g>
@@ -110,7 +118,11 @@
     		</a>
     	</div>
     	<div class="header-icon" id="header-icon-notifications" data-title="{{word_list|getword:'notifications'|ucwords}}">
+            {% if current_user == None %}
+            <a href="/signin/" class="right" id="notificationsbtn">
+            {% else %}
             <a href="" id="notificationsbtn" class="right" onclick="return openCloseNotifications({% url 'updateallnotifications' %});">
+            {% endif %}
                 <div class="header-icon-background full-shadow-border">
                     <svg class="svg-icon" viewBox="0 0 15 15">
                         <g>
@@ -126,7 +138,11 @@
             </a>
     	</div>
     	<div class="header-icon" data-title="{{word_list|getword:'create-post'|ucwords}}">
+            {% if current_user == None %}
+            <a href="/signin/" class="right">
+            {% else %}
             <a href="/submit/" class="right">
+            {% endif %}
                 <div class="header-icon-background full-shadow-border">
                     <svg class="svg-icon" viewBox="0 0 15 15">
                         <g>

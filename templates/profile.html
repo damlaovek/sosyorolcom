@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
         <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
         <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
+        <link rel="stylesheet" href="{% static 'css/postdetail.css' %}">
         <script src="{% static 'js/new/autosize.min.js' %}"></script>
         <script src="{% static 'js/new/user-list.min.js' %}"></script>
         <script src="{% static 'js/index.js' %}"></script>
@@ -19,6 +20,7 @@
         <!-- TODO: Add SDKs for Firebase products that you want to use
             https://firebase.google.com/docs/web/setup#available-libraries -->
         <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-database.js"></script>
 
         <script>
         // Your web app's Firebase configuration
@@ -37,7 +39,7 @@
         firebase.analytics();
         </script>
         <style>
-            .box{box-shadow:0px 3px 4px rgba(173,173,173, 0.53);}
+            .box{box-shadow:0px 3px 8px rgba(223,223,223, 0.53);}
             .box .box{box-shadow:none;}
             .lst-item{padding:10px 0 15px 0;}
             .lst-item:hover{border-bottom:5px solid var(--main-color);padding-bottom:10px; color:var(--main-color);}
@@ -126,7 +128,7 @@
                                     <div class="full-width inline-flex mt20">
                                         <a href="/u/{{profile.user_login}}/followers"><p class="cb"><span class="fwbold" id="num_follower">{{profile.followers|length}}</span>&nbsp;{{word_list|getword:"followers"}}</p></a>
                                         <a href="/u/{{profile.user_login}}/followings"><p class="cb ml20"><span class="fwbold" id="num_following">{{profile.followings|length}}</span>&nbsp;{{word_list|getword:"followings"}}</p></a>
-                                        <p class="cb ml20"><span class="fwbold">{{profile.posts|length}}</span>&nbsp;{{word_list|getword:"posts"}}</p>
+                                        <p class="cb ml20"><span class="fwbold">{{post_length}}</span>&nbsp;{{word_list|getword:"posts"}}</p>
                                     </div>
                                     <div class="full-width inline-flex mt20">
                                         {% if profile.ID != current_user.ID %}
@@ -166,7 +168,7 @@
                                                     {% for f in profile.followers %}
                                                         {% if forloop.counter < 4 %}
                                                             {% if forloop.counter == 3 %}
-                                                                <a href="/u/{{f.follower.user_nicename}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
+                                                                <a href="/u/{{f.follower.user_login}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
                                                                     <img class="sqrt30 rounded" src="{{f.follower.avatar_url}}" style="object-fit:cover;">
                                                                 </a>
                                                                 {% if followers|length > 3  %}
@@ -181,7 +183,7 @@
                                                                     </div>
                                                                 {% endif %}
                                                             {% else %}
-                                                                <a href="/u/{{f.follower.user_nicename}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
+                                                                <a href="/u/{{f.follower.user_login}}" target="_blank"  class="sqrt30 imgbw rounded" style="margin-left: -10px;">
                                                                     <img class="sqrt30 rounded" src="{{f.follower.avatar_url}}" style="object-fit:cover;">
                                                                 </a>
                                                             {% endif %}
@@ -237,7 +239,7 @@
                             {% else %}
                             <a href="/u/{{profile.user_login}}/quiz"><li class="hand fs15 cg2 fwmedium lst-item m020 noselect">{{word_list|getword:"quiz"|ucwords}}</li></a>
                             {% endif %}
-                            {% if filter == "comment" %}
+                            {% if filter == "comments" %}
                             <a href="/u/{{profile.user_login}}/comments"><li class="hand fs15 cg2 fwmedium lst-item active noselect">{{word_list|getword:"comment"|ucwords}}</li></a>
                             {% else %}
                             <a href="/u/{{profile.user_login}}/comments"><li class="hand fs15 cg2 fwmedium lst-item noselect">{{word_list|getword:"comment"|ucwords}}</li></a>
@@ -246,67 +248,164 @@
                     </div>
                     <div class="full-width mt20" id="posts">
                         <input type="hidden" value="True" id="has-more-0">
-                        {% for post in profile.posts %}
-                            {% if post.post_type == "post" %}
-                                {% if filter == "post" %}
-                                    {% include 'posts/posttemplates/post_template.html' with post=post %}
-                                {% elif filter == "all" %}
-                                    {% include 'posts/posttemplates/post_template.html' with post=post %}
+                        {% if filter == "comments" %}
+                            {% if profile.comments|length == 0 %}
+                            <div class="bsbb p20 full-width tac border bcgrayish br10">
+                                <div class="sqr60 rounded bcgrayish center full-shadow-border" style="margin:auto;">
+                                    <svg class="svg-icon" viewBox="0 0 40 40">
+                                        <g>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 20.359375 35.3125 C 18.820312 35.3125 17.328125 35.320312 15.898438 35.320312 C 15.890625 35.414062 15.886719 35.507812 15.886719 35.605469 C 15.886719 38.074219 17.890625 40.074219 20.359375 40.074219 C 22.828125 40.074219 24.828125 38.074219 24.828125 35.605469 C 24.828125 35.507812 24.824219 35.414062 24.820312 35.320312 C 23.386719 35.320312 21.894531 35.3125 20.359375 35.3125 Z M 20.359375 35.3125 "/>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 34.273438 23.769531 C 34.941406 23.5 35.425781 22.734375 35.425781 21.835938 C 35.425781 20.707031 34.667969 19.792969 33.738281 19.792969 L 32.699219 19.792969 C 32.605469 17.941406 32.671875 15.710938 32.671875 15.710938 C 32.671875 9.789062 28.597656 4.585938 23.097656 3.148438 C 23.191406 2.894531 23.246094 2.621094 23.246094 2.332031 C 23.242188 1.042969 22.199219 0 20.914062 0 L 19.164062 0 C 17.875 0 16.828125 1.042969 16.828125 2.332031 C 16.828125 2.621094 16.886719 2.894531 16.980469 3.148438 C 11.480469 4.585938 7.402344 9.789062 7.402344 15.710938 C 7.402344 15.710938 7.46875 17.941406 7.375 19.792969 L 6.339844 19.792969 C 5.40625 19.792969 4.648438 20.707031 4.648438 21.835938 C 4.648438 22.734375 5.132812 23.5 5.800781 23.769531 C 3.625 26.300781 1.050781 27.574219 1.050781 30.289062 C 1.050781 34.574219 9.550781 34.210938 20.039062 34.210938 C 30.523438 34.210938 39.023438 34.574219 39.023438 30.289062 C 39.023438 27.574219 36.449219 26.300781 34.273438 23.769531 Z M 18.03125 6.351562 C 16.671875 6.671875 15.382812 7.359375 14.242188 8.292969 C 11.601562 10.449219 10.582031 13.585938 10.828125 16.9375 C 10.890625 17.78125 9.578125 17.773438 9.515625 16.9375 C 9.253906 13.34375 10.394531 9.753906 13.242188 7.421875 C 14.515625 6.378906 16.0625 5.46875 17.683594 5.089844 C 18.507812 4.894531 18.855469 6.160156 18.03125 6.351562 Z M 18.03125 6.351562 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                                <p class="cg2 full-width tac mt10 fwbold">{{word_list|getword:"no-comments-yet"|ucfirst}}</p>
+                            </div>
+                            {% else %}
+                            <ul class="bsbb full-width box bcw">
+                            {% for comment in profile.comments %}
+                                {% if forloop.first %}
+                                <li class="bsbb full-width p200">
+                                {% else %}
+                                <li class="bsbb full-width p200 bt">
                                 {% endif %}
-                            {% elif post.post_type == "repost" %}
-                                {% if filter == "all" %}
-                                    {% include 'posts/posttemplates/repost_template.html' with repost=post %}
-                                {% endif %}
-                            {% elif post.post_type == "media" %}
-                                {% if filter == "media" %}
-                                    {% include 'posts/posttemplates/media_template.html' with media=post %}
-                                {% elif filter == "all" %}
-                                    {% include 'posts/posttemplates/media_template.html' with media=post %}
-                                {% endif %}
-                            {% elif post.post_type == "link" %}
-                                {% if filter == "link" %}
-                                    {% include 'posts/posttemplates/link_template.html' with link=post %}
-                                {% elif filter == "all" %}
-                                    {% include 'posts/posttemplates/link_template.html' with link=post %}
-                                {% endif %}
-                            {% elif post.post_type == "questions" %}
-                                {% if filter == "question" %}
-                                    {% include 'posts/posttemplates/post_template.html' with post=post %}
-                                {% elif filter == "all" %}
-                                    {% include 'posts/posttemplates/post_template.html' with post=post %}
-                                {% endif %}
-                            {% elif post.post_type == "answer" %}
-                                {% if filter == "answer" %}
-                                    {% include 'posts/posttemplates/answer_template.html' with answer=post %}
-                                {% elif filter == "all" %}
-                                    {% include 'posts/posttemplates/answer_template.html' with answer=post %}
-                                {% endif %}                
-                            {% elif post.post_type == "poll" %}
-                                {% if filter == "poll" %}
-                                    {% include 'posts/posttemplates/poll_template.html' with poll=post %}
-                                {% elif filter == "all" %}
-                                    {% include 'posts/posttemplates/poll_template.html' with poll=post %}
-                                {% endif %}
-                            {% elif post.post_type == "quiz" %}
-                                {% if filter == "quiz" %}
-                                    {% if post.quiz_type == "colorBox" %}
-                                        {% include 'posts/posttemplates/colorBox_quiz_template.html' with quiz=post %}
-                                    {% elif post.quiz_type == "media" %}
-                                        {% include 'posts/posttemplates/media_quiz_template.html' with quiz=post %}
-                                    {% else %}
-                                        {% include 'posts/posttemplates/quiz_template.html' with quiz=post %}
+                                    <div class='p020'>
+                                        <div class='full-width inline-block'>
+                                            <a href='/u/{{comment.user.user_login}}' class='left'><img src='{{comment.user.avatar_url}}' class='sqr40 rounded'/></a>
+                                            <div class='ml10 left w50'>
+                                                <a href='/u/{{comment.user.user_login}}'><p class='ctitle  lh20 underline-on-hover'>{{comment.user.display_name}}</p></a>
+                                                <p class='cg2 lh20 fs13'>{{comment.comment_date}}</p>
+                                            </div>
+                                        </div>
+                                        <a href="/u/{{comment.comment_post.author.user_login}}/"><p class="bsbb fwbold underline-on-hover mt15 full-width">{{comment.comment_post.post_title}}</p></a>
+                                        <p class='lh20 fs14 ctext mt10'>{{comment.comment_content}}</p>
+                                    </div>
+                                    <div class='inline-block p50 m010 w20'>
+                                        <div class='icon left rotateY180' onclick="toggleCommentEditor({{comment.comment_ID}})">
+                                            <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                                <g>
+                                                    <path style='stroke-width:0.5;stroke:var(--gray2);fill-rule:nonzero;fill-opacity:1;' d='M 0.664062 18.40625 C 0.671875 18.40625 0.675781 18.40625 0.683594 18.40625 C 1 18.394531 1.199219 18.148438 1.226562 17.832031 C 1.25 17.601562 1.871094 11.992188 10.625 12 L 10.644531 15.585938 C 10.644531 15.828125 10.785156 16.046875 11.003906 16.148438 C 11.21875 16.253906 11.480469 16.222656 11.667969 16.066406 L 19.773438 9.351562 C 19.917969 9.234375 20 9.054688 20 8.871094 C 20 8.683594 19.914062 8.503906 19.769531 8.386719 L 11.664062 1.734375 C 11.480469 1.582031 11.21875 1.554688 11.003906 1.65625 C 10.785156 1.757812 10.644531 1.976562 10.644531 2.21875 L 10.628906 5.726562 C 6.996094 5.84375 4.183594 7.011719 2.359375 9.144531 C -0.609375 12.617188 0.0546875 17.664062 0.0820312 17.875 C 0.128906 18.179688 0.355469 18.40625 0.664062 18.40625 Z M 11.269531 10.738281 C 5.015625 10.742188 2.625 12.855469 1.261719 14.71875 C 1.460938 13.222656 2.042969 11.425781 3.3125 9.953125 C 4.996094 7.996094 7.714844 6.96875 11.269531 6.96875 C 11.617188 6.96875 11.894531 6.6875 11.894531 6.34375 L 11.894531 3.535156 L 18.390625 8.875 L 11.894531 14.261719 L 11.894531 11.363281 C 11.894531 11.195312 11.828125 11.039062 11.710938 10.921875 C 11.59375 10.804688 11.4375 10.738281 11.269531 10.738281 Z M 11.269531 10.738281'/>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                        <div class='icon left' onclick='upvote(".$index.$index2.");'>
+                                            <svg width='20px' height='20px' id='upvote".$index.$index2."' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+                                                <g>
+                                                    <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                        <p class='vote noselect' id='vote".$index.$index2."'>1</p>
+                                        <div class='left icon ml5' onclick='downvote(".$index.$index2.");'>
+                                            <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote".$index.$index2."' class='downvote'>
+                                                <g id='surface1'>
+                                                    <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                        <div class='right icon'>
+                                            <svg width='20px' height='20px' viewBox='0 0 20 20' class='rotate90'>
+                                                <g>
+                                                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12 " transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                    <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    {% if comment.child_comments|length > 0 %}
+                                        <div class="hand cb p1020 underline-on-hover" onclick="showChildComments(this, {{comment.comment_ID}})">{{word_list|getword:"view-replies"|ucwords}}</div>
                                     {% endif %}
-                                {% elif filter == "all" %}
-                                    {% if post.quiz_type == "colorBox" %}
-                                        {% include 'posts/posttemplates/colorBox_quiz_template.html' with quiz=post %}
-                                    {% elif post.quiz_type == "media" %}
-                                        {% include 'posts/posttemplates/media_quiz_template.html' with quiz=post %}
+                                    <div class="comment-editor-wrapper dnone" id="comment-editor-wrapper{{comment.comment_ID}}">
+                                        {% include 'posts/comments/comment_editor.html' with parent_id=comment.comment_ID post_id=post.ID %}
+                                    </div>
+                                    {% if comment.child_comments|length > 0 %}
+                                    <div class="dnone" id="child-comments-wrapper{{comment.comment_ID}}">
                                     {% else %}
-                                        {% include 'posts/posttemplates/quiz_template.html' with quiz=post %}
+                                    <div id="child-comments-wrapper{{comment.comment_ID}}">
                                     {% endif %}
-                                {% endif %}
+                                        {% include 'posts/comments/comment_list.html' with comments=comment.child_comments padding=20 %}
+                                    </div>
+                                </li>
+                            {% endfor %}
+                            </ul>
                             {% endif %}
-                        {% endfor %}
+                        {% else %}
+                            {% if profile.posts|length == 0 %}
+                            <div class="bsbb p20 full-width tac border bcgrayish br10">
+                                <div class="sqr60 rounded bcgrayish center full-shadow-border" style="margin:auto;">
+                                    <svg class="svg-icon" viewBox="0 0 40 40">
+                                        <g>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 20.359375 35.3125 C 18.820312 35.3125 17.328125 35.320312 15.898438 35.320312 C 15.890625 35.414062 15.886719 35.507812 15.886719 35.605469 C 15.886719 38.074219 17.890625 40.074219 20.359375 40.074219 C 22.828125 40.074219 24.828125 38.074219 24.828125 35.605469 C 24.828125 35.507812 24.824219 35.414062 24.820312 35.320312 C 23.386719 35.320312 21.894531 35.3125 20.359375 35.3125 Z M 20.359375 35.3125 "/>
+                                            <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 34.273438 23.769531 C 34.941406 23.5 35.425781 22.734375 35.425781 21.835938 C 35.425781 20.707031 34.667969 19.792969 33.738281 19.792969 L 32.699219 19.792969 C 32.605469 17.941406 32.671875 15.710938 32.671875 15.710938 C 32.671875 9.789062 28.597656 4.585938 23.097656 3.148438 C 23.191406 2.894531 23.246094 2.621094 23.246094 2.332031 C 23.242188 1.042969 22.199219 0 20.914062 0 L 19.164062 0 C 17.875 0 16.828125 1.042969 16.828125 2.332031 C 16.828125 2.621094 16.886719 2.894531 16.980469 3.148438 C 11.480469 4.585938 7.402344 9.789062 7.402344 15.710938 C 7.402344 15.710938 7.46875 17.941406 7.375 19.792969 L 6.339844 19.792969 C 5.40625 19.792969 4.648438 20.707031 4.648438 21.835938 C 4.648438 22.734375 5.132812 23.5 5.800781 23.769531 C 3.625 26.300781 1.050781 27.574219 1.050781 30.289062 C 1.050781 34.574219 9.550781 34.210938 20.039062 34.210938 C 30.523438 34.210938 39.023438 34.574219 39.023438 30.289062 C 39.023438 27.574219 36.449219 26.300781 34.273438 23.769531 Z M 18.03125 6.351562 C 16.671875 6.671875 15.382812 7.359375 14.242188 8.292969 C 11.601562 10.449219 10.582031 13.585938 10.828125 16.9375 C 10.890625 17.78125 9.578125 17.773438 9.515625 16.9375 C 9.253906 13.34375 10.394531 9.753906 13.242188 7.421875 C 14.515625 6.378906 16.0625 5.46875 17.683594 5.089844 C 18.507812 4.894531 18.855469 6.160156 18.03125 6.351562 Z M 18.03125 6.351562 "/>
+                                        </g>
+                                    </svg>
+                                </div>
+                                <p class="cg2 full-width tac mt10 fwbold">{{word_list|getword:"no-posts-yet"|ucfirst}}</p>
+                            </div>
+                            {% endif %}
+                            {% for post in profile.posts %}
+                                {% if post.post_type == "post" %}
+                                    {% if filter == "post" %}
+                                        {% include 'posts/posttemplates/post_template.html' with post=post %}
+                                    {% elif filter == "all" %}
+                                        {% include 'posts/posttemplates/post_template.html' with post=post %}
+                                    {% endif %}
+                                {% elif post.post_status == "repost" %}
+                                    {% if filter == "all" %}
+                                        {% include 'posts/posttemplates/repost_template.html' with repost=post %}
+                                    {% endif %}
+                                {% elif post.post_type == "media" %}
+                                    {% if filter == "media" %}
+                                        {% include 'posts/posttemplates/media_template.html' with media=post %}
+                                    {% elif filter == "all" %}
+                                        {% include 'posts/posttemplates/media_template.html' with media=post %}
+                                    {% endif %}
+                                {% elif post.post_type == "link" %}
+                                    {% if filter == "link" %}
+                                        {% include 'posts/posttemplates/link_template.html' with link=post %}
+                                    {% elif filter == "all" %}
+                                        {% include 'posts/posttemplates/link_template.html' with link=post %}
+                                    {% endif %}
+                                {% elif post.post_type == "questions" %}
+                                    {% if filter == "question" %}
+                                        {% include 'posts/posttemplates/post_template.html' with post=post %}
+                                    {% elif filter == "all" %}
+                                        {% include 'posts/posttemplates/post_template.html' with post=post %}
+                                    {% endif %}
+                                {% elif post.post_type == "answer" %}
+                                    {% if filter == "answer" %}
+                                        {% include 'posts/posttemplates/answer_template.html' with answer=post %}
+                                    {% elif filter == "all" %}
+                                        {% include 'posts/posttemplates/answer_template.html' with answer=post %}
+                                    {% endif %}                
+                                {% elif post.post_type == "poll" %}
+                                    {% if filter == "poll" %}
+                                        {% include 'posts/posttemplates/poll_template.html' with poll=post %}
+                                    {% elif filter == "all" %}
+                                        {% include 'posts/posttemplates/poll_template.html' with poll=post %}
+                                    {% endif %}
+                                {% elif post.post_type == "quiz" %}
+                                    {% if filter == "quiz" %}
+                                        {% if post.quiz_type == "colorBox" %}
+                                            {% include 'posts/posttemplates/colorBox_quiz_template.html' with quiz=post %}
+                                        {% elif post.quiz_type == "media" %}
+                                            {% include 'posts/posttemplates/media_quiz_template.html' with quiz=post %}
+                                        {% else %}
+                                            {% include 'posts/posttemplates/quiz_template.html' with quiz=post %}
+                                        {% endif %}
+                                    {% elif filter == "all" %}
+                                        {% if post.quiz_type == "colorBox" %}
+                                            {% include 'posts/posttemplates/colorBox_quiz_template.html' with quiz=post %}
+                                        {% elif post.quiz_type == "media" %}
+                                            {% include 'posts/posttemplates/media_quiz_template.html' with quiz=post %}
+                                        {% else %}
+                                            {% include 'posts/posttemplates/quiz_template.html' with quiz=post %}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
                     </div>
                     <div id="loader" class="full-width tac dnone">
                         <img src="{% static 'assets/img/sosyorol-loader.gif' %}" style="margin:auto; height: 80px;">
@@ -333,14 +432,14 @@
                             <ul class="full-width bt" style="margin-top:12px;">
                                 {% for user in users %}
                                     <li class="bsbb full-width bb right-list-item">
-                                        <a href="" class="bsbb full-width p1020 inline-block">
+                                        <a href="/u/{{user.user_login}}" class="bsbb full-width p1020 inline-block">
                                             <img class="sqr40 rounded lh30 left" src="{{user.avatar_url}}"/>
                                             <div class="ml10 left">
-                                                <p class="lh20 fwblack ctitle">{{user.display_name}}</p>
-                                                <p class="cg2 lh20">u/{{user.user_login}}</p>
+                                                <p class="lh20 fwblack ctitle" style="text-overflow: ellipsis; width: 100px; height:20px; overflow: hidden;">{{user.display_name}}</p>
+                                                <p class="cg2 lh20" style="text-overflow: ellipsis; width: 100px;overflow: hidden;">u/{{user.user_login}}</p>
                                             </div>
                                             <div class="right" style="top:5.5px;">
-                                                <p class="btn"><span class="p115">{{word_list|getword:"follow"|ucfirst}}</span></p>
+                                                <p class="btn" onclick="return follow(this,'{{current_user.ID}}','{{user.ID}}', '{{followingtxt|ucwords}}', '{{current_user.ID}}','{{user.ID}}');"><span class="p115">{{word_list|getword:"follow"|ucfirst}}</span></p>
                                             </div>
                                         </a>
                                     </li>
@@ -350,43 +449,47 @@
                                 <a href="" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
                             </div>
                         </div>
-                        <div class="full-shadow-border section-right-bottom" style="padding:0;width:calc(100% - 60px);">
-                            <ul class="full-width inline-block">
-                                {% for media in medias %}
-                                    <li class="left" style="width:calc(100% / 3);height:100px;">
-                                        <a class="full" href="/u/{{media.author.user_login}}/{{media.hex_id}}/{{media.guid}}">
-                                            {% if media.media_type == "image" %}
-                                                {% if forloop.counter == 1 %}
-                                                    <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-top-left-radius: 5px;"/>
-                                                {% elif forloop.counter == 3 %}
-                                                    <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-top-right-radius: 5px;"/>
-                                                {% elif forloop.counter == 4 %}
-                                                    <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-bottom-left-radius: 5px;"/>
-                                                {% elif forloop.counter == 6 %}
-                                                    <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-bottom-right-radius: 5px;"/>
-                                                {% else %}
-                                                    <img src="{{media.media_url}}" class="full" style="object-fit: cover;"/>
+                        {% if medias|length > 0 %}
+                            <div class="full-shadow-border section-right-bottom" style="padding:0;width:calc(100% - 60px);">
+                                <ul class="full-width inline-block">
+                                    {% for media in medias %}
+                                        <li class="left" style="width:calc(100% / 3);height:100px;">
+                                            <a class="full" href="/u/{{media.author.user_login}}/{{media.hex_id}}/{{media.guid}}">
+                                                {% if media.media_type == "image" %}
+                                                    {% if forloop.counter == 1 %}
+                                                        <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-top-left-radius: 5px;"/>
+                                                    {% elif forloop.counter == 3 %}
+                                                        <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-top-right-radius: 5px;"/>
+                                                    {% elif forloop.counter == 4 %}
+                                                        <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-bottom-left-radius: 5px;"/>
+                                                    {% elif forloop.counter == 6 %}
+                                                        <img src="{{media.media_url}}" class="full" style="object-fit: cover;border-bottom-right-radius: 5px;"/>
+                                                    {% else %}
+                                                        <img src="{{media.media_url}}" class="full" style="object-fit: cover;"/>
+                                                    {% endif %}
                                                 {% endif %}
-                                            {% endif %}
-                                        </a>
-                                    </li>
-                                {% endfor %}
-                                {% for i in empty_medias %}
-                                    {% if forloop.last%}
-                                        <li class="left" style="width:calc(100% / 3);height:100px; background-color:var(--main-color-alpha);">
+                                            </a>
                                         </li>
-                                    {% else %}
-                                        <li class="left" style="width:calc(100% / 3 - 1px);height:100px; border-right:1px solid var(--white); background-color:var(--main-color-alpha);">
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </div>
+                                    {% endfor %}
+                                    {% for i in empty_medias %}
+                                        {% if forloop.last%}
+                                            <li class="left" style="width:calc(100% / 3);height:100px; background-color:var(--main-color-alpha);">
+                                            </li>
+                                        {% else %}
+                                            <li class="left" style="width:calc(100% / 3 - 1px);height:100px; border-right:1px solid var(--white); background-color:var(--main-color-alpha);">
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
                     {% else %}
                     {% endif %}
                 </div>
             {% endif %}
         </div>
+        {% include 'includes/general/chat_popup.html' %}
+        {% include 'posts/repost_popup.html' %}
         <script>
             var offset = 0;
             var limit = 5;
@@ -431,5 +534,16 @@
                 }
             }
         </script>
+        {% if filter == "comments" %}
+        <script>
+            function toggleCommentEditor(comment_ID){
+                document.getElementById("comment-editor-wrapper"+comment_ID).classList.toggle("dnone");
+            }
+            function showChildComments(elem, comment_ID){
+                elem.classList.add("dnone");
+                document.getElementById("child-comments-wrapper"+comment_ID).classList.remove("dnone");
+            }
+        </script>
+        {% endif %}
     </body>
 </html>

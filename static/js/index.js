@@ -1,6 +1,80 @@
 // dark mode & lang
 var j=jQuery.noConflict();
-window.onload=function(){var e=document.getElementById("profile-more-submenu"),o=document.getElementById("profile-more-actions");document.onclick=function(t){"profile-more-submenu"===t.target.id?t.preventDefault():"profile-more-actions"===t.target.id?(e.classList.toggle("open"),o.classList.toggle("active")):(e.classList.remove("open"),o.classList.remove("active"))}},j(document).ready(function(){autosize(document.querySelectorAll("textarea"));document.getElementById("switch-shadow");var e=document.getElementById("mode-text");j("#switch-shadow").change(function(){this.checked?(e.innerHTML="<?php echo ucwords_tr($darkmode); ?>",document.getElementsByTagName("BODY")[0].classList.add("dark"),document.getElementById("logo3").srcset="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/header/sosyorol-logo3-dark.webp",document.getElementById("logo2").srcset="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/header/sosyorol-logo1-dark.jpg",document.getElementById("logo1").src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/header/sosyorol-logo1-dark.jpg",jQuery.ajax({type:"POST",url:"https://www.sosyorol.com/user-preferences/",async:!0,data:{uid:"<?php echo $userID; ?>",sel:"dark",op:"mode"},success:function(e){location.reload()},error:function(e,o,t){}})):(e.innerHTML="<?php echo ucwords_tr($lightmode); ?>",document.getElementsByTagName("BODY")[0].classList.remove("dark"),document.getElementById("logo3").srcset="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/header/sosyorol-logo3.webp",document.getElementById("logo2").srcset="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/header/sosyorol-logo1.jpg",document.getElementById("logo1").src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/header/sosyorol-logo1.jpg",jQuery.ajax({type:"POST",url:"https://www.sosyorol.com/user-preferences/",async:!0,data:{uid:"<?php echo $userID; ?>",sel:"light",op:"mode"},success:function(e){},error:function(e,o,t){}}))})});
+(window.onload = function () {
+    var e = document.getElementById("profile-more-submenu"),
+        o = document.getElementById("profile-more-actions");
+    document.onclick = function (t) {
+        "profile-more-submenu" === t.target.id ? t.preventDefault() : "profile-more-actions" === t.target.id ? (e.classList.toggle("open"), o.classList.toggle("active")) : (e.classList.remove("open"), o.classList.remove("active"));
+    };
+}),
+    j(document).ready(function () {
+        autosize(document.querySelectorAll("textarea"));
+        document.getElementById("switch-shadow");
+        var e = document.getElementById("mode-text");
+       /*j("#switch-shadow").change(function () {
+            this.checked
+                ? ((e.innerHTML = "<?php echo ucwords_tr($darkmode); ?>"),
+                  document.getElementsByTagName("BODY")[0].classList.add("dark"),
+                  (document.getElementById("logo3").srcset = "/static/assets/img/header/sosyorol-logo3-dark.webp"),
+                  (document.getElementById("logo2").srcset = "/static/assets/img/header/sosyorol-logo1-dark.jpg"),
+                  (document.getElementById("logo1").src = "/static/assets/img/header/sosyorol-logo1-dark.jpg"),
+                  jQuery.ajax({
+                      type: "POST",
+                      url: "https://www.sosyorol.com/user-preferences/",
+                      async: !0,
+                      data: { uid: "<?php echo $userID; ?>", sel: "dark", op: "mode" },
+                      success: function (e) {
+                          location.reload();
+                      },
+                      error: function (e, o, t) {},
+                  }))
+                : ((e.innerHTML = "<?php echo ucwords_tr($lightmode); ?>"),
+                  document.getElementsByTagName("BODY")[0].classList.remove("dark"),
+                  (document.getElementById("logo3").srcset = "/static/assets/img/header/sosyorol-logo3.webp"),
+                  (document.getElementById("logo2").srcset = "/static/assets/img/header/sosyorol-logo1.jpg"),
+                  (document.getElementById("logo1").src = "/static/assets/img/header/sosyorol-logo1.jpg"),
+                  jQuery.ajax({ type: "POST", url: "https://www.sosyorol.com/user-preferences/", async: !0, data: { uid: "<?php echo $userID; ?>", sel: "light", op: "mode" }, success: function (e) {}, error: function (e, o, t) {} }));
+        });*/
+    });
+
+function changemode(userId, darkTxt, lightTxt){
+    var s = document.getElementById("switch-shadow");
+    var e = document.getElementById("mode-text");
+    if(s.checked){
+        e.innerHTML = darkTxt;
+        document.getElementsByTagName("BODY")[0].classList.add("dark");
+        document.getElementById("logo3").srcset = "/static/assets/img/header/sosyorol-logo3-dark.webp";
+        document.getElementById("logo2").srcset = "/static/assets/img/header/sosyorol-logo1-dark.jpg";
+        document.getElementById("logo1").src = "/static/assets/img/header/sosyorol-logo1-dark.jpg";
+        jQuery.ajax({
+            type: "POST",
+            url: "/changemode/",
+            async: !0,
+            data: { uid: userId, mode: "dark" },
+            success: function (e) {
+                location.reload();
+            },
+            error: function (e, o, t) {},
+        });
+    }else{
+        e.innerHTML = lightTxt;
+        document.getElementsByTagName("BODY")[0].classList.remove("dark");
+        document.getElementById("logo3").srcset = "/static/assets/img/header/sosyorol-logo3.webp";
+        document.getElementById("logo2").srcset = "/static/assets/img/header/sosyorol-logo1.jpg";
+        document.getElementById("logo1").src = "/static/assets/img/header/sosyorol-logo1.jpg";
+        jQuery.ajax({
+            type: "POST",
+            url: "/changemode/",
+            async: !0,
+            data: { uid: userId, mode: "light" },
+            success: function (e) {
+                location.reload();
+            },
+            error: function (e, o, t) {},
+        });
+    }
+}
+
     
 // menus
 var scrollDuration = 600,
@@ -72,7 +146,7 @@ var scrollDuration = 600,
         }, 300))
         if (document.getElementById("upvote" + e).classList.contains("active")) {
             j.ajax({
-                url:"postrating/",
+                url:"/postrating/",
                 type : "POST", // http method
                 data : {csrfmiddlewaretoken: csrf, redirect: window.location.href, post_id : e, opinion : "like", operation: "add"}, // data sent with the post request
                 // handle a successful response
@@ -83,7 +157,7 @@ var scrollDuration = 600,
             });
         }else{
             j.ajax({
-                url:"postrating/",
+                url:"/postrating/",
                 type : "POST", // http method
                 data : {csrfmiddlewaretoken: csrf, redirect: window.location.href, post_id : e, opinion : "like", operation: "remove"}, // data sent with the post request
                 // handle a successful response
@@ -103,7 +177,7 @@ var scrollDuration = 600,
         }, 300))
         if (document.getElementById("downvote" + e).classList.contains("active")) {
             j.ajax({
-                url:"postrating/",
+                url:"/postrating/",
                 type : "POST", // http method
                 data : {csrfmiddlewaretoken: csrf, redirect: window.location.href, post_id : e, opinion : "dislike", operation: "add"}, // data sent with the post request
                 // handle a successful response
@@ -114,7 +188,7 @@ var scrollDuration = 600,
             });
         }else{
             j.ajax({
-                url:"postrating/",
+                url:"/postrating/",
                 type : "POST", // http method
                 data : {csrfmiddlewaretoken: csrf, redirect: window.location.href, post_id : e, opinion : "dislike", operation: "remove"}, // data sent with the post request
                 // handle a successful response
@@ -129,7 +203,7 @@ var scrollDuration = 600,
     function repost(postId) {
         document.getElementsByClassName("repost_popup")[0].id = "repost_popup_"+postId
         j.ajax({
-            url:"getpostbyid/",
+            url:"/getpostbyid/",
             type : "POST", // http method
             data : {postId: postId}, // data sent with the post request
             // handle a successful response
@@ -144,7 +218,7 @@ var scrollDuration = 600,
     function re_post(postId){
         var txt = document.getElementById("repost_txt").value;
         j.ajax({
-            url:"repost/",
+            url:"/repost/",
             type : "POST", // http method
             data : {postId: postId, txt: txt}, // data sent with the post request
             // handle a successful response

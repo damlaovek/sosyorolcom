@@ -6,7 +6,7 @@ function follow(elem, followerId, followingId, txt, current="-1", profile="-1"){
     }
     jQuery.ajax({
         type: "GET",
-        url:"/followunfollowuser",
+        url:"/followunfollowuser/",
         data: data,
         success: function(response) {
             displayAlert(response.content);
@@ -36,7 +36,7 @@ function unfollow(elem, followerId, followingId, txt, current="-1", profile="-1"
     }
     jQuery.ajax({
         type: "GET",
-        url:"/followunfollowuser",
+        url:"/followunfollowuser/",
         data: data,
         success: function(response) {
             displayAlert(response.content);

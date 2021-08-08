@@ -12,6 +12,7 @@
         <script src="{% static 'js/index.js' %}"></script>
     </head>
     <body class="{{darkmode}}">
+        <input type="hidden" name="filter" id="filter" value="{{filter}}">
         {% include 'includes/general/header.html' %}
         {% include 'includes/general/lang_popup.html' %}
         <div class="full-width inline-flex">
@@ -28,7 +29,7 @@
                         <p class="lh24 mt20 fs15 cg2 mxw500">{{page_dict.historyPageDesc}}</p>
                         <form class="bsbb mw200" method="GET" action="">
                             <input class="p1020 lh30 br25 mt10 bcg mw200" type="text" autocomplete="off" name="query" id="history_search" placeholder="Geçmişte ara" value="{{query}}">
-                            <svg class="absolute aligntr svg-icon" viewBox="0 0 15 15" style="top:5px; right:10px;">
+                            <svg class="absolute aligntr svg-icon" viewBox="0 0 15 15" style="top:5px; right:30px;">
                                 <g>
                                     <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 14.667969 13.039062 L 11.578125 9.945312 C 12.320312 8.867188 12.695312 7.667969 12.695312 6.347656 C 12.695312 5.488281 12.527344 4.664062 12.195312 3.882812 C 11.859375 3.097656 11.410156 2.421875 10.84375 1.851562 C 10.273438 1.285156 9.597656 0.835938 8.8125 0.5 C 8.027344 0.167969 7.207031 0 6.347656 0 C 5.488281 0 4.664062 0.167969 3.882812 0.5 C 3.097656 0.835938 2.421875 1.285156 1.851562 1.851562 C 1.285156 2.421875 0.832031 3.097656 0.5 3.882812 C 0.167969 4.667969 0 5.488281 0 6.347656 C 0 7.207031 0.167969 8.027344 0.5 8.8125 C 0.832031 9.597656 1.285156 10.273438 1.851562 10.839844 C 2.421875 11.410156 3.097656 11.859375 3.882812 12.195312 C 4.664062 12.527344 5.488281 12.695312 6.347656 12.695312 C 7.667969 12.695312 8.867188 12.320312 9.945312 11.578125 L 13.039062 14.660156 C 13.253906 14.886719 13.523438 15.003906 13.847656 15.003906 C 14.160156 15.003906 14.433594 14.886719 14.660156 14.660156 C 14.886719 14.433594 15.003906 14.160156 15.003906 13.847656 C 15.003906 13.53125 14.890625 13.257812 14.667969 13.039062 Z M 9.199219 9.199219 C 8.410156 9.992188 7.460938 10.386719 6.347656 10.386719 C 5.234375 10.386719 4.285156 9.992188 3.492188 9.199219 C 2.703125 8.410156 2.308594 7.460938 2.308594 6.347656 C 2.308594 5.234375 2.703125 4.285156 3.492188 3.492188 C 4.285156 2.703125 5.234375 2.308594 6.347656 2.308594 C 7.460938 2.308594 8.410156 2.703125 9.199219 3.492188 C 9.992188 4.285156 10.386719 5.234375 10.386719 6.347656 C 10.386719 7.460938 9.992188 8.410156 9.199219 9.199219 Z M 9.199219 9.199219 "/>
                                 </g>
@@ -39,53 +40,59 @@
                         </form>
                     </div>
                 </div>
-                {% for key, values in history.items %}
-                    <div class="bsbb full-width mt20" id="posts" style="width:812px;margin:auto;margin-top:20px;">
-                        <div class="full-width">
-                            <p class="cg2 fwbold mb10">{{key}}</p>
-                            {% for value in values %}
-                                {% if value.history_type == 'search' %}
-                                    {% if filter == "all" or filter == "search" %}
-                                        <div class="box full-width">
-                                            {% include 'search/search_history_template.html' with search=value %}
-                                        </div>
+                <div class="full-width" id="history-feed">
+                    <input type="hidden" value="True" id="has-more-0">
+                    {% for key, values in history.items %}
+                        <div class="bsbb full-width mt20" id="posts" style="width:812px;margin:auto;margin-top:20px;">
+                            <div class="full-width">
+                                <p class="cg2 fwbold mb10">{{key}}</p>
+                                {% for value in values %}
+                                    {% if value.history_type == 'search' %}
+                                        {% if filter == "all" or filter == "search" %}
+                                            <div class="box full-width">
+                                                {% include 'search/search_history_template.html' with search=value %}
+                                            </div>
+                                        {% endif %}
+                                    {% elif value.history_type == 'community' %}
+                                        {% if filter == "all" or filter == "community" %}
+                                            {% include 'communities/communitytemplates/community_template.html' with community=value.term %}
+                                        {% endif %}
+                                    {% elif value.history_type == "post" %}
+                                        {%if value.post.post_type == "post" %}
+                                            {% if filter == "all" or filter == "post" %}
+                                                {% include 'posts/posttemplates/post_template.html' with post=value.post %}
+                                            {% endif %}
+                                        {% elif post.post_type == "media" %}
+                                            {% if filter == "all" or filter == "media" %}
+                                                {% include 'posts/posttemplates/media_template.html' with post=value.post  %}
+                                            {% endif %}
+                                        {% elif value.post.post_type == "link" %}
+                                            {% if filter == "all" or filter == "link" %}    
+                                                {% include 'posts/posttemplates/link_template.html' with link=value.post %}
+                                            {% endif %}
+                                        {% elif value.post.post_type == "answer" %}
+                                            {% if filter == "all" or filter == "answer" %}
+                                                {% include 'posts/posttemplates/answer_template.html' with answer=value.post %}
+                                            {% endif %}
+                                        {% elif value.post.post_type == "poll" %}
+                                            {% if filter == "all" or filter == "poll" %}
+                                                {% include 'posts/posttemplates/poll_template.html' with poll=value.post %}
+                                            {% endif %}
+                                        {% elif value.post.post_type == "quiz" %}
+                                        {% endif %}
+                                    {% elif value.history_type == "profile" %}
+                                        {% if filter == "all" or filter == "profile" %}
+                                            {% include 'users/usertemplates/user_template.html' with user=value.visited_user %}
+                                        {% endif %}
                                     {% endif %}
-                                {% elif value.history_type == 'community' %}
-                                    {% if filter == "all" or filter == "community" %}
-                                        {% include 'communities/communitytemplates/community_template.html' with community=value.term %}
-                                    {% endif %}
-                                {% elif value.history_type == "post" %}
-                                    {%if value.post.post_type == "post" %}
-                                        {% if filter == "all" or filter == "post" %}
-                                            {% include 'posts/posttemplates/post_template.html' with post=value.post %}
-                                        {% endif %}
-                                    {% elif post.post_type == "media" %}
-                                        {% if filter == "all" or filter == "media" %}
-                                            {% include 'posts/posttemplates/media_template.html' with post=value.post  %}
-                                        {% endif %}
-                                    {% elif value.post.post_type == "link" %}
-                                        {% if filter == "all" or filter == "link" %}    
-                                            {% include 'posts/posttemplates/link_template.html' with link=value.post %}
-                                        {% endif %}
-                                    {% elif value.post.post_type == "answer" %}
-                                        {% if filter == "all" or filter == "answer" %}
-                                            {% include 'posts/posttemplates/answer_template.html' with answer=value.post %}
-                                        {% endif %}
-                                    {% elif value.post.post_type == "poll" %}
-                                        {% if filter == "all" or filter == "poll" %}
-                                            {% include 'posts/posttemplates/poll_template.html' with poll=value.post %}
-                                        {% endif %}
-                                    {% elif value.post.post_type == "quiz" %}
-                                    {% endif %}
-                                {% elif value.history_type == "profile" %}
-                                    {% if filter == "all" or filter == "profile" %}
-                                        {% include 'users/usertemplates/user_template.html' with user=value.visited_user %}
-                                    {% endif %}
-                                {% endif %}
-                            {% endfor %}
+                                {% endfor %}
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
+                <div id="loader" class="full-width tac dnone">
+                    <img src="{% static 'assets/img/sosyorol-loader.gif' %}" style="margin:auto; height: 80px;">
+                </div>
             </div>
             <div class="section-right fixed">
                 <div class="bsbb full-shadow-border section-right-top full-width" style="padding:0;width:calc(100% - 60px);">
@@ -272,5 +279,49 @@
                 </div>
             </div>
         </div>
+        <script>
+            var offset = 0;
+            var limit = 5;
+            var isLoading = false;
+            var hasMore = true;
+            window.onload = () => {
+                offset = 0;
+                isLoading = false;
+                hasMore = true;
+            }
+            var j = jQuery.noConflict();
+            window.onscroll = () => {
+                if (document.documentElement.scrollHeight - document.documentElement.scrollTop === document.documentElement.clientHeight){
+                    if(hasMore){
+                        if(isLoading){
+                            return;
+                        }else{
+                            if(hasMore){
+                                isLoading = true;
+                                document.getElementById("loader").classList.remove("dnone");
+                                var filter = document.getElementById("filter").value;
+                                j.ajax({
+                                    url:"{% url 'loadmorehistoryposts' %}",
+                                    type : "POST", // http method
+                                    data : { limit: limit, offset: offset + limit, filter: filter, query:"{{query}}"}, // data sent with the post request
+                                    // handle a successful response
+                                    success : function(json) {
+                                        // log the returned json to the console
+                                        console.log(json); // another sanity check
+                                        document.getElementById("history-feed").innerHTML += json;
+                                        if (document.getElementById("has-more-"+offset).value == false || document.getElementById("has-more-"+offset).value == "False"){
+                                            hasMore = false;
+                                        }
+                                        offset += limit;
+                                        isLoading = false;
+                                        document.getElementById("loader").classList.add("dnone");
+                                    }
+                                });   
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
     </body>
 </html>

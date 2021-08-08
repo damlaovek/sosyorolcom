@@ -13,7 +13,7 @@ const getSearchResults = searchTerm => {
     searchTerm = searchTerm.toLowerCase();
     j.ajax({
         type: "POST",
-        url: "/getsearchresults",
+        url: "/getsearchresults/",
         data: {search: searchTerm},
         success: function(response) {
             showResults(searchTerm, response);

@@ -1,7 +1,7 @@
 function joinCommunity(elem, community_id, txt){
     jQuery.ajax({
         type: "POST",
-        url: "/followunfollowcommunity",
+        url: "/followunfollowcommunity/",
         async: !0,
         data: {
             community_id: community_id,
@@ -19,7 +19,7 @@ function joinCommunity(elem, community_id, txt){
 function unfollowCommunity(elem, community_id, txt){
     jQuery.ajax({
         type: "POST",
-        url: "/followunfollowcommunity",
+        url: "/followunfollowcommunity/",
         async: !0,
         data: {
             community_id: community_id,

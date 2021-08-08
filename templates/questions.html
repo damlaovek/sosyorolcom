@@ -1,7 +1,7 @@
 {% load index %}
 {% load static %}
 {% include 'includes/general/head.html' %}
-        <title>Sosyorol - Sosyal İçerik Platformu</title>
+        <title>{{word_list|getword:"questions"|ucfirst}} - Sosyal İçerik Platformu</title>
         <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
         <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
         <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
@@ -17,6 +17,7 @@
         <!-- TODO: Add SDKs for Firebase products that you want to use
             https://firebase.google.com/docs/web/setup#available-libraries -->
         <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-database.js"></script>
 
         <script>
         // Your web app's Firebase configuration
@@ -42,7 +43,7 @@
         <div class="full-width inline-flex">
             <div class="fixed section-left" id="section-left" style="overflow-x: hidden;">
                 <ul class="nav">
-                    <form method="GET" action="/search" class="relative" style="margin:0;width:calc(100% + 80px);margin-left:-22px;margin-top:-58px;z-index:99;filter:drop-shadow(0 1px 6px rgba(0, 0, 0, .161));" id="search_form">
+                    <form method="GET" action="/search" class="relative" style="margin:0;width:calc(100% + 80px);margin-left:-22px;margin-top:-58px;z-index:99;filter:drop-shadow(0 1px 6px rgba(223,223,223, 0.53));" id="search_form">
                         {% csrf_token %}
                         <input type="text" name="search_key" id="search" class="bsbb full-width p20" style="padding-top:58px;padding-left:32px;padding-right:70px;" placeholder="Search in Sosyorol"  autocomplete='off'>
                         <svg class="absolute aligntr svg-icon" style="top: 38px; right:40px;" viewBox="0 0 15 15">
@@ -345,8 +346,73 @@
                 </div>
             </div>
             <div class="section-right fixed" id="section-right">
+                <div  class="full-shadow-border section-right-bottom" style="padding:10px 0 0 0;width:calc(100% - 60px);">
+                    <div class="bsbb full-width inline-block p020 mt5">
+                        <p class="fs19 fwblack ctitle left mb10">{{word_list|getword:"popular-communities"|ucwords}}</p>
+                        <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                            </g>
+                        </svg>
+                    </div>
+                    <ul class="full-width mt7 bt">
+                        {% for c in popular_communities %}
+                            <li class="bsbb full-width bb"></li>
+                                <a href="/c/{{c.term.slug}}" class="bsbb full-width p1020 inline-block right-list-item">
+                                    {% if c.term.profile_img == '' %}
+                                        <img class="bsbb p5 sqr40 rounded lh30 left non-draggable" src="{% static 'assets/img/defaults/default-community.png' %}" style="background-color:var(--main-color)"/>
+                                    {% else %}
+                                        <img class="bsbb p5 sqr40 rounded lh30 left non-draggable" src="{{c.term.profile_img}}" style="background-color:{{c.term.cover_color}}"/>
+                                    {% endif %}
+                                    <div class="ml10 left">
+                                        <div class="lh20 fwblack ctitle ellipsis underline-onhover" style="width:145px;">c/{{c.term.name}}</div>
+                                        <p class="cg2 lh20 ellipsis underline-onhover">{{c.term.views}}&nbsp;{{word_list|getword:"views"|ucfirst}}</p>
+                                    </div>
+                                    <div class="right" style="top:5.5px;">
+                                        <p class="btn hand" onclick="joinCommunity(this, '{{c.term.term_id}}', '&#10003;');this.onclick=function(){return false;};return false;"><span class="p115">{{word_list|getword:"join"|ucfirst}}</span></p>
+                                    </div>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="bsbb p1020 bt hand right-list-item">
+                        <a href="/communities/leaderboard" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
+                    </div>
+                </div>
+                <div  class="full-shadow-border section-right-bottom" style="padding:10px 0 0 0;width:calc(100% - 60px);">
+                    <div class="bsbb full-width inline-block p020 mt5">
+                        <p class="fs19 fwblack ctitle left">{{word_list|getword:"users-you-may-follow"|ucwords}}</p>
+                        <svg width="16px" height="16px" viewBox="0 0 20 20" class="right" style="margin-top:4px;">
+                            <g>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 10 0 C 4.484375 0 0 4.484375 0 10 C 0 15.515625 4.484375 20 10 20 C 15.515625 20 20 15.515625 20 10 C 20 4.484375 15.515625 0 10 0 Z M 10 17.554688 C 5.835938 17.554688 2.445312 14.164062 2.445312 10 C 2.445312 5.835938 5.835938 2.445312 10 2.445312 C 14.164062 2.445312 17.554688 5.835938 17.554688 10 C 17.554688 14.164062 14.164062 17.554688 10 17.554688 Z M 10 17.554688 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 8.898438 L 11.222656 8.898438 L 11.222656 15.339844 L 8.777344 15.339844 Z M 8.777344 8.898438 "/>
+                                <path style=" stroke:none;fill-rule:nonzero;fill:var(--gray2);fill-opacity:1;" d="M 8.777344 4.660156 L 11.222656 4.660156 L 11.222656 7.023438 L 8.777344 7.023438 Z M 8.777344 4.660156 "/>
+                            </g>
+                        </svg>
+                    </div>
+                    <ul class="full-width bt" style="margin-top:12px;">
+                        {% for user in users %}
+                            <li class="bsbb full-width bb right-list-item">
+                                <a href="" class="bsbb full-width p1020 inline-block">
+                                    <img class="sqr40 rounded lh30 left" src="{{user.avatar_url}}"/>
+                                    <div class="ml10 left">
+                                        <p class="lh20 fwblack ctitle">{{user.display_name}}</p>
+                                        <p class="cg2 lh20">u/{{user.user_login}}</p>
+                                    </div>
+                                    <div class="right" style="top:5.5px;">
+                                        <p class="btn"><span class="p115">{{word_list|getword:"follow"|ucfirst}}</span></p>
+                                    </div>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
+        {% include 'includes/general/chat_popup.html' %}
+        {% include 'posts/repost_popup.html' %}
         <script type="text/javascript" src="{% static 'js/search.js' %}"></script>
         <script>
             function shortcutsSelected(){

@@ -73,7 +73,7 @@ function validateUsername(lengthErr, specialCharErr, alredyExistsErr, onlyNumber
         displayAlert(onlyNumbersErr);
     }else{
         j.ajax({
-            url:"checkusernamevalidity",
+            url:"/checkusernamevalidity/",
             type : "POST",
             data : { username: username.value},
             success : function(json) {

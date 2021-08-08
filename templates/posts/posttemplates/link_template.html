@@ -10,8 +10,12 @@
                 </g>
             </svg>
         </div>
-        <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{link.ID}}">
-            <li class="hand" onclick="savePost(this, {{link.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
+        <ul class="sqr200 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{link.ID}}">
+            <li class="hand menu-item noselect" onclick="savePost(this, {{link.ID}}, {{current_user.ID}}, '{{csrf_token}}')">{{word_list|getword:"save"|ucfirst}}</li>
+            {% if current_user.ID == link.author.ID %}
+                <a href="/u/{{link.author.user_login}}/{{link.hex_id}}/{{link.guid}}/edit" class="cg"><li class="hand menu-item noselect">{{word_list|getword:"edit"|ucfirst}}</li></a>
+                <li class="hand menu-item noselect" onclick="removePost()">{{word_list|getword:"delete"|ucfirst}}</li>
+            {% endif %}
         </ul>
         <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{word_list|getword:"link"|ucfirst}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{word_list|getword:"recommended-for-you"|ucwords}}</span></p>
         <div  class='full-width inline-flex' style='margin-bottom:10px;'>

@@ -2,13 +2,13 @@
     <div class="hand full-width chat-popup-item" onclick="openChatItemPopup('{{chat.ID}}');">
         {% if forloop.first %}
             {% if chat.seen == 0 and chat.sender != current_uid %}
-                <div class="bsbb cba full-width item-hover hand bb bt p010" style="border-right: 4px solid var(--main-color);">
+                <div class="bsbb full-width item-hover hand bb bt p010" style="border-right: 4px solid var(--main-color);">
             {% else %}
                 <div class="bsbb full-width item-hover hand bb bt p010">
             {% endif %}
         {% else %}
             {% if chat.seen == 0 and chat.sender != current_uid %}
-                <div class="bsbb cba full-width item-hover hand bb p010" style="border-right: 4px solid var(--main-color);">
+                <div class="bsbb full-width item-hover hand bb p010" style="border-right: 4px solid var(--main-color);">
             {% else %}
                 <div class="bsbb full-width item-hover hand bb p010">
             {% endif %}

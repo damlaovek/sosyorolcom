@@ -12,8 +12,12 @@
                         </g>
                     </svg>
                 </div>
-                <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{answer.ID}}">
-                    <li class="hand" onclick="savePost(this, {{answer.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
+                <ul class="sqr200 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{answer.ID}}">
+                    <li class="hand menu-item noselect" onclick="savePost(this, {{answer.ID}}, {{current_user.ID}}, '{{csrf_token}}')">{{word_list|getword:"save"|ucfirst}}</li>
+                    {% if current_user.ID == answer.author.ID %}
+                        <a href="/u/{{answer.parent.author.user_login}}/{{answer.parent.hex_id}}/{{answer.parent.guid}}/answer/{{answer.author.user_login}}/edit" class="cg"><li class="hand menu-item noselect">{{word_list|getword:"edit"|ucfirst}}</li></a>
+                        <li class="hand menu-item noselect" onclick="removePost()">{{word_list|getword:"delete"|ucfirst}}</li>
+                    {% endif %}
                 </ul>
                 <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{word_list|getword:"answer-noun"|ucfirst}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="fs13 hide">{{word_list|getword:"recommended-for-you"|ucfirst}}</span></p>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>

@@ -1,6 +1,7 @@
 {% load static %}
+{% load index %}
 {% include 'includes/general/head.html' %}
-        <title>Sosyorol - Sosyal İçerik Platformu</title>
+        <title>{{savedposts_dict.saveditems|ucwords}} - Sosyal İçerik Platformu</title>
         <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
         <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
         <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
@@ -123,7 +124,7 @@
                         <li class="bsbb full-width bb right-list-item">
                             <a href="" class="bsbb full-width p1020 inline-flex">
                                 <div class="sqrt30 rounded p5 bcb lh30">
-                                    <svg  width="25px" height="16px" viewBox="0 0 25 16" version="1.1" class="hcentered" style="margin-top:7px; margin-left:2.5px;">
+                                    <svg  width="25px" height="16px" viewBox="0 0 25 16" version="1.1" class="hcentered" style="top:-7px; margin-left:2.5px;">
                                         <g>
                                             <path style="fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(90.980392%,94.901961%,97.647059%);stroke-opacity:1;stroke-miterlimit:4;" d="M 24.483781 8.99985 L 14.561281 18.923434 L 9.33425 13.698092 L 1.500031 21.53818 " transform="matrix(0.925926,0,0,0.941176,0.575926,-6.474353)"/>
                                             <path style="fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(90.980392%,94.901961%,97.647059%);stroke-opacity:1;stroke-miterlimit:4;" d="M 25.498719 8.99985 L 31.767781 8.99985 L 31.767781 15.266939 " transform="matrix(0.925926,0,0,0.941176,-6.168519,-6.474353)"/>
@@ -141,7 +142,7 @@
                         </li>
                     </ul>
                     <div class="bsbb p020 mt10">
-                        <a href="" class="cb">{{right_menu_dict.showmore}}</a>
+                        <a href="" class="cb">{{right_menu_dict.showmore|ucfirst}}</a>
                     </div>
                 </div>
                 <div  class="full-shadow-border section-right-bottom" style="padding:10px 0;width:calc(100% - 60px);">
@@ -158,21 +159,21 @@
                     <ul class="full-width mt7 bt">
                         {% for user in users %}
                             <li class="bsbb full-width bb right-list-item">
-                                <a href="" class="bsbb full-width p1020 inline-block">
+                                <a href="/u/{{user.user_login}}" class="bsbb full-width p1020 inline-block">
                                     <img class="sqr40 rounded lh30 left" src="{{user.avatar_url}}"/>
                                     <div class="ml10 left">
                                         <p class="lh20 fwblack ctitle">{{user.display_name}}</p>
                                         <p class="cg2 lh20">u/{{user.user_login}}</p>
                                     </div>
                                     <div class="right" style="top:5.5px;">
-                                        <p class="btn"><span class="p115">{{right_menu_dict.follow}}</span></p>
+                                        <p class="btn"><span class="p115">{{right_menu_dict.follow|ucfirst}}</span></p>
                                     </div>
                                 </a>
                             </li>
                         {% endfor %}
                     </ul>
                     <div class="bsbb p020 mt10">
-                        <a href="" class="cb">{{right_menu_dict.showmore}}</a>
+                        <a href="/u/{{current_user.user_login}}/suggested" class="cb">{{right_menu_dict.showmore|ucfirst}}</a>
                     </div>
                 </div>
             </div>

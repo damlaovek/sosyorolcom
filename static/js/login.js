@@ -1,3 +1,9 @@
+function setCookie(cname, cvalue) {
+    const d = new Date();
+    d.setTime(d.getTime() + (10*365*24*60*60*1000));
+    let expires = "expires="+ d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
 var googleLogin = document.getElementById("googleLogin");
 googleLogin.onclick = function () {
     var o = new firebase.auth.GoogleAuthProvider();
@@ -105,15 +111,16 @@ function loginWithEmailAndPassword(email, password){
         var user = firebase.auth().user;
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
-                console.log(user.uid);
                 var signin_form = document.getElementById("signin_form");
-                document.getElementsByName("uid")[0].value = user.uid;
+                document.getElementsByName("uid")[0].value = email;
                 var j = jQuery.noConflict();
                 j.ajax({
                     url:"/",
                     Type:'POST',
-                    data:{uid:user.uid},
-                    success:function(response){ }
+                    data:{uid:email},
+                    success:function(response){ 
+                        setCookie("uid", email);
+                    }
                 });
                 signin_form.action = "/";
                 signin_form.submit();

@@ -36,7 +36,7 @@
         firebase.analytics();
         </script>
         <style>
-            .box{box-shadow:0px 3px 4px rgba(173,173,173, 0.53);}
+            .box{box-shadow:0px 3px 8px rgba(223,223,223, 0.53);}
             .box .box{box-shadow:none;}
             .lst-item{padding:10px 0 15px 0;}
             .lst-item:hover{border-bottom:5px solid var(--main-color);padding-bottom:10px; color:var(--main-color);}
@@ -214,6 +214,19 @@
                             </div>
                         </div>
                     </div>
+                    {% if followers|length == 0 %}
+                    <div class="bsbb p20 full-width tac border bcgrayish br10 mt20">
+                        <div class="sqr60 rounded bcgrayish center full-shadow-border" style="margin:auto;">
+                            <svg class="svg-icon" viewBox="0 0 15 15">
+                                <g>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 0.601562 14.574219 L 14.398438 14.574219 C 14.582031 14.574219 14.753906 14.5 14.871094 14.367188 C 14.96875 14.253906 15.015625 14.109375 14.996094 13.960938 C 14.671875 11.441406 13.121094 9.339844 11 8.222656 C 10.101562 9.117188 8.867188 9.671875 7.5 9.671875 C 6.132812 9.671875 4.898438 9.117188 4 8.222656 C 1.878906 9.339844 0.328125 11.441406 0.00390625 13.960938 C -0.015625 14.109375 0.03125 14.253906 0.128906 14.367188 C 0.246094 14.5 0.417969 14.574219 0.601562 14.574219 Z M 0.601562 14.574219 "/>
+                                    <path style=" stroke:none;fill-rule:nonzero;fill-opacity:1;" d="M 4.390625 7.675781 C 4.472656 7.761719 4.554688 7.839844 4.640625 7.917969 C 5.402344 8.597656 6.402344 9.015625 7.5 9.015625 C 8.597656 9.015625 9.597656 8.597656 10.355469 7.917969 C 10.445312 7.839844 10.527344 7.761719 10.609375 7.675781 C 10.6875 7.589844 10.765625 7.503906 10.839844 7.414062 C 11.4375 6.675781 11.796875 5.742188 11.796875 4.722656 C 11.796875 2.351562 9.867188 0.425781 7.5 0.425781 C 5.132812 0.425781 3.203125 2.351562 3.203125 4.722656 C 3.203125 5.742188 3.5625 6.675781 4.160156 7.414062 C 4.230469 7.503906 4.308594 7.589844 4.390625 7.675781 Z M 4.390625 7.675781 "/>
+                                </g>
+                            </svg>
+                        </div>
+                        <p class="cg2 full-width tac mt10 fwbold">{{word_list|getword:"no-followers"|ucfirst}}</p>
+                    </div>
+                    {% else %}
                     <div class="full-width full-shadow-border box mt20">
                         <ul class="full-width">
                             {% for user in followers %}
@@ -244,6 +257,7 @@
                             {% endfor %}
                         </ul>
                     </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="section-right fixed" id="section-right">
@@ -266,8 +280,8 @@
                                     <a href="" class="bsbb full-width p1020 inline-block">
                                         <img class="sqr40 rounded lh30 left" src="{{user.avatar_url}}"/>
                                         <div class="ml10 left">
-                                            <p class="lh20 fwblack ctitle">{{user.display_name}}</p>
-                                            <p class="cg2 lh20">u/{{user.user_login}}</p>
+                                            <p class="lh20 fwblack ctitle" style="text-overflow: ellipsis; width: 100px; height:20px; overflow: hidden;">{{user.display_name}}</p>
+                                            <p class="cg2 lh20" style="text-overflow: ellipsis; width: 100px; overflow: hidden;">u/{{user.user_login}}</p>
                                         </div>
                                         <div class="right" style="top:5.5px;">
                                             <p class="btn"><span class="p115">{{word_list|getword:"follow"|ucfirst}}</span></p>
@@ -277,9 +291,10 @@
                             {% endfor %}
                         </ul>
                         <div class="bsbb p020 mt10">
-                            <a href="" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
+                            <a href="/u/{{current_user.user_login}}/suggested/" class="cb">{{word_list|getword:"show-more"|ucfirst}}</a>
                         </div>
                     </div>
+                    {% if medias|length > 0 %}
                     <div class="full-shadow-border section-right-bottom" style="padding:0;width:calc(100% - 60px);">
                         <ul class="full-width inline-block">
                             {% for media in medias %}
@@ -312,6 +327,7 @@
                             {% endfor %}
                         </ul>
                     </div>
+                    {% endif %}
                 {% else %}
                 {% endif %}
             </div>

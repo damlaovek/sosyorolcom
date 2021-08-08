@@ -130,7 +130,7 @@
         </div>
         <div class="cp-container">
             <div class="bsbb box p20 mt20 title full-width inline-block">
-                <div class="bsbb p10 hand left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;' style="width:calc(25% - 15px); text-align:center;border-radius:4px;">{{newpost_actions_dict.cancel}}</div>
+                <div class="bsbb p10 hand left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;' style="width:calc(25% - 15px); text-align:center;border-radius:4px;" onclick="javascript:history.back()">{{newpost_actions_dict.cancel}}</div>
                 <div class="bsbb p10 m020 hand left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;'  style="width:calc(25% - 15px); text-align:center;border-radius:4px;">{{newpost_actions_dict.clear}}</div>
                 <div class="bsbb p10 hand left fs15 lh20 text noselect textarea" onmouseover='this.style.opacity = 0.75;' onmouseout='this.style.opacity = 1.0;'  style="width:calc(25% - 15px);margin-right:20px; text-align:center;border-radius:4px;">{{newpost_actions_dict.save}}</div>
                 <input disabled type="submit" id="cp-sendBtn" class="btn p10 left fs15 lh20 noselect" style="border-radius:4px;height:30px;width:calc(25% - 35px); border:none; text-align:center; color:var(--main-color); font-weight:700;" value="{{newpost_actions_dict.send}}" onclick="return saveQuiz()"/>
@@ -1138,7 +1138,7 @@
         }
         j.ajax({
             type: "POST",
-            url: "/pickpostcommunities",
+            url: "/pickpostcommunities/",
             data: {search: searchTerm, selectedComms:selectedComms},
             success: function(response) {
                 commSearchResultsContainer.innerHTML = response;
@@ -1196,7 +1196,7 @@
         selectedCommsList.appendChild(li);
         j.ajax({
             type: "POST",
-            url: "/getcommunityflairs",
+            url: "/getcommunityflairs/",
             data: {community: commName.replace("c/", "")},
             success: function(response) {
                 flairContainer.innerHTML += response;
@@ -1315,7 +1315,7 @@
             url:"{% url 'savenewquiz' %}",
             data: data,
             success: function(response) {
-                displayAlert(response.content);
+                window.location.href = response.url;
             }
         });
         return false;

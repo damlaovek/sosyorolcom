@@ -11,9 +11,9 @@
         {% endif %}
             <div class='p020'>
                 <div class='full-width inline-block'>
-                    <a href='https://www.sosyorol.com/user/".$user->user_nicename."' class='left'><img src='{{comment.user.avatar_url}}' class='sqr40 rounded'/></a>
+                    <a href='/u/{{comment.user.user_login}}/' class='left'><img src='{{comment.user.avatar_url}}' class='sqr40 rounded'/></a>
                     <div class='ml10 left w50'>
-                        <a href='https://www.sosyorol.com/user/".$user->user_nicename."'><p class='ctitle  lh20 underline-on-hover'>{{comment.user.display_name}}</p></a>
+                        <a href='/u/{{comment.user.user_login}}/'><p class='ctitle  lh20 underline-on-hover'>{{comment.user.display_name}}</p></a>
                         <p class='cg2 lh20 fs13'>{{comment.comment_date}}</p>
                     </div>
                 </div>

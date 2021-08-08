@@ -28,6 +28,10 @@
                                 <form method="POST" name="signin_form" id="signin_form">
                                     {% csrf_token %}
                                     <input type="hidden" name="uid">
+                                    <input type="hidden" name="email">
+                                    <input type="hidden" name="user_login">
+                                    <input type="hidden" name="user_password">
+                                    <input type="hidden" name="display_name">
                                 </form>
                                 <form method="POST" name="signup-form" onsubmit="return submitSignupForm();">
                                     {% csrf_token %}
@@ -225,7 +229,11 @@
                                     });
                                     var signin_form = document.getElementById("signin_form");
                                     document.getElementsByName("uid")[0].value = user.uid;
-                                    signin_form.action = "/";
+                                    document.getElementsByName("email")[0].value = email;
+                                    document.getElementsByName("user_login")[0].value = document.getElementsByName("username")[0].value;
+                                    document.getElementsByName("user_password")[0].value = password;
+                                    document.getElementsByName("display_name")[0].value = document.getElementsByName("firstname")[0].value + " " + document.getElementsByName("lastname")[0].value;
+                                    signin_form.action = "/createdbuser/";
                                     signin_form.submit();
                                 }
                             });

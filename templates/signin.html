@@ -29,7 +29,7 @@
                                 </form>
                                 <form method="POST" name="login-form" onsubmit="return submitForm()">
                                     {% csrf_token %}
-                                    <input class="bsbb cg full-width p20 bcw br20 border" type="text" name="email" placeholder="{{ page_dict.emailorphone }} / {{page_dict.username}}" onkeyup="validateForm();">
+                                    <input class="bsbb cg full-width p20 bcw br20 border" type="text" name="email" placeholder="{{ page_dict.emailorphone }}" onkeyup="validateForm();">
                                     <input class="bsbb cg full-width p20 mt20 bcw br20 border" name="password" type="password" placeholder="{{page_dict.password}}" onkeyup="validateForm();" autocomplete="on">
                                     <input type="submit" disabled class="bsbb full-width p20 m200 bcb cw br20 full-shadow2 fwbold hand" value="{{page_dict.signin}}" name="login_btn">
                                 </form>

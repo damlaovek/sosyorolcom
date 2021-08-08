@@ -3,10 +3,10 @@
     <div class='community-template-link' style="height:290px;">
         <div class='full-shadow-border box full'>
             <div class='full-width user-template-top'>
-                <a href='https://www.sosyorol.com/u/{{user.user_login}}' class='absolute'><img src='{{user.avatar_url}}' class='rounded'/></a>
+                <a href='/u/{{user.user_login}}' class='absolute'><img src='{{user.avatar_url}}' class='rounded'/></a>
                 <i class="fa fa-times absolute hand cg2 icon" style="margin:0; width: 20px;top:2.5px; right:2.5px;" aria-hidden="true" onclick='removeElement("user-template-{{user.ID}}", {{user.ID}});'></i>
             </div>
-            <a href='https://www.sosyorol.com/u/{{user.user_login}}' class='user-template-name'><p>{{user.display_name}}</p></a>
+            <a href='/u/{{user.user_login}}' class='user-template-name'><p>{{user.display_name}}</p></a>
             <p class='limited-lines seven user-template-bio'>{{user.description}}</p>
             <div class='absolute full-width' id='follow-btn-c'>
                 <p class='btn hand noselect'>{{word_list|getword:"follow"|ucwords}}</p>

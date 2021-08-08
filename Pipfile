@@ -19,6 +19,7 @@ sklearn = "*"
 nltk = "*"
 python-memcached = "*"
 pylibmc = "==1.5.2"
+unidecode = "*"
 
 [requires]
 python_version = "3.8"

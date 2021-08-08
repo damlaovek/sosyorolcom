@@ -1,0 +1,48 @@
+<input type="hidden" value="{{hasMore}}" id="has-more-{{offset}}">
+{% for key, values in history.items %}
+    <div class="bsbb full-width mt20" id="posts" style="width:812px;margin:auto;margin-top:20px;">
+        <div class="full-width">
+            <p class="cg2 fwbold mb10">{{key}}</p>
+            {% for value in values %}
+                {% if value.history_type == 'search' %}
+                    {% if filter == "all" or filter == "search" %}
+                        <div class="box full-width">
+                            {% include 'search/search_history_template.html' with search=value %}
+                        </div>
+                    {% endif %}
+                {% elif value.history_type == 'community' %}
+                    {% if filter == "all" or filter == "community" %}
+                        {% include 'communities/communitytemplates/community_template.html' with community=value.term %}
+                    {% endif %}
+                {% elif value.history_type == "post" %}
+                    {%if value.post.post_type == "post" %}
+                        {% if filter == "all" or filter == "post" %}
+                            {% include 'posts/posttemplates/post_template.html' with post=value.post %}
+                        {% endif %}
+                    {% elif post.post_type == "media" %}
+                        {% if filter == "all" or filter == "media" %}
+                            {% include 'posts/posttemplates/media_template.html' with post=value.post  %}
+                        {% endif %}
+                    {% elif value.post.post_type == "link" %}
+                        {% if filter == "all" or filter == "link" %}    
+                            {% include 'posts/posttemplates/link_template.html' with link=value.post %}
+                        {% endif %}
+                    {% elif value.post.post_type == "answer" %}
+                        {% if filter == "all" or filter == "answer" %}
+                            {% include 'posts/posttemplates/answer_template.html' with answer=value.post %}
+                        {% endif %}
+                    {% elif value.post.post_type == "poll" %}
+                        {% if filter == "all" or filter == "poll" %}
+                            {% include 'posts/posttemplates/poll_template.html' with poll=value.post %}
+                        {% endif %}
+                    {% elif value.post.post_type == "quiz" %}
+                    {% endif %}
+                {% elif value.history_type == "profile" %}
+                    {% if filter == "all" or filter == "profile" %}
+                        {% include 'users/usertemplates/user_template.html' with user=value.visited_user %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}

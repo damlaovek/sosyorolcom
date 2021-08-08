@@ -24,6 +24,7 @@ class User(models.Model):
     followings = models.QuerySet()
     blocked = models.QuerySet()
     posts = models.QuerySet()
+    comments = models.QuerySet()
     employments = ""
     educations = ""
     languages = ""
@@ -124,6 +125,7 @@ class Post(models.Model):
     quiz_type = ""
     isanswered = False
     isfollowed = 0
+    views = 0
     class Meta:
         db_table = "wpmu_posts"
 
@@ -204,7 +206,6 @@ class SimilarPosts(models.Model):
 # Comment related models.
 class Comment(models.Model):
     comment_ID = models.BigIntegerField(primary_key = True)
-    comment_post_ID = models.BigIntegerField()
     comment_content = models.TextField()
     comment_approved = models.SmallIntegerField()
     comment_author = models.TextField()
@@ -213,6 +214,8 @@ class Comment(models.Model):
     child_comments = models.QuerySet()
     comment_date = models.DateTimeField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment_post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    hex_id = ""
     class Meta:
         db_table = "wpmu_comments"
 

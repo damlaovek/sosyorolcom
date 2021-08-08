@@ -48,14 +48,16 @@ function titleChanged(elem, txt){
     if(elem.value == ''){
         document.getElementById('title-placeholder').innerHTML=txt;
     }
-    updateTextareaCounter(elem, 'title-counter', 25)
+    updateTextareaCounter(elem, 'title-counter', 25);
+    validateForm();
 }
 function descChanged(elem, txt, max){
     document.getElementById('desc-placeholder').innerHTML=safe_tags_replace(elem.value);
     if(elem.value == ''){
         document.getElementById('desc-placeholder').innerHTML=txt;
     }
-    updateTextareaCounter(elem, 'desc-counter', max)
+    updateTextareaCounter(elem, 'desc-counter', max);
+    validateForm();
 }
 
 function uploadImg(input, url){
@@ -174,7 +176,7 @@ function saveList(csrf){
     var title = document.getElementsByName('cp-title')[0].value;
     var desc = document.getElementsByName('cp-desc')[0].value;
     j.ajax({
-        url:"create/savenewlist/",
+        url:"savenewlist/",
         type : "POST", // http method
         data : { csrfmiddlewaretoken: csrf, photo_url : imgUrl, title : title, desc: desc, color: imgColor, privacy: isPrivate}, // data sent with the post request
         // handle a successful response

@@ -30,6 +30,9 @@
         </script>
         <style>
             .sosmoji:hover{background-color: var(--grayish);}
+            #header-icon-chat[data-title]:after{display:none;}
+            #chatbtn{cursor: default;}
+            #chatbtn .svg-icon path{fill:var(--main-color);}
         </style>
     </head>
     <body class="{{darkmode}}" onload="checkViewsCookie()">
@@ -163,7 +166,7 @@
                         snapshot2.forEach((childSnapshot2) => {
                             var childData2 = childSnapshot2.val();
                             var chRef = firebase.database().ref("chats");
-                            chRef.on('value', (snapshot) => {
+                            chRef.on('value', (snapshot4) => {
                             });
                             var singleObj = {};
                             singleObj['ID'] = childData3.ID;
@@ -176,9 +179,10 @@
                             if(index == snapshot.numChildren()){
                                 j.ajax({
                                     type: "POST",
-                                    url: "/get_chat_item",
+                                    url: "/get_chat_item/",
                                     data: {chats: JSON.stringify(objects)},
                                     success: function(response) {
+                                        console.log(response);
                                         document.getElementById('chats').innerHTML = response;
                                     }
                                 });
@@ -217,7 +221,7 @@
         }
         j.ajax({
             type: "POST",
-            url: "/get_searched_people",
+            url: "/get_searched_people/",
             data: {search: searchTerm, selectedUsers: selectedUsers },
             success: function(response) {
                 userSearchResultsContainer.innerHTML = response;

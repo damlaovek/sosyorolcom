@@ -37,7 +37,10 @@ def getdata(json, field):
 
 @register.filter
 def tolower(txt):
-    lang = UserMeta.objects.filter(user_id = current_uid).filter(meta_key = 'language')[0].meta_value
+    if current_uid:
+        lang = UserMeta.objects.filter(user_id = current_uid).filter(meta_key = 'language')[0].meta_value
+    else:
+        lang = "en-EN"
     if lang == "tr-TR":
         rep = [ ('İ','i'), ('I','ı'), ('Ğ','ğ'),('Ü','ü'), ('Ş','ş'), ('Ö','ö'),('Ç','ç')]
         for search, replace in rep:
@@ -50,7 +53,10 @@ def striphtml(data):
 
 @register.filter
 def toupper(txt):
-    lang = UserMeta.objects.filter(user_id = current_uid).filter(meta_key = 'language')[0].meta_value
+    if current_uid:
+        lang = UserMeta.objects.filter(user_id = current_uid).filter(meta_key = 'language')[0].meta_value
+    else:
+        lang = "en-EN"
     if lang == "tr-TR":
         rep = [ ('İ','i'), ('I','ı'), ('Ğ','ğ'),('Ü','ü'), ('Ş','ş'), ('Ö','ö'),('Ç','ç')]
         for search, replace in rep:

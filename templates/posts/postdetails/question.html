@@ -110,7 +110,9 @@
             </div>
         </div>
         <div>
-            {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=poll.ID %}
+            {% if current_user != None %}
+            {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=question.ID %}
+            {% endif %}
         </div>
         {% if comments.count > 0 %}
             {{comments}}
@@ -125,7 +127,7 @@
         {% endif %}
     </div>
 </div>
-{% if question.isanswered is False %}
+{% if question.isanswered is False and  current_user != None %}
 <div class="bsbb box p20 title fs18" style="margin:0 auto 20px auto;">
     <p class="fs19 fwbold">{{word_list|getword:"answer"|ucwords}}</p>
     <div class="bsbb full-width box m200">

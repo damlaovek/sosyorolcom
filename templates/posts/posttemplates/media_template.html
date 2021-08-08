@@ -3,13 +3,22 @@
     <div class='full-width box answer-template-oc'>
         <div style='width:calc(100% - 20px);padding-bottom:10px;' class='p010'>
             <div style='width:calc(100% - 20px);' class='p010'>
-                <svg width='20px' height='20px' viewBox='0 0 20 20' class='icon absolute hand' style='top:0;right:0;transform: rotate(90deg);'>
-                    <g>
-                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
-                    </g>
-                </svg>
+                <div class='sqr20 icon absolute hand aligntr bringfront' onclick="showMoreOptions(this, {{media.ID}})">
+                    <svg width='20px' height='20px' viewBox='0 0 20 20' class="rotate90">
+                        <g>
+                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                            <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                        </g>
+                    </svg>
+                </div>
+                <ul class="sqr200 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{media.ID}}">
+                    <li class="hand menu-item noselect" onclick="savePost(this, {{media.ID}}, {{current_user.ID}}, '{{csrf_token}}')">{{word_list|getword:"save"|ucfirst}}</li>
+                    {% if current_user.ID == media.author.ID %}
+                        <a href="/u/{{media.author.user_login}}/{{media.hex_id}}/{{media.guid}}/edit" class="cg"><li class="hand menu-item noselect">{{word_list|getword:"edit"|ucfirst}}</li></a>
+                        <li class="hand menu-item noselect" onclick="removePost()">{{word_list|getword:"delete"|ucfirst}}</li>
+                    {% endif %}
+                </ul>
                 <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{word_list|getword:"media"|ucfirst}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{word_list|getword:"recommended-for-you"|ucfirst}}</span></p>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
                     <img src='{{media.author.avatar_url}}' style='width:40px;height:40px;' class='rounded'/>
@@ -129,3 +138,30 @@
         </div>
     </div>
 </div>
+<script>
+    var j = jQuery.noConflict();
+    function showMoreOptions(elem, postID){
+        if (elem.classList.contains("active")){
+            elem.classList.remove("active");
+            document.getElementById("moreoptions"+postID).classList.add("dnone");
+        }else{
+            elem.classList.add("active");
+            document.getElementById("moreoptions"+postID).classList.remove("dnone");
+        }
+    }
+    function savePost(elem, postID, userID, csrf){
+        j.ajax({
+            url:"{% url 'save-the-post' %}",
+            type : "POST", // http method
+            data : { redirect: window.location.href, csrfmiddlewaretoken: csrf, post_id : postID, operation : "save", user_id : userID}, // data sent with the post request
+            // handle a successful response
+            success : function(json) {
+                 // log the returned json to the console
+                console.log("success"); // another sanity check
+            }
+        });
+    }
+    function removePost(){
+
+    }
+</script>

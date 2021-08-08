@@ -12,8 +12,12 @@
                         </g>
                     </svg>
                 </div>
-                <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{post.ID}}">
-                    <li class="hand" onclick="savePost(this, {{post.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
+                <ul class="sqr200 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{post.ID}}">
+                    <li class="hand menu-item noselect" onclick="savePost(this, {{post.ID}}, {{current_user.ID}}, '{{csrf_token}}')">{{word_list|getword:"save"|ucfirst}}</li>
+                    {% if current_user.ID == post.author.ID %}
+                        <a href="/u/{{post.author.user_login}}/{{post.hex_id}}/{{post.guid}}/edit" class="cg"><li class="hand menu-item noselect">{{word_list|getword:"edit"|ucfirst}}</li></a>
+                        <li class="hand menu-item noselect" onclick="removePost()">{{word_list|getword:"delete"|ucfirst}}</li>
+                    {% endif %}
                 </ul>
                 {% if post.post_type == "post" %}
                 <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{word_list|getword:"article"|ucfirst}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{word_list|getword:"recommended-for-you"|ucwords}}</span></p>
@@ -31,15 +35,15 @@
                 {% if post.post_content != "" %}
                     {% if post.preview == 'not-found' %}
                         <div class="full-width answer-more-container hand" id="post-more-container" onclick="document.getElementById('post-template{{post.ID|escapejs}}').style.display='block';this.remove();">
-                            <p class='answer-shorttext hand' id='post-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick='document.getElementById("photo-frame-{{post.ID}}").style.display="none";document.getElementById("post-shorttext{{post.ID}}").style.display="none";document.getElementById("post-template{{post.ID|escapejs}}").style.display="block";this.remove();'>({{word_list|getword:"more"|ucfirst}})</span></p>
+                            <p class='answer-shorttext hand' id='post-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick='document.getElementById("photo-frame-{{post.ID|escapejs}}").style.display="none";document.getElementById("post-shorttext{{post.ID|escapejs}}").style.display="none";document.getElementById("post-template{{post.ID|escapejs}}").style.display="block";this.remove();'>({{word_list|getword:"more"|ucfirst}})</span></p>
                         </div>
                         <div class='answer-template' id='post-template{{post.ID}}'>{% autoescape off %}{{post.post_content}}{% endautoescape %}</div>
                     {% else %}
                         <div class='full-width' class='answer-more-container' id='answer-more-container' style='cursor:pointer;' onclick='this.remove();document.getElementById("answer-template{{post.ID}}").style.display="block";'>
                             {% include 'posts/posttemplates/photo_college.html' %}
-                            <p class='answer-shorttext' id='answer-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick='document.getElementById("answer-img{{post.ID}}").style.display="none";document.getElementById("answer-shorttext{{post.ID}}").style.display="none";document.getElementById("answer-template{{post.ID}}").style.display="block";this.remove();'>({{word_list|getword:"more"|ucfirst}})</span></p>
+                            <p class='answer-shorttext' id='answer-shorttext{{post.ID}}'>{{post.short_content}}&nbsp;<span style='cursor:pointer;' id='answer-more' onclick='document.getElementById("answer-shorttext{{post.ID|escapejs}}").style.display="none";document.getElementById("answer-template{{post.ID|escapejs}}").style.display="block";this.remove();'>({{word_list|getword:"more"|ucfirst}})</span></p>
                         </div>
-                        <div class='answer-template' id='answer-template{{answer.ID}}'>{% autoescape off %}{{post.post_content}}{% endautoescape %}</div>
+                        <div class='answer-template' id='answer-template{{post.ID}}'>{% autoescape off %}{{post.post_content}}{% endautoescape %}</div>
                     {% endif %}
                 {% endif %}
             </div>
@@ -156,5 +160,8 @@
                 console.log("success"); // another sanity check
             }
         });
+    }
+    function removePost(){
+
     }
 </script>

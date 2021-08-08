@@ -166,13 +166,13 @@
                     </div>
                     {% if dark == "dark"  %}
                         <div class="switch__container left">
-                            <input id="switch-shadow" class="switch switch--shadow" type="checkbox" checked>
+                            <input id="switch-shadow" class="switch switch--shadow" type="checkbox" checked  onchange="changemode('{{current_user.ID}}', 'Dark mode', 'Light mode')">
                             <label for="switch-shadow"></label>
                         </div>
                         <p id="mode-text">{{left_menu_dict.darkmode|ucfirst}}</p>
                     {% else %}
                         <div class="switch__container left">
-                            <input id="switch-shadow" class="switch switch--shadow" type="checkbox">
+                            <input id="switch-shadow" class="switch switch--shadow" type="checkbox"  onchange="changemode('{{current_user.ID}}', 'Dark mode', 'Light mode')">
                             <label for="switch-shadow"></label>
                         </div>
                         <p id="mode-text">{{left_menu_dict.lightmode|ucfirst}}</p>

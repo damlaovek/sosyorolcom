@@ -163,7 +163,9 @@
         </div>
         <div id="result-container"></div>
         <div>
-            {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=quiz.ID %}
+            {% if current_user != None %}
+                {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=quiz.ID %}
+            {% endif %}
         </div>
         {% if comments|length > 0 %}
             <div class='comments-wrapper pt10' id='comments-wrapper{{post.ID}}' style="display:block;">

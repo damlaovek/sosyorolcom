@@ -488,3 +488,15 @@ def update_community_followers():
         except:
             f.delete()
 
+def update_followers():
+    all = sm.UserRelation.objects.all()
+    for query in all:
+        try:
+            following = sm.User.objects.get(ID=query.following_id)
+            try:
+                follower = sm.User.objects.get(ID=query.follower_id)
+            except:
+                query.delete()
+        except:
+            query.delete()
+

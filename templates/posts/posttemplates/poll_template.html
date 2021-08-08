@@ -12,8 +12,12 @@
                         </g>
                     </svg>
                 </div>
-                <ul class="sqr200 p10 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{poll.ID}}">
-                    <li class="hand" onclick="savePost(this, {{poll.ID}}, {{current_user.ID}}, '{{csrf_token}}')">Save</li>
+                <ul class="sqr200 box absolute aligntr mt40 bringfront dnone" id="moreoptions{{poll.ID}}">
+                    <li class="hand menu-item noselect" onclick="savePost(this, {{poll.ID}}, {{current_user.ID}}, '{{csrf_token}}')">{{word_list|getword:"save"|ucfirst}}</li>
+                    {% if current_user.ID == poll.author.ID %}
+                        <a href="/u/{{poll.author.user_login}}/{{poll.hex_id}}/{{poll.guid}}/edit" class="cg"><li class="hand menu-item noselect">{{word_list|getword:"edit"|ucfirst}}</li></a>
+                        <li class="hand menu-item noselect" onclick="removePost()">{{word_list|getword:"delete"|ucfirst}}</li>
+                    {% endif %}
                 </ul>
                 <p style='color:var(--gray2);font-size:13px;margin-bottom:10px;'>{{word_list|getword:"poll"|ucfirst}}<span class="hide" style='font-size:10px;margin: 0 4px;'> &#10625; </span><span class="hide fs13">{{word_list|getword:"recommended-for-you"|ucwords}}</span></p>
                 <div  class='full-width inline-flex' style='margin-bottom:10px;'>
@@ -72,14 +76,14 @@
                             </div>
                             <div class="full-width bt"></div>
                             <div class='bsbb full-width p10 inline-flex'>
-                                <div style="position:relative;width:120px; height:38px;">
-                                    <input onclick="votepoll('{{poll.ID}}')" type="submit" class="btn p10 hand blocked" id="votebtn" style="border-radius:4px;" value="{{post_template_dict.vote}}">
+                                <div style="position:relative;height:38px;margin-right: 10px;">
+                                    <input onclick="votepoll('{{poll.ID}}')" type="submit" class="btn p10 hand blocked" id="votebtn" style="border-radius:4px;" value="{{word_list|getword:'vote'|ucfirst}}">
                                     <div class="loader hidden"></div>
                                 </div>
                                 {% if poll.votes|length == 1 %}
-                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;margin-left:20px;'>{{poll.votes|length}} {{post_template_dict.votenoun}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
+                                    <p class="noselect" style='color:var(--gray2);line-height:30px;font-size:13px;'>{{poll.votes|length}} {{word_list|getword:"vote-noun"}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
                                 {% else %}
-                                    <p class="noselect" style='color:var(--gray2);line-height:40px;font-size:13px;margin-left:20px;'>{{poll.votes|length}} {{post_template_dict.votesnoun}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
+                                    <p class="noselect" style='color:var(--gray2);line-height:30px;font-size:13px;'>{{poll.votes|length}} {{word_list|getword:"votes-noun"}}<span style='font-size:10px;margin: 0 4px;'> &#10625; </span>{{poll.poll_duration_left}}</p>
                                 {% endif %}
                             </div>
                         </form>

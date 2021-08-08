@@ -132,7 +132,9 @@
             </div>
         </div>
         <div>
-            {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=link.ID %}
+            {% if current_user != None %}
+                {% include 'posts/comments/comment_editor.html' with parent_id=0 post_id=link.ID %}
+            {% endif %}
         </div>
         {% if comments|length > 0 %}
             <div class='comments-wrapper pt10' id='comments-wrapper{{link.ID}}' style="display:block;">

@@ -5,18 +5,18 @@
     {% if filter == "all" %}
         <a href="/c/{{c.slug}}" title="{{c.name}}" class="full-width">
             <li class="bsbb full-width p1020 bt inline-block right-list-item">
-                <p class="left fwbold lh40" style="width:20px; text-align:right;">{{offset|add:forloop.counter}}</p>
+                <p class="left fwbold lh40 ctitle" style="width:20px; text-align:right;">{{offset|add:forloop.counter}}</p>
                 {% if c.profile_img == '' %}
                     <img class="p5 left sqrt30 rounded img-sd non-draggable ml10" src="{% static 'assets/img/defaults/default-community.png' %}" style="background-color:var(--main-color)"/>
                 {% else %}
                     <img class="p5 left sqrt30 rounded img-sd non-draggable ml10" src="{{c.profile_img}}" style="background-color:{{c.cover_color}}"/>
                 {% endif %}
                 <div class="left ml10">
-                    <p  class="ellipsis underline-onhover lh40 fwbold">c/{{c.name}}</p>
+                    <p  class="ellipsis underline-onhover lh40 fwbold ctitle">c/{{c.name}}</p>
                 </div>
                 {% if forloop.counter|divisibleby:2 %}
                     <div class="pl20 right pt11 inline-flex">
-                        <p class="mr10" style="top:-1px;">2</p>
+                        <p class="mr10 ctitle" style="top:-1px;">2</p>
                         <svg width="16px" height="16px" viewBox="0 0 20 12">
                             <g>
                                 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(19.215686%,90.196078%,16.078431%);fill-opacity:1;" d="M 18.425781 11.746094 L 1.691406 11.746094 C 1.007812 11.746094 0.390625 11.335938 0.128906 10.707031 C -0.132812 10.074219 0.0078125 9.347656 0.492188 8.863281 L 8.863281 0.496094 C 9.179688 0.179688 9.609375 0 10.054688 0 C 10.503906 0 10.933594 0.179688 11.246094 0.496094 L 19.613281 8.863281 C 20.101562 9.34375 20.246094 10.070312 19.984375 10.703125 C 19.726562 11.335938 19.109375 11.746094 18.425781 11.746094 Z M 18.425781 11.746094 "/>
@@ -25,7 +25,7 @@
                     </div>
                 {% else %}
                     <div class="pl20 right pt11 inline-flex">
-                        <p class="mr10" style="top:-1px;">2</p>
+                        <p class="mr10 ctitle" style="top:-1px;">2</p>
                         <svg width="16px" height="16px" viewBox="0 0 20 12">
                             <g>
                                 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,21.960784%,21.960784%);fill-opacity:1;" d="M 1.691406 0 L 18.425781 0 C 19.109375 0 19.722656 0.410156 19.988281 1.039062 C 20.25 1.671875 20.105469 2.398438 19.625 2.882812 L 11.253906 11.25 C 10.9375 11.566406 10.507812 11.746094 10.058594 11.746094 C 9.613281 11.746094 9.183594 11.566406 8.867188 11.25 L 0.5 2.882812 C 0.015625 2.402344 -0.132812 1.675781 0.128906 1.042969 C 0.390625 0.410156 1.007812 0 1.691406 0 Z M 1.691406 0 "/>

@@ -110,7 +110,7 @@
         }
         j.ajax({
             type: "POST",
-            url: "/get_searched_people",
+            url: "/get_searched_people/",
             data: {search: searchTerm, selectedUsers: selectedUsers },
             success: function(response) {
                 userSearchResultsContainerChatPopup.innerHTML = response;
@@ -171,10 +171,8 @@
                 var childKey = childSnapshot.key;
                 var childData = childSnapshot.val();
                 firebase.database().ref('chats/'+childKey).on('value', (snapshot3) => {
-                    console.log("a chat on value");
                     var childData3 = snapshot3.val();
                     firebase.database().ref('chats/'+childKey+'/messages').limitToLast(1).on('value', (snapshot2) => {
-                        console.log("a chat messages on value");
                         snapshot2.forEach((childSnapshot2) => {
                             var childData2 = childSnapshot2.val();
                             var chRef = firebase.database().ref("chats");
@@ -195,18 +193,16 @@
                             if(!found){
                                 objects[index] = singleObj;
                             }
-                            if(index == snapshot.numChildren()){
-                                console.log(index);
+                            if(index == snapshot.numChildren() - 1){
                                 j.ajax({
                                     type: "POST",
-                                    url: "/get_chat_popup_item",
+                                    url: "/get_chat_popup_item/",
                                     data: {chats: JSON.stringify(objects)},
                                     success: function(response) {
                                         document.getElementById('chats_list_popup').innerHTML = response;
                                     }
                                 });
                             }else{
-                                console.log(index);
                                 index += 1;
                             }
                         });
@@ -390,7 +386,7 @@
                                 if(index == snapshot2.numChildren()){
                                     j.ajax({
                                         type: "POST",
-                                        url: "/getchatpopupbox",
+                                        url: "/getchatpopupbox/",
                                         data: {chat: JSON.stringify({ID: chatData.ID, users: chatData.users, messages: messages })},
                                         success: function(response) {
                                             document.getElementById("chat_box_popup"+chatId).innerHTML = response;
@@ -545,7 +541,7 @@
                         if(index == snapshot2.numChildren()){
                             j.ajax({
                                 type: "POST",
-                                url: "/getchatpopupbox",
+                                url: "/getchatpopupbox/",
                                 data: {chat: JSON.stringify({ID: chatData.ID, users: chatData.users, messages: messages })},
                                 success: function(response) {
                                     var elems = document.getElementById('chat_box_popup_container').getElementsByClassName("chat_box_item_popup");

@@ -13,7 +13,7 @@
         <script src="{% static 'js/index.js' %}"></script>
         <script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/jquery.textfill.js'></script>
         <style>
-            .box{box-shadow:0px 3px 4px rgba(173,173,173, 0.53);}
+            .box{box-shadow:0px 3px 8px rgba(223,223,223, 0.53);}
             .box .box{box-shadow:none;}
             .lst-item{padding:10px 0 15px 0;}
             .lst-item:hover{border-bottom:5px solid var(--main-color);padding-bottom:10px; color:var(--main-color);}
@@ -343,7 +343,7 @@
                                 document.getElementById("loader").classList.remove("dnone");
                                 var filter = document.getElementById("filter").value;
                                 j.ajax({
-                                    url:"{% url 'loadmorecommunityposts' %}",
+                                    url:"/loadmorecommunityposts/",
                                     type : "POST", // http method
                                     data : { limit: limit, offset: offset + limit, term_id: '{{community.term_id}}', filter: filter}, // data sent with the post request
                                     // handle a successful response
@@ -351,13 +351,13 @@
                                         // log the returned json to the console
                                         //console.log(json); // another sanity check
                                         document.getElementById("posts").innerHTML += json;
+                                        offset += limit;
                                         if (document.getElementById("has-more-"+offset).value == false || document.getElementById("has-more-"+offset).value == "False"){
                                             hasMore = false;
                                         }
-                                        offset += limit;
                                         isLoading = false;
                                         document.getElementById("loader").classList.add("dnone");
-                                    }
+                                    },
                                 });   
                             }
                         }

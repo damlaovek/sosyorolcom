@@ -1,0 +1,178 @@
+{% load static %}
+{% load index %}
+{% include 'includes/general/head.html' %}
+        <title>Sosyorol - Sosyal İçerik Platformu</title>
+        <link rel="stylesheet" href="{% static 'css/left-menu-v2.css' %}">
+        <link rel="stylesheet" href="{% static 'css/right-menu-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/feed-v42.css' %}">
+        <link rel="stylesheet" href="{% static 'css/answer-template-v9.css' %}">
+        <link rel="stylesheet" href="{% static 'css/comments-v1.css' %}">
+        <link rel="stylesheet" href="{% static 'css/submit-v23.css' %}">
+        <script src="{% static 'js/new/autosize.min.js' %}"></script>
+        <script src="{% static 'js/new/user-list.min.js' %}"></script>
+        <script src="{% static 'js/index.js' %}"></script>
+        <script src="{% static 'js/sosyorol.min.js' %}"></script>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+        <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script>
+
+        <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyA9jeHII9FVkhOQfCM_NyoifnN8eIN6EFM",
+            authDomain: "sosyorol-b6ab6.firebaseapp.com",
+            databaseURL: "https://sosyorol-b6ab6.firebaseio.com",
+            projectId: "sosyorol-b6ab6",
+            storageBucket: "sosyorol-b6ab6.appspot.com",
+            messagingSenderId: "565098272319",
+            appId: "1:565098272319:web:5105dd611ce14cf98c8a8a",
+            measurementId: "G-18ZNPD8JH4"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+        </script>
+    </head>
+    <body class="{{darkmode}}">
+        {% include 'includes/general/header.html' %}
+        {% include 'includes/general/lang_popup.html' %}
+        <div class="full-width inline-flex">
+            {% include 'includes/general/left_menu.html' %}
+            <style>
+                .box{box-shadow:0px 3px 4px rgba(173,173,173, 0.53);}
+                .box .box{box-shadow:none;}
+            </style>
+            <script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/jquery.textfill.js'></script>
+            <div class="section-middle" style="margin-top:58px;">
+                <div class="hcentered" style="max-width: 893px;">
+                    <div class="filter-options">
+                        <div class="bsbb full-width box bcw">
+                            <div class="bsbb full-width p200">
+                                <div class='p020'>
+                                    <div class='full-width inline-block'>
+                                        <a href='/u/{{comment.comment_post.author.user_login}}' class='left'><img src='{{comment.comment_post.author.avatar_url}}' class='sqr40 rounded'/></a>
+                                        <div class='ml10 left w50'>
+                                            <a href='/u/{{comment.comment_post.author.user_login}}'><p class='ctitle  lh20 underline-on-hover'>{{comment.comment_post.author.display_name}}</p></a>
+                                            <p class='cg2 lh20 fs13'>{{comment.comment_post.post_date}}</p>
+                                        </div>
+                                    </div>
+                                    <a href="/u/{{comment.comment_post.author.user_login}}/{{comment.comment_post.hex_id}}/{{comment.comment_post.guid}}"><p class="bsbb fwbold underline-on-hover mt15 full-width">{{comment.comment_post.post_title}}</p></a>
+                                    <p class='lh20 fs14 ctext mt10'>{{comment.comment_content}}</p>
+                                </div>
+                                <div class='inline-block p50 m010 w20'>
+                                    <div class='icon left rotateY180' onclick="toggleCommentEditor({{comment.comment_ID}})">
+                                        <svg width='20px' height='20px' viewBox='0 0 20 20'>
+                                            <g>
+                                                <path style='stroke-width:0.5;stroke:var(--gray2);fill-rule:nonzero;fill-opacity:1;' d='M 0.664062 18.40625 C 0.671875 18.40625 0.675781 18.40625 0.683594 18.40625 C 1 18.394531 1.199219 18.148438 1.226562 17.832031 C 1.25 17.601562 1.871094 11.992188 10.625 12 L 10.644531 15.585938 C 10.644531 15.828125 10.785156 16.046875 11.003906 16.148438 C 11.21875 16.253906 11.480469 16.222656 11.667969 16.066406 L 19.773438 9.351562 C 19.917969 9.234375 20 9.054688 20 8.871094 C 20 8.683594 19.914062 8.503906 19.769531 8.386719 L 11.664062 1.734375 C 11.480469 1.582031 11.21875 1.554688 11.003906 1.65625 C 10.785156 1.757812 10.644531 1.976562 10.644531 2.21875 L 10.628906 5.726562 C 6.996094 5.84375 4.183594 7.011719 2.359375 9.144531 C -0.609375 12.617188 0.0546875 17.664062 0.0820312 17.875 C 0.128906 18.179688 0.355469 18.40625 0.664062 18.40625 Z M 11.269531 10.738281 C 5.015625 10.742188 2.625 12.855469 1.261719 14.71875 C 1.460938 13.222656 2.042969 11.425781 3.3125 9.953125 C 4.996094 7.996094 7.714844 6.96875 11.269531 6.96875 C 11.617188 6.96875 11.894531 6.6875 11.894531 6.34375 L 11.894531 3.535156 L 18.390625 8.875 L 11.894531 14.261719 L 11.894531 11.363281 C 11.894531 11.195312 11.828125 11.039062 11.710938 10.921875 C 11.59375 10.804688 11.4375 10.738281 11.269531 10.738281 Z M 11.269531 10.738281'/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    <div class='icon left' onclick='upvote(".$index.$index2.");'>
+                                        <svg width='20px' height='20px' id='upvote".$index.$index2."' class='upvote' viewBox='0 0 20 20' style='transform: rotate(180deg);'>
+                                            <g>
+                                                <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    <p class='vote noselect' id='vote".$index.$index2."'>1</p>
+                                    <div class='left icon ml5' onclick='downvote(".$index.$index2.");'>
+                                        <svg width='20px' height='20px' viewBox='0 0 20 20' id='downvote".$index.$index2."' class='downvote'>
+                                            <g id='surface1'>
+                                                <path style='stroke:none;fill-rule:nonzero;fill-opacity:1;' d='M 3.917969 11.488281 L 10 17.578125 L 16.082031 11.492188 L 13.375 11.492188 C 12.9375 11.492188 12.582031 11.136719 12.582031 10.699219 L 12.582031 2.019531 L 7.21875 2.019531 L 7.21875 10.695312 C 7.21875 11.132812 6.863281 11.488281 6.425781 11.488281 Z M 9.4375 19.261719 L 1.445312 11.257812 C 1.21875 11.03125 1.152344 10.6875 1.273438 10.390625 C 1.394531 10.09375 1.683594 9.898438 2.007812 9.898438 L 5.636719 9.898438 L 5.636719 1.222656 C 5.636719 0.785156 5.992188 0.429688 6.429688 0.429688 L 13.378906 0.429688 C 13.816406 0.429688 14.171875 0.785156 14.171875 1.222656 L 14.171875 9.898438 L 18 9.898438 C 18.320312 9.898438 18.609375 10.09375 18.734375 10.390625 C 18.855469 10.6875 18.789062 11.027344 18.5625 11.257812 L 10.5625 19.261719 C 10.152344 19.667969 9.851562 19.675781 9.4375 19.261719 Z M 9.4375 19.261719 '/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    <div class='right icon'>
+                                        <svg width='20px' height='20px' viewBox='0 0 20 20' class='rotate90'>
+                                            <g>
+                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12 " transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437" transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                </div>
+                                {% if comment.child_comments|length > 0 %}
+                                    <div class="hand cb p1020 underline-on-hover" onclick="showChildComments(this, {{comment.comment_ID}})">{{word_list|getword:"view-replies"|ucwords}}</div>
+                                {% endif %}
+                                <div class="comment-editor-wrapper dnone" id="comment-editor-wrapper{{comment.comment_ID}}">
+                                    {% include 'posts/comments/comment_editor.html' with parent_id=comment.comment_ID post_id=post.ID %}
+                                </div>
+                                {% if comment.child_comments|length > 0 %}
+                                <div class="dnone" id="child-comments-wrapper{{comment.comment_ID}}">
+                                {% else %}
+                                <div id="child-comments-wrapper{{comment.comment_ID}}">
+                                {% endif %}
+                                    {% include 'posts/comments/comment_list.html' with comments=comment.child_comments padding=20 %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if ref == "notif" %}
+                {% include 'includes/general/notifications-menu.html' %}
+            {% else %}
+            <div class="section-right fixed" id="section-right">
+                <div class="full-shadow-border section-right-top">
+                    <div class="absolute aligntl bb full-width mt40"></div>
+                    <div class="inline-block full-width" style="margin-top:-10px;">
+                        <p class="fwblack fs19 lh40">{{word_list|getword:"comment_owner"}}</p>
+                        <svg viewBox="0 0 20 20" id="profile-more-actions" class="absolute icon hand right" onclick="showHide2('profile-more-submenu');">
+                            <g>
+                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 12 C 12.998437 12.553125 12.553125 12.998437 12 12.998437 C 11.446875 12.998437 11.001563 12.553125 11.001563 12 C 11.001563 11.446875 11.446875 11.001563 12 11.001563 C 12.553125 11.001563 12.998437 11.446875 12.998437 12 Z M 12.998437 12 " transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 5.001562 C 12.998437 5.55 12.553125 6 12 6 C 11.446875 6 11.001563 5.55 11.001563 5.001562 C 11.001563 4.448437 11.446875 3.998437 12 3.998437 C 12.553125 3.998437 12.998437 4.448437 12.998437 5.001562 Z M 12.998437 5.001562 " transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                                <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 12.998437 18.998437 C 12.998437 19.551562 12.553125 20.001562 12 20.001562 C 11.446875 20.001562 11.001563 19.551562 11.001563 18.998437 C 11.001563 18.45 11.446875 18 12 18 C 12.553125 18 12.998437 18.45 12.998437 18.998437 Z M 12.998437 18.998437 " transform="matrix(0.833333,0,0,0.833333,0,0)"/>
+                            </g>
+                        </svg>
+                        <div class="absolute full-shadow-border" id="profile-more-submenu">
+                            <a href="/u/{{comment.user.user_login}}" class="inline-flex" id="profile-link">
+                                <svg width="14pt" height="14pt" viewBox="0 0 14 14">
+                                    <g>
+                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 1.004286 11.997149 C 1.004286 11.997149 5.001074 3.996788 11.997149 3.996788 C 19.00001 3.996788 22.996797 11.997149 22.996797 11.997149 C 22.996797 11.997149 19.00001 20.004296 11.997149 20.004296 C 5.001074 20.004296 1.004286 11.997149 1.004286 11.997149 Z M 1.004286 11.997149 " transform="matrix(0.575658,0,0,0.575658,0,0)"/>
+                                        <path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;" d="M 15.003222 11.997149 C 15.003222 13.652864 13.652864 15.003222 11.997149 15.003222 C 10.34822 15.003222 8.997862 13.652864 8.997862 11.997149 C 8.997862 10.34822 10.34822 8.997862 11.997149 8.997862 C 13.652864 8.997862 15.003222 10.34822 15.003222 11.997149 Z M 15.003222 11.997149 " transform="matrix(0.575658,0,0,0.575658,0,0)"/>
+                                    </g>
+                                </svg>
+                                <p id="viewPRofile" class="ml10 noselect">{{word_list|getword:"go-to-profile"|ucwords}}</p>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="inline-block full-width" id="user-profile-c">
+                        <img class="non-draggable rounded left sqr40 cover" src="{{comment.user.avatar_url}}"/>
+                        <div class="left" id="user-profile-ic">
+                            <p class="ellipsis">{{comment.user.display_name}}</p>
+                            <a href=""><p class="ellipsis">u/{{comment.user.user_login}}</p></a>
+                        </div>
+                    </div>
+                    <p id="user-bio" class="mt10">{{comment.user.description}}</p>
+                    {% if current_user.ID != comment.user.ID %}
+                        {% if current_user.followings|isfollowing:comment.user %}
+                            <p class="btn full-width hand noselect fwbold" id="cp-btn" style="font-weight: bold;" onclick="return unfollow(this,'{{current_user.ID}}','{{post.author.ID}}', '{{followtxt|ucwords}}', '{{current_user.ID}}','{{post.author.ID}}');">{{word_list|getword:"following"|ucwords}}</p>
+                        {% else %}
+                            <p class="btn full-width hand noselect fwbold" id="cp-btn" style="font-weight: bold;" onclick="return follow(this,'{{current_user.ID}}','{{post.author.ID}}', '{{followingtxt|ucwords}}', '{{current_user.ID}}','{{post.author.ID}}');">{{word_list|getword:"follow"|ucwords}}</p>
+                        {% endif %}
+                    {% endif %}
+                    <p class="p100 cg2"><span class="fwbold">{{word_list|getword:"joined"|ucfirst}}:</span> {{comment.user.user_registered}}</p>
+                </div>
+                <div  class="full-shadow-border section-right-bottom">
+                    <div class="bsbb inline-block full-width p1020">
+                        <p class="fwblack fs19 left">{% autoescape off %}{{more_from_content_owner}}{% endautoescape %}</p>
+                    </div>
+                    <ul class="full-width">
+                        {% for op in other_comments %}
+                            <a href="/u/{{op.user.user_login}}/comments/{{op.hex_id}}" title="{{c.name}}" class="full-width">
+                                <li class="bsbb full-width p1020 bt inline-block right-list-item">
+                                    <p class="underline-on-hover fs15 noselect">{{op.comment_content}}</p>
+                                </li>
+                            </a>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </body>
+</html>
